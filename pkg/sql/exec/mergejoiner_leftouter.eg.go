@@ -67321,18 +67321,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67376,18 +67387,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
 									outCol.Set(outStartIdx, v)
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol.Get(int(sel[i+o.builderState.right.curSrcStartIdx]))
-										outCol.Set(i+outStartIdx, v)
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67431,18 +67453,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx].Set(&v)
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx].Set(&v)
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67486,18 +67519,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67541,18 +67585,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67596,18 +67651,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67651,18 +67717,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67706,18 +67783,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67761,18 +67849,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().ExtendWithSel(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend), sel)
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67822,17 +67921,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67876,17 +67984,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
 									outCol.Set(outStartIdx, v)
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol.Get(int(sel[i+o.builderState.right.curSrcStartIdx]))
-										outCol.Set(i+outStartIdx, v)
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67930,17 +68047,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx].Set(&v)
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx].Set(&v)
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -67984,17 +68110,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68038,17 +68173,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68092,17 +68236,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68146,17 +68299,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68200,17 +68362,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68254,17 +68425,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
 									outCol[outStartIdx] = v
 								} else {
-									for i := 0; i < toAppend; i++ {
-										v := srcCol[int(sel[i+o.builderState.right.curSrcStartIdx])]
-										outCol[i+outStartIdx] = v
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68316,15 +68496,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68368,15 +68562,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
 									outCol.Set(outStartIdx, v)
 								} else {
-									outCol.CopySlice(srcCol, outStartIdx, o.builderState.right.curSrcStartIdx, o.builderState.right.curSrcStartIdx+toAppend)
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68420,21 +68628,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx].Set(&v)
 								} else {
-									{
-										__tgt_slice := outCol[outStartIdx:]
-										__src_slice := srcCol[o.builderState.right.curSrcStartIdx : o.builderState.right.curSrcStartIdx+toAppend]
-										for __i := range __src_slice {
-											__tgt_slice[__i].Set(&__src_slice[__i])
-										}
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68478,15 +68694,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68530,15 +68760,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68582,15 +68826,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68634,15 +68892,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68686,15 +68958,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68738,15 +69024,29 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-								out.Nulls().Extend(src.Nulls(), uint64(outStartIdx), uint16(o.builderState.right.curSrcStartIdx), uint16(toAppend))
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
+									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+										out.Nulls().SetNull(uint16(outStartIdx))
+									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68796,14 +69096,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68847,14 +69159,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
 									outCol.Set(outStartIdx, v)
 								} else {
-									outCol.CopySlice(srcCol, outStartIdx, o.builderState.right.curSrcStartIdx, o.builderState.right.curSrcStartIdx+toAppend)
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68898,20 +69222,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx].Set(&v)
 								} else {
-									{
-										__tgt_slice := outCol[outStartIdx:]
-										__src_slice := srcCol[o.builderState.right.curSrcStartIdx : o.builderState.right.curSrcStartIdx+toAppend]
-										for __i := range __src_slice {
-											__tgt_slice[__i].Set(&__src_slice[__i])
-										}
-									}
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -68955,14 +69285,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -69006,14 +69348,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -69057,14 +69411,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -69108,14 +69474,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -69159,14 +69537,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
@@ -69210,14 +69600,26 @@ RightColLoop:
 							if rightGroup.nullGroup {
 								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 							} else {
-
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
+									// TODO(yuzefovich): think about making execgen.SET set both the
+									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
 									outCol[outStartIdx] = v
 								} else {
-									copy(outCol[outStartIdx:], srcCol[o.builderState.right.curSrcStartIdx:o.builderState.right.curSrcStartIdx+toAppend])
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												ColType:     colType,
+												Src:         src,
+												Sel:         sel,
+												DestIdx:     uint64(outStartIdx),
+												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+											},
+										},
+									)
 								}
 							}
 
