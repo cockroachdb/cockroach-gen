@@ -18,12 +18,8 @@ import (
 )
 
 type projEQBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projEQBoolBoolConstOp) EstimateStaticMemoryUsage() int {
@@ -98,12 +94,8 @@ func (p projEQBoolBoolConstOp) Init() {
 }
 
 type projEQBoolConstBoolOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projEQBoolConstBoolOp) EstimateStaticMemoryUsage() int {
@@ -178,12 +170,7 @@ func (p projEQBoolConstBoolOp) Init() {
 }
 
 type projEQBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQBoolBoolOp) EstimateStaticMemoryUsage() int {
@@ -230,7 +217,7 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -262,12 +249,8 @@ func (p projEQBoolBoolOp) Init() {
 }
 
 type projNEBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projNEBoolBoolConstOp) EstimateStaticMemoryUsage() int {
@@ -342,12 +325,8 @@ func (p projNEBoolBoolConstOp) Init() {
 }
 
 type projNEBoolConstBoolOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projNEBoolConstBoolOp) EstimateStaticMemoryUsage() int {
@@ -422,12 +401,7 @@ func (p projNEBoolConstBoolOp) Init() {
 }
 
 type projNEBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEBoolBoolOp) EstimateStaticMemoryUsage() int {
@@ -474,7 +448,7 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -506,12 +480,8 @@ func (p projNEBoolBoolOp) Init() {
 }
 
 type projLTBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projLTBoolBoolConstOp) EstimateStaticMemoryUsage() int {
@@ -586,12 +556,8 @@ func (p projLTBoolBoolConstOp) Init() {
 }
 
 type projLTBoolConstBoolOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projLTBoolConstBoolOp) EstimateStaticMemoryUsage() int {
@@ -666,12 +632,7 @@ func (p projLTBoolConstBoolOp) Init() {
 }
 
 type projLTBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTBoolBoolOp) EstimateStaticMemoryUsage() int {
@@ -718,7 +679,7 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -750,12 +711,8 @@ func (p projLTBoolBoolOp) Init() {
 }
 
 type projLEBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projLEBoolBoolConstOp) EstimateStaticMemoryUsage() int {
@@ -830,12 +787,8 @@ func (p projLEBoolBoolConstOp) Init() {
 }
 
 type projLEBoolConstBoolOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projLEBoolConstBoolOp) EstimateStaticMemoryUsage() int {
@@ -910,12 +863,7 @@ func (p projLEBoolConstBoolOp) Init() {
 }
 
 type projLEBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEBoolBoolOp) EstimateStaticMemoryUsage() int {
@@ -962,7 +910,7 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -994,12 +942,8 @@ func (p projLEBoolBoolOp) Init() {
 }
 
 type projGTBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projGTBoolBoolConstOp) EstimateStaticMemoryUsage() int {
@@ -1074,12 +1018,8 @@ func (p projGTBoolBoolConstOp) Init() {
 }
 
 type projGTBoolConstBoolOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projGTBoolConstBoolOp) EstimateStaticMemoryUsage() int {
@@ -1154,12 +1094,7 @@ func (p projGTBoolConstBoolOp) Init() {
 }
 
 type projGTBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTBoolBoolOp) EstimateStaticMemoryUsage() int {
@@ -1206,7 +1141,7 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -1238,12 +1173,8 @@ func (p projGTBoolBoolOp) Init() {
 }
 
 type projGEBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projGEBoolBoolConstOp) EstimateStaticMemoryUsage() int {
@@ -1318,12 +1249,8 @@ func (p projGEBoolBoolConstOp) Init() {
 }
 
 type projGEBoolConstBoolOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg bool
-
-	outputIdx int
 }
 
 func (p projGEBoolConstBoolOp) EstimateStaticMemoryUsage() int {
@@ -1398,12 +1325,7 @@ func (p projGEBoolConstBoolOp) Init() {
 }
 
 type projGEBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEBoolBoolOp) EstimateStaticMemoryUsage() int {
@@ -1450,7 +1372,7 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -1482,12 +1404,8 @@ func (p projGEBoolBoolOp) Init() {
 }
 
 type projEQBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projEQBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -1546,12 +1464,8 @@ func (p projEQBytesBytesConstOp) Init() {
 }
 
 type projEQBytesConstBytesOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projEQBytesConstBytesOp) EstimateStaticMemoryUsage() int {
@@ -1610,12 +1524,7 @@ func (p projEQBytesConstBytesOp) Init() {
 }
 
 type projEQBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQBytesBytesOp) EstimateStaticMemoryUsage() int {
@@ -1654,7 +1563,7 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1.Slice(0, int(n))
 		colLen := col1.Len()
 		_ = projCol[colLen-1]
-		_ = col2.Slice(0, colLen-1)
+		_ = col2.Get(colLen - 1)
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
@@ -1678,12 +1587,8 @@ func (p projEQBytesBytesOp) Init() {
 }
 
 type projNEBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projNEBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -1742,12 +1647,8 @@ func (p projNEBytesBytesConstOp) Init() {
 }
 
 type projNEBytesConstBytesOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projNEBytesConstBytesOp) EstimateStaticMemoryUsage() int {
@@ -1806,12 +1707,7 @@ func (p projNEBytesConstBytesOp) Init() {
 }
 
 type projNEBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEBytesBytesOp) EstimateStaticMemoryUsage() int {
@@ -1850,7 +1746,7 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1.Slice(0, int(n))
 		colLen := col1.Len()
 		_ = projCol[colLen-1]
-		_ = col2.Slice(0, colLen-1)
+		_ = col2.Get(colLen - 1)
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
@@ -1874,12 +1770,8 @@ func (p projNEBytesBytesOp) Init() {
 }
 
 type projLTBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projLTBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -1938,12 +1830,8 @@ func (p projLTBytesBytesConstOp) Init() {
 }
 
 type projLTBytesConstBytesOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projLTBytesConstBytesOp) EstimateStaticMemoryUsage() int {
@@ -2002,12 +1890,7 @@ func (p projLTBytesConstBytesOp) Init() {
 }
 
 type projLTBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTBytesBytesOp) EstimateStaticMemoryUsage() int {
@@ -2046,7 +1929,7 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1.Slice(0, int(n))
 		colLen := col1.Len()
 		_ = projCol[colLen-1]
-		_ = col2.Slice(0, colLen-1)
+		_ = col2.Get(colLen - 1)
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
@@ -2070,12 +1953,8 @@ func (p projLTBytesBytesOp) Init() {
 }
 
 type projLEBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projLEBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -2134,12 +2013,8 @@ func (p projLEBytesBytesConstOp) Init() {
 }
 
 type projLEBytesConstBytesOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projLEBytesConstBytesOp) EstimateStaticMemoryUsage() int {
@@ -2198,12 +2073,7 @@ func (p projLEBytesConstBytesOp) Init() {
 }
 
 type projLEBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEBytesBytesOp) EstimateStaticMemoryUsage() int {
@@ -2242,7 +2112,7 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1.Slice(0, int(n))
 		colLen := col1.Len()
 		_ = projCol[colLen-1]
-		_ = col2.Slice(0, colLen-1)
+		_ = col2.Get(colLen - 1)
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
@@ -2266,12 +2136,8 @@ func (p projLEBytesBytesOp) Init() {
 }
 
 type projGTBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projGTBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -2330,12 +2196,8 @@ func (p projGTBytesBytesConstOp) Init() {
 }
 
 type projGTBytesConstBytesOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projGTBytesConstBytesOp) EstimateStaticMemoryUsage() int {
@@ -2394,12 +2256,7 @@ func (p projGTBytesConstBytesOp) Init() {
 }
 
 type projGTBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTBytesBytesOp) EstimateStaticMemoryUsage() int {
@@ -2438,7 +2295,7 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1.Slice(0, int(n))
 		colLen := col1.Len()
 		_ = projCol[colLen-1]
-		_ = col2.Slice(0, colLen-1)
+		_ = col2.Get(colLen - 1)
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
@@ -2462,12 +2319,8 @@ func (p projGTBytesBytesOp) Init() {
 }
 
 type projGEBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projGEBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -2526,12 +2379,8 @@ func (p projGEBytesBytesConstOp) Init() {
 }
 
 type projGEBytesConstBytesOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projGEBytesConstBytesOp) EstimateStaticMemoryUsage() int {
@@ -2590,12 +2439,7 @@ func (p projGEBytesConstBytesOp) Init() {
 }
 
 type projGEBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEBytesBytesOp) EstimateStaticMemoryUsage() int {
@@ -2634,7 +2478,7 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1.Slice(0, int(n))
 		colLen := col1.Len()
 		_ = projCol[colLen-1]
-		_ = col2.Slice(0, colLen-1)
+		_ = col2.Get(colLen - 1)
 		for i := 0; i < col1.Len(); i++ {
 			arg1 := col1.Get(i)
 			arg2 := col2.Get(i)
@@ -2658,12 +2502,8 @@ func (p projGEBytesBytesOp) Init() {
 }
 
 type projPlusDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -2714,12 +2554,8 @@ func (p projPlusDecimalDecimalConstOp) Init() {
 }
 
 type projPlusDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -2770,12 +2606,7 @@ func (p projPlusDecimalConstDecimalOp) Init() {
 }
 
 type projPlusDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -2810,7 +2641,7 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -2830,12 +2661,8 @@ func (p projPlusDecimalDecimalOp) Init() {
 }
 
 type projMinusDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -2886,12 +2713,8 @@ func (p projMinusDecimalDecimalConstOp) Init() {
 }
 
 type projMinusDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -2942,12 +2765,7 @@ func (p projMinusDecimalConstDecimalOp) Init() {
 }
 
 type projMinusDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -2982,7 +2800,7 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -3002,12 +2820,8 @@ func (p projMinusDecimalDecimalOp) Init() {
 }
 
 type projMultDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -3058,12 +2872,8 @@ func (p projMultDecimalDecimalConstOp) Init() {
 }
 
 type projMultDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3114,12 +2924,7 @@ func (p projMultDecimalConstDecimalOp) Init() {
 }
 
 type projMultDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3154,7 +2959,7 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -3174,12 +2979,8 @@ func (p projMultDecimalDecimalOp) Init() {
 }
 
 type projDivDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -3246,12 +3047,8 @@ func (p projDivDecimalDecimalConstOp) Init() {
 }
 
 type projDivDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3318,12 +3115,7 @@ func (p projDivDecimalConstDecimalOp) Init() {
 }
 
 type projDivDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3366,7 +3158,7 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -3394,12 +3186,8 @@ func (p projDivDecimalDecimalOp) Init() {
 }
 
 type projEQDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -3458,12 +3246,8 @@ func (p projEQDecimalDecimalConstOp) Init() {
 }
 
 type projEQDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3522,12 +3306,7 @@ func (p projEQDecimalConstDecimalOp) Init() {
 }
 
 type projEQDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3566,7 +3345,7 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -3590,12 +3369,8 @@ func (p projEQDecimalDecimalOp) Init() {
 }
 
 type projNEDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -3654,12 +3429,8 @@ func (p projNEDecimalDecimalConstOp) Init() {
 }
 
 type projNEDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3718,12 +3489,7 @@ func (p projNEDecimalConstDecimalOp) Init() {
 }
 
 type projNEDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3762,7 +3528,7 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -3786,12 +3552,8 @@ func (p projNEDecimalDecimalOp) Init() {
 }
 
 type projLTDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -3850,12 +3612,8 @@ func (p projLTDecimalDecimalConstOp) Init() {
 }
 
 type projLTDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3914,12 +3672,7 @@ func (p projLTDecimalConstDecimalOp) Init() {
 }
 
 type projLTDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -3958,7 +3711,7 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -3982,12 +3735,8 @@ func (p projLTDecimalDecimalOp) Init() {
 }
 
 type projLEDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -4046,12 +3795,8 @@ func (p projLEDecimalDecimalConstOp) Init() {
 }
 
 type projLEDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -4110,12 +3855,7 @@ func (p projLEDecimalConstDecimalOp) Init() {
 }
 
 type projLEDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -4154,7 +3894,7 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -4178,12 +3918,8 @@ func (p projLEDecimalDecimalOp) Init() {
 }
 
 type projGTDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -4242,12 +3978,8 @@ func (p projGTDecimalDecimalConstOp) Init() {
 }
 
 type projGTDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -4306,12 +4038,7 @@ func (p projGTDecimalConstDecimalOp) Init() {
 }
 
 type projGTDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -4350,7 +4077,7 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -4374,12 +4101,8 @@ func (p projGTDecimalDecimalOp) Init() {
 }
 
 type projGEDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -4438,12 +4161,8 @@ func (p projGEDecimalDecimalConstOp) Init() {
 }
 
 type projGEDecimalConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -4502,12 +4221,7 @@ func (p projGEDecimalConstDecimalOp) Init() {
 }
 
 type projGEDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
@@ -4546,7 +4260,7 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -4570,12 +4284,8 @@ func (p projGEDecimalDecimalOp) Init() {
 }
 
 type projPlusDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -4640,12 +4350,8 @@ func (p projPlusDecimalInt8ConstOp) Init() {
 }
 
 type projPlusDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -4710,12 +4416,7 @@ func (p projPlusDecimalConstInt8Op) Init() {
 }
 
 type projPlusDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -4757,7 +4458,7 @@ func (p projPlusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -4784,12 +4485,8 @@ func (p projPlusDecimalInt8Op) Init() {
 }
 
 type projMinusDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -4854,12 +4551,8 @@ func (p projMinusDecimalInt8ConstOp) Init() {
 }
 
 type projMinusDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -4924,12 +4617,7 @@ func (p projMinusDecimalConstInt8Op) Init() {
 }
 
 type projMinusDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -4971,7 +4659,7 @@ func (p projMinusDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -4998,12 +4686,8 @@ func (p projMinusDecimalInt8Op) Init() {
 }
 
 type projMultDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -5068,12 +4752,8 @@ func (p projMultDecimalInt8ConstOp) Init() {
 }
 
 type projMultDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -5138,12 +4818,7 @@ func (p projMultDecimalConstInt8Op) Init() {
 }
 
 type projMultDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -5185,7 +4860,7 @@ func (p projMultDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -5212,12 +4887,8 @@ func (p projMultDecimalInt8Op) Init() {
 }
 
 type projDivDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -5290,12 +4961,8 @@ func (p projDivDecimalInt8ConstOp) Init() {
 }
 
 type projDivDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -5368,12 +5035,7 @@ func (p projDivDecimalConstInt8Op) Init() {
 }
 
 type projDivDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -5419,7 +5081,7 @@ func (p projDivDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -5450,12 +5112,8 @@ func (p projDivDecimalInt8Op) Init() {
 }
 
 type projEQDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -5526,12 +5184,8 @@ func (p projEQDecimalInt8ConstOp) Init() {
 }
 
 type projEQDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -5602,12 +5256,7 @@ func (p projEQDecimalConstInt8Op) Init() {
 }
 
 type projEQDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -5652,7 +5301,7 @@ func (p projEQDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -5682,12 +5331,8 @@ func (p projEQDecimalInt8Op) Init() {
 }
 
 type projNEDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -5758,12 +5403,8 @@ func (p projNEDecimalInt8ConstOp) Init() {
 }
 
 type projNEDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -5834,12 +5475,7 @@ func (p projNEDecimalConstInt8Op) Init() {
 }
 
 type projNEDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -5884,7 +5520,7 @@ func (p projNEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -5914,12 +5550,8 @@ func (p projNEDecimalInt8Op) Init() {
 }
 
 type projLTDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -5990,12 +5622,8 @@ func (p projLTDecimalInt8ConstOp) Init() {
 }
 
 type projLTDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -6066,12 +5694,7 @@ func (p projLTDecimalConstInt8Op) Init() {
 }
 
 type projLTDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -6116,7 +5739,7 @@ func (p projLTDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -6146,12 +5769,8 @@ func (p projLTDecimalInt8Op) Init() {
 }
 
 type projLEDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -6222,12 +5841,8 @@ func (p projLEDecimalInt8ConstOp) Init() {
 }
 
 type projLEDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -6298,12 +5913,7 @@ func (p projLEDecimalConstInt8Op) Init() {
 }
 
 type projLEDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -6348,7 +5958,7 @@ func (p projLEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -6378,12 +5988,8 @@ func (p projLEDecimalInt8Op) Init() {
 }
 
 type projGTDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -6454,12 +6060,8 @@ func (p projGTDecimalInt8ConstOp) Init() {
 }
 
 type projGTDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -6530,12 +6132,7 @@ func (p projGTDecimalConstInt8Op) Init() {
 }
 
 type projGTDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -6580,7 +6177,7 @@ func (p projGTDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -6610,12 +6207,8 @@ func (p projGTDecimalInt8Op) Init() {
 }
 
 type projGEDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEDecimalInt8ConstOp) EstimateStaticMemoryUsage() int {
@@ -6686,12 +6279,8 @@ func (p projGEDecimalInt8ConstOp) Init() {
 }
 
 type projGEDecimalConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -6762,12 +6351,7 @@ func (p projGEDecimalConstInt8Op) Init() {
 }
 
 type projGEDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalInt8Op) EstimateStaticMemoryUsage() int {
@@ -6812,7 +6396,7 @@ func (p projGEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -6842,12 +6426,8 @@ func (p projGEDecimalInt8Op) Init() {
 }
 
 type projPlusDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -6912,12 +6492,8 @@ func (p projPlusDecimalInt16ConstOp) Init() {
 }
 
 type projPlusDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -6982,12 +6558,7 @@ func (p projPlusDecimalConstInt16Op) Init() {
 }
 
 type projPlusDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -7029,7 +6600,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -7056,12 +6627,8 @@ func (p projPlusDecimalInt16Op) Init() {
 }
 
 type projMinusDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -7126,12 +6693,8 @@ func (p projMinusDecimalInt16ConstOp) Init() {
 }
 
 type projMinusDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -7196,12 +6759,7 @@ func (p projMinusDecimalConstInt16Op) Init() {
 }
 
 type projMinusDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -7243,7 +6801,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -7270,12 +6828,8 @@ func (p projMinusDecimalInt16Op) Init() {
 }
 
 type projMultDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -7340,12 +6894,8 @@ func (p projMultDecimalInt16ConstOp) Init() {
 }
 
 type projMultDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -7410,12 +6960,7 @@ func (p projMultDecimalConstInt16Op) Init() {
 }
 
 type projMultDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -7457,7 +7002,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -7484,12 +7029,8 @@ func (p projMultDecimalInt16Op) Init() {
 }
 
 type projDivDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -7562,12 +7103,8 @@ func (p projDivDecimalInt16ConstOp) Init() {
 }
 
 type projDivDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -7640,12 +7177,7 @@ func (p projDivDecimalConstInt16Op) Init() {
 }
 
 type projDivDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -7691,7 +7223,7 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -7722,12 +7254,8 @@ func (p projDivDecimalInt16Op) Init() {
 }
 
 type projEQDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -7798,12 +7326,8 @@ func (p projEQDecimalInt16ConstOp) Init() {
 }
 
 type projEQDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -7874,12 +7398,7 @@ func (p projEQDecimalConstInt16Op) Init() {
 }
 
 type projEQDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -7924,7 +7443,7 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -7954,12 +7473,8 @@ func (p projEQDecimalInt16Op) Init() {
 }
 
 type projNEDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -8030,12 +7545,8 @@ func (p projNEDecimalInt16ConstOp) Init() {
 }
 
 type projNEDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -8106,12 +7617,7 @@ func (p projNEDecimalConstInt16Op) Init() {
 }
 
 type projNEDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -8156,7 +7662,7 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -8186,12 +7692,8 @@ func (p projNEDecimalInt16Op) Init() {
 }
 
 type projLTDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -8262,12 +7764,8 @@ func (p projLTDecimalInt16ConstOp) Init() {
 }
 
 type projLTDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -8338,12 +7836,7 @@ func (p projLTDecimalConstInt16Op) Init() {
 }
 
 type projLTDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -8388,7 +7881,7 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -8418,12 +7911,8 @@ func (p projLTDecimalInt16Op) Init() {
 }
 
 type projLEDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -8494,12 +7983,8 @@ func (p projLEDecimalInt16ConstOp) Init() {
 }
 
 type projLEDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -8570,12 +8055,7 @@ func (p projLEDecimalConstInt16Op) Init() {
 }
 
 type projLEDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -8620,7 +8100,7 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -8650,12 +8130,8 @@ func (p projLEDecimalInt16Op) Init() {
 }
 
 type projGTDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -8726,12 +8202,8 @@ func (p projGTDecimalInt16ConstOp) Init() {
 }
 
 type projGTDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -8802,12 +8274,7 @@ func (p projGTDecimalConstInt16Op) Init() {
 }
 
 type projGTDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -8852,7 +8319,7 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -8882,12 +8349,8 @@ func (p projGTDecimalInt16Op) Init() {
 }
 
 type projGEDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
@@ -8958,12 +8421,8 @@ func (p projGEDecimalInt16ConstOp) Init() {
 }
 
 type projGEDecimalConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -9034,12 +8493,7 @@ func (p projGEDecimalConstInt16Op) Init() {
 }
 
 type projGEDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalInt16Op) EstimateStaticMemoryUsage() int {
@@ -9084,7 +8538,7 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -9114,12 +8568,8 @@ func (p projGEDecimalInt16Op) Init() {
 }
 
 type projPlusDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -9184,12 +8634,8 @@ func (p projPlusDecimalInt32ConstOp) Init() {
 }
 
 type projPlusDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -9254,12 +8700,7 @@ func (p projPlusDecimalConstInt32Op) Init() {
 }
 
 type projPlusDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -9301,7 +8742,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -9328,12 +8769,8 @@ func (p projPlusDecimalInt32Op) Init() {
 }
 
 type projMinusDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -9398,12 +8835,8 @@ func (p projMinusDecimalInt32ConstOp) Init() {
 }
 
 type projMinusDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -9468,12 +8901,7 @@ func (p projMinusDecimalConstInt32Op) Init() {
 }
 
 type projMinusDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -9515,7 +8943,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -9542,12 +8970,8 @@ func (p projMinusDecimalInt32Op) Init() {
 }
 
 type projMultDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -9612,12 +9036,8 @@ func (p projMultDecimalInt32ConstOp) Init() {
 }
 
 type projMultDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -9682,12 +9102,7 @@ func (p projMultDecimalConstInt32Op) Init() {
 }
 
 type projMultDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -9729,7 +9144,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -9756,12 +9171,8 @@ func (p projMultDecimalInt32Op) Init() {
 }
 
 type projDivDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -9834,12 +9245,8 @@ func (p projDivDecimalInt32ConstOp) Init() {
 }
 
 type projDivDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -9912,12 +9319,7 @@ func (p projDivDecimalConstInt32Op) Init() {
 }
 
 type projDivDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -9963,7 +9365,7 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -9994,12 +9396,8 @@ func (p projDivDecimalInt32Op) Init() {
 }
 
 type projEQDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -10070,12 +9468,8 @@ func (p projEQDecimalInt32ConstOp) Init() {
 }
 
 type projEQDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -10146,12 +9540,7 @@ func (p projEQDecimalConstInt32Op) Init() {
 }
 
 type projEQDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -10196,7 +9585,7 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -10226,12 +9615,8 @@ func (p projEQDecimalInt32Op) Init() {
 }
 
 type projNEDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -10302,12 +9687,8 @@ func (p projNEDecimalInt32ConstOp) Init() {
 }
 
 type projNEDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -10378,12 +9759,7 @@ func (p projNEDecimalConstInt32Op) Init() {
 }
 
 type projNEDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -10428,7 +9804,7 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -10458,12 +9834,8 @@ func (p projNEDecimalInt32Op) Init() {
 }
 
 type projLTDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -10534,12 +9906,8 @@ func (p projLTDecimalInt32ConstOp) Init() {
 }
 
 type projLTDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -10610,12 +9978,7 @@ func (p projLTDecimalConstInt32Op) Init() {
 }
 
 type projLTDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -10660,7 +10023,7 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -10690,12 +10053,8 @@ func (p projLTDecimalInt32Op) Init() {
 }
 
 type projLEDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -10766,12 +10125,8 @@ func (p projLEDecimalInt32ConstOp) Init() {
 }
 
 type projLEDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -10842,12 +10197,7 @@ func (p projLEDecimalConstInt32Op) Init() {
 }
 
 type projLEDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -10892,7 +10242,7 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -10922,12 +10272,8 @@ func (p projLEDecimalInt32Op) Init() {
 }
 
 type projGTDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -10998,12 +10344,8 @@ func (p projGTDecimalInt32ConstOp) Init() {
 }
 
 type projGTDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -11074,12 +10416,7 @@ func (p projGTDecimalConstInt32Op) Init() {
 }
 
 type projGTDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -11124,7 +10461,7 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -11154,12 +10491,8 @@ func (p projGTDecimalInt32Op) Init() {
 }
 
 type projGEDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
@@ -11230,12 +10563,8 @@ func (p projGEDecimalInt32ConstOp) Init() {
 }
 
 type projGEDecimalConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -11306,12 +10635,7 @@ func (p projGEDecimalConstInt32Op) Init() {
 }
 
 type projGEDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalInt32Op) EstimateStaticMemoryUsage() int {
@@ -11356,7 +10680,7 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -11386,12 +10710,8 @@ func (p projGEDecimalInt32Op) Init() {
 }
 
 type projPlusDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -11456,12 +10776,8 @@ func (p projPlusDecimalInt64ConstOp) Init() {
 }
 
 type projPlusDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -11526,12 +10842,7 @@ func (p projPlusDecimalConstInt64Op) Init() {
 }
 
 type projPlusDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -11573,7 +10884,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -11600,12 +10911,8 @@ func (p projPlusDecimalInt64Op) Init() {
 }
 
 type projMinusDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -11670,12 +10977,8 @@ func (p projMinusDecimalInt64ConstOp) Init() {
 }
 
 type projMinusDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -11740,12 +11043,7 @@ func (p projMinusDecimalConstInt64Op) Init() {
 }
 
 type projMinusDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -11787,7 +11085,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -11814,12 +11112,8 @@ func (p projMinusDecimalInt64Op) Init() {
 }
 
 type projMultDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -11884,12 +11178,8 @@ func (p projMultDecimalInt64ConstOp) Init() {
 }
 
 type projMultDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -11954,12 +11244,7 @@ func (p projMultDecimalConstInt64Op) Init() {
 }
 
 type projMultDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -12001,7 +11286,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -12028,12 +11313,8 @@ func (p projMultDecimalInt64Op) Init() {
 }
 
 type projDivDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -12106,12 +11387,8 @@ func (p projDivDecimalInt64ConstOp) Init() {
 }
 
 type projDivDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -12184,12 +11461,7 @@ func (p projDivDecimalConstInt64Op) Init() {
 }
 
 type projDivDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -12235,7 +11507,7 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -12266,12 +11538,8 @@ func (p projDivDecimalInt64Op) Init() {
 }
 
 type projEQDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -12342,12 +11610,8 @@ func (p projEQDecimalInt64ConstOp) Init() {
 }
 
 type projEQDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -12418,12 +11682,7 @@ func (p projEQDecimalConstInt64Op) Init() {
 }
 
 type projEQDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -12468,7 +11727,7 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -12498,12 +11757,8 @@ func (p projEQDecimalInt64Op) Init() {
 }
 
 type projNEDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -12574,12 +11829,8 @@ func (p projNEDecimalInt64ConstOp) Init() {
 }
 
 type projNEDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -12650,12 +11901,7 @@ func (p projNEDecimalConstInt64Op) Init() {
 }
 
 type projNEDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -12700,7 +11946,7 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -12730,12 +11976,8 @@ func (p projNEDecimalInt64Op) Init() {
 }
 
 type projLTDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -12806,12 +12048,8 @@ func (p projLTDecimalInt64ConstOp) Init() {
 }
 
 type projLTDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -12882,12 +12120,7 @@ func (p projLTDecimalConstInt64Op) Init() {
 }
 
 type projLTDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -12932,7 +12165,7 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -12962,12 +12195,8 @@ func (p projLTDecimalInt64Op) Init() {
 }
 
 type projLEDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -13038,12 +12267,8 @@ func (p projLEDecimalInt64ConstOp) Init() {
 }
 
 type projLEDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -13114,12 +12339,7 @@ func (p projLEDecimalConstInt64Op) Init() {
 }
 
 type projLEDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -13164,7 +12384,7 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -13194,12 +12414,8 @@ func (p projLEDecimalInt64Op) Init() {
 }
 
 type projGTDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -13270,12 +12486,8 @@ func (p projGTDecimalInt64ConstOp) Init() {
 }
 
 type projGTDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -13346,12 +12558,7 @@ func (p projGTDecimalConstInt64Op) Init() {
 }
 
 type projGTDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -13396,7 +12603,7 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -13426,12 +12633,8 @@ func (p projGTDecimalInt64Op) Init() {
 }
 
 type projGEDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
@@ -13502,12 +12705,8 @@ func (p projGEDecimalInt64ConstOp) Init() {
 }
 
 type projGEDecimalConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -13578,12 +12777,7 @@ func (p projGEDecimalConstInt64Op) Init() {
 }
 
 type projGEDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalInt64Op) EstimateStaticMemoryUsage() int {
@@ -13628,7 +12822,7 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -13658,12 +12852,8 @@ func (p projGEDecimalInt64Op) Init() {
 }
 
 type projEQDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQDecimalFloat32ConstOp) EstimateStaticMemoryUsage() int {
@@ -13738,12 +12928,8 @@ func (p projEQDecimalFloat32ConstOp) Init() {
 }
 
 type projEQDecimalConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -13818,12 +13004,7 @@ func (p projEQDecimalConstFloat32Op) Init() {
 }
 
 type projEQDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalFloat32Op) EstimateStaticMemoryUsage() int {
@@ -13870,7 +13051,7 @@ func (p projEQDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -13902,12 +13083,8 @@ func (p projEQDecimalFloat32Op) Init() {
 }
 
 type projNEDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEDecimalFloat32ConstOp) EstimateStaticMemoryUsage() int {
@@ -13982,12 +13159,8 @@ func (p projNEDecimalFloat32ConstOp) Init() {
 }
 
 type projNEDecimalConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14062,12 +13235,7 @@ func (p projNEDecimalConstFloat32Op) Init() {
 }
 
 type projNEDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14114,7 +13282,7 @@ func (p projNEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -14146,12 +13314,8 @@ func (p projNEDecimalFloat32Op) Init() {
 }
 
 type projLTDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTDecimalFloat32ConstOp) EstimateStaticMemoryUsage() int {
@@ -14226,12 +13390,8 @@ func (p projLTDecimalFloat32ConstOp) Init() {
 }
 
 type projLTDecimalConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14306,12 +13466,7 @@ func (p projLTDecimalConstFloat32Op) Init() {
 }
 
 type projLTDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14358,7 +13513,7 @@ func (p projLTDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -14390,12 +13545,8 @@ func (p projLTDecimalFloat32Op) Init() {
 }
 
 type projLEDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEDecimalFloat32ConstOp) EstimateStaticMemoryUsage() int {
@@ -14470,12 +13621,8 @@ func (p projLEDecimalFloat32ConstOp) Init() {
 }
 
 type projLEDecimalConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14550,12 +13697,7 @@ func (p projLEDecimalConstFloat32Op) Init() {
 }
 
 type projLEDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14602,7 +13744,7 @@ func (p projLEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -14634,12 +13776,8 @@ func (p projLEDecimalFloat32Op) Init() {
 }
 
 type projGTDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTDecimalFloat32ConstOp) EstimateStaticMemoryUsage() int {
@@ -14714,12 +13852,8 @@ func (p projGTDecimalFloat32ConstOp) Init() {
 }
 
 type projGTDecimalConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14794,12 +13928,7 @@ func (p projGTDecimalConstFloat32Op) Init() {
 }
 
 type projGTDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalFloat32Op) EstimateStaticMemoryUsage() int {
@@ -14846,7 +13975,7 @@ func (p projGTDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -14878,12 +14007,8 @@ func (p projGTDecimalFloat32Op) Init() {
 }
 
 type projGEDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEDecimalFloat32ConstOp) EstimateStaticMemoryUsage() int {
@@ -14958,12 +14083,8 @@ func (p projGEDecimalFloat32ConstOp) Init() {
 }
 
 type projGEDecimalConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -15038,12 +14159,7 @@ func (p projGEDecimalConstFloat32Op) Init() {
 }
 
 type projGEDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalFloat32Op) EstimateStaticMemoryUsage() int {
@@ -15090,7 +14206,7 @@ func (p projGEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -15122,12 +14238,8 @@ func (p projGEDecimalFloat32Op) Init() {
 }
 
 type projEQDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
@@ -15202,12 +14314,8 @@ func (p projEQDecimalFloat64ConstOp) Init() {
 }
 
 type projEQDecimalConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -15282,12 +14390,7 @@ func (p projEQDecimalConstFloat64Op) Init() {
 }
 
 type projEQDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQDecimalFloat64Op) EstimateStaticMemoryUsage() int {
@@ -15334,7 +14437,7 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -15366,12 +14469,8 @@ func (p projEQDecimalFloat64Op) Init() {
 }
 
 type projNEDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
@@ -15446,12 +14545,8 @@ func (p projNEDecimalFloat64ConstOp) Init() {
 }
 
 type projNEDecimalConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -15526,12 +14621,7 @@ func (p projNEDecimalConstFloat64Op) Init() {
 }
 
 type projNEDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
@@ -15578,7 +14668,7 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -15610,12 +14700,8 @@ func (p projNEDecimalFloat64Op) Init() {
 }
 
 type projLTDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
@@ -15690,12 +14776,8 @@ func (p projLTDecimalFloat64ConstOp) Init() {
 }
 
 type projLTDecimalConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -15770,12 +14852,7 @@ func (p projLTDecimalConstFloat64Op) Init() {
 }
 
 type projLTDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTDecimalFloat64Op) EstimateStaticMemoryUsage() int {
@@ -15822,7 +14899,7 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -15854,12 +14931,8 @@ func (p projLTDecimalFloat64Op) Init() {
 }
 
 type projLEDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
@@ -15934,12 +15007,8 @@ func (p projLEDecimalFloat64ConstOp) Init() {
 }
 
 type projLEDecimalConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -16014,12 +15083,7 @@ func (p projLEDecimalConstFloat64Op) Init() {
 }
 
 type projLEDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
@@ -16066,7 +15130,7 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -16098,12 +15162,8 @@ func (p projLEDecimalFloat64Op) Init() {
 }
 
 type projGTDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
@@ -16178,12 +15238,8 @@ func (p projGTDecimalFloat64ConstOp) Init() {
 }
 
 type projGTDecimalConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -16258,12 +15314,7 @@ func (p projGTDecimalConstFloat64Op) Init() {
 }
 
 type projGTDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTDecimalFloat64Op) EstimateStaticMemoryUsage() int {
@@ -16310,7 +15361,7 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -16342,12 +15393,8 @@ func (p projGTDecimalFloat64Op) Init() {
 }
 
 type projGEDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
@@ -16422,12 +15469,8 @@ func (p projGEDecimalFloat64ConstOp) Init() {
 }
 
 type projGEDecimalConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -16502,12 +15545,7 @@ func (p projGEDecimalConstFloat64Op) Init() {
 }
 
 type projGEDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
@@ -16554,7 +15592,7 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -16586,12 +15624,8 @@ func (p projGEDecimalFloat64Op) Init() {
 }
 
 type projPlusInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -16660,12 +15694,8 @@ func (p projPlusInt8DecimalConstOp) Init() {
 }
 
 type projPlusInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -16734,12 +15764,7 @@ func (p projPlusInt8ConstDecimalOp) Init() {
 }
 
 type projPlusInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -16783,7 +15808,7 @@ func (p projPlusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -16812,12 +15837,8 @@ func (p projPlusInt8DecimalOp) Init() {
 }
 
 type projMinusInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -16886,12 +15907,8 @@ func (p projMinusInt8DecimalConstOp) Init() {
 }
 
 type projMinusInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -16960,12 +15977,7 @@ func (p projMinusInt8ConstDecimalOp) Init() {
 }
 
 type projMinusInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -17009,7 +16021,7 @@ func (p projMinusInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -17038,12 +16050,8 @@ func (p projMinusInt8DecimalOp) Init() {
 }
 
 type projMultInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -17112,12 +16120,8 @@ func (p projMultInt8DecimalConstOp) Init() {
 }
 
 type projMultInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -17186,12 +16190,7 @@ func (p projMultInt8ConstDecimalOp) Init() {
 }
 
 type projMultInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -17235,7 +16234,7 @@ func (p projMultInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -17264,12 +16263,8 @@ func (p projMultInt8DecimalOp) Init() {
 }
 
 type projDivInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -17344,12 +16339,8 @@ func (p projDivInt8DecimalConstOp) Init() {
 }
 
 type projDivInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -17424,12 +16415,7 @@ func (p projDivInt8ConstDecimalOp) Init() {
 }
 
 type projDivInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -17476,7 +16462,7 @@ func (p projDivInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -17508,12 +16494,8 @@ func (p projDivInt8DecimalOp) Init() {
 }
 
 type projEQInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -17584,12 +16566,8 @@ func (p projEQInt8DecimalConstOp) Init() {
 }
 
 type projEQInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -17660,12 +16638,7 @@ func (p projEQInt8ConstDecimalOp) Init() {
 }
 
 type projEQInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -17710,7 +16683,7 @@ func (p projEQInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -17740,12 +16713,8 @@ func (p projEQInt8DecimalOp) Init() {
 }
 
 type projNEInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -17816,12 +16785,8 @@ func (p projNEInt8DecimalConstOp) Init() {
 }
 
 type projNEInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -17892,12 +16857,7 @@ func (p projNEInt8ConstDecimalOp) Init() {
 }
 
 type projNEInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -17942,7 +16902,7 @@ func (p projNEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -17972,12 +16932,8 @@ func (p projNEInt8DecimalOp) Init() {
 }
 
 type projLTInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -18048,12 +17004,8 @@ func (p projLTInt8DecimalConstOp) Init() {
 }
 
 type projLTInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -18124,12 +17076,7 @@ func (p projLTInt8ConstDecimalOp) Init() {
 }
 
 type projLTInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -18174,7 +17121,7 @@ func (p projLTInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -18204,12 +17151,8 @@ func (p projLTInt8DecimalOp) Init() {
 }
 
 type projLEInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -18280,12 +17223,8 @@ func (p projLEInt8DecimalConstOp) Init() {
 }
 
 type projLEInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -18356,12 +17295,7 @@ func (p projLEInt8ConstDecimalOp) Init() {
 }
 
 type projLEInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -18406,7 +17340,7 @@ func (p projLEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -18436,12 +17370,8 @@ func (p projLEInt8DecimalOp) Init() {
 }
 
 type projGTInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -18512,12 +17442,8 @@ func (p projGTInt8DecimalConstOp) Init() {
 }
 
 type projGTInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -18588,12 +17514,7 @@ func (p projGTInt8ConstDecimalOp) Init() {
 }
 
 type projGTInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -18638,7 +17559,7 @@ func (p projGTInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -18668,12 +17589,8 @@ func (p projGTInt8DecimalOp) Init() {
 }
 
 type projGEInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEInt8DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -18744,12 +17661,8 @@ func (p projGEInt8DecimalConstOp) Init() {
 }
 
 type projGEInt8ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -18820,12 +17733,7 @@ func (p projGEInt8ConstDecimalOp) Init() {
 }
 
 type projGEInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8DecimalOp) EstimateStaticMemoryUsage() int {
@@ -18870,7 +17778,7 @@ func (p projGEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -18900,12 +17808,8 @@ func (p projGEInt8DecimalOp) Init() {
 }
 
 type projPlusInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -18968,12 +17872,8 @@ func (p projPlusInt8Int8ConstOp) Init() {
 }
 
 type projPlusInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -19036,12 +17936,7 @@ func (p projPlusInt8ConstInt8Op) Init() {
 }
 
 type projPlusInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -19082,7 +17977,7 @@ func (p projPlusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -19108,12 +18003,8 @@ func (p projPlusInt8Int8Op) Init() {
 }
 
 type projMinusInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -19176,12 +18067,8 @@ func (p projMinusInt8Int8ConstOp) Init() {
 }
 
 type projMinusInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -19244,12 +18131,7 @@ func (p projMinusInt8ConstInt8Op) Init() {
 }
 
 type projMinusInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -19290,7 +18172,7 @@ func (p projMinusInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -19316,12 +18198,8 @@ func (p projMinusInt8Int8Op) Init() {
 }
 
 type projMultInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -19398,12 +18276,8 @@ func (p projMultInt8Int8ConstOp) Init() {
 }
 
 type projMultInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -19480,12 +18354,7 @@ func (p projMultInt8ConstInt8Op) Init() {
 }
 
 type projMultInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -19533,7 +18402,7 @@ func (p projMultInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -19566,12 +18435,8 @@ func (p projMultInt8Int8Op) Init() {
 }
 
 type projDivInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -19642,12 +18507,8 @@ func (p projDivInt8Int8ConstOp) Init() {
 }
 
 type projDivInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -19718,12 +18579,7 @@ func (p projDivInt8ConstInt8Op) Init() {
 }
 
 type projDivInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -19768,7 +18624,7 @@ func (p projDivInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -19798,12 +18654,8 @@ func (p projDivInt8Int8Op) Init() {
 }
 
 type projEQInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -19884,12 +18736,8 @@ func (p projEQInt8Int8ConstOp) Init() {
 }
 
 type projEQInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -19970,12 +18818,7 @@ func (p projEQInt8ConstInt8Op) Init() {
 }
 
 type projEQInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -20025,7 +18868,7 @@ func (p projEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -20060,12 +18903,8 @@ func (p projEQInt8Int8Op) Init() {
 }
 
 type projNEInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -20146,12 +18985,8 @@ func (p projNEInt8Int8ConstOp) Init() {
 }
 
 type projNEInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -20232,12 +19067,7 @@ func (p projNEInt8ConstInt8Op) Init() {
 }
 
 type projNEInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -20287,7 +19117,7 @@ func (p projNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -20322,12 +19152,8 @@ func (p projNEInt8Int8Op) Init() {
 }
 
 type projLTInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -20408,12 +19234,8 @@ func (p projLTInt8Int8ConstOp) Init() {
 }
 
 type projLTInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -20494,12 +19316,7 @@ func (p projLTInt8ConstInt8Op) Init() {
 }
 
 type projLTInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -20549,7 +19366,7 @@ func (p projLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -20584,12 +19401,8 @@ func (p projLTInt8Int8Op) Init() {
 }
 
 type projLEInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -20670,12 +19483,8 @@ func (p projLEInt8Int8ConstOp) Init() {
 }
 
 type projLEInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -20756,12 +19565,7 @@ func (p projLEInt8ConstInt8Op) Init() {
 }
 
 type projLEInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -20811,7 +19615,7 @@ func (p projLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -20846,12 +19650,8 @@ func (p projLEInt8Int8Op) Init() {
 }
 
 type projGTInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -20932,12 +19732,8 @@ func (p projGTInt8Int8ConstOp) Init() {
 }
 
 type projGTInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -21018,12 +19814,7 @@ func (p projGTInt8ConstInt8Op) Init() {
 }
 
 type projGTInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -21073,7 +19864,7 @@ func (p projGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -21108,12 +19899,8 @@ func (p projGTInt8Int8Op) Init() {
 }
 
 type projGEInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -21194,12 +19981,8 @@ func (p projGEInt8Int8ConstOp) Init() {
 }
 
 type projGEInt8ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -21280,12 +20063,7 @@ func (p projGEInt8ConstInt8Op) Init() {
 }
 
 type projGEInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8Int8Op) EstimateStaticMemoryUsage() int {
@@ -21335,7 +20113,7 @@ func (p projGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -21370,12 +20148,8 @@ func (p projGEInt8Int8Op) Init() {
 }
 
 type projPlusInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -21438,12 +20212,8 @@ func (p projPlusInt8Int16ConstOp) Init() {
 }
 
 type projPlusInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -21506,12 +20276,7 @@ func (p projPlusInt8ConstInt16Op) Init() {
 }
 
 type projPlusInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -21552,7 +20317,7 @@ func (p projPlusInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -21578,12 +20343,8 @@ func (p projPlusInt8Int16Op) Init() {
 }
 
 type projMinusInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -21646,12 +20407,8 @@ func (p projMinusInt8Int16ConstOp) Init() {
 }
 
 type projMinusInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -21714,12 +20471,7 @@ func (p projMinusInt8ConstInt16Op) Init() {
 }
 
 type projMinusInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -21760,7 +20512,7 @@ func (p projMinusInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -21786,12 +20538,8 @@ func (p projMinusInt8Int16Op) Init() {
 }
 
 type projMultInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -21868,12 +20616,8 @@ func (p projMultInt8Int16ConstOp) Init() {
 }
 
 type projMultInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -21950,12 +20694,7 @@ func (p projMultInt8ConstInt16Op) Init() {
 }
 
 type projMultInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -22003,7 +20742,7 @@ func (p projMultInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -22036,12 +20775,8 @@ func (p projMultInt8Int16Op) Init() {
 }
 
 type projDivInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -22112,12 +20847,8 @@ func (p projDivInt8Int16ConstOp) Init() {
 }
 
 type projDivInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -22188,12 +20919,7 @@ func (p projDivInt8ConstInt16Op) Init() {
 }
 
 type projDivInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -22238,7 +20964,7 @@ func (p projDivInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -22268,12 +20994,8 @@ func (p projDivInt8Int16Op) Init() {
 }
 
 type projEQInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -22354,12 +21076,8 @@ func (p projEQInt8Int16ConstOp) Init() {
 }
 
 type projEQInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -22440,12 +21158,7 @@ func (p projEQInt8ConstInt16Op) Init() {
 }
 
 type projEQInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -22495,7 +21208,7 @@ func (p projEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -22530,12 +21243,8 @@ func (p projEQInt8Int16Op) Init() {
 }
 
 type projNEInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -22616,12 +21325,8 @@ func (p projNEInt8Int16ConstOp) Init() {
 }
 
 type projNEInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -22702,12 +21407,7 @@ func (p projNEInt8ConstInt16Op) Init() {
 }
 
 type projNEInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -22757,7 +21457,7 @@ func (p projNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -22792,12 +21492,8 @@ func (p projNEInt8Int16Op) Init() {
 }
 
 type projLTInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -22878,12 +21574,8 @@ func (p projLTInt8Int16ConstOp) Init() {
 }
 
 type projLTInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -22964,12 +21656,7 @@ func (p projLTInt8ConstInt16Op) Init() {
 }
 
 type projLTInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -23019,7 +21706,7 @@ func (p projLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -23054,12 +21741,8 @@ func (p projLTInt8Int16Op) Init() {
 }
 
 type projLEInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -23140,12 +21823,8 @@ func (p projLEInt8Int16ConstOp) Init() {
 }
 
 type projLEInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -23226,12 +21905,7 @@ func (p projLEInt8ConstInt16Op) Init() {
 }
 
 type projLEInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -23281,7 +21955,7 @@ func (p projLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -23316,12 +21990,8 @@ func (p projLEInt8Int16Op) Init() {
 }
 
 type projGTInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -23402,12 +22072,8 @@ func (p projGTInt8Int16ConstOp) Init() {
 }
 
 type projGTInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -23488,12 +22154,7 @@ func (p projGTInt8ConstInt16Op) Init() {
 }
 
 type projGTInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -23543,7 +22204,7 @@ func (p projGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -23578,12 +22239,8 @@ func (p projGTInt8Int16Op) Init() {
 }
 
 type projGEInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt8Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -23664,12 +22321,8 @@ func (p projGEInt8Int16ConstOp) Init() {
 }
 
 type projGEInt8ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -23750,12 +22403,7 @@ func (p projGEInt8ConstInt16Op) Init() {
 }
 
 type projGEInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8Int16Op) EstimateStaticMemoryUsage() int {
@@ -23805,7 +22453,7 @@ func (p projGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -23840,12 +22488,8 @@ func (p projGEInt8Int16Op) Init() {
 }
 
 type projPlusInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -23908,12 +22552,8 @@ func (p projPlusInt8Int32ConstOp) Init() {
 }
 
 type projPlusInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -23976,12 +22616,7 @@ func (p projPlusInt8ConstInt32Op) Init() {
 }
 
 type projPlusInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -24022,7 +22657,7 @@ func (p projPlusInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -24048,12 +22683,8 @@ func (p projPlusInt8Int32Op) Init() {
 }
 
 type projMinusInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -24116,12 +22747,8 @@ func (p projMinusInt8Int32ConstOp) Init() {
 }
 
 type projMinusInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -24184,12 +22811,7 @@ func (p projMinusInt8ConstInt32Op) Init() {
 }
 
 type projMinusInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -24230,7 +22852,7 @@ func (p projMinusInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -24256,12 +22878,8 @@ func (p projMinusInt8Int32Op) Init() {
 }
 
 type projMultInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -24338,12 +22956,8 @@ func (p projMultInt8Int32ConstOp) Init() {
 }
 
 type projMultInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -24420,12 +23034,7 @@ func (p projMultInt8ConstInt32Op) Init() {
 }
 
 type projMultInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -24473,7 +23082,7 @@ func (p projMultInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -24506,12 +23115,8 @@ func (p projMultInt8Int32Op) Init() {
 }
 
 type projDivInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -24582,12 +23187,8 @@ func (p projDivInt8Int32ConstOp) Init() {
 }
 
 type projDivInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -24658,12 +23259,7 @@ func (p projDivInt8ConstInt32Op) Init() {
 }
 
 type projDivInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -24708,7 +23304,7 @@ func (p projDivInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -24738,12 +23334,8 @@ func (p projDivInt8Int32Op) Init() {
 }
 
 type projEQInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -24824,12 +23416,8 @@ func (p projEQInt8Int32ConstOp) Init() {
 }
 
 type projEQInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -24910,12 +23498,7 @@ func (p projEQInt8ConstInt32Op) Init() {
 }
 
 type projEQInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -24965,7 +23548,7 @@ func (p projEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -25000,12 +23583,8 @@ func (p projEQInt8Int32Op) Init() {
 }
 
 type projNEInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -25086,12 +23665,8 @@ func (p projNEInt8Int32ConstOp) Init() {
 }
 
 type projNEInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -25172,12 +23747,7 @@ func (p projNEInt8ConstInt32Op) Init() {
 }
 
 type projNEInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -25227,7 +23797,7 @@ func (p projNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -25262,12 +23832,8 @@ func (p projNEInt8Int32Op) Init() {
 }
 
 type projLTInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -25348,12 +23914,8 @@ func (p projLTInt8Int32ConstOp) Init() {
 }
 
 type projLTInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -25434,12 +23996,7 @@ func (p projLTInt8ConstInt32Op) Init() {
 }
 
 type projLTInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -25489,7 +24046,7 @@ func (p projLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -25524,12 +24081,8 @@ func (p projLTInt8Int32Op) Init() {
 }
 
 type projLEInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -25610,12 +24163,8 @@ func (p projLEInt8Int32ConstOp) Init() {
 }
 
 type projLEInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -25696,12 +24245,7 @@ func (p projLEInt8ConstInt32Op) Init() {
 }
 
 type projLEInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -25751,7 +24295,7 @@ func (p projLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -25786,12 +24330,8 @@ func (p projLEInt8Int32Op) Init() {
 }
 
 type projGTInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -25872,12 +24412,8 @@ func (p projGTInt8Int32ConstOp) Init() {
 }
 
 type projGTInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -25958,12 +24494,7 @@ func (p projGTInt8ConstInt32Op) Init() {
 }
 
 type projGTInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -26013,7 +24544,7 @@ func (p projGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -26048,12 +24579,8 @@ func (p projGTInt8Int32Op) Init() {
 }
 
 type projGEInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt8Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -26134,12 +24661,8 @@ func (p projGEInt8Int32ConstOp) Init() {
 }
 
 type projGEInt8ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -26220,12 +24743,7 @@ func (p projGEInt8ConstInt32Op) Init() {
 }
 
 type projGEInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8Int32Op) EstimateStaticMemoryUsage() int {
@@ -26275,7 +24793,7 @@ func (p projGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -26310,12 +24828,8 @@ func (p projGEInt8Int32Op) Init() {
 }
 
 type projPlusInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -26378,12 +24892,8 @@ func (p projPlusInt8Int64ConstOp) Init() {
 }
 
 type projPlusInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -26446,12 +24956,7 @@ func (p projPlusInt8ConstInt64Op) Init() {
 }
 
 type projPlusInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -26492,7 +24997,7 @@ func (p projPlusInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -26518,12 +25023,8 @@ func (p projPlusInt8Int64Op) Init() {
 }
 
 type projMinusInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -26586,12 +25087,8 @@ func (p projMinusInt8Int64ConstOp) Init() {
 }
 
 type projMinusInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -26654,12 +25151,7 @@ func (p projMinusInt8ConstInt64Op) Init() {
 }
 
 type projMinusInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -26700,7 +25192,7 @@ func (p projMinusInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -26726,12 +25218,8 @@ func (p projMinusInt8Int64Op) Init() {
 }
 
 type projMultInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -26808,12 +25296,8 @@ func (p projMultInt8Int64ConstOp) Init() {
 }
 
 type projMultInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -26890,12 +25374,7 @@ func (p projMultInt8ConstInt64Op) Init() {
 }
 
 type projMultInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -26943,7 +25422,7 @@ func (p projMultInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -26976,12 +25455,8 @@ func (p projMultInt8Int64Op) Init() {
 }
 
 type projDivInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -27052,12 +25527,8 @@ func (p projDivInt8Int64ConstOp) Init() {
 }
 
 type projDivInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -27128,12 +25599,7 @@ func (p projDivInt8ConstInt64Op) Init() {
 }
 
 type projDivInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -27178,7 +25644,7 @@ func (p projDivInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -27208,12 +25674,8 @@ func (p projDivInt8Int64Op) Init() {
 }
 
 type projEQInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -27294,12 +25756,8 @@ func (p projEQInt8Int64ConstOp) Init() {
 }
 
 type projEQInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -27380,12 +25838,7 @@ func (p projEQInt8ConstInt64Op) Init() {
 }
 
 type projEQInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -27435,7 +25888,7 @@ func (p projEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -27470,12 +25923,8 @@ func (p projEQInt8Int64Op) Init() {
 }
 
 type projNEInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -27556,12 +26005,8 @@ func (p projNEInt8Int64ConstOp) Init() {
 }
 
 type projNEInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -27642,12 +26087,7 @@ func (p projNEInt8ConstInt64Op) Init() {
 }
 
 type projNEInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -27697,7 +26137,7 @@ func (p projNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -27732,12 +26172,8 @@ func (p projNEInt8Int64Op) Init() {
 }
 
 type projLTInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -27818,12 +26254,8 @@ func (p projLTInt8Int64ConstOp) Init() {
 }
 
 type projLTInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -27904,12 +26336,7 @@ func (p projLTInt8ConstInt64Op) Init() {
 }
 
 type projLTInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -27959,7 +26386,7 @@ func (p projLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -27994,12 +26421,8 @@ func (p projLTInt8Int64Op) Init() {
 }
 
 type projLEInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -28080,12 +26503,8 @@ func (p projLEInt8Int64ConstOp) Init() {
 }
 
 type projLEInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -28166,12 +26585,7 @@ func (p projLEInt8ConstInt64Op) Init() {
 }
 
 type projLEInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -28221,7 +26635,7 @@ func (p projLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -28256,12 +26670,8 @@ func (p projLEInt8Int64Op) Init() {
 }
 
 type projGTInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -28342,12 +26752,8 @@ func (p projGTInt8Int64ConstOp) Init() {
 }
 
 type projGTInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -28428,12 +26834,7 @@ func (p projGTInt8ConstInt64Op) Init() {
 }
 
 type projGTInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -28483,7 +26884,7 @@ func (p projGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -28518,12 +26919,8 @@ func (p projGTInt8Int64Op) Init() {
 }
 
 type projGEInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt8Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -28604,12 +27001,8 @@ func (p projGEInt8Int64ConstOp) Init() {
 }
 
 type projGEInt8ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -28690,12 +27083,7 @@ func (p projGEInt8ConstInt64Op) Init() {
 }
 
 type projGEInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8Int64Op) EstimateStaticMemoryUsage() int {
@@ -28745,7 +27133,7 @@ func (p projGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -28780,12 +27168,8 @@ func (p projGEInt8Int64Op) Init() {
 }
 
 type projEQInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQInt8Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -28882,12 +27266,8 @@ func (p projEQInt8Float32ConstOp) Init() {
 }
 
 type projEQInt8ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -28984,12 +27364,7 @@ func (p projEQInt8ConstFloat32Op) Init() {
 }
 
 type projEQInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8Float32Op) EstimateStaticMemoryUsage() int {
@@ -29047,7 +27422,7 @@ func (p projEQInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -29090,12 +27465,8 @@ func (p projEQInt8Float32Op) Init() {
 }
 
 type projNEInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEInt8Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -29192,12 +27563,8 @@ func (p projNEInt8Float32ConstOp) Init() {
 }
 
 type projNEInt8ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -29294,12 +27661,7 @@ func (p projNEInt8ConstFloat32Op) Init() {
 }
 
 type projNEInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8Float32Op) EstimateStaticMemoryUsage() int {
@@ -29357,7 +27719,7 @@ func (p projNEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -29400,12 +27762,8 @@ func (p projNEInt8Float32Op) Init() {
 }
 
 type projLTInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTInt8Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -29502,12 +27860,8 @@ func (p projLTInt8Float32ConstOp) Init() {
 }
 
 type projLTInt8ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -29604,12 +27958,7 @@ func (p projLTInt8ConstFloat32Op) Init() {
 }
 
 type projLTInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8Float32Op) EstimateStaticMemoryUsage() int {
@@ -29667,7 +28016,7 @@ func (p projLTInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -29710,12 +28059,8 @@ func (p projLTInt8Float32Op) Init() {
 }
 
 type projLEInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEInt8Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -29812,12 +28157,8 @@ func (p projLEInt8Float32ConstOp) Init() {
 }
 
 type projLEInt8ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -29914,12 +28255,7 @@ func (p projLEInt8ConstFloat32Op) Init() {
 }
 
 type projLEInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8Float32Op) EstimateStaticMemoryUsage() int {
@@ -29977,7 +28313,7 @@ func (p projLEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -30020,12 +28356,8 @@ func (p projLEInt8Float32Op) Init() {
 }
 
 type projGTInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTInt8Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -30122,12 +28454,8 @@ func (p projGTInt8Float32ConstOp) Init() {
 }
 
 type projGTInt8ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -30224,12 +28552,7 @@ func (p projGTInt8ConstFloat32Op) Init() {
 }
 
 type projGTInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8Float32Op) EstimateStaticMemoryUsage() int {
@@ -30287,7 +28610,7 @@ func (p projGTInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -30330,12 +28653,8 @@ func (p projGTInt8Float32Op) Init() {
 }
 
 type projGEInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEInt8Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -30432,12 +28751,8 @@ func (p projGEInt8Float32ConstOp) Init() {
 }
 
 type projGEInt8ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -30534,12 +28849,7 @@ func (p projGEInt8ConstFloat32Op) Init() {
 }
 
 type projGEInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8Float32Op) EstimateStaticMemoryUsage() int {
@@ -30597,7 +28907,7 @@ func (p projGEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -30640,12 +28950,8 @@ func (p projGEInt8Float32Op) Init() {
 }
 
 type projEQInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQInt8Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -30742,12 +29048,8 @@ func (p projEQInt8Float64ConstOp) Init() {
 }
 
 type projEQInt8ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt8ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -30844,12 +29146,7 @@ func (p projEQInt8ConstFloat64Op) Init() {
 }
 
 type projEQInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt8Float64Op) EstimateStaticMemoryUsage() int {
@@ -30907,7 +29204,7 @@ func (p projEQInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -30950,12 +29247,8 @@ func (p projEQInt8Float64Op) Init() {
 }
 
 type projNEInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEInt8Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -31052,12 +29345,8 @@ func (p projNEInt8Float64ConstOp) Init() {
 }
 
 type projNEInt8ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt8ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -31154,12 +29443,7 @@ func (p projNEInt8ConstFloat64Op) Init() {
 }
 
 type projNEInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt8Float64Op) EstimateStaticMemoryUsage() int {
@@ -31217,7 +29501,7 @@ func (p projNEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -31260,12 +29544,8 @@ func (p projNEInt8Float64Op) Init() {
 }
 
 type projLTInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTInt8Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -31362,12 +29642,8 @@ func (p projLTInt8Float64ConstOp) Init() {
 }
 
 type projLTInt8ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt8ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -31464,12 +29740,7 @@ func (p projLTInt8ConstFloat64Op) Init() {
 }
 
 type projLTInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt8Float64Op) EstimateStaticMemoryUsage() int {
@@ -31527,7 +29798,7 @@ func (p projLTInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -31570,12 +29841,8 @@ func (p projLTInt8Float64Op) Init() {
 }
 
 type projLEInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEInt8Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -31672,12 +29939,8 @@ func (p projLEInt8Float64ConstOp) Init() {
 }
 
 type projLEInt8ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt8ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -31774,12 +30037,7 @@ func (p projLEInt8ConstFloat64Op) Init() {
 }
 
 type projLEInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt8Float64Op) EstimateStaticMemoryUsage() int {
@@ -31837,7 +30095,7 @@ func (p projLEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -31880,12 +30138,8 @@ func (p projLEInt8Float64Op) Init() {
 }
 
 type projGTInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTInt8Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -31982,12 +30236,8 @@ func (p projGTInt8Float64ConstOp) Init() {
 }
 
 type projGTInt8ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt8ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -32084,12 +30334,7 @@ func (p projGTInt8ConstFloat64Op) Init() {
 }
 
 type projGTInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt8Float64Op) EstimateStaticMemoryUsage() int {
@@ -32147,7 +30392,7 @@ func (p projGTInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -32190,12 +30435,8 @@ func (p projGTInt8Float64Op) Init() {
 }
 
 type projGEInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEInt8Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -32292,12 +30533,8 @@ func (p projGEInt8Float64ConstOp) Init() {
 }
 
 type projGEInt8ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt8ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -32394,12 +30631,7 @@ func (p projGEInt8ConstFloat64Op) Init() {
 }
 
 type projGEInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt8Float64Op) EstimateStaticMemoryUsage() int {
@@ -32457,7 +30689,7 @@ func (p projGEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -32500,12 +30732,8 @@ func (p projGEInt8Float64Op) Init() {
 }
 
 type projPlusInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -32574,12 +30802,8 @@ func (p projPlusInt16DecimalConstOp) Init() {
 }
 
 type projPlusInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -32648,12 +30872,7 @@ func (p projPlusInt16ConstDecimalOp) Init() {
 }
 
 type projPlusInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -32697,7 +30916,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -32726,12 +30945,8 @@ func (p projPlusInt16DecimalOp) Init() {
 }
 
 type projMinusInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -32800,12 +31015,8 @@ func (p projMinusInt16DecimalConstOp) Init() {
 }
 
 type projMinusInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -32874,12 +31085,7 @@ func (p projMinusInt16ConstDecimalOp) Init() {
 }
 
 type projMinusInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -32923,7 +31129,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -32952,12 +31158,8 @@ func (p projMinusInt16DecimalOp) Init() {
 }
 
 type projMultInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -33026,12 +31228,8 @@ func (p projMultInt16DecimalConstOp) Init() {
 }
 
 type projMultInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -33100,12 +31298,7 @@ func (p projMultInt16ConstDecimalOp) Init() {
 }
 
 type projMultInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -33149,7 +31342,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -33178,12 +31371,8 @@ func (p projMultInt16DecimalOp) Init() {
 }
 
 type projDivInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -33258,12 +31447,8 @@ func (p projDivInt16DecimalConstOp) Init() {
 }
 
 type projDivInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -33338,12 +31523,7 @@ func (p projDivInt16ConstDecimalOp) Init() {
 }
 
 type projDivInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -33390,7 +31570,7 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -33422,12 +31602,8 @@ func (p projDivInt16DecimalOp) Init() {
 }
 
 type projEQInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -33498,12 +31674,8 @@ func (p projEQInt16DecimalConstOp) Init() {
 }
 
 type projEQInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -33574,12 +31746,7 @@ func (p projEQInt16ConstDecimalOp) Init() {
 }
 
 type projEQInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -33624,7 +31791,7 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -33654,12 +31821,8 @@ func (p projEQInt16DecimalOp) Init() {
 }
 
 type projNEInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -33730,12 +31893,8 @@ func (p projNEInt16DecimalConstOp) Init() {
 }
 
 type projNEInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -33806,12 +31965,7 @@ func (p projNEInt16ConstDecimalOp) Init() {
 }
 
 type projNEInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -33856,7 +32010,7 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -33886,12 +32040,8 @@ func (p projNEInt16DecimalOp) Init() {
 }
 
 type projLTInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -33962,12 +32112,8 @@ func (p projLTInt16DecimalConstOp) Init() {
 }
 
 type projLTInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -34038,12 +32184,7 @@ func (p projLTInt16ConstDecimalOp) Init() {
 }
 
 type projLTInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -34088,7 +32229,7 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -34118,12 +32259,8 @@ func (p projLTInt16DecimalOp) Init() {
 }
 
 type projLEInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -34194,12 +32331,8 @@ func (p projLEInt16DecimalConstOp) Init() {
 }
 
 type projLEInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -34270,12 +32403,7 @@ func (p projLEInt16ConstDecimalOp) Init() {
 }
 
 type projLEInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -34320,7 +32448,7 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -34350,12 +32478,8 @@ func (p projLEInt16DecimalOp) Init() {
 }
 
 type projGTInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -34426,12 +32550,8 @@ func (p projGTInt16DecimalConstOp) Init() {
 }
 
 type projGTInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -34502,12 +32622,7 @@ func (p projGTInt16ConstDecimalOp) Init() {
 }
 
 type projGTInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -34552,7 +32667,7 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -34582,12 +32697,8 @@ func (p projGTInt16DecimalOp) Init() {
 }
 
 type projGEInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -34658,12 +32769,8 @@ func (p projGEInt16DecimalConstOp) Init() {
 }
 
 type projGEInt16ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -34734,12 +32841,7 @@ func (p projGEInt16ConstDecimalOp) Init() {
 }
 
 type projGEInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16DecimalOp) EstimateStaticMemoryUsage() int {
@@ -34784,7 +32886,7 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -34814,12 +32916,8 @@ func (p projGEInt16DecimalOp) Init() {
 }
 
 type projPlusInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -34882,12 +32980,8 @@ func (p projPlusInt16Int8ConstOp) Init() {
 }
 
 type projPlusInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -34950,12 +33044,7 @@ func (p projPlusInt16ConstInt8Op) Init() {
 }
 
 type projPlusInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -34996,7 +33085,7 @@ func (p projPlusInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -35022,12 +33111,8 @@ func (p projPlusInt16Int8Op) Init() {
 }
 
 type projMinusInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -35090,12 +33175,8 @@ func (p projMinusInt16Int8ConstOp) Init() {
 }
 
 type projMinusInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -35158,12 +33239,7 @@ func (p projMinusInt16ConstInt8Op) Init() {
 }
 
 type projMinusInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -35204,7 +33280,7 @@ func (p projMinusInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -35230,12 +33306,8 @@ func (p projMinusInt16Int8Op) Init() {
 }
 
 type projMultInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -35312,12 +33384,8 @@ func (p projMultInt16Int8ConstOp) Init() {
 }
 
 type projMultInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -35394,12 +33462,7 @@ func (p projMultInt16ConstInt8Op) Init() {
 }
 
 type projMultInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -35447,7 +33510,7 @@ func (p projMultInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -35480,12 +33543,8 @@ func (p projMultInt16Int8Op) Init() {
 }
 
 type projDivInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -35556,12 +33615,8 @@ func (p projDivInt16Int8ConstOp) Init() {
 }
 
 type projDivInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -35632,12 +33687,7 @@ func (p projDivInt16ConstInt8Op) Init() {
 }
 
 type projDivInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -35682,7 +33732,7 @@ func (p projDivInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -35712,12 +33762,8 @@ func (p projDivInt16Int8Op) Init() {
 }
 
 type projEQInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -35798,12 +33844,8 @@ func (p projEQInt16Int8ConstOp) Init() {
 }
 
 type projEQInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -35884,12 +33926,7 @@ func (p projEQInt16ConstInt8Op) Init() {
 }
 
 type projEQInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -35939,7 +33976,7 @@ func (p projEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -35974,12 +34011,8 @@ func (p projEQInt16Int8Op) Init() {
 }
 
 type projNEInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -36060,12 +34093,8 @@ func (p projNEInt16Int8ConstOp) Init() {
 }
 
 type projNEInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -36146,12 +34175,7 @@ func (p projNEInt16ConstInt8Op) Init() {
 }
 
 type projNEInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -36201,7 +34225,7 @@ func (p projNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -36236,12 +34260,8 @@ func (p projNEInt16Int8Op) Init() {
 }
 
 type projLTInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -36322,12 +34342,8 @@ func (p projLTInt16Int8ConstOp) Init() {
 }
 
 type projLTInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -36408,12 +34424,7 @@ func (p projLTInt16ConstInt8Op) Init() {
 }
 
 type projLTInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -36463,7 +34474,7 @@ func (p projLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -36498,12 +34509,8 @@ func (p projLTInt16Int8Op) Init() {
 }
 
 type projLEInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -36584,12 +34591,8 @@ func (p projLEInt16Int8ConstOp) Init() {
 }
 
 type projLEInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -36670,12 +34673,7 @@ func (p projLEInt16ConstInt8Op) Init() {
 }
 
 type projLEInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -36725,7 +34723,7 @@ func (p projLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -36760,12 +34758,8 @@ func (p projLEInt16Int8Op) Init() {
 }
 
 type projGTInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -36846,12 +34840,8 @@ func (p projGTInt16Int8ConstOp) Init() {
 }
 
 type projGTInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -36932,12 +34922,7 @@ func (p projGTInt16ConstInt8Op) Init() {
 }
 
 type projGTInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -36987,7 +34972,7 @@ func (p projGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -37022,12 +35007,8 @@ func (p projGTInt16Int8Op) Init() {
 }
 
 type projGEInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt16Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -37108,12 +35089,8 @@ func (p projGEInt16Int8ConstOp) Init() {
 }
 
 type projGEInt16ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -37194,12 +35171,7 @@ func (p projGEInt16ConstInt8Op) Init() {
 }
 
 type projGEInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16Int8Op) EstimateStaticMemoryUsage() int {
@@ -37249,7 +35221,7 @@ func (p projGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -37284,12 +35256,8 @@ func (p projGEInt16Int8Op) Init() {
 }
 
 type projPlusInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -37352,12 +35320,8 @@ func (p projPlusInt16Int16ConstOp) Init() {
 }
 
 type projPlusInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -37420,12 +35384,7 @@ func (p projPlusInt16ConstInt16Op) Init() {
 }
 
 type projPlusInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -37466,7 +35425,7 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -37492,12 +35451,8 @@ func (p projPlusInt16Int16Op) Init() {
 }
 
 type projMinusInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -37560,12 +35515,8 @@ func (p projMinusInt16Int16ConstOp) Init() {
 }
 
 type projMinusInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -37628,12 +35579,7 @@ func (p projMinusInt16ConstInt16Op) Init() {
 }
 
 type projMinusInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -37674,7 +35620,7 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -37700,12 +35646,8 @@ func (p projMinusInt16Int16Op) Init() {
 }
 
 type projMultInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -37782,12 +35724,8 @@ func (p projMultInt16Int16ConstOp) Init() {
 }
 
 type projMultInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -37864,12 +35802,7 @@ func (p projMultInt16ConstInt16Op) Init() {
 }
 
 type projMultInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -37917,7 +35850,7 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -37950,12 +35883,8 @@ func (p projMultInt16Int16Op) Init() {
 }
 
 type projDivInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -38026,12 +35955,8 @@ func (p projDivInt16Int16ConstOp) Init() {
 }
 
 type projDivInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -38102,12 +36027,7 @@ func (p projDivInt16ConstInt16Op) Init() {
 }
 
 type projDivInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -38152,7 +36072,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -38182,12 +36102,8 @@ func (p projDivInt16Int16Op) Init() {
 }
 
 type projEQInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -38268,12 +36184,8 @@ func (p projEQInt16Int16ConstOp) Init() {
 }
 
 type projEQInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -38354,12 +36266,7 @@ func (p projEQInt16ConstInt16Op) Init() {
 }
 
 type projEQInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -38409,7 +36316,7 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -38444,12 +36351,8 @@ func (p projEQInt16Int16Op) Init() {
 }
 
 type projNEInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -38530,12 +36433,8 @@ func (p projNEInt16Int16ConstOp) Init() {
 }
 
 type projNEInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -38616,12 +36515,7 @@ func (p projNEInt16ConstInt16Op) Init() {
 }
 
 type projNEInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -38671,7 +36565,7 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -38706,12 +36600,8 @@ func (p projNEInt16Int16Op) Init() {
 }
 
 type projLTInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -38792,12 +36682,8 @@ func (p projLTInt16Int16ConstOp) Init() {
 }
 
 type projLTInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -38878,12 +36764,7 @@ func (p projLTInt16ConstInt16Op) Init() {
 }
 
 type projLTInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -38933,7 +36814,7 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -38968,12 +36849,8 @@ func (p projLTInt16Int16Op) Init() {
 }
 
 type projLEInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -39054,12 +36931,8 @@ func (p projLEInt16Int16ConstOp) Init() {
 }
 
 type projLEInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -39140,12 +37013,7 @@ func (p projLEInt16ConstInt16Op) Init() {
 }
 
 type projLEInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -39195,7 +37063,7 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -39230,12 +37098,8 @@ func (p projLEInt16Int16Op) Init() {
 }
 
 type projGTInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -39316,12 +37180,8 @@ func (p projGTInt16Int16ConstOp) Init() {
 }
 
 type projGTInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -39402,12 +37262,7 @@ func (p projGTInt16ConstInt16Op) Init() {
 }
 
 type projGTInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -39457,7 +37312,7 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -39492,12 +37347,8 @@ func (p projGTInt16Int16Op) Init() {
 }
 
 type projGEInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -39578,12 +37429,8 @@ func (p projGEInt16Int16ConstOp) Init() {
 }
 
 type projGEInt16ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -39664,12 +37511,7 @@ func (p projGEInt16ConstInt16Op) Init() {
 }
 
 type projGEInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16Int16Op) EstimateStaticMemoryUsage() int {
@@ -39719,7 +37561,7 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -39754,12 +37596,8 @@ func (p projGEInt16Int16Op) Init() {
 }
 
 type projPlusInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -39822,12 +37660,8 @@ func (p projPlusInt16Int32ConstOp) Init() {
 }
 
 type projPlusInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -39890,12 +37724,7 @@ func (p projPlusInt16ConstInt32Op) Init() {
 }
 
 type projPlusInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -39936,7 +37765,7 @@ func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -39962,12 +37791,8 @@ func (p projPlusInt16Int32Op) Init() {
 }
 
 type projMinusInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -40030,12 +37855,8 @@ func (p projMinusInt16Int32ConstOp) Init() {
 }
 
 type projMinusInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -40098,12 +37919,7 @@ func (p projMinusInt16ConstInt32Op) Init() {
 }
 
 type projMinusInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -40144,7 +37960,7 @@ func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -40170,12 +37986,8 @@ func (p projMinusInt16Int32Op) Init() {
 }
 
 type projMultInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -40252,12 +38064,8 @@ func (p projMultInt16Int32ConstOp) Init() {
 }
 
 type projMultInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -40334,12 +38142,7 @@ func (p projMultInt16ConstInt32Op) Init() {
 }
 
 type projMultInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -40387,7 +38190,7 @@ func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -40420,12 +38223,8 @@ func (p projMultInt16Int32Op) Init() {
 }
 
 type projDivInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -40496,12 +38295,8 @@ func (p projDivInt16Int32ConstOp) Init() {
 }
 
 type projDivInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -40572,12 +38367,7 @@ func (p projDivInt16ConstInt32Op) Init() {
 }
 
 type projDivInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -40622,7 +38412,7 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -40652,12 +38442,8 @@ func (p projDivInt16Int32Op) Init() {
 }
 
 type projEQInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -40738,12 +38524,8 @@ func (p projEQInt16Int32ConstOp) Init() {
 }
 
 type projEQInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -40824,12 +38606,7 @@ func (p projEQInt16ConstInt32Op) Init() {
 }
 
 type projEQInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -40879,7 +38656,7 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -40914,12 +38691,8 @@ func (p projEQInt16Int32Op) Init() {
 }
 
 type projNEInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -41000,12 +38773,8 @@ func (p projNEInt16Int32ConstOp) Init() {
 }
 
 type projNEInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -41086,12 +38855,7 @@ func (p projNEInt16ConstInt32Op) Init() {
 }
 
 type projNEInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -41141,7 +38905,7 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -41176,12 +38940,8 @@ func (p projNEInt16Int32Op) Init() {
 }
 
 type projLTInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -41262,12 +39022,8 @@ func (p projLTInt16Int32ConstOp) Init() {
 }
 
 type projLTInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -41348,12 +39104,7 @@ func (p projLTInt16ConstInt32Op) Init() {
 }
 
 type projLTInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -41403,7 +39154,7 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -41438,12 +39189,8 @@ func (p projLTInt16Int32Op) Init() {
 }
 
 type projLEInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -41524,12 +39271,8 @@ func (p projLEInt16Int32ConstOp) Init() {
 }
 
 type projLEInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -41610,12 +39353,7 @@ func (p projLEInt16ConstInt32Op) Init() {
 }
 
 type projLEInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -41665,7 +39403,7 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -41700,12 +39438,8 @@ func (p projLEInt16Int32Op) Init() {
 }
 
 type projGTInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -41786,12 +39520,8 @@ func (p projGTInt16Int32ConstOp) Init() {
 }
 
 type projGTInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -41872,12 +39602,7 @@ func (p projGTInt16ConstInt32Op) Init() {
 }
 
 type projGTInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -41927,7 +39652,7 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -41962,12 +39687,8 @@ func (p projGTInt16Int32Op) Init() {
 }
 
 type projGEInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -42048,12 +39769,8 @@ func (p projGEInt16Int32ConstOp) Init() {
 }
 
 type projGEInt16ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -42134,12 +39851,7 @@ func (p projGEInt16ConstInt32Op) Init() {
 }
 
 type projGEInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16Int32Op) EstimateStaticMemoryUsage() int {
@@ -42189,7 +39901,7 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -42224,12 +39936,8 @@ func (p projGEInt16Int32Op) Init() {
 }
 
 type projPlusInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -42292,12 +40000,8 @@ func (p projPlusInt16Int64ConstOp) Init() {
 }
 
 type projPlusInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -42360,12 +40064,7 @@ func (p projPlusInt16ConstInt64Op) Init() {
 }
 
 type projPlusInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -42406,7 +40105,7 @@ func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -42432,12 +40131,8 @@ func (p projPlusInt16Int64Op) Init() {
 }
 
 type projMinusInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -42500,12 +40195,8 @@ func (p projMinusInt16Int64ConstOp) Init() {
 }
 
 type projMinusInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -42568,12 +40259,7 @@ func (p projMinusInt16ConstInt64Op) Init() {
 }
 
 type projMinusInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -42614,7 +40300,7 @@ func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -42640,12 +40326,8 @@ func (p projMinusInt16Int64Op) Init() {
 }
 
 type projMultInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -42722,12 +40404,8 @@ func (p projMultInt16Int64ConstOp) Init() {
 }
 
 type projMultInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -42804,12 +40482,7 @@ func (p projMultInt16ConstInt64Op) Init() {
 }
 
 type projMultInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -42857,7 +40530,7 @@ func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -42890,12 +40563,8 @@ func (p projMultInt16Int64Op) Init() {
 }
 
 type projDivInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -42966,12 +40635,8 @@ func (p projDivInt16Int64ConstOp) Init() {
 }
 
 type projDivInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -43042,12 +40707,7 @@ func (p projDivInt16ConstInt64Op) Init() {
 }
 
 type projDivInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -43092,7 +40752,7 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -43122,12 +40782,8 @@ func (p projDivInt16Int64Op) Init() {
 }
 
 type projEQInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -43208,12 +40864,8 @@ func (p projEQInt16Int64ConstOp) Init() {
 }
 
 type projEQInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -43294,12 +40946,7 @@ func (p projEQInt16ConstInt64Op) Init() {
 }
 
 type projEQInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -43349,7 +40996,7 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -43384,12 +41031,8 @@ func (p projEQInt16Int64Op) Init() {
 }
 
 type projNEInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -43470,12 +41113,8 @@ func (p projNEInt16Int64ConstOp) Init() {
 }
 
 type projNEInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -43556,12 +41195,7 @@ func (p projNEInt16ConstInt64Op) Init() {
 }
 
 type projNEInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -43611,7 +41245,7 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -43646,12 +41280,8 @@ func (p projNEInt16Int64Op) Init() {
 }
 
 type projLTInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -43732,12 +41362,8 @@ func (p projLTInt16Int64ConstOp) Init() {
 }
 
 type projLTInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -43818,12 +41444,7 @@ func (p projLTInt16ConstInt64Op) Init() {
 }
 
 type projLTInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -43873,7 +41494,7 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -43908,12 +41529,8 @@ func (p projLTInt16Int64Op) Init() {
 }
 
 type projLEInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -43994,12 +41611,8 @@ func (p projLEInt16Int64ConstOp) Init() {
 }
 
 type projLEInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -44080,12 +41693,7 @@ func (p projLEInt16ConstInt64Op) Init() {
 }
 
 type projLEInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -44135,7 +41743,7 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -44170,12 +41778,8 @@ func (p projLEInt16Int64Op) Init() {
 }
 
 type projGTInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -44256,12 +41860,8 @@ func (p projGTInt16Int64ConstOp) Init() {
 }
 
 type projGTInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -44342,12 +41942,7 @@ func (p projGTInt16ConstInt64Op) Init() {
 }
 
 type projGTInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -44397,7 +41992,7 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -44432,12 +42027,8 @@ func (p projGTInt16Int64Op) Init() {
 }
 
 type projGEInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -44518,12 +42109,8 @@ func (p projGEInt16Int64ConstOp) Init() {
 }
 
 type projGEInt16ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -44604,12 +42191,7 @@ func (p projGEInt16ConstInt64Op) Init() {
 }
 
 type projGEInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16Int64Op) EstimateStaticMemoryUsage() int {
@@ -44659,7 +42241,7 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -44694,12 +42276,8 @@ func (p projGEInt16Int64Op) Init() {
 }
 
 type projEQInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQInt16Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -44796,12 +42374,8 @@ func (p projEQInt16Float32ConstOp) Init() {
 }
 
 type projEQInt16ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -44898,12 +42472,7 @@ func (p projEQInt16ConstFloat32Op) Init() {
 }
 
 type projEQInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16Float32Op) EstimateStaticMemoryUsage() int {
@@ -44961,7 +42530,7 @@ func (p projEQInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -45004,12 +42573,8 @@ func (p projEQInt16Float32Op) Init() {
 }
 
 type projNEInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEInt16Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -45106,12 +42671,8 @@ func (p projNEInt16Float32ConstOp) Init() {
 }
 
 type projNEInt16ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -45208,12 +42769,7 @@ func (p projNEInt16ConstFloat32Op) Init() {
 }
 
 type projNEInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16Float32Op) EstimateStaticMemoryUsage() int {
@@ -45271,7 +42827,7 @@ func (p projNEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -45314,12 +42870,8 @@ func (p projNEInt16Float32Op) Init() {
 }
 
 type projLTInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTInt16Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -45416,12 +42968,8 @@ func (p projLTInt16Float32ConstOp) Init() {
 }
 
 type projLTInt16ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -45518,12 +43066,7 @@ func (p projLTInt16ConstFloat32Op) Init() {
 }
 
 type projLTInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16Float32Op) EstimateStaticMemoryUsage() int {
@@ -45581,7 +43124,7 @@ func (p projLTInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -45624,12 +43167,8 @@ func (p projLTInt16Float32Op) Init() {
 }
 
 type projLEInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEInt16Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -45726,12 +43265,8 @@ func (p projLEInt16Float32ConstOp) Init() {
 }
 
 type projLEInt16ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -45828,12 +43363,7 @@ func (p projLEInt16ConstFloat32Op) Init() {
 }
 
 type projLEInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16Float32Op) EstimateStaticMemoryUsage() int {
@@ -45891,7 +43421,7 @@ func (p projLEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -45934,12 +43464,8 @@ func (p projLEInt16Float32Op) Init() {
 }
 
 type projGTInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTInt16Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -46036,12 +43562,8 @@ func (p projGTInt16Float32ConstOp) Init() {
 }
 
 type projGTInt16ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -46138,12 +43660,7 @@ func (p projGTInt16ConstFloat32Op) Init() {
 }
 
 type projGTInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16Float32Op) EstimateStaticMemoryUsage() int {
@@ -46201,7 +43718,7 @@ func (p projGTInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -46244,12 +43761,8 @@ func (p projGTInt16Float32Op) Init() {
 }
 
 type projGEInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEInt16Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -46346,12 +43859,8 @@ func (p projGEInt16Float32ConstOp) Init() {
 }
 
 type projGEInt16ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -46448,12 +43957,7 @@ func (p projGEInt16ConstFloat32Op) Init() {
 }
 
 type projGEInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16Float32Op) EstimateStaticMemoryUsage() int {
@@ -46511,7 +44015,7 @@ func (p projGEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -46554,12 +44058,8 @@ func (p projGEInt16Float32Op) Init() {
 }
 
 type projEQInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -46656,12 +44156,8 @@ func (p projEQInt16Float64ConstOp) Init() {
 }
 
 type projEQInt16ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -46758,12 +44254,7 @@ func (p projEQInt16ConstFloat64Op) Init() {
 }
 
 type projEQInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt16Float64Op) EstimateStaticMemoryUsage() int {
@@ -46821,7 +44312,7 @@ func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -46864,12 +44355,8 @@ func (p projEQInt16Float64Op) Init() {
 }
 
 type projNEInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -46966,12 +44453,8 @@ func (p projNEInt16Float64ConstOp) Init() {
 }
 
 type projNEInt16ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -47068,12 +44551,7 @@ func (p projNEInt16ConstFloat64Op) Init() {
 }
 
 type projNEInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt16Float64Op) EstimateStaticMemoryUsage() int {
@@ -47131,7 +44609,7 @@ func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -47174,12 +44652,8 @@ func (p projNEInt16Float64Op) Init() {
 }
 
 type projLTInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -47276,12 +44750,8 @@ func (p projLTInt16Float64ConstOp) Init() {
 }
 
 type projLTInt16ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -47378,12 +44848,7 @@ func (p projLTInt16ConstFloat64Op) Init() {
 }
 
 type projLTInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt16Float64Op) EstimateStaticMemoryUsage() int {
@@ -47441,7 +44906,7 @@ func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -47484,12 +44949,8 @@ func (p projLTInt16Float64Op) Init() {
 }
 
 type projLEInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -47586,12 +45047,8 @@ func (p projLEInt16Float64ConstOp) Init() {
 }
 
 type projLEInt16ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -47688,12 +45145,7 @@ func (p projLEInt16ConstFloat64Op) Init() {
 }
 
 type projLEInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt16Float64Op) EstimateStaticMemoryUsage() int {
@@ -47751,7 +45203,7 @@ func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -47794,12 +45246,8 @@ func (p projLEInt16Float64Op) Init() {
 }
 
 type projGTInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -47896,12 +45344,8 @@ func (p projGTInt16Float64ConstOp) Init() {
 }
 
 type projGTInt16ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -47998,12 +45442,7 @@ func (p projGTInt16ConstFloat64Op) Init() {
 }
 
 type projGTInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt16Float64Op) EstimateStaticMemoryUsage() int {
@@ -48061,7 +45500,7 @@ func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -48104,12 +45543,8 @@ func (p projGTInt16Float64Op) Init() {
 }
 
 type projGEInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -48206,12 +45641,8 @@ func (p projGEInt16Float64ConstOp) Init() {
 }
 
 type projGEInt16ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -48308,12 +45739,7 @@ func (p projGEInt16ConstFloat64Op) Init() {
 }
 
 type projGEInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt16Float64Op) EstimateStaticMemoryUsage() int {
@@ -48371,7 +45797,7 @@ func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -48414,12 +45840,8 @@ func (p projGEInt16Float64Op) Init() {
 }
 
 type projPlusInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -48488,12 +45910,8 @@ func (p projPlusInt32DecimalConstOp) Init() {
 }
 
 type projPlusInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -48562,12 +45980,7 @@ func (p projPlusInt32ConstDecimalOp) Init() {
 }
 
 type projPlusInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -48611,7 +46024,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -48640,12 +46053,8 @@ func (p projPlusInt32DecimalOp) Init() {
 }
 
 type projMinusInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -48714,12 +46123,8 @@ func (p projMinusInt32DecimalConstOp) Init() {
 }
 
 type projMinusInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -48788,12 +46193,7 @@ func (p projMinusInt32ConstDecimalOp) Init() {
 }
 
 type projMinusInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -48837,7 +46237,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -48866,12 +46266,8 @@ func (p projMinusInt32DecimalOp) Init() {
 }
 
 type projMultInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -48940,12 +46336,8 @@ func (p projMultInt32DecimalConstOp) Init() {
 }
 
 type projMultInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -49014,12 +46406,7 @@ func (p projMultInt32ConstDecimalOp) Init() {
 }
 
 type projMultInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -49063,7 +46450,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -49092,12 +46479,8 @@ func (p projMultInt32DecimalOp) Init() {
 }
 
 type projDivInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -49172,12 +46555,8 @@ func (p projDivInt32DecimalConstOp) Init() {
 }
 
 type projDivInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -49252,12 +46631,7 @@ func (p projDivInt32ConstDecimalOp) Init() {
 }
 
 type projDivInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -49304,7 +46678,7 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -49336,12 +46710,8 @@ func (p projDivInt32DecimalOp) Init() {
 }
 
 type projEQInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -49412,12 +46782,8 @@ func (p projEQInt32DecimalConstOp) Init() {
 }
 
 type projEQInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -49488,12 +46854,7 @@ func (p projEQInt32ConstDecimalOp) Init() {
 }
 
 type projEQInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -49538,7 +46899,7 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -49568,12 +46929,8 @@ func (p projEQInt32DecimalOp) Init() {
 }
 
 type projNEInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -49644,12 +47001,8 @@ func (p projNEInt32DecimalConstOp) Init() {
 }
 
 type projNEInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -49720,12 +47073,7 @@ func (p projNEInt32ConstDecimalOp) Init() {
 }
 
 type projNEInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -49770,7 +47118,7 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -49800,12 +47148,8 @@ func (p projNEInt32DecimalOp) Init() {
 }
 
 type projLTInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -49876,12 +47220,8 @@ func (p projLTInt32DecimalConstOp) Init() {
 }
 
 type projLTInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -49952,12 +47292,7 @@ func (p projLTInt32ConstDecimalOp) Init() {
 }
 
 type projLTInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -50002,7 +47337,7 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -50032,12 +47367,8 @@ func (p projLTInt32DecimalOp) Init() {
 }
 
 type projLEInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -50108,12 +47439,8 @@ func (p projLEInt32DecimalConstOp) Init() {
 }
 
 type projLEInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -50184,12 +47511,7 @@ func (p projLEInt32ConstDecimalOp) Init() {
 }
 
 type projLEInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -50234,7 +47556,7 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -50264,12 +47586,8 @@ func (p projLEInt32DecimalOp) Init() {
 }
 
 type projGTInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -50340,12 +47658,8 @@ func (p projGTInt32DecimalConstOp) Init() {
 }
 
 type projGTInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -50416,12 +47730,7 @@ func (p projGTInt32ConstDecimalOp) Init() {
 }
 
 type projGTInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -50466,7 +47775,7 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -50496,12 +47805,8 @@ func (p projGTInt32DecimalOp) Init() {
 }
 
 type projGEInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -50572,12 +47877,8 @@ func (p projGEInt32DecimalConstOp) Init() {
 }
 
 type projGEInt32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -50648,12 +47949,7 @@ func (p projGEInt32ConstDecimalOp) Init() {
 }
 
 type projGEInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -50698,7 +47994,7 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -50728,12 +48024,8 @@ func (p projGEInt32DecimalOp) Init() {
 }
 
 type projPlusInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -50796,12 +48088,8 @@ func (p projPlusInt32Int8ConstOp) Init() {
 }
 
 type projPlusInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -50864,12 +48152,7 @@ func (p projPlusInt32ConstInt8Op) Init() {
 }
 
 type projPlusInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -50910,7 +48193,7 @@ func (p projPlusInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -50936,12 +48219,8 @@ func (p projPlusInt32Int8Op) Init() {
 }
 
 type projMinusInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -51004,12 +48283,8 @@ func (p projMinusInt32Int8ConstOp) Init() {
 }
 
 type projMinusInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -51072,12 +48347,7 @@ func (p projMinusInt32ConstInt8Op) Init() {
 }
 
 type projMinusInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -51118,7 +48388,7 @@ func (p projMinusInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -51144,12 +48414,8 @@ func (p projMinusInt32Int8Op) Init() {
 }
 
 type projMultInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -51226,12 +48492,8 @@ func (p projMultInt32Int8ConstOp) Init() {
 }
 
 type projMultInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -51308,12 +48570,7 @@ func (p projMultInt32ConstInt8Op) Init() {
 }
 
 type projMultInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -51361,7 +48618,7 @@ func (p projMultInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -51394,12 +48651,8 @@ func (p projMultInt32Int8Op) Init() {
 }
 
 type projDivInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -51470,12 +48723,8 @@ func (p projDivInt32Int8ConstOp) Init() {
 }
 
 type projDivInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -51546,12 +48795,7 @@ func (p projDivInt32ConstInt8Op) Init() {
 }
 
 type projDivInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -51596,7 +48840,7 @@ func (p projDivInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -51626,12 +48870,8 @@ func (p projDivInt32Int8Op) Init() {
 }
 
 type projEQInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -51712,12 +48952,8 @@ func (p projEQInt32Int8ConstOp) Init() {
 }
 
 type projEQInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -51798,12 +49034,7 @@ func (p projEQInt32ConstInt8Op) Init() {
 }
 
 type projEQInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -51853,7 +49084,7 @@ func (p projEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -51888,12 +49119,8 @@ func (p projEQInt32Int8Op) Init() {
 }
 
 type projNEInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -51974,12 +49201,8 @@ func (p projNEInt32Int8ConstOp) Init() {
 }
 
 type projNEInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -52060,12 +49283,7 @@ func (p projNEInt32ConstInt8Op) Init() {
 }
 
 type projNEInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -52115,7 +49333,7 @@ func (p projNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -52150,12 +49368,8 @@ func (p projNEInt32Int8Op) Init() {
 }
 
 type projLTInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -52236,12 +49450,8 @@ func (p projLTInt32Int8ConstOp) Init() {
 }
 
 type projLTInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -52322,12 +49532,7 @@ func (p projLTInt32ConstInt8Op) Init() {
 }
 
 type projLTInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -52377,7 +49582,7 @@ func (p projLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -52412,12 +49617,8 @@ func (p projLTInt32Int8Op) Init() {
 }
 
 type projLEInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -52498,12 +49699,8 @@ func (p projLEInt32Int8ConstOp) Init() {
 }
 
 type projLEInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -52584,12 +49781,7 @@ func (p projLEInt32ConstInt8Op) Init() {
 }
 
 type projLEInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -52639,7 +49831,7 @@ func (p projLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -52674,12 +49866,8 @@ func (p projLEInt32Int8Op) Init() {
 }
 
 type projGTInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -52760,12 +49948,8 @@ func (p projGTInt32Int8ConstOp) Init() {
 }
 
 type projGTInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -52846,12 +50030,7 @@ func (p projGTInt32ConstInt8Op) Init() {
 }
 
 type projGTInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -52901,7 +50080,7 @@ func (p projGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -52936,12 +50115,8 @@ func (p projGTInt32Int8Op) Init() {
 }
 
 type projGEInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -53022,12 +50197,8 @@ func (p projGEInt32Int8ConstOp) Init() {
 }
 
 type projGEInt32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -53108,12 +50279,7 @@ func (p projGEInt32ConstInt8Op) Init() {
 }
 
 type projGEInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32Int8Op) EstimateStaticMemoryUsage() int {
@@ -53163,7 +50329,7 @@ func (p projGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -53198,12 +50364,8 @@ func (p projGEInt32Int8Op) Init() {
 }
 
 type projPlusInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -53266,12 +50428,8 @@ func (p projPlusInt32Int16ConstOp) Init() {
 }
 
 type projPlusInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -53334,12 +50492,7 @@ func (p projPlusInt32ConstInt16Op) Init() {
 }
 
 type projPlusInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -53380,7 +50533,7 @@ func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -53406,12 +50559,8 @@ func (p projPlusInt32Int16Op) Init() {
 }
 
 type projMinusInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -53474,12 +50623,8 @@ func (p projMinusInt32Int16ConstOp) Init() {
 }
 
 type projMinusInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -53542,12 +50687,7 @@ func (p projMinusInt32ConstInt16Op) Init() {
 }
 
 type projMinusInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -53588,7 +50728,7 @@ func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -53614,12 +50754,8 @@ func (p projMinusInt32Int16Op) Init() {
 }
 
 type projMultInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -53696,12 +50832,8 @@ func (p projMultInt32Int16ConstOp) Init() {
 }
 
 type projMultInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -53778,12 +50910,7 @@ func (p projMultInt32ConstInt16Op) Init() {
 }
 
 type projMultInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -53831,7 +50958,7 @@ func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -53864,12 +50991,8 @@ func (p projMultInt32Int16Op) Init() {
 }
 
 type projDivInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -53940,12 +51063,8 @@ func (p projDivInt32Int16ConstOp) Init() {
 }
 
 type projDivInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -54016,12 +51135,7 @@ func (p projDivInt32ConstInt16Op) Init() {
 }
 
 type projDivInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -54066,7 +51180,7 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -54096,12 +51210,8 @@ func (p projDivInt32Int16Op) Init() {
 }
 
 type projEQInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -54182,12 +51292,8 @@ func (p projEQInt32Int16ConstOp) Init() {
 }
 
 type projEQInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -54268,12 +51374,7 @@ func (p projEQInt32ConstInt16Op) Init() {
 }
 
 type projEQInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -54323,7 +51424,7 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -54358,12 +51459,8 @@ func (p projEQInt32Int16Op) Init() {
 }
 
 type projNEInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -54444,12 +51541,8 @@ func (p projNEInt32Int16ConstOp) Init() {
 }
 
 type projNEInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -54530,12 +51623,7 @@ func (p projNEInt32ConstInt16Op) Init() {
 }
 
 type projNEInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -54585,7 +51673,7 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -54620,12 +51708,8 @@ func (p projNEInt32Int16Op) Init() {
 }
 
 type projLTInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -54706,12 +51790,8 @@ func (p projLTInt32Int16ConstOp) Init() {
 }
 
 type projLTInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -54792,12 +51872,7 @@ func (p projLTInt32ConstInt16Op) Init() {
 }
 
 type projLTInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -54847,7 +51922,7 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -54882,12 +51957,8 @@ func (p projLTInt32Int16Op) Init() {
 }
 
 type projLEInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -54968,12 +52039,8 @@ func (p projLEInt32Int16ConstOp) Init() {
 }
 
 type projLEInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -55054,12 +52121,7 @@ func (p projLEInt32ConstInt16Op) Init() {
 }
 
 type projLEInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -55109,7 +52171,7 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -55144,12 +52206,8 @@ func (p projLEInt32Int16Op) Init() {
 }
 
 type projGTInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -55230,12 +52288,8 @@ func (p projGTInt32Int16ConstOp) Init() {
 }
 
 type projGTInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -55316,12 +52370,7 @@ func (p projGTInt32ConstInt16Op) Init() {
 }
 
 type projGTInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -55371,7 +52420,7 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -55406,12 +52455,8 @@ func (p projGTInt32Int16Op) Init() {
 }
 
 type projGEInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -55492,12 +52537,8 @@ func (p projGEInt32Int16ConstOp) Init() {
 }
 
 type projGEInt32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -55578,12 +52619,7 @@ func (p projGEInt32ConstInt16Op) Init() {
 }
 
 type projGEInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32Int16Op) EstimateStaticMemoryUsage() int {
@@ -55633,7 +52669,7 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -55668,12 +52704,8 @@ func (p projGEInt32Int16Op) Init() {
 }
 
 type projPlusInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -55736,12 +52768,8 @@ func (p projPlusInt32Int32ConstOp) Init() {
 }
 
 type projPlusInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -55804,12 +52832,7 @@ func (p projPlusInt32ConstInt32Op) Init() {
 }
 
 type projPlusInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -55850,7 +52873,7 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -55876,12 +52899,8 @@ func (p projPlusInt32Int32Op) Init() {
 }
 
 type projMinusInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -55944,12 +52963,8 @@ func (p projMinusInt32Int32ConstOp) Init() {
 }
 
 type projMinusInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -56012,12 +53027,7 @@ func (p projMinusInt32ConstInt32Op) Init() {
 }
 
 type projMinusInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -56058,7 +53068,7 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -56084,12 +53094,8 @@ func (p projMinusInt32Int32Op) Init() {
 }
 
 type projMultInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -56166,12 +53172,8 @@ func (p projMultInt32Int32ConstOp) Init() {
 }
 
 type projMultInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -56248,12 +53250,7 @@ func (p projMultInt32ConstInt32Op) Init() {
 }
 
 type projMultInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -56301,7 +53298,7 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -56334,12 +53331,8 @@ func (p projMultInt32Int32Op) Init() {
 }
 
 type projDivInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -56410,12 +53403,8 @@ func (p projDivInt32Int32ConstOp) Init() {
 }
 
 type projDivInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -56486,12 +53475,7 @@ func (p projDivInt32ConstInt32Op) Init() {
 }
 
 type projDivInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -56536,7 +53520,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -56566,12 +53550,8 @@ func (p projDivInt32Int32Op) Init() {
 }
 
 type projEQInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -56652,12 +53632,8 @@ func (p projEQInt32Int32ConstOp) Init() {
 }
 
 type projEQInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -56738,12 +53714,7 @@ func (p projEQInt32ConstInt32Op) Init() {
 }
 
 type projEQInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -56793,7 +53764,7 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -56828,12 +53799,8 @@ func (p projEQInt32Int32Op) Init() {
 }
 
 type projNEInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -56914,12 +53881,8 @@ func (p projNEInt32Int32ConstOp) Init() {
 }
 
 type projNEInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -57000,12 +53963,7 @@ func (p projNEInt32ConstInt32Op) Init() {
 }
 
 type projNEInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -57055,7 +54013,7 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -57090,12 +54048,8 @@ func (p projNEInt32Int32Op) Init() {
 }
 
 type projLTInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -57176,12 +54130,8 @@ func (p projLTInt32Int32ConstOp) Init() {
 }
 
 type projLTInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -57262,12 +54212,7 @@ func (p projLTInt32ConstInt32Op) Init() {
 }
 
 type projLTInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -57317,7 +54262,7 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -57352,12 +54297,8 @@ func (p projLTInt32Int32Op) Init() {
 }
 
 type projLEInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -57438,12 +54379,8 @@ func (p projLEInt32Int32ConstOp) Init() {
 }
 
 type projLEInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -57524,12 +54461,7 @@ func (p projLEInt32ConstInt32Op) Init() {
 }
 
 type projLEInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -57579,7 +54511,7 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -57614,12 +54546,8 @@ func (p projLEInt32Int32Op) Init() {
 }
 
 type projGTInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -57700,12 +54628,8 @@ func (p projGTInt32Int32ConstOp) Init() {
 }
 
 type projGTInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -57786,12 +54710,7 @@ func (p projGTInt32ConstInt32Op) Init() {
 }
 
 type projGTInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -57841,7 +54760,7 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -57876,12 +54795,8 @@ func (p projGTInt32Int32Op) Init() {
 }
 
 type projGEInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -57962,12 +54877,8 @@ func (p projGEInt32Int32ConstOp) Init() {
 }
 
 type projGEInt32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -58048,12 +54959,7 @@ func (p projGEInt32ConstInt32Op) Init() {
 }
 
 type projGEInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32Int32Op) EstimateStaticMemoryUsage() int {
@@ -58103,7 +55009,7 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -58138,12 +55044,8 @@ func (p projGEInt32Int32Op) Init() {
 }
 
 type projPlusInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -58206,12 +55108,8 @@ func (p projPlusInt32Int64ConstOp) Init() {
 }
 
 type projPlusInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -58274,12 +55172,7 @@ func (p projPlusInt32ConstInt64Op) Init() {
 }
 
 type projPlusInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -58320,7 +55213,7 @@ func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -58346,12 +55239,8 @@ func (p projPlusInt32Int64Op) Init() {
 }
 
 type projMinusInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -58414,12 +55303,8 @@ func (p projMinusInt32Int64ConstOp) Init() {
 }
 
 type projMinusInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -58482,12 +55367,7 @@ func (p projMinusInt32ConstInt64Op) Init() {
 }
 
 type projMinusInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -58528,7 +55408,7 @@ func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -58554,12 +55434,8 @@ func (p projMinusInt32Int64Op) Init() {
 }
 
 type projMultInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -58636,12 +55512,8 @@ func (p projMultInt32Int64ConstOp) Init() {
 }
 
 type projMultInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -58718,12 +55590,7 @@ func (p projMultInt32ConstInt64Op) Init() {
 }
 
 type projMultInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -58771,7 +55638,7 @@ func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -58804,12 +55671,8 @@ func (p projMultInt32Int64Op) Init() {
 }
 
 type projDivInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -58880,12 +55743,8 @@ func (p projDivInt32Int64ConstOp) Init() {
 }
 
 type projDivInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -58956,12 +55815,7 @@ func (p projDivInt32ConstInt64Op) Init() {
 }
 
 type projDivInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -59006,7 +55860,7 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -59036,12 +55890,8 @@ func (p projDivInt32Int64Op) Init() {
 }
 
 type projEQInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -59122,12 +55972,8 @@ func (p projEQInt32Int64ConstOp) Init() {
 }
 
 type projEQInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -59208,12 +56054,7 @@ func (p projEQInt32ConstInt64Op) Init() {
 }
 
 type projEQInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -59263,7 +56104,7 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -59298,12 +56139,8 @@ func (p projEQInt32Int64Op) Init() {
 }
 
 type projNEInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -59384,12 +56221,8 @@ func (p projNEInt32Int64ConstOp) Init() {
 }
 
 type projNEInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -59470,12 +56303,7 @@ func (p projNEInt32ConstInt64Op) Init() {
 }
 
 type projNEInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -59525,7 +56353,7 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -59560,12 +56388,8 @@ func (p projNEInt32Int64Op) Init() {
 }
 
 type projLTInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -59646,12 +56470,8 @@ func (p projLTInt32Int64ConstOp) Init() {
 }
 
 type projLTInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -59732,12 +56552,7 @@ func (p projLTInt32ConstInt64Op) Init() {
 }
 
 type projLTInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -59787,7 +56602,7 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -59822,12 +56637,8 @@ func (p projLTInt32Int64Op) Init() {
 }
 
 type projLEInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -59908,12 +56719,8 @@ func (p projLEInt32Int64ConstOp) Init() {
 }
 
 type projLEInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -59994,12 +56801,7 @@ func (p projLEInt32ConstInt64Op) Init() {
 }
 
 type projLEInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -60049,7 +56851,7 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -60084,12 +56886,8 @@ func (p projLEInt32Int64Op) Init() {
 }
 
 type projGTInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -60170,12 +56968,8 @@ func (p projGTInt32Int64ConstOp) Init() {
 }
 
 type projGTInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -60256,12 +57050,7 @@ func (p projGTInt32ConstInt64Op) Init() {
 }
 
 type projGTInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -60311,7 +57100,7 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -60346,12 +57135,8 @@ func (p projGTInt32Int64Op) Init() {
 }
 
 type projGEInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -60432,12 +57217,8 @@ func (p projGEInt32Int64ConstOp) Init() {
 }
 
 type projGEInt32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -60518,12 +57299,7 @@ func (p projGEInt32ConstInt64Op) Init() {
 }
 
 type projGEInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32Int64Op) EstimateStaticMemoryUsage() int {
@@ -60573,7 +57349,7 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -60608,12 +57384,8 @@ func (p projGEInt32Int64Op) Init() {
 }
 
 type projEQInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQInt32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -60710,12 +57482,8 @@ func (p projEQInt32Float32ConstOp) Init() {
 }
 
 type projEQInt32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -60812,12 +57580,7 @@ func (p projEQInt32ConstFloat32Op) Init() {
 }
 
 type projEQInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32Float32Op) EstimateStaticMemoryUsage() int {
@@ -60875,7 +57638,7 @@ func (p projEQInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -60918,12 +57681,8 @@ func (p projEQInt32Float32Op) Init() {
 }
 
 type projNEInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEInt32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -61020,12 +57779,8 @@ func (p projNEInt32Float32ConstOp) Init() {
 }
 
 type projNEInt32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -61122,12 +57877,7 @@ func (p projNEInt32ConstFloat32Op) Init() {
 }
 
 type projNEInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32Float32Op) EstimateStaticMemoryUsage() int {
@@ -61185,7 +57935,7 @@ func (p projNEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -61228,12 +57978,8 @@ func (p projNEInt32Float32Op) Init() {
 }
 
 type projLTInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTInt32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -61330,12 +58076,8 @@ func (p projLTInt32Float32ConstOp) Init() {
 }
 
 type projLTInt32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -61432,12 +58174,7 @@ func (p projLTInt32ConstFloat32Op) Init() {
 }
 
 type projLTInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32Float32Op) EstimateStaticMemoryUsage() int {
@@ -61495,7 +58232,7 @@ func (p projLTInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -61538,12 +58275,8 @@ func (p projLTInt32Float32Op) Init() {
 }
 
 type projLEInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEInt32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -61640,12 +58373,8 @@ func (p projLEInt32Float32ConstOp) Init() {
 }
 
 type projLEInt32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -61742,12 +58471,7 @@ func (p projLEInt32ConstFloat32Op) Init() {
 }
 
 type projLEInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32Float32Op) EstimateStaticMemoryUsage() int {
@@ -61805,7 +58529,7 @@ func (p projLEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -61848,12 +58572,8 @@ func (p projLEInt32Float32Op) Init() {
 }
 
 type projGTInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTInt32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -61950,12 +58670,8 @@ func (p projGTInt32Float32ConstOp) Init() {
 }
 
 type projGTInt32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -62052,12 +58768,7 @@ func (p projGTInt32ConstFloat32Op) Init() {
 }
 
 type projGTInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32Float32Op) EstimateStaticMemoryUsage() int {
@@ -62115,7 +58826,7 @@ func (p projGTInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -62158,12 +58869,8 @@ func (p projGTInt32Float32Op) Init() {
 }
 
 type projGEInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEInt32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -62260,12 +58967,8 @@ func (p projGEInt32Float32ConstOp) Init() {
 }
 
 type projGEInt32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -62362,12 +59065,7 @@ func (p projGEInt32ConstFloat32Op) Init() {
 }
 
 type projGEInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32Float32Op) EstimateStaticMemoryUsage() int {
@@ -62425,7 +59123,7 @@ func (p projGEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -62468,12 +59166,8 @@ func (p projGEInt32Float32Op) Init() {
 }
 
 type projEQInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -62570,12 +59264,8 @@ func (p projEQInt32Float64ConstOp) Init() {
 }
 
 type projEQInt32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -62672,12 +59362,7 @@ func (p projEQInt32ConstFloat64Op) Init() {
 }
 
 type projEQInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt32Float64Op) EstimateStaticMemoryUsage() int {
@@ -62735,7 +59420,7 @@ func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -62778,12 +59463,8 @@ func (p projEQInt32Float64Op) Init() {
 }
 
 type projNEInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -62880,12 +59561,8 @@ func (p projNEInt32Float64ConstOp) Init() {
 }
 
 type projNEInt32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -62982,12 +59659,7 @@ func (p projNEInt32ConstFloat64Op) Init() {
 }
 
 type projNEInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt32Float64Op) EstimateStaticMemoryUsage() int {
@@ -63045,7 +59717,7 @@ func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -63088,12 +59760,8 @@ func (p projNEInt32Float64Op) Init() {
 }
 
 type projLTInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -63190,12 +59858,8 @@ func (p projLTInt32Float64ConstOp) Init() {
 }
 
 type projLTInt32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -63292,12 +59956,7 @@ func (p projLTInt32ConstFloat64Op) Init() {
 }
 
 type projLTInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt32Float64Op) EstimateStaticMemoryUsage() int {
@@ -63355,7 +60014,7 @@ func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -63398,12 +60057,8 @@ func (p projLTInt32Float64Op) Init() {
 }
 
 type projLEInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -63500,12 +60155,8 @@ func (p projLEInt32Float64ConstOp) Init() {
 }
 
 type projLEInt32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -63602,12 +60253,7 @@ func (p projLEInt32ConstFloat64Op) Init() {
 }
 
 type projLEInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt32Float64Op) EstimateStaticMemoryUsage() int {
@@ -63665,7 +60311,7 @@ func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -63708,12 +60354,8 @@ func (p projLEInt32Float64Op) Init() {
 }
 
 type projGTInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -63810,12 +60452,8 @@ func (p projGTInt32Float64ConstOp) Init() {
 }
 
 type projGTInt32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -63912,12 +60550,7 @@ func (p projGTInt32ConstFloat64Op) Init() {
 }
 
 type projGTInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt32Float64Op) EstimateStaticMemoryUsage() int {
@@ -63975,7 +60608,7 @@ func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -64018,12 +60651,8 @@ func (p projGTInt32Float64Op) Init() {
 }
 
 type projGEInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -64120,12 +60749,8 @@ func (p projGEInt32Float64ConstOp) Init() {
 }
 
 type projGEInt32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -64222,12 +60847,7 @@ func (p projGEInt32ConstFloat64Op) Init() {
 }
 
 type projGEInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt32Float64Op) EstimateStaticMemoryUsage() int {
@@ -64285,7 +60905,7 @@ func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -64328,12 +60948,8 @@ func (p projGEInt32Float64Op) Init() {
 }
 
 type projPlusInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projPlusInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -64402,12 +61018,8 @@ func (p projPlusInt64DecimalConstOp) Init() {
 }
 
 type projPlusInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -64476,12 +61088,7 @@ func (p projPlusInt64ConstDecimalOp) Init() {
 }
 
 type projPlusInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -64525,7 +61132,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -64554,12 +61161,8 @@ func (p projPlusInt64DecimalOp) Init() {
 }
 
 type projMinusInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMinusInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -64628,12 +61231,8 @@ func (p projMinusInt64DecimalConstOp) Init() {
 }
 
 type projMinusInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -64702,12 +61301,7 @@ func (p projMinusInt64ConstDecimalOp) Init() {
 }
 
 type projMinusInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -64751,7 +61345,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -64780,12 +61374,8 @@ func (p projMinusInt64DecimalOp) Init() {
 }
 
 type projMultInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projMultInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -64854,12 +61444,8 @@ func (p projMultInt64DecimalConstOp) Init() {
 }
 
 type projMultInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -64928,12 +61514,7 @@ func (p projMultInt64ConstDecimalOp) Init() {
 }
 
 type projMultInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -64977,7 +61558,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -65006,12 +61587,8 @@ func (p projMultInt64DecimalOp) Init() {
 }
 
 type projDivInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projDivInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -65086,12 +61663,8 @@ func (p projDivInt64DecimalConstOp) Init() {
 }
 
 type projDivInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -65166,12 +61739,7 @@ func (p projDivInt64ConstDecimalOp) Init() {
 }
 
 type projDivInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -65218,7 +61786,7 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -65250,12 +61818,8 @@ func (p projDivInt64DecimalOp) Init() {
 }
 
 type projEQInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -65326,12 +61890,8 @@ func (p projEQInt64DecimalConstOp) Init() {
 }
 
 type projEQInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -65402,12 +61962,7 @@ func (p projEQInt64ConstDecimalOp) Init() {
 }
 
 type projEQInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -65452,7 +62007,7 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -65482,12 +62037,8 @@ func (p projEQInt64DecimalOp) Init() {
 }
 
 type projNEInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -65558,12 +62109,8 @@ func (p projNEInt64DecimalConstOp) Init() {
 }
 
 type projNEInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -65634,12 +62181,7 @@ func (p projNEInt64ConstDecimalOp) Init() {
 }
 
 type projNEInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -65684,7 +62226,7 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -65714,12 +62256,8 @@ func (p projNEInt64DecimalOp) Init() {
 }
 
 type projLTInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -65790,12 +62328,8 @@ func (p projLTInt64DecimalConstOp) Init() {
 }
 
 type projLTInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -65866,12 +62400,7 @@ func (p projLTInt64ConstDecimalOp) Init() {
 }
 
 type projLTInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -65916,7 +62445,7 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -65946,12 +62475,8 @@ func (p projLTInt64DecimalOp) Init() {
 }
 
 type projLEInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -66022,12 +62547,8 @@ func (p projLEInt64DecimalConstOp) Init() {
 }
 
 type projLEInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -66098,12 +62619,7 @@ func (p projLEInt64ConstDecimalOp) Init() {
 }
 
 type projLEInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -66148,7 +62664,7 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -66178,12 +62694,8 @@ func (p projLEInt64DecimalOp) Init() {
 }
 
 type projGTInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -66254,12 +62766,8 @@ func (p projGTInt64DecimalConstOp) Init() {
 }
 
 type projGTInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -66330,12 +62838,7 @@ func (p projGTInt64ConstDecimalOp) Init() {
 }
 
 type projGTInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -66380,7 +62883,7 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -66410,12 +62913,8 @@ func (p projGTInt64DecimalOp) Init() {
 }
 
 type projGEInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -66486,12 +62985,8 @@ func (p projGEInt64DecimalConstOp) Init() {
 }
 
 type projGEInt64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -66562,12 +63057,7 @@ func (p projGEInt64ConstDecimalOp) Init() {
 }
 
 type projGEInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -66612,7 +63102,7 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -66642,12 +63132,8 @@ func (p projGEInt64DecimalOp) Init() {
 }
 
 type projPlusInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projPlusInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -66710,12 +63196,8 @@ func (p projPlusInt64Int8ConstOp) Init() {
 }
 
 type projPlusInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -66778,12 +63260,7 @@ func (p projPlusInt64ConstInt8Op) Init() {
 }
 
 type projPlusInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -66824,7 +63301,7 @@ func (p projPlusInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -66850,12 +63327,8 @@ func (p projPlusInt64Int8Op) Init() {
 }
 
 type projMinusInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMinusInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -66918,12 +63391,8 @@ func (p projMinusInt64Int8ConstOp) Init() {
 }
 
 type projMinusInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -66986,12 +63455,7 @@ func (p projMinusInt64ConstInt8Op) Init() {
 }
 
 type projMinusInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -67032,7 +63496,7 @@ func (p projMinusInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -67058,12 +63522,8 @@ func (p projMinusInt64Int8Op) Init() {
 }
 
 type projMultInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projMultInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -67140,12 +63600,8 @@ func (p projMultInt64Int8ConstOp) Init() {
 }
 
 type projMultInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -67222,12 +63678,7 @@ func (p projMultInt64ConstInt8Op) Init() {
 }
 
 type projMultInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -67275,7 +63726,7 @@ func (p projMultInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -67308,12 +63759,8 @@ func (p projMultInt64Int8Op) Init() {
 }
 
 type projDivInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projDivInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -67384,12 +63831,8 @@ func (p projDivInt64Int8ConstOp) Init() {
 }
 
 type projDivInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -67460,12 +63903,7 @@ func (p projDivInt64ConstInt8Op) Init() {
 }
 
 type projDivInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -67510,7 +63948,7 @@ func (p projDivInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -67540,12 +63978,8 @@ func (p projDivInt64Int8Op) Init() {
 }
 
 type projEQInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -67626,12 +64060,8 @@ func (p projEQInt64Int8ConstOp) Init() {
 }
 
 type projEQInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -67712,12 +64142,7 @@ func (p projEQInt64ConstInt8Op) Init() {
 }
 
 type projEQInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -67767,7 +64192,7 @@ func (p projEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -67802,12 +64227,8 @@ func (p projEQInt64Int8Op) Init() {
 }
 
 type projNEInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -67888,12 +64309,8 @@ func (p projNEInt64Int8ConstOp) Init() {
 }
 
 type projNEInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -67974,12 +64391,7 @@ func (p projNEInt64ConstInt8Op) Init() {
 }
 
 type projNEInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -68029,7 +64441,7 @@ func (p projNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -68064,12 +64476,8 @@ func (p projNEInt64Int8Op) Init() {
 }
 
 type projLTInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -68150,12 +64558,8 @@ func (p projLTInt64Int8ConstOp) Init() {
 }
 
 type projLTInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -68236,12 +64640,7 @@ func (p projLTInt64ConstInt8Op) Init() {
 }
 
 type projLTInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -68291,7 +64690,7 @@ func (p projLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -68326,12 +64725,8 @@ func (p projLTInt64Int8Op) Init() {
 }
 
 type projLEInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -68412,12 +64807,8 @@ func (p projLEInt64Int8ConstOp) Init() {
 }
 
 type projLEInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -68498,12 +64889,7 @@ func (p projLEInt64ConstInt8Op) Init() {
 }
 
 type projLEInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -68553,7 +64939,7 @@ func (p projLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -68588,12 +64974,8 @@ func (p projLEInt64Int8Op) Init() {
 }
 
 type projGTInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -68674,12 +65056,8 @@ func (p projGTInt64Int8ConstOp) Init() {
 }
 
 type projGTInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -68760,12 +65138,7 @@ func (p projGTInt64ConstInt8Op) Init() {
 }
 
 type projGTInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -68815,7 +65188,7 @@ func (p projGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -68850,12 +65223,8 @@ func (p projGTInt64Int8Op) Init() {
 }
 
 type projGEInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEInt64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -68936,12 +65305,8 @@ func (p projGEInt64Int8ConstOp) Init() {
 }
 
 type projGEInt64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -69022,12 +65387,7 @@ func (p projGEInt64ConstInt8Op) Init() {
 }
 
 type projGEInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64Int8Op) EstimateStaticMemoryUsage() int {
@@ -69077,7 +65437,7 @@ func (p projGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -69112,12 +65472,8 @@ func (p projGEInt64Int8Op) Init() {
 }
 
 type projPlusInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projPlusInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -69180,12 +65536,8 @@ func (p projPlusInt64Int16ConstOp) Init() {
 }
 
 type projPlusInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -69248,12 +65600,7 @@ func (p projPlusInt64ConstInt16Op) Init() {
 }
 
 type projPlusInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -69294,7 +65641,7 @@ func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -69320,12 +65667,8 @@ func (p projPlusInt64Int16Op) Init() {
 }
 
 type projMinusInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMinusInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -69388,12 +65731,8 @@ func (p projMinusInt64Int16ConstOp) Init() {
 }
 
 type projMinusInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -69456,12 +65795,7 @@ func (p projMinusInt64ConstInt16Op) Init() {
 }
 
 type projMinusInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -69502,7 +65836,7 @@ func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -69528,12 +65862,8 @@ func (p projMinusInt64Int16Op) Init() {
 }
 
 type projMultInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projMultInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -69610,12 +65940,8 @@ func (p projMultInt64Int16ConstOp) Init() {
 }
 
 type projMultInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -69692,12 +66018,7 @@ func (p projMultInt64ConstInt16Op) Init() {
 }
 
 type projMultInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -69745,7 +66066,7 @@ func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -69778,12 +66099,8 @@ func (p projMultInt64Int16Op) Init() {
 }
 
 type projDivInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projDivInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -69854,12 +66171,8 @@ func (p projDivInt64Int16ConstOp) Init() {
 }
 
 type projDivInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -69930,12 +66243,7 @@ func (p projDivInt64ConstInt16Op) Init() {
 }
 
 type projDivInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -69980,7 +66288,7 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -70010,12 +66318,8 @@ func (p projDivInt64Int16Op) Init() {
 }
 
 type projEQInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -70096,12 +66400,8 @@ func (p projEQInt64Int16ConstOp) Init() {
 }
 
 type projEQInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -70182,12 +66482,7 @@ func (p projEQInt64ConstInt16Op) Init() {
 }
 
 type projEQInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -70237,7 +66532,7 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -70272,12 +66567,8 @@ func (p projEQInt64Int16Op) Init() {
 }
 
 type projNEInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -70358,12 +66649,8 @@ func (p projNEInt64Int16ConstOp) Init() {
 }
 
 type projNEInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -70444,12 +66731,7 @@ func (p projNEInt64ConstInt16Op) Init() {
 }
 
 type projNEInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -70499,7 +66781,7 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -70534,12 +66816,8 @@ func (p projNEInt64Int16Op) Init() {
 }
 
 type projLTInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -70620,12 +66898,8 @@ func (p projLTInt64Int16ConstOp) Init() {
 }
 
 type projLTInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -70706,12 +66980,7 @@ func (p projLTInt64ConstInt16Op) Init() {
 }
 
 type projLTInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -70761,7 +67030,7 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -70796,12 +67065,8 @@ func (p projLTInt64Int16Op) Init() {
 }
 
 type projLEInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -70882,12 +67147,8 @@ func (p projLEInt64Int16ConstOp) Init() {
 }
 
 type projLEInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -70968,12 +67229,7 @@ func (p projLEInt64ConstInt16Op) Init() {
 }
 
 type projLEInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -71023,7 +67279,7 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -71058,12 +67314,8 @@ func (p projLEInt64Int16Op) Init() {
 }
 
 type projGTInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -71144,12 +67396,8 @@ func (p projGTInt64Int16ConstOp) Init() {
 }
 
 type projGTInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -71230,12 +67478,7 @@ func (p projGTInt64ConstInt16Op) Init() {
 }
 
 type projGTInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -71285,7 +67528,7 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -71320,12 +67563,8 @@ func (p projGTInt64Int16Op) Init() {
 }
 
 type projGEInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -71406,12 +67645,8 @@ func (p projGEInt64Int16ConstOp) Init() {
 }
 
 type projGEInt64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -71492,12 +67727,7 @@ func (p projGEInt64ConstInt16Op) Init() {
 }
 
 type projGEInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64Int16Op) EstimateStaticMemoryUsage() int {
@@ -71547,7 +67777,7 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -71582,12 +67812,8 @@ func (p projGEInt64Int16Op) Init() {
 }
 
 type projPlusInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projPlusInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -71650,12 +67876,8 @@ func (p projPlusInt64Int32ConstOp) Init() {
 }
 
 type projPlusInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -71718,12 +67940,7 @@ func (p projPlusInt64ConstInt32Op) Init() {
 }
 
 type projPlusInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -71764,7 +67981,7 @@ func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -71790,12 +68007,8 @@ func (p projPlusInt64Int32Op) Init() {
 }
 
 type projMinusInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMinusInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -71858,12 +68071,8 @@ func (p projMinusInt64Int32ConstOp) Init() {
 }
 
 type projMinusInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -71926,12 +68135,7 @@ func (p projMinusInt64ConstInt32Op) Init() {
 }
 
 type projMinusInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -71972,7 +68176,7 @@ func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -71998,12 +68202,8 @@ func (p projMinusInt64Int32Op) Init() {
 }
 
 type projMultInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projMultInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -72080,12 +68280,8 @@ func (p projMultInt64Int32ConstOp) Init() {
 }
 
 type projMultInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -72162,12 +68358,7 @@ func (p projMultInt64ConstInt32Op) Init() {
 }
 
 type projMultInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -72215,7 +68406,7 @@ func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -72248,12 +68439,8 @@ func (p projMultInt64Int32Op) Init() {
 }
 
 type projDivInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projDivInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -72324,12 +68511,8 @@ func (p projDivInt64Int32ConstOp) Init() {
 }
 
 type projDivInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -72400,12 +68583,7 @@ func (p projDivInt64ConstInt32Op) Init() {
 }
 
 type projDivInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -72450,7 +68628,7 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -72480,12 +68658,8 @@ func (p projDivInt64Int32Op) Init() {
 }
 
 type projEQInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -72566,12 +68740,8 @@ func (p projEQInt64Int32ConstOp) Init() {
 }
 
 type projEQInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -72652,12 +68822,7 @@ func (p projEQInt64ConstInt32Op) Init() {
 }
 
 type projEQInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -72707,7 +68872,7 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -72742,12 +68907,8 @@ func (p projEQInt64Int32Op) Init() {
 }
 
 type projNEInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -72828,12 +68989,8 @@ func (p projNEInt64Int32ConstOp) Init() {
 }
 
 type projNEInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -72914,12 +69071,7 @@ func (p projNEInt64ConstInt32Op) Init() {
 }
 
 type projNEInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -72969,7 +69121,7 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -73004,12 +69156,8 @@ func (p projNEInt64Int32Op) Init() {
 }
 
 type projLTInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -73090,12 +69238,8 @@ func (p projLTInt64Int32ConstOp) Init() {
 }
 
 type projLTInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -73176,12 +69320,7 @@ func (p projLTInt64ConstInt32Op) Init() {
 }
 
 type projLTInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -73231,7 +69370,7 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -73266,12 +69405,8 @@ func (p projLTInt64Int32Op) Init() {
 }
 
 type projLEInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -73352,12 +69487,8 @@ func (p projLEInt64Int32ConstOp) Init() {
 }
 
 type projLEInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -73438,12 +69569,7 @@ func (p projLEInt64ConstInt32Op) Init() {
 }
 
 type projLEInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -73493,7 +69619,7 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -73528,12 +69654,8 @@ func (p projLEInt64Int32Op) Init() {
 }
 
 type projGTInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -73614,12 +69736,8 @@ func (p projGTInt64Int32ConstOp) Init() {
 }
 
 type projGTInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -73700,12 +69818,7 @@ func (p projGTInt64ConstInt32Op) Init() {
 }
 
 type projGTInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -73755,7 +69868,7 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -73790,12 +69903,8 @@ func (p projGTInt64Int32Op) Init() {
 }
 
 type projGEInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -73876,12 +69985,8 @@ func (p projGEInt64Int32ConstOp) Init() {
 }
 
 type projGEInt64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -73962,12 +70067,7 @@ func (p projGEInt64ConstInt32Op) Init() {
 }
 
 type projGEInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64Int32Op) EstimateStaticMemoryUsage() int {
@@ -74017,7 +70117,7 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -74052,12 +70152,8 @@ func (p projGEInt64Int32Op) Init() {
 }
 
 type projPlusInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -74120,12 +70216,8 @@ func (p projPlusInt64Int64ConstOp) Init() {
 }
 
 type projPlusInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projPlusInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -74188,12 +70280,7 @@ func (p projPlusInt64ConstInt64Op) Init() {
 }
 
 type projPlusInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -74234,7 +70321,7 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -74260,12 +70347,8 @@ func (p projPlusInt64Int64Op) Init() {
 }
 
 type projMinusInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -74328,12 +70411,8 @@ func (p projMinusInt64Int64ConstOp) Init() {
 }
 
 type projMinusInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMinusInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -74396,12 +70475,7 @@ func (p projMinusInt64ConstInt64Op) Init() {
 }
 
 type projMinusInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -74442,7 +70516,7 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -74468,12 +70542,8 @@ func (p projMinusInt64Int64Op) Init() {
 }
 
 type projMultInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -74550,12 +70620,8 @@ func (p projMultInt64Int64ConstOp) Init() {
 }
 
 type projMultInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projMultInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -74632,12 +70698,7 @@ func (p projMultInt64ConstInt64Op) Init() {
 }
 
 type projMultInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -74685,7 +70746,7 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -74718,12 +70779,8 @@ func (p projMultInt64Int64Op) Init() {
 }
 
 type projDivInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -74794,12 +70851,8 @@ func (p projDivInt64Int64ConstOp) Init() {
 }
 
 type projDivInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projDivInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -74870,12 +70923,7 @@ func (p projDivInt64ConstInt64Op) Init() {
 }
 
 type projDivInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -74920,7 +70968,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -74950,12 +70998,8 @@ func (p projDivInt64Int64Op) Init() {
 }
 
 type projEQInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -75036,12 +71080,8 @@ func (p projEQInt64Int64ConstOp) Init() {
 }
 
 type projEQInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -75122,12 +71162,7 @@ func (p projEQInt64ConstInt64Op) Init() {
 }
 
 type projEQInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -75177,7 +71212,7 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -75212,12 +71247,8 @@ func (p projEQInt64Int64Op) Init() {
 }
 
 type projNEInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -75298,12 +71329,8 @@ func (p projNEInt64Int64ConstOp) Init() {
 }
 
 type projNEInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -75384,12 +71411,7 @@ func (p projNEInt64ConstInt64Op) Init() {
 }
 
 type projNEInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -75439,7 +71461,7 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -75474,12 +71496,8 @@ func (p projNEInt64Int64Op) Init() {
 }
 
 type projLTInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -75560,12 +71578,8 @@ func (p projLTInt64Int64ConstOp) Init() {
 }
 
 type projLTInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -75646,12 +71660,7 @@ func (p projLTInt64ConstInt64Op) Init() {
 }
 
 type projLTInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -75701,7 +71710,7 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -75736,12 +71745,8 @@ func (p projLTInt64Int64Op) Init() {
 }
 
 type projLEInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -75822,12 +71827,8 @@ func (p projLEInt64Int64ConstOp) Init() {
 }
 
 type projLEInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -75908,12 +71909,7 @@ func (p projLEInt64ConstInt64Op) Init() {
 }
 
 type projLEInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -75963,7 +71959,7 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -75998,12 +71994,8 @@ func (p projLEInt64Int64Op) Init() {
 }
 
 type projGTInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -76084,12 +72076,8 @@ func (p projGTInt64Int64ConstOp) Init() {
 }
 
 type projGTInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -76170,12 +72158,7 @@ func (p projGTInt64ConstInt64Op) Init() {
 }
 
 type projGTInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -76225,7 +72208,7 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -76260,12 +72243,8 @@ func (p projGTInt64Int64Op) Init() {
 }
 
 type projGEInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -76346,12 +72325,8 @@ func (p projGEInt64Int64ConstOp) Init() {
 }
 
 type projGEInt64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -76432,12 +72407,7 @@ func (p projGEInt64ConstInt64Op) Init() {
 }
 
 type projGEInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64Int64Op) EstimateStaticMemoryUsage() int {
@@ -76487,7 +72457,7 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -76522,12 +72492,8 @@ func (p projGEInt64Int64Op) Init() {
 }
 
 type projEQInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQInt64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -76624,12 +72590,8 @@ func (p projEQInt64Float32ConstOp) Init() {
 }
 
 type projEQInt64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -76726,12 +72688,7 @@ func (p projEQInt64ConstFloat32Op) Init() {
 }
 
 type projEQInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64Float32Op) EstimateStaticMemoryUsage() int {
@@ -76789,7 +72746,7 @@ func (p projEQInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -76832,12 +72789,8 @@ func (p projEQInt64Float32Op) Init() {
 }
 
 type projNEInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEInt64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -76934,12 +72887,8 @@ func (p projNEInt64Float32ConstOp) Init() {
 }
 
 type projNEInt64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -77036,12 +72985,7 @@ func (p projNEInt64ConstFloat32Op) Init() {
 }
 
 type projNEInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64Float32Op) EstimateStaticMemoryUsage() int {
@@ -77099,7 +73043,7 @@ func (p projNEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -77142,12 +73086,8 @@ func (p projNEInt64Float32Op) Init() {
 }
 
 type projLTInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTInt64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -77244,12 +73184,8 @@ func (p projLTInt64Float32ConstOp) Init() {
 }
 
 type projLTInt64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -77346,12 +73282,7 @@ func (p projLTInt64ConstFloat32Op) Init() {
 }
 
 type projLTInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64Float32Op) EstimateStaticMemoryUsage() int {
@@ -77409,7 +73340,7 @@ func (p projLTInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -77452,12 +73383,8 @@ func (p projLTInt64Float32Op) Init() {
 }
 
 type projLEInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEInt64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -77554,12 +73481,8 @@ func (p projLEInt64Float32ConstOp) Init() {
 }
 
 type projLEInt64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -77656,12 +73579,7 @@ func (p projLEInt64ConstFloat32Op) Init() {
 }
 
 type projLEInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64Float32Op) EstimateStaticMemoryUsage() int {
@@ -77719,7 +73637,7 @@ func (p projLEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -77762,12 +73680,8 @@ func (p projLEInt64Float32Op) Init() {
 }
 
 type projGTInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTInt64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -77864,12 +73778,8 @@ func (p projGTInt64Float32ConstOp) Init() {
 }
 
 type projGTInt64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -77966,12 +73876,7 @@ func (p projGTInt64ConstFloat32Op) Init() {
 }
 
 type projGTInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64Float32Op) EstimateStaticMemoryUsage() int {
@@ -78029,7 +73934,7 @@ func (p projGTInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -78072,12 +73977,8 @@ func (p projGTInt64Float32Op) Init() {
 }
 
 type projGEInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEInt64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -78174,12 +74075,8 @@ func (p projGEInt64Float32ConstOp) Init() {
 }
 
 type projGEInt64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -78276,12 +74173,7 @@ func (p projGEInt64ConstFloat32Op) Init() {
 }
 
 type projGEInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64Float32Op) EstimateStaticMemoryUsage() int {
@@ -78339,7 +74231,7 @@ func (p projGEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -78382,12 +74274,8 @@ func (p projGEInt64Float32Op) Init() {
 }
 
 type projEQInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -78484,12 +74372,8 @@ func (p projEQInt64Float64ConstOp) Init() {
 }
 
 type projEQInt64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -78586,12 +74470,7 @@ func (p projEQInt64ConstFloat64Op) Init() {
 }
 
 type projEQInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQInt64Float64Op) EstimateStaticMemoryUsage() int {
@@ -78649,7 +74528,7 @@ func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -78692,12 +74571,8 @@ func (p projEQInt64Float64Op) Init() {
 }
 
 type projNEInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -78794,12 +74669,8 @@ func (p projNEInt64Float64ConstOp) Init() {
 }
 
 type projNEInt64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -78896,12 +74767,7 @@ func (p projNEInt64ConstFloat64Op) Init() {
 }
 
 type projNEInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEInt64Float64Op) EstimateStaticMemoryUsage() int {
@@ -78959,7 +74825,7 @@ func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -79002,12 +74868,8 @@ func (p projNEInt64Float64Op) Init() {
 }
 
 type projLTInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -79104,12 +74966,8 @@ func (p projLTInt64Float64ConstOp) Init() {
 }
 
 type projLTInt64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -79206,12 +75064,7 @@ func (p projLTInt64ConstFloat64Op) Init() {
 }
 
 type projLTInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTInt64Float64Op) EstimateStaticMemoryUsage() int {
@@ -79269,7 +75122,7 @@ func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -79312,12 +75165,8 @@ func (p projLTInt64Float64Op) Init() {
 }
 
 type projLEInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -79414,12 +75263,8 @@ func (p projLEInt64Float64ConstOp) Init() {
 }
 
 type projLEInt64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -79516,12 +75361,7 @@ func (p projLEInt64ConstFloat64Op) Init() {
 }
 
 type projLEInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEInt64Float64Op) EstimateStaticMemoryUsage() int {
@@ -79579,7 +75419,7 @@ func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -79622,12 +75462,8 @@ func (p projLEInt64Float64Op) Init() {
 }
 
 type projGTInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -79724,12 +75560,8 @@ func (p projGTInt64Float64ConstOp) Init() {
 }
 
 type projGTInt64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -79826,12 +75658,7 @@ func (p projGTInt64ConstFloat64Op) Init() {
 }
 
 type projGTInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTInt64Float64Op) EstimateStaticMemoryUsage() int {
@@ -79889,7 +75716,7 @@ func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -79932,12 +75759,8 @@ func (p projGTInt64Float64Op) Init() {
 }
 
 type projGEInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -80034,12 +75857,8 @@ func (p projGEInt64Float64ConstOp) Init() {
 }
 
 type projGEInt64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -80136,12 +75955,7 @@ func (p projGEInt64ConstFloat64Op) Init() {
 }
 
 type projGEInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEInt64Float64Op) EstimateStaticMemoryUsage() int {
@@ -80199,7 +76013,7 @@ func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -80242,12 +76056,8 @@ func (p projGEInt64Float64Op) Init() {
 }
 
 type projEQFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQFloat32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -80322,12 +76132,8 @@ func (p projEQFloat32DecimalConstOp) Init() {
 }
 
 type projEQFloat32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -80402,12 +76208,7 @@ func (p projEQFloat32ConstDecimalOp) Init() {
 }
 
 type projEQFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -80454,7 +76255,7 @@ func (p projEQFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -80486,12 +76287,8 @@ func (p projEQFloat32DecimalOp) Init() {
 }
 
 type projNEFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEFloat32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -80566,12 +76363,8 @@ func (p projNEFloat32DecimalConstOp) Init() {
 }
 
 type projNEFloat32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -80646,12 +76439,7 @@ func (p projNEFloat32ConstDecimalOp) Init() {
 }
 
 type projNEFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -80698,7 +76486,7 @@ func (p projNEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -80730,12 +76518,8 @@ func (p projNEFloat32DecimalOp) Init() {
 }
 
 type projLTFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTFloat32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -80810,12 +76594,8 @@ func (p projLTFloat32DecimalConstOp) Init() {
 }
 
 type projLTFloat32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -80890,12 +76670,7 @@ func (p projLTFloat32ConstDecimalOp) Init() {
 }
 
 type projLTFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -80942,7 +76717,7 @@ func (p projLTFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -80974,12 +76749,8 @@ func (p projLTFloat32DecimalOp) Init() {
 }
 
 type projLEFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEFloat32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -81054,12 +76825,8 @@ func (p projLEFloat32DecimalConstOp) Init() {
 }
 
 type projLEFloat32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -81134,12 +76901,7 @@ func (p projLEFloat32ConstDecimalOp) Init() {
 }
 
 type projLEFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -81186,7 +76948,7 @@ func (p projLEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -81218,12 +76980,8 @@ func (p projLEFloat32DecimalOp) Init() {
 }
 
 type projGTFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTFloat32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -81298,12 +77056,8 @@ func (p projGTFloat32DecimalConstOp) Init() {
 }
 
 type projGTFloat32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -81378,12 +77132,7 @@ func (p projGTFloat32ConstDecimalOp) Init() {
 }
 
 type projGTFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -81430,7 +77179,7 @@ func (p projGTFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -81462,12 +77211,8 @@ func (p projGTFloat32DecimalOp) Init() {
 }
 
 type projGEFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEFloat32DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -81542,12 +77287,8 @@ func (p projGEFloat32DecimalConstOp) Init() {
 }
 
 type projGEFloat32ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -81622,12 +77363,7 @@ func (p projGEFloat32ConstDecimalOp) Init() {
 }
 
 type projGEFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32DecimalOp) EstimateStaticMemoryUsage() int {
@@ -81674,7 +77410,7 @@ func (p projGEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -81706,12 +77442,8 @@ func (p projGEFloat32DecimalOp) Init() {
 }
 
 type projEQFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQFloat32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -81808,12 +77540,8 @@ func (p projEQFloat32Int8ConstOp) Init() {
 }
 
 type projEQFloat32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -81910,12 +77638,7 @@ func (p projEQFloat32ConstInt8Op) Init() {
 }
 
 type projEQFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32Int8Op) EstimateStaticMemoryUsage() int {
@@ -81973,7 +77696,7 @@ func (p projEQFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -82016,12 +77739,8 @@ func (p projEQFloat32Int8Op) Init() {
 }
 
 type projNEFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEFloat32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -82118,12 +77837,8 @@ func (p projNEFloat32Int8ConstOp) Init() {
 }
 
 type projNEFloat32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -82220,12 +77935,7 @@ func (p projNEFloat32ConstInt8Op) Init() {
 }
 
 type projNEFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32Int8Op) EstimateStaticMemoryUsage() int {
@@ -82283,7 +77993,7 @@ func (p projNEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -82326,12 +78036,8 @@ func (p projNEFloat32Int8Op) Init() {
 }
 
 type projLTFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTFloat32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -82428,12 +78134,8 @@ func (p projLTFloat32Int8ConstOp) Init() {
 }
 
 type projLTFloat32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -82530,12 +78232,7 @@ func (p projLTFloat32ConstInt8Op) Init() {
 }
 
 type projLTFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32Int8Op) EstimateStaticMemoryUsage() int {
@@ -82593,7 +78290,7 @@ func (p projLTFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -82636,12 +78333,8 @@ func (p projLTFloat32Int8Op) Init() {
 }
 
 type projLEFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEFloat32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -82738,12 +78431,8 @@ func (p projLEFloat32Int8ConstOp) Init() {
 }
 
 type projLEFloat32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -82840,12 +78529,7 @@ func (p projLEFloat32ConstInt8Op) Init() {
 }
 
 type projLEFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32Int8Op) EstimateStaticMemoryUsage() int {
@@ -82903,7 +78587,7 @@ func (p projLEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -82946,12 +78630,8 @@ func (p projLEFloat32Int8Op) Init() {
 }
 
 type projGTFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTFloat32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -83048,12 +78728,8 @@ func (p projGTFloat32Int8ConstOp) Init() {
 }
 
 type projGTFloat32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -83150,12 +78826,7 @@ func (p projGTFloat32ConstInt8Op) Init() {
 }
 
 type projGTFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32Int8Op) EstimateStaticMemoryUsage() int {
@@ -83213,7 +78884,7 @@ func (p projGTFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -83256,12 +78927,8 @@ func (p projGTFloat32Int8Op) Init() {
 }
 
 type projGEFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEFloat32Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -83358,12 +79025,8 @@ func (p projGEFloat32Int8ConstOp) Init() {
 }
 
 type projGEFloat32ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -83460,12 +79123,7 @@ func (p projGEFloat32ConstInt8Op) Init() {
 }
 
 type projGEFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32Int8Op) EstimateStaticMemoryUsage() int {
@@ -83523,7 +79181,7 @@ func (p projGEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -83566,12 +79224,8 @@ func (p projGEFloat32Int8Op) Init() {
 }
 
 type projEQFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQFloat32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -83668,12 +79322,8 @@ func (p projEQFloat32Int16ConstOp) Init() {
 }
 
 type projEQFloat32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -83770,12 +79420,7 @@ func (p projEQFloat32ConstInt16Op) Init() {
 }
 
 type projEQFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32Int16Op) EstimateStaticMemoryUsage() int {
@@ -83833,7 +79478,7 @@ func (p projEQFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -83876,12 +79521,8 @@ func (p projEQFloat32Int16Op) Init() {
 }
 
 type projNEFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEFloat32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -83978,12 +79619,8 @@ func (p projNEFloat32Int16ConstOp) Init() {
 }
 
 type projNEFloat32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -84080,12 +79717,7 @@ func (p projNEFloat32ConstInt16Op) Init() {
 }
 
 type projNEFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32Int16Op) EstimateStaticMemoryUsage() int {
@@ -84143,7 +79775,7 @@ func (p projNEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -84186,12 +79818,8 @@ func (p projNEFloat32Int16Op) Init() {
 }
 
 type projLTFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTFloat32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -84288,12 +79916,8 @@ func (p projLTFloat32Int16ConstOp) Init() {
 }
 
 type projLTFloat32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -84390,12 +80014,7 @@ func (p projLTFloat32ConstInt16Op) Init() {
 }
 
 type projLTFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32Int16Op) EstimateStaticMemoryUsage() int {
@@ -84453,7 +80072,7 @@ func (p projLTFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -84496,12 +80115,8 @@ func (p projLTFloat32Int16Op) Init() {
 }
 
 type projLEFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEFloat32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -84598,12 +80213,8 @@ func (p projLEFloat32Int16ConstOp) Init() {
 }
 
 type projLEFloat32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -84700,12 +80311,7 @@ func (p projLEFloat32ConstInt16Op) Init() {
 }
 
 type projLEFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32Int16Op) EstimateStaticMemoryUsage() int {
@@ -84763,7 +80369,7 @@ func (p projLEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -84806,12 +80412,8 @@ func (p projLEFloat32Int16Op) Init() {
 }
 
 type projGTFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTFloat32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -84908,12 +80510,8 @@ func (p projGTFloat32Int16ConstOp) Init() {
 }
 
 type projGTFloat32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -85010,12 +80608,7 @@ func (p projGTFloat32ConstInt16Op) Init() {
 }
 
 type projGTFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32Int16Op) EstimateStaticMemoryUsage() int {
@@ -85073,7 +80666,7 @@ func (p projGTFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -85116,12 +80709,8 @@ func (p projGTFloat32Int16Op) Init() {
 }
 
 type projGEFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEFloat32Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -85218,12 +80807,8 @@ func (p projGEFloat32Int16ConstOp) Init() {
 }
 
 type projGEFloat32ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -85320,12 +80905,7 @@ func (p projGEFloat32ConstInt16Op) Init() {
 }
 
 type projGEFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32Int16Op) EstimateStaticMemoryUsage() int {
@@ -85383,7 +80963,7 @@ func (p projGEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -85426,12 +81006,8 @@ func (p projGEFloat32Int16Op) Init() {
 }
 
 type projEQFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQFloat32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -85528,12 +81104,8 @@ func (p projEQFloat32Int32ConstOp) Init() {
 }
 
 type projEQFloat32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -85630,12 +81202,7 @@ func (p projEQFloat32ConstInt32Op) Init() {
 }
 
 type projEQFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32Int32Op) EstimateStaticMemoryUsage() int {
@@ -85693,7 +81260,7 @@ func (p projEQFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -85736,12 +81303,8 @@ func (p projEQFloat32Int32Op) Init() {
 }
 
 type projNEFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEFloat32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -85838,12 +81401,8 @@ func (p projNEFloat32Int32ConstOp) Init() {
 }
 
 type projNEFloat32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -85940,12 +81499,7 @@ func (p projNEFloat32ConstInt32Op) Init() {
 }
 
 type projNEFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32Int32Op) EstimateStaticMemoryUsage() int {
@@ -86003,7 +81557,7 @@ func (p projNEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -86046,12 +81600,8 @@ func (p projNEFloat32Int32Op) Init() {
 }
 
 type projLTFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTFloat32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -86148,12 +81698,8 @@ func (p projLTFloat32Int32ConstOp) Init() {
 }
 
 type projLTFloat32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -86250,12 +81796,7 @@ func (p projLTFloat32ConstInt32Op) Init() {
 }
 
 type projLTFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32Int32Op) EstimateStaticMemoryUsage() int {
@@ -86313,7 +81854,7 @@ func (p projLTFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -86356,12 +81897,8 @@ func (p projLTFloat32Int32Op) Init() {
 }
 
 type projLEFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEFloat32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -86458,12 +81995,8 @@ func (p projLEFloat32Int32ConstOp) Init() {
 }
 
 type projLEFloat32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -86560,12 +82093,7 @@ func (p projLEFloat32ConstInt32Op) Init() {
 }
 
 type projLEFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32Int32Op) EstimateStaticMemoryUsage() int {
@@ -86623,7 +82151,7 @@ func (p projLEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -86666,12 +82194,8 @@ func (p projLEFloat32Int32Op) Init() {
 }
 
 type projGTFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTFloat32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -86768,12 +82292,8 @@ func (p projGTFloat32Int32ConstOp) Init() {
 }
 
 type projGTFloat32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -86870,12 +82390,7 @@ func (p projGTFloat32ConstInt32Op) Init() {
 }
 
 type projGTFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32Int32Op) EstimateStaticMemoryUsage() int {
@@ -86933,7 +82448,7 @@ func (p projGTFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -86976,12 +82491,8 @@ func (p projGTFloat32Int32Op) Init() {
 }
 
 type projGEFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEFloat32Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -87078,12 +82589,8 @@ func (p projGEFloat32Int32ConstOp) Init() {
 }
 
 type projGEFloat32ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -87180,12 +82687,7 @@ func (p projGEFloat32ConstInt32Op) Init() {
 }
 
 type projGEFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32Int32Op) EstimateStaticMemoryUsage() int {
@@ -87243,7 +82745,7 @@ func (p projGEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -87286,12 +82788,8 @@ func (p projGEFloat32Int32Op) Init() {
 }
 
 type projEQFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQFloat32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -87388,12 +82886,8 @@ func (p projEQFloat32Int64ConstOp) Init() {
 }
 
 type projEQFloat32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -87490,12 +82984,7 @@ func (p projEQFloat32ConstInt64Op) Init() {
 }
 
 type projEQFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32Int64Op) EstimateStaticMemoryUsage() int {
@@ -87553,7 +83042,7 @@ func (p projEQFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -87596,12 +83085,8 @@ func (p projEQFloat32Int64Op) Init() {
 }
 
 type projNEFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEFloat32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -87698,12 +83183,8 @@ func (p projNEFloat32Int64ConstOp) Init() {
 }
 
 type projNEFloat32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -87800,12 +83281,7 @@ func (p projNEFloat32ConstInt64Op) Init() {
 }
 
 type projNEFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32Int64Op) EstimateStaticMemoryUsage() int {
@@ -87863,7 +83339,7 @@ func (p projNEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -87906,12 +83382,8 @@ func (p projNEFloat32Int64Op) Init() {
 }
 
 type projLTFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTFloat32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -88008,12 +83480,8 @@ func (p projLTFloat32Int64ConstOp) Init() {
 }
 
 type projLTFloat32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -88110,12 +83578,7 @@ func (p projLTFloat32ConstInt64Op) Init() {
 }
 
 type projLTFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32Int64Op) EstimateStaticMemoryUsage() int {
@@ -88173,7 +83636,7 @@ func (p projLTFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -88216,12 +83679,8 @@ func (p projLTFloat32Int64Op) Init() {
 }
 
 type projLEFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEFloat32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -88318,12 +83777,8 @@ func (p projLEFloat32Int64ConstOp) Init() {
 }
 
 type projLEFloat32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -88420,12 +83875,7 @@ func (p projLEFloat32ConstInt64Op) Init() {
 }
 
 type projLEFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32Int64Op) EstimateStaticMemoryUsage() int {
@@ -88483,7 +83933,7 @@ func (p projLEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -88526,12 +83976,8 @@ func (p projLEFloat32Int64Op) Init() {
 }
 
 type projGTFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTFloat32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -88628,12 +84074,8 @@ func (p projGTFloat32Int64ConstOp) Init() {
 }
 
 type projGTFloat32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -88730,12 +84172,7 @@ func (p projGTFloat32ConstInt64Op) Init() {
 }
 
 type projGTFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32Int64Op) EstimateStaticMemoryUsage() int {
@@ -88793,7 +84230,7 @@ func (p projGTFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -88836,12 +84273,8 @@ func (p projGTFloat32Int64Op) Init() {
 }
 
 type projGEFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEFloat32Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -88938,12 +84371,8 @@ func (p projGEFloat32Int64ConstOp) Init() {
 }
 
 type projGEFloat32ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -89040,12 +84469,7 @@ func (p projGEFloat32ConstInt64Op) Init() {
 }
 
 type projGEFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32Int64Op) EstimateStaticMemoryUsage() int {
@@ -89103,7 +84527,7 @@ func (p projGEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -89146,12 +84570,8 @@ func (p projGEFloat32Int64Op) Init() {
 }
 
 type projPlusFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projPlusFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -89198,12 +84618,8 @@ func (p projPlusFloat32Float32ConstOp) Init() {
 }
 
 type projPlusFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projPlusFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -89250,12 +84666,7 @@ func (p projPlusFloat32ConstFloat32Op) Init() {
 }
 
 type projPlusFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -89288,7 +84699,7 @@ func (p projPlusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -89306,12 +84717,8 @@ func (p projPlusFloat32Float32Op) Init() {
 }
 
 type projMinusFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMinusFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -89358,12 +84765,8 @@ func (p projMinusFloat32Float32ConstOp) Init() {
 }
 
 type projMinusFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMinusFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -89410,12 +84813,7 @@ func (p projMinusFloat32ConstFloat32Op) Init() {
 }
 
 type projMinusFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -89448,7 +84846,7 @@ func (p projMinusFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -89466,12 +84864,8 @@ func (p projMinusFloat32Float32Op) Init() {
 }
 
 type projMultFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMultFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -89518,12 +84912,8 @@ func (p projMultFloat32Float32ConstOp) Init() {
 }
 
 type projMultFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMultFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -89570,12 +84960,7 @@ func (p projMultFloat32ConstFloat32Op) Init() {
 }
 
 type projMultFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -89608,7 +84993,7 @@ func (p projMultFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -89626,12 +85011,8 @@ func (p projMultFloat32Float32Op) Init() {
 }
 
 type projDivFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projDivFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -89678,12 +85059,8 @@ func (p projDivFloat32Float32ConstOp) Init() {
 }
 
 type projDivFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projDivFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -89730,12 +85107,7 @@ func (p projDivFloat32ConstFloat32Op) Init() {
 }
 
 type projDivFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -89768,7 +85140,7 @@ func (p projDivFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -89786,12 +85158,8 @@ func (p projDivFloat32Float32Op) Init() {
 }
 
 type projEQFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -89888,12 +85256,8 @@ func (p projEQFloat32Float32ConstOp) Init() {
 }
 
 type projEQFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -89990,12 +85354,7 @@ func (p projEQFloat32ConstFloat32Op) Init() {
 }
 
 type projEQFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -90053,7 +85412,7 @@ func (p projEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -90096,12 +85455,8 @@ func (p projEQFloat32Float32Op) Init() {
 }
 
 type projNEFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -90198,12 +85553,8 @@ func (p projNEFloat32Float32ConstOp) Init() {
 }
 
 type projNEFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -90300,12 +85651,7 @@ func (p projNEFloat32ConstFloat32Op) Init() {
 }
 
 type projNEFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -90363,7 +85709,7 @@ func (p projNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -90406,12 +85752,8 @@ func (p projNEFloat32Float32Op) Init() {
 }
 
 type projLTFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -90508,12 +85850,8 @@ func (p projLTFloat32Float32ConstOp) Init() {
 }
 
 type projLTFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -90610,12 +85948,7 @@ func (p projLTFloat32ConstFloat32Op) Init() {
 }
 
 type projLTFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -90673,7 +86006,7 @@ func (p projLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -90716,12 +86049,8 @@ func (p projLTFloat32Float32Op) Init() {
 }
 
 type projLEFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -90818,12 +86147,8 @@ func (p projLEFloat32Float32ConstOp) Init() {
 }
 
 type projLEFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -90920,12 +86245,7 @@ func (p projLEFloat32ConstFloat32Op) Init() {
 }
 
 type projLEFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -90983,7 +86303,7 @@ func (p projLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -91026,12 +86346,8 @@ func (p projLEFloat32Float32Op) Init() {
 }
 
 type projGTFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -91128,12 +86444,8 @@ func (p projGTFloat32Float32ConstOp) Init() {
 }
 
 type projGTFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -91230,12 +86542,7 @@ func (p projGTFloat32ConstFloat32Op) Init() {
 }
 
 type projGTFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -91293,7 +86600,7 @@ func (p projGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -91336,12 +86643,8 @@ func (p projGTFloat32Float32Op) Init() {
 }
 
 type projGEFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -91438,12 +86741,8 @@ func (p projGEFloat32Float32ConstOp) Init() {
 }
 
 type projGEFloat32ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -91540,12 +86839,7 @@ func (p projGEFloat32ConstFloat32Op) Init() {
 }
 
 type projGEFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32Float32Op) EstimateStaticMemoryUsage() int {
@@ -91603,7 +86897,7 @@ func (p projGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -91646,12 +86940,8 @@ func (p projGEFloat32Float32Op) Init() {
 }
 
 type projPlusFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projPlusFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -91698,12 +86988,8 @@ func (p projPlusFloat32Float64ConstOp) Init() {
 }
 
 type projPlusFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projPlusFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -91750,12 +87036,7 @@ func (p projPlusFloat32ConstFloat64Op) Init() {
 }
 
 type projPlusFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -91788,7 +87069,7 @@ func (p projPlusFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -91806,12 +87087,8 @@ func (p projPlusFloat32Float64Op) Init() {
 }
 
 type projMinusFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMinusFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -91858,12 +87135,8 @@ func (p projMinusFloat32Float64ConstOp) Init() {
 }
 
 type projMinusFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMinusFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -91910,12 +87183,7 @@ func (p projMinusFloat32ConstFloat64Op) Init() {
 }
 
 type projMinusFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -91948,7 +87216,7 @@ func (p projMinusFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -91966,12 +87234,8 @@ func (p projMinusFloat32Float64Op) Init() {
 }
 
 type projMultFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMultFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -92018,12 +87282,8 @@ func (p projMultFloat32Float64ConstOp) Init() {
 }
 
 type projMultFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMultFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -92070,12 +87330,7 @@ func (p projMultFloat32ConstFloat64Op) Init() {
 }
 
 type projMultFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -92108,7 +87363,7 @@ func (p projMultFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -92126,12 +87381,8 @@ func (p projMultFloat32Float64Op) Init() {
 }
 
 type projDivFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projDivFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -92178,12 +87429,8 @@ func (p projDivFloat32Float64ConstOp) Init() {
 }
 
 type projDivFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projDivFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -92230,12 +87477,7 @@ func (p projDivFloat32ConstFloat64Op) Init() {
 }
 
 type projDivFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -92268,7 +87510,7 @@ func (p projDivFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -92286,12 +87528,8 @@ func (p projDivFloat32Float64Op) Init() {
 }
 
 type projEQFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -92388,12 +87626,8 @@ func (p projEQFloat32Float64ConstOp) Init() {
 }
 
 type projEQFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -92490,12 +87724,7 @@ func (p projEQFloat32ConstFloat64Op) Init() {
 }
 
 type projEQFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -92553,7 +87782,7 @@ func (p projEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -92596,12 +87825,8 @@ func (p projEQFloat32Float64Op) Init() {
 }
 
 type projNEFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -92698,12 +87923,8 @@ func (p projNEFloat32Float64ConstOp) Init() {
 }
 
 type projNEFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -92800,12 +88021,7 @@ func (p projNEFloat32ConstFloat64Op) Init() {
 }
 
 type projNEFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -92863,7 +88079,7 @@ func (p projNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -92906,12 +88122,8 @@ func (p projNEFloat32Float64Op) Init() {
 }
 
 type projLTFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -93008,12 +88220,8 @@ func (p projLTFloat32Float64ConstOp) Init() {
 }
 
 type projLTFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -93110,12 +88318,7 @@ func (p projLTFloat32ConstFloat64Op) Init() {
 }
 
 type projLTFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -93173,7 +88376,7 @@ func (p projLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -93216,12 +88419,8 @@ func (p projLTFloat32Float64Op) Init() {
 }
 
 type projLEFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -93318,12 +88517,8 @@ func (p projLEFloat32Float64ConstOp) Init() {
 }
 
 type projLEFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -93420,12 +88615,7 @@ func (p projLEFloat32ConstFloat64Op) Init() {
 }
 
 type projLEFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -93483,7 +88673,7 @@ func (p projLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -93526,12 +88716,8 @@ func (p projLEFloat32Float64Op) Init() {
 }
 
 type projGTFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -93628,12 +88814,8 @@ func (p projGTFloat32Float64ConstOp) Init() {
 }
 
 type projGTFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -93730,12 +88912,7 @@ func (p projGTFloat32ConstFloat64Op) Init() {
 }
 
 type projGTFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -93793,7 +88970,7 @@ func (p projGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -93836,12 +89013,8 @@ func (p projGTFloat32Float64Op) Init() {
 }
 
 type projGEFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat32Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -93938,12 +89111,8 @@ func (p projGEFloat32Float64ConstOp) Init() {
 }
 
 type projGEFloat32ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat32ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -94040,12 +89209,7 @@ func (p projGEFloat32ConstFloat64Op) Init() {
 }
 
 type projGEFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat32Float64Op) EstimateStaticMemoryUsage() int {
@@ -94103,7 +89267,7 @@ func (p projGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -94146,12 +89310,8 @@ func (p projGEFloat32Float64Op) Init() {
 }
 
 type projEQFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projEQFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -94226,12 +89386,8 @@ func (p projEQFloat64DecimalConstOp) Init() {
 }
 
 type projEQFloat64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -94306,12 +89462,7 @@ func (p projEQFloat64ConstDecimalOp) Init() {
 }
 
 type projEQFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -94358,7 +89509,7 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -94390,12 +89541,8 @@ func (p projEQFloat64DecimalOp) Init() {
 }
 
 type projNEFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projNEFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -94470,12 +89617,8 @@ func (p projNEFloat64DecimalConstOp) Init() {
 }
 
 type projNEFloat64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -94550,12 +89693,7 @@ func (p projNEFloat64ConstDecimalOp) Init() {
 }
 
 type projNEFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -94602,7 +89740,7 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -94634,12 +89772,8 @@ func (p projNEFloat64DecimalOp) Init() {
 }
 
 type projLTFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLTFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -94714,12 +89848,8 @@ func (p projLTFloat64DecimalConstOp) Init() {
 }
 
 type projLTFloat64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -94794,12 +89924,7 @@ func (p projLTFloat64ConstDecimalOp) Init() {
 }
 
 type projLTFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -94846,7 +89971,7 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -94878,12 +90003,8 @@ func (p projLTFloat64DecimalOp) Init() {
 }
 
 type projLEFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projLEFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -94958,12 +90079,8 @@ func (p projLEFloat64DecimalConstOp) Init() {
 }
 
 type projLEFloat64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -95038,12 +90155,7 @@ func (p projLEFloat64ConstDecimalOp) Init() {
 }
 
 type projLEFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -95090,7 +90202,7 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -95122,12 +90234,8 @@ func (p projLEFloat64DecimalOp) Init() {
 }
 
 type projGTFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGTFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -95202,12 +90310,8 @@ func (p projGTFloat64DecimalConstOp) Init() {
 }
 
 type projGTFloat64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -95282,12 +90386,7 @@ func (p projGTFloat64ConstDecimalOp) Init() {
 }
 
 type projGTFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -95334,7 +90433,7 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -95366,12 +90465,8 @@ func (p projGTFloat64DecimalOp) Init() {
 }
 
 type projGEFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg apd.Decimal
-
-	outputIdx int
 }
 
 func (p projGEFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
@@ -95446,12 +90541,8 @@ func (p projGEFloat64DecimalConstOp) Init() {
 }
 
 type projGEFloat64ConstDecimalOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
@@ -95526,12 +90617,7 @@ func (p projGEFloat64ConstDecimalOp) Init() {
 }
 
 type projGEFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
@@ -95578,7 +90664,7 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -95610,12 +90696,8 @@ func (p projGEFloat64DecimalOp) Init() {
 }
 
 type projEQFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projEQFloat64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -95712,12 +90794,8 @@ func (p projEQFloat64Int8ConstOp) Init() {
 }
 
 type projEQFloat64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -95814,12 +90892,7 @@ func (p projEQFloat64ConstInt8Op) Init() {
 }
 
 type projEQFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64Int8Op) EstimateStaticMemoryUsage() int {
@@ -95877,7 +90950,7 @@ func (p projEQFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -95920,12 +90993,8 @@ func (p projEQFloat64Int8Op) Init() {
 }
 
 type projNEFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projNEFloat64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -96022,12 +91091,8 @@ func (p projNEFloat64Int8ConstOp) Init() {
 }
 
 type projNEFloat64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -96124,12 +91189,7 @@ func (p projNEFloat64ConstInt8Op) Init() {
 }
 
 type projNEFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64Int8Op) EstimateStaticMemoryUsage() int {
@@ -96187,7 +91247,7 @@ func (p projNEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -96230,12 +91290,8 @@ func (p projNEFloat64Int8Op) Init() {
 }
 
 type projLTFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLTFloat64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -96332,12 +91388,8 @@ func (p projLTFloat64Int8ConstOp) Init() {
 }
 
 type projLTFloat64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -96434,12 +91486,7 @@ func (p projLTFloat64ConstInt8Op) Init() {
 }
 
 type projLTFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64Int8Op) EstimateStaticMemoryUsage() int {
@@ -96497,7 +91544,7 @@ func (p projLTFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -96540,12 +91587,8 @@ func (p projLTFloat64Int8Op) Init() {
 }
 
 type projLEFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projLEFloat64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -96642,12 +91685,8 @@ func (p projLEFloat64Int8ConstOp) Init() {
 }
 
 type projLEFloat64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -96744,12 +91783,7 @@ func (p projLEFloat64ConstInt8Op) Init() {
 }
 
 type projLEFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64Int8Op) EstimateStaticMemoryUsage() int {
@@ -96807,7 +91841,7 @@ func (p projLEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -96850,12 +91884,8 @@ func (p projLEFloat64Int8Op) Init() {
 }
 
 type projGTFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGTFloat64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -96952,12 +91982,8 @@ func (p projGTFloat64Int8ConstOp) Init() {
 }
 
 type projGTFloat64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -97054,12 +92080,7 @@ func (p projGTFloat64ConstInt8Op) Init() {
 }
 
 type projGTFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64Int8Op) EstimateStaticMemoryUsage() int {
@@ -97117,7 +92138,7 @@ func (p projGTFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -97160,12 +92181,8 @@ func (p projGTFloat64Int8Op) Init() {
 }
 
 type projGEFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int8
-
-	outputIdx int
 }
 
 func (p projGEFloat64Int8ConstOp) EstimateStaticMemoryUsage() int {
@@ -97262,12 +92279,8 @@ func (p projGEFloat64Int8ConstOp) Init() {
 }
 
 type projGEFloat64ConstInt8Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstInt8Op) EstimateStaticMemoryUsage() int {
@@ -97364,12 +92377,7 @@ func (p projGEFloat64ConstInt8Op) Init() {
 }
 
 type projGEFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64Int8Op) EstimateStaticMemoryUsage() int {
@@ -97427,7 +92435,7 @@ func (p projGEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -97470,12 +92478,8 @@ func (p projGEFloat64Int8Op) Init() {
 }
 
 type projEQFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projEQFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -97572,12 +92576,8 @@ func (p projEQFloat64Int16ConstOp) Init() {
 }
 
 type projEQFloat64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -97674,12 +92674,7 @@ func (p projEQFloat64ConstInt16Op) Init() {
 }
 
 type projEQFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64Int16Op) EstimateStaticMemoryUsage() int {
@@ -97737,7 +92732,7 @@ func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -97780,12 +92775,8 @@ func (p projEQFloat64Int16Op) Init() {
 }
 
 type projNEFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projNEFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -97882,12 +92873,8 @@ func (p projNEFloat64Int16ConstOp) Init() {
 }
 
 type projNEFloat64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -97984,12 +92971,7 @@ func (p projNEFloat64ConstInt16Op) Init() {
 }
 
 type projNEFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64Int16Op) EstimateStaticMemoryUsage() int {
@@ -98047,7 +93029,7 @@ func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -98090,12 +93072,8 @@ func (p projNEFloat64Int16Op) Init() {
 }
 
 type projLTFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLTFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -98192,12 +93170,8 @@ func (p projLTFloat64Int16ConstOp) Init() {
 }
 
 type projLTFloat64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -98294,12 +93268,7 @@ func (p projLTFloat64ConstInt16Op) Init() {
 }
 
 type projLTFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64Int16Op) EstimateStaticMemoryUsage() int {
@@ -98357,7 +93326,7 @@ func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -98400,12 +93369,8 @@ func (p projLTFloat64Int16Op) Init() {
 }
 
 type projLEFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projLEFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -98502,12 +93467,8 @@ func (p projLEFloat64Int16ConstOp) Init() {
 }
 
 type projLEFloat64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -98604,12 +93565,7 @@ func (p projLEFloat64ConstInt16Op) Init() {
 }
 
 type projLEFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64Int16Op) EstimateStaticMemoryUsage() int {
@@ -98667,7 +93623,7 @@ func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -98710,12 +93666,8 @@ func (p projLEFloat64Int16Op) Init() {
 }
 
 type projGTFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGTFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -98812,12 +93764,8 @@ func (p projGTFloat64Int16ConstOp) Init() {
 }
 
 type projGTFloat64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -98914,12 +93862,7 @@ func (p projGTFloat64ConstInt16Op) Init() {
 }
 
 type projGTFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64Int16Op) EstimateStaticMemoryUsage() int {
@@ -98977,7 +93920,7 @@ func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -99020,12 +93963,8 @@ func (p projGTFloat64Int16Op) Init() {
 }
 
 type projGEFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int16
-
-	outputIdx int
 }
 
 func (p projGEFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
@@ -99122,12 +94061,8 @@ func (p projGEFloat64Int16ConstOp) Init() {
 }
 
 type projGEFloat64ConstInt16Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
@@ -99224,12 +94159,7 @@ func (p projGEFloat64ConstInt16Op) Init() {
 }
 
 type projGEFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64Int16Op) EstimateStaticMemoryUsage() int {
@@ -99287,7 +94217,7 @@ func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -99330,12 +94260,8 @@ func (p projGEFloat64Int16Op) Init() {
 }
 
 type projEQFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projEQFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -99432,12 +94358,8 @@ func (p projEQFloat64Int32ConstOp) Init() {
 }
 
 type projEQFloat64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -99534,12 +94456,7 @@ func (p projEQFloat64ConstInt32Op) Init() {
 }
 
 type projEQFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64Int32Op) EstimateStaticMemoryUsage() int {
@@ -99597,7 +94514,7 @@ func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -99640,12 +94557,8 @@ func (p projEQFloat64Int32Op) Init() {
 }
 
 type projNEFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projNEFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -99742,12 +94655,8 @@ func (p projNEFloat64Int32ConstOp) Init() {
 }
 
 type projNEFloat64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -99844,12 +94753,7 @@ func (p projNEFloat64ConstInt32Op) Init() {
 }
 
 type projNEFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64Int32Op) EstimateStaticMemoryUsage() int {
@@ -99907,7 +94811,7 @@ func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -99950,12 +94854,8 @@ func (p projNEFloat64Int32Op) Init() {
 }
 
 type projLTFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLTFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -100052,12 +94952,8 @@ func (p projLTFloat64Int32ConstOp) Init() {
 }
 
 type projLTFloat64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -100154,12 +95050,7 @@ func (p projLTFloat64ConstInt32Op) Init() {
 }
 
 type projLTFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64Int32Op) EstimateStaticMemoryUsage() int {
@@ -100217,7 +95108,7 @@ func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -100260,12 +95151,8 @@ func (p projLTFloat64Int32Op) Init() {
 }
 
 type projLEFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projLEFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -100362,12 +95249,8 @@ func (p projLEFloat64Int32ConstOp) Init() {
 }
 
 type projLEFloat64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -100464,12 +95347,7 @@ func (p projLEFloat64ConstInt32Op) Init() {
 }
 
 type projLEFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64Int32Op) EstimateStaticMemoryUsage() int {
@@ -100527,7 +95405,7 @@ func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -100570,12 +95448,8 @@ func (p projLEFloat64Int32Op) Init() {
 }
 
 type projGTFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGTFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -100672,12 +95546,8 @@ func (p projGTFloat64Int32ConstOp) Init() {
 }
 
 type projGTFloat64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -100774,12 +95644,7 @@ func (p projGTFloat64ConstInt32Op) Init() {
 }
 
 type projGTFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64Int32Op) EstimateStaticMemoryUsage() int {
@@ -100837,7 +95702,7 @@ func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -100880,12 +95745,8 @@ func (p projGTFloat64Int32Op) Init() {
 }
 
 type projGEFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int32
-
-	outputIdx int
 }
 
 func (p projGEFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
@@ -100982,12 +95843,8 @@ func (p projGEFloat64Int32ConstOp) Init() {
 }
 
 type projGEFloat64ConstInt32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
@@ -101084,12 +95941,7 @@ func (p projGEFloat64ConstInt32Op) Init() {
 }
 
 type projGEFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64Int32Op) EstimateStaticMemoryUsage() int {
@@ -101147,7 +95999,7 @@ func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -101190,12 +96042,8 @@ func (p projGEFloat64Int32Op) Init() {
 }
 
 type projEQFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projEQFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -101292,12 +96140,8 @@ func (p projEQFloat64Int64ConstOp) Init() {
 }
 
 type projEQFloat64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -101394,12 +96238,7 @@ func (p projEQFloat64ConstInt64Op) Init() {
 }
 
 type projEQFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64Int64Op) EstimateStaticMemoryUsage() int {
@@ -101457,7 +96296,7 @@ func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -101500,12 +96339,8 @@ func (p projEQFloat64Int64Op) Init() {
 }
 
 type projNEFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projNEFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -101602,12 +96437,8 @@ func (p projNEFloat64Int64ConstOp) Init() {
 }
 
 type projNEFloat64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -101704,12 +96535,7 @@ func (p projNEFloat64ConstInt64Op) Init() {
 }
 
 type projNEFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64Int64Op) EstimateStaticMemoryUsage() int {
@@ -101767,7 +96593,7 @@ func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -101810,12 +96636,8 @@ func (p projNEFloat64Int64Op) Init() {
 }
 
 type projLTFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLTFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -101912,12 +96734,8 @@ func (p projLTFloat64Int64ConstOp) Init() {
 }
 
 type projLTFloat64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -102014,12 +96832,7 @@ func (p projLTFloat64ConstInt64Op) Init() {
 }
 
 type projLTFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64Int64Op) EstimateStaticMemoryUsage() int {
@@ -102077,7 +96890,7 @@ func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -102120,12 +96933,8 @@ func (p projLTFloat64Int64Op) Init() {
 }
 
 type projLEFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projLEFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -102222,12 +97031,8 @@ func (p projLEFloat64Int64ConstOp) Init() {
 }
 
 type projLEFloat64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -102324,12 +97129,7 @@ func (p projLEFloat64ConstInt64Op) Init() {
 }
 
 type projLEFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64Int64Op) EstimateStaticMemoryUsage() int {
@@ -102387,7 +97187,7 @@ func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -102430,12 +97230,8 @@ func (p projLEFloat64Int64Op) Init() {
 }
 
 type projGTFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGTFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -102532,12 +97328,8 @@ func (p projGTFloat64Int64ConstOp) Init() {
 }
 
 type projGTFloat64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -102634,12 +97426,7 @@ func (p projGTFloat64ConstInt64Op) Init() {
 }
 
 type projGTFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64Int64Op) EstimateStaticMemoryUsage() int {
@@ -102697,7 +97484,7 @@ func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -102740,12 +97527,8 @@ func (p projGTFloat64Int64Op) Init() {
 }
 
 type projGEFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg int64
-
-	outputIdx int
 }
 
 func (p projGEFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
@@ -102842,12 +97625,8 @@ func (p projGEFloat64Int64ConstOp) Init() {
 }
 
 type projGEFloat64ConstInt64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
@@ -102944,12 +97723,7 @@ func (p projGEFloat64ConstInt64Op) Init() {
 }
 
 type projGEFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64Int64Op) EstimateStaticMemoryUsage() int {
@@ -103007,7 +97781,7 @@ func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -103050,12 +97824,8 @@ func (p projGEFloat64Int64Op) Init() {
 }
 
 type projPlusFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projPlusFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -103102,12 +97872,8 @@ func (p projPlusFloat64Float32ConstOp) Init() {
 }
 
 type projPlusFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projPlusFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -103154,12 +97920,7 @@ func (p projPlusFloat64ConstFloat32Op) Init() {
 }
 
 type projPlusFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -103192,7 +97953,7 @@ func (p projPlusFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -103210,12 +97971,8 @@ func (p projPlusFloat64Float32Op) Init() {
 }
 
 type projMinusFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMinusFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -103262,12 +98019,8 @@ func (p projMinusFloat64Float32ConstOp) Init() {
 }
 
 type projMinusFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMinusFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -103314,12 +98067,7 @@ func (p projMinusFloat64ConstFloat32Op) Init() {
 }
 
 type projMinusFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -103352,7 +98100,7 @@ func (p projMinusFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -103370,12 +98118,8 @@ func (p projMinusFloat64Float32Op) Init() {
 }
 
 type projMultFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projMultFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -103422,12 +98166,8 @@ func (p projMultFloat64Float32ConstOp) Init() {
 }
 
 type projMultFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMultFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -103474,12 +98214,7 @@ func (p projMultFloat64ConstFloat32Op) Init() {
 }
 
 type projMultFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -103512,7 +98247,7 @@ func (p projMultFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -103530,12 +98265,8 @@ func (p projMultFloat64Float32Op) Init() {
 }
 
 type projDivFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projDivFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -103582,12 +98313,8 @@ func (p projDivFloat64Float32ConstOp) Init() {
 }
 
 type projDivFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projDivFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -103634,12 +98361,7 @@ func (p projDivFloat64ConstFloat32Op) Init() {
 }
 
 type projDivFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -103672,7 +98394,7 @@ func (p projDivFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -103690,12 +98412,8 @@ func (p projDivFloat64Float32Op) Init() {
 }
 
 type projEQFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projEQFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -103792,12 +98510,8 @@ func (p projEQFloat64Float32ConstOp) Init() {
 }
 
 type projEQFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -103894,12 +98608,7 @@ func (p projEQFloat64ConstFloat32Op) Init() {
 }
 
 type projEQFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -103957,7 +98666,7 @@ func (p projEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -104000,12 +98709,8 @@ func (p projEQFloat64Float32Op) Init() {
 }
 
 type projNEFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projNEFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -104102,12 +98807,8 @@ func (p projNEFloat64Float32ConstOp) Init() {
 }
 
 type projNEFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -104204,12 +98905,7 @@ func (p projNEFloat64ConstFloat32Op) Init() {
 }
 
 type projNEFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -104267,7 +98963,7 @@ func (p projNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -104310,12 +99006,8 @@ func (p projNEFloat64Float32Op) Init() {
 }
 
 type projLTFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLTFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -104412,12 +99104,8 @@ func (p projLTFloat64Float32ConstOp) Init() {
 }
 
 type projLTFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -104514,12 +99202,7 @@ func (p projLTFloat64ConstFloat32Op) Init() {
 }
 
 type projLTFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -104577,7 +99260,7 @@ func (p projLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -104620,12 +99303,8 @@ func (p projLTFloat64Float32Op) Init() {
 }
 
 type projLEFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projLEFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -104722,12 +99401,8 @@ func (p projLEFloat64Float32ConstOp) Init() {
 }
 
 type projLEFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -104824,12 +99499,7 @@ func (p projLEFloat64ConstFloat32Op) Init() {
 }
 
 type projLEFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -104887,7 +99557,7 @@ func (p projLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -104930,12 +99600,8 @@ func (p projLEFloat64Float32Op) Init() {
 }
 
 type projGTFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGTFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -105032,12 +99698,8 @@ func (p projGTFloat64Float32ConstOp) Init() {
 }
 
 type projGTFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -105134,12 +99796,7 @@ func (p projGTFloat64ConstFloat32Op) Init() {
 }
 
 type projGTFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -105197,7 +99854,7 @@ func (p projGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -105240,12 +99897,8 @@ func (p projGTFloat64Float32Op) Init() {
 }
 
 type projGEFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float32
-
-	outputIdx int
 }
 
 func (p projGEFloat64Float32ConstOp) EstimateStaticMemoryUsage() int {
@@ -105342,12 +99995,8 @@ func (p projGEFloat64Float32ConstOp) Init() {
 }
 
 type projGEFloat64ConstFloat32Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstFloat32Op) EstimateStaticMemoryUsage() int {
@@ -105444,12 +100093,7 @@ func (p projGEFloat64ConstFloat32Op) Init() {
 }
 
 type projGEFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64Float32Op) EstimateStaticMemoryUsage() int {
@@ -105507,7 +100151,7 @@ func (p projGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -105550,12 +100194,8 @@ func (p projGEFloat64Float32Op) Init() {
 }
 
 type projPlusFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projPlusFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -105602,12 +100242,8 @@ func (p projPlusFloat64Float64ConstOp) Init() {
 }
 
 type projPlusFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projPlusFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -105654,12 +100290,7 @@ func (p projPlusFloat64ConstFloat64Op) Init() {
 }
 
 type projPlusFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projPlusFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -105692,7 +100323,7 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -105710,12 +100341,8 @@ func (p projPlusFloat64Float64Op) Init() {
 }
 
 type projMinusFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMinusFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -105762,12 +100389,8 @@ func (p projMinusFloat64Float64ConstOp) Init() {
 }
 
 type projMinusFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMinusFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -105814,12 +100437,7 @@ func (p projMinusFloat64ConstFloat64Op) Init() {
 }
 
 type projMinusFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMinusFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -105852,7 +100470,7 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -105870,12 +100488,8 @@ func (p projMinusFloat64Float64Op) Init() {
 }
 
 type projMultFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMultFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -105922,12 +100536,8 @@ func (p projMultFloat64Float64ConstOp) Init() {
 }
 
 type projMultFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projMultFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -105974,12 +100584,7 @@ func (p projMultFloat64ConstFloat64Op) Init() {
 }
 
 type projMultFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projMultFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -106012,7 +100617,7 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -106030,12 +100635,8 @@ func (p projMultFloat64Float64Op) Init() {
 }
 
 type projDivFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projDivFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -106082,12 +100683,8 @@ func (p projDivFloat64Float64ConstOp) Init() {
 }
 
 type projDivFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projDivFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -106134,12 +100731,7 @@ func (p projDivFloat64ConstFloat64Op) Init() {
 }
 
 type projDivFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projDivFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -106172,7 +100764,7 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -106190,12 +100782,8 @@ func (p projDivFloat64Float64Op) Init() {
 }
 
 type projEQFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -106292,12 +100880,8 @@ func (p projEQFloat64Float64ConstOp) Init() {
 }
 
 type projEQFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projEQFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -106394,12 +100978,7 @@ func (p projEQFloat64ConstFloat64Op) Init() {
 }
 
 type projEQFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projEQFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -106457,7 +101036,7 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -106500,12 +101079,8 @@ func (p projEQFloat64Float64Op) Init() {
 }
 
 type projNEFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -106602,12 +101177,8 @@ func (p projNEFloat64Float64ConstOp) Init() {
 }
 
 type projNEFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projNEFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -106704,12 +101275,7 @@ func (p projNEFloat64ConstFloat64Op) Init() {
 }
 
 type projNEFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projNEFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -106767,7 +101333,7 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -106810,12 +101376,8 @@ func (p projNEFloat64Float64Op) Init() {
 }
 
 type projLTFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -106912,12 +101474,8 @@ func (p projLTFloat64Float64ConstOp) Init() {
 }
 
 type projLTFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLTFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -107014,12 +101572,7 @@ func (p projLTFloat64ConstFloat64Op) Init() {
 }
 
 type projLTFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLTFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -107077,7 +101630,7 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -107120,12 +101673,8 @@ func (p projLTFloat64Float64Op) Init() {
 }
 
 type projLEFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -107222,12 +101771,8 @@ func (p projLEFloat64Float64ConstOp) Init() {
 }
 
 type projLEFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projLEFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -107324,12 +101869,7 @@ func (p projLEFloat64ConstFloat64Op) Init() {
 }
 
 type projLEFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projLEFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -107387,7 +101927,7 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -107430,12 +101970,8 @@ func (p projLEFloat64Float64Op) Init() {
 }
 
 type projGTFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -107532,12 +102068,8 @@ func (p projGTFloat64Float64ConstOp) Init() {
 }
 
 type projGTFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGTFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -107634,12 +102166,7 @@ func (p projGTFloat64ConstFloat64Op) Init() {
 }
 
 type projGTFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGTFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -107697,7 +102224,7 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -107740,12 +102267,8 @@ func (p projGTFloat64Float64Op) Init() {
 }
 
 type projGEFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
@@ -107842,12 +102365,8 @@ func (p projGEFloat64Float64ConstOp) Init() {
 }
 
 type projGEFloat64ConstFloat64Op struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg float64
-
-	outputIdx int
 }
 
 func (p projGEFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
@@ -107944,12 +102463,7 @@ func (p projGEFloat64ConstFloat64Op) Init() {
 }
 
 type projGEFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
-
-	outputIdx int
+	projOpBase
 }
 
 func (p projGEFloat64Float64Op) EstimateStaticMemoryUsage() int {
@@ -108007,7 +102521,7 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		col1 = col1[0:int(n)]
 		colLen := len(col1)
 		_ = projCol[colLen-1]
-		_ = col2[0 : colLen-1]
+		_ = col2[colLen-1]
 		for i := range col1 {
 			arg1 := col1[i]
 			arg2 := col2[i]
@@ -108060,6 +102574,11 @@ func GetProjectionRConstOperator(
 	constArg tree.Datum,
 	outputIdx int,
 ) (Operator, error) {
+	projConstOpBase := projConstOpBase{
+		OneInputNode: NewOneInputNode(input),
+		colIdx:       colIdx,
+		outputIdx:    outputIdx,
+	}
 	c, err := typeconv.GetDatumToPhysicalFn(rightColType)(constArg)
 	if err != nil {
 		return nil, err
@@ -108073,68 +102592,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQBoolBoolConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQBoolBoolConstOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.NE:
-					return &projNEBoolBoolConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEBoolBoolConstOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.LT:
-					return &projLTBoolBoolConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTBoolBoolConstOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.LE:
-					return &projLEBoolBoolConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEBoolBoolConstOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.GT:
-					return &projGTBoolBoolConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTBoolBoolConstOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.GE:
-					return &projGEBoolBoolConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEBoolBoolConstOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -108146,68 +102626,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQBytesBytesConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQBytesBytesConstOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.NE:
-					return &projNEBytesBytesConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEBytesBytesConstOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.LT:
-					return &projLTBytesBytesConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTBytesBytesConstOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.LE:
-					return &projLEBytesBytesConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEBytesBytesConstOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.GT:
-					return &projGTBytesBytesConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTBytesBytesConstOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.GE:
-					return &projGEBytesBytesConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEBytesBytesConstOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -108219,93 +102660,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalDecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalDecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108317,93 +102696,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEDecimalInt8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108415,93 +102732,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEDecimalInt16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108513,93 +102768,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEDecimalInt32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108611,93 +102804,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEDecimalInt64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108709,61 +102840,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalFloat32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalFloat32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEDecimalFloat32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalFloat32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTDecimalFloat32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalFloat32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEDecimalFloat32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalFloat32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTDecimalFloat32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalFloat32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEDecimalFloat32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalFloat32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108775,68 +102868,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalFloat64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalFloat64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEDecimalFloat64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalFloat64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTDecimalFloat64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalFloat64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEDecimalFloat64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalFloat64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTDecimalFloat64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalFloat64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEDecimalFloat64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalFloat64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -108848,93 +102902,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEInt8DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -108946,93 +102938,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109044,93 +102974,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt8Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109142,93 +103010,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt8Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109240,93 +103046,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt8Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109338,61 +103082,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEInt8Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTInt8Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEInt8Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTInt8Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEInt8Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109404,68 +103110,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEInt8Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTInt8Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEInt8Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTInt8Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEInt8Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -109477,93 +103144,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEInt16DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109575,93 +103180,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt16Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109673,93 +103216,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109771,93 +103252,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt16Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109869,93 +103288,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt16Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -109967,61 +103324,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEInt16Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTInt16Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEInt16Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTInt16Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEInt16Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110033,68 +103352,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEInt16Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTInt16Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEInt16Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTInt16Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEInt16Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -110106,93 +103386,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEInt32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110204,93 +103422,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110302,93 +103458,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110400,93 +103494,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110498,93 +103530,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110596,61 +103566,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEInt32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTInt32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEInt32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTInt32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEInt32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110662,68 +103594,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEInt32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTInt32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEInt32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTInt32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEInt32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -110735,93 +103628,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEInt64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110833,93 +103664,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -110931,93 +103700,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111029,93 +103736,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111127,93 +103772,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111225,61 +103808,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEInt64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTInt64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEInt64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTInt64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEInt64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111291,68 +103836,29 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEInt64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTInt64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEInt64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTInt64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEInt64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -111364,61 +103870,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEFloat32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTFloat32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEFloat32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTFloat32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEFloat32DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111430,61 +103898,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEFloat32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTFloat32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEFloat32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTFloat32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEFloat32Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111496,61 +103926,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEFloat32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTFloat32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEFloat32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTFloat32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEFloat32Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111562,61 +103954,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEFloat32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTFloat32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEFloat32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTFloat32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEFloat32Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111628,61 +103982,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEFloat32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTFloat32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEFloat32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTFloat32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEFloat32Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111694,93 +104010,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Minus:
-					return &projMinusFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Mult:
-					return &projMultFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Div:
-					return &projDivFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111792,100 +104046,37 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Minus:
-					return &projMinusFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Mult:
-					return &projMultFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Div:
-					return &projDivFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat32Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -111897,61 +104088,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEFloat64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTFloat64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEFloat64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTFloat64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEFloat64DecimalConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64DecimalConstOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -111963,61 +104116,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEFloat64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTFloat64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEFloat64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTFloat64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEFloat64Int8ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int8ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112029,61 +104144,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEFloat64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTFloat64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEFloat64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTFloat64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEFloat64Int16ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int16ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112095,61 +104172,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEFloat64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTFloat64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEFloat64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTFloat64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEFloat64Int32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112161,61 +104200,23 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEFloat64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTFloat64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEFloat64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTFloat64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEFloat64Int64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112227,93 +104228,31 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Minus:
-					return &projMinusFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Mult:
-					return &projMultFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Div:
-					return &projDivFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat64Float32ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Float32ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112325,104 +104264,40 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Minus:
-					return &projMinusFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Mult:
-					return &projMultFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Div:
-					return &projDivFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64Float64ConstOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Float64ConstOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	default:
 		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
@@ -112439,6 +104314,11 @@ func GetProjectionLConstOperator(
 	constArg tree.Datum,
 	outputIdx int,
 ) (Operator, error) {
+	projConstOpBase := projConstOpBase{
+		OneInputNode: NewOneInputNode(input),
+		colIdx:       colIdx,
+		outputIdx:    outputIdx,
+	}
 	c, err := typeconv.GetDatumToPhysicalFn(leftColType)(constArg)
 	if err != nil {
 		return nil, err
@@ -112452,68 +104332,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQBoolConstBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQBoolConstBoolOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.NE:
-					return &projNEBoolConstBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEBoolConstBoolOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.LT:
-					return &projLTBoolConstBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTBoolConstBoolOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.LE:
-					return &projLEBoolConstBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEBoolConstBoolOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.GT:
-					return &projGTBoolConstBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTBoolConstBoolOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				case tree.GE:
-					return &projGEBoolConstBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(bool),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEBoolConstBoolOp{projConstOpBase: projConstOpBase, constArg: c.(bool)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -112525,68 +104366,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQBytesConstBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQBytesConstBytesOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.NE:
-					return &projNEBytesConstBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEBytesConstBytesOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.LT:
-					return &projLTBytesConstBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTBytesConstBytesOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.LE:
-					return &projLEBytesConstBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEBytesConstBytesOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.GT:
-					return &projGTBytesConstBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTBytesConstBytesOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				case tree.GE:
-					return &projGEBytesConstBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.([]byte),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEBytesConstBytesOp{projConstOpBase: projConstOpBase, constArg: c.([]byte)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -112598,93 +104400,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112696,93 +104436,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112794,93 +104472,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112892,93 +104508,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -112990,93 +104544,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Minus:
-					return &projMinusDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Mult:
-					return &projMultDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.Div:
-					return &projDivDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113088,61 +104580,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113154,68 +104608,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.NE:
-					return &projNEDecimalConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LT:
-					return &projLTDecimalConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.LE:
-					return &projLEDecimalConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GT:
-					return &projGTDecimalConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				case tree.GE:
-					return &projGEDecimalConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(apd.Decimal),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(apd.Decimal)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -113227,93 +104642,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113325,93 +104678,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113423,93 +104714,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113521,93 +104750,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113619,93 +104786,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Minus:
-					return &projMinusInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Mult:
-					return &projMultInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.Div:
-					return &projDivInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113717,61 +104822,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113783,68 +104850,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.NE:
-					return &projNEInt8ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LT:
-					return &projLTInt8ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.LE:
-					return &projLEInt8ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GT:
-					return &projGTInt8ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				case tree.GE:
-					return &projGEInt8ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int8),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int8)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -113856,93 +104884,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -113954,93 +104920,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114052,93 +104956,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114150,93 +104992,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114248,93 +105028,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Minus:
-					return &projMinusInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Mult:
-					return &projMultInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.Div:
-					return &projDivInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114346,61 +105064,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114412,68 +105092,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.NE:
-					return &projNEInt16ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LT:
-					return &projLTInt16ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.LE:
-					return &projLEInt16ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GT:
-					return &projGTInt16ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				case tree.GE:
-					return &projGEInt16ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int16),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int16)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -114485,93 +105126,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114583,93 +105162,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114681,93 +105198,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114779,93 +105234,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114877,93 +105270,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Minus:
-					return &projMinusInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Mult:
-					return &projMultInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.Div:
-					return &projDivInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -114975,61 +105306,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115041,68 +105334,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.NE:
-					return &projNEInt32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LT:
-					return &projLTInt32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.LE:
-					return &projLEInt32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GT:
-					return &projGTInt32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				case tree.GE:
-					return &projGEInt32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -115114,93 +105368,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115212,93 +105404,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115310,93 +105440,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115408,93 +105476,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115506,93 +105512,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Minus:
-					return &projMinusInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Mult:
-					return &projMultInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.Div:
-					return &projDivInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115604,61 +105548,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115670,68 +105576,29 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.NE:
-					return &projNEInt64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LT:
-					return &projLTInt64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.LE:
-					return &projLEInt64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GT:
-					return &projGTInt64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				case tree.GE:
-					return &projGEInt64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(int64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(int64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -115743,61 +105610,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115809,61 +105638,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115875,61 +105666,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -115941,61 +105694,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116007,61 +105722,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116073,93 +105750,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Minus:
-					return &projMinusFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Mult:
-					return &projMultFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Div:
-					return &projDivFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116171,100 +105786,37 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Minus:
-					return &projMinusFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Mult:
-					return &projMultFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.Div:
-					return &projDivFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.NE:
-					return &projNEFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LT:
-					return &projLTFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.LE:
-					return &projLEFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GT:
-					return &projGTFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				case tree.GE:
-					return &projGEFloat32ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float32),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float32)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -116276,61 +105828,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstDecimalOp{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116342,61 +105856,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstInt8Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116408,61 +105884,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstInt16Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116474,61 +105912,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstInt32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116540,61 +105940,23 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstInt64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116606,93 +105968,31 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Minus:
-					return &projMinusFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Mult:
-					return &projMultFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Div:
-					return &projDivFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstFloat32Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -116704,104 +106004,40 @@ func GetProjectionLConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Minus:
-					return &projMinusFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Mult:
-					return &projMultFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.Div:
-					return &projDivFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.NE:
-					return &projNEFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LT:
-					return &projLTFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.LE:
-					return &projLEFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GT:
-					return &projGTFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				case tree.GE:
-					return &projGEFloat64ConstFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						colIdx:       colIdx,
-						constArg:     c.(float64),
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64ConstFloat64Op{projConstOpBase: projConstOpBase, constArg: c.(float64)}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	default:
 		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
@@ -116818,6 +106054,7 @@ func GetProjectionOperator(
 	col2Idx int,
 	outputIdx int,
 ) (Operator, error) {
+	projOpBase := projOpBase{OneInputNode: NewOneInputNode(input), col1Idx: col1Idx, col2Idx: col2Idx, outputIdx: outputIdx}
 	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 
 	case coltypes.Bool:
@@ -116827,68 +106064,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQBoolBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQBoolBoolOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEBoolBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEBoolBoolOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTBoolBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTBoolBoolOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEBoolBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEBoolBoolOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTBoolBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTBoolBoolOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEBoolBoolOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEBoolBoolOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -116900,68 +106098,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQBytesBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQBytesBytesOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEBytesBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEBytesBytesOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTBytesBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTBytesBytesOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEBytesBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEBytesBytesOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTBytesBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTBytesBytesOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEBytesBytesOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEBytesBytesOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -116973,93 +106132,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalDecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalDecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalDecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalDecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117071,93 +106168,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalInt8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117169,93 +106204,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalInt16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117267,93 +106240,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalInt32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117365,93 +106276,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivDecimalInt64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalInt64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalInt64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalInt64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117463,61 +106312,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalFloat32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalFloat32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalFloat32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalFloat32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalFloat32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalFloat32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalFloat32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117529,68 +106340,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQDecimalFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQDecimalFloat64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEDecimalFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEDecimalFloat64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTDecimalFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTDecimalFloat64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEDecimalFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEDecimalFloat64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTDecimalFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTDecimalFloat64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEDecimalFloat64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEDecimalFloat64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -117602,93 +106374,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117700,93 +106410,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117798,93 +106446,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117896,93 +106482,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -117994,93 +106518,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt8Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Int64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118092,61 +106554,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Float32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Float32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Float32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Float32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Float32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118158,68 +106582,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt8Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt8Float64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt8Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt8Float64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt8Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt8Float64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt8Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt8Float64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt8Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt8Float64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt8Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt8Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -118231,93 +106616,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118329,93 +106652,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118427,93 +106688,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118525,93 +106724,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118623,93 +106760,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt16Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Int64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118721,61 +106796,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Float32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Float32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Float32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Float32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Float32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118787,68 +106824,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt16Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt16Float64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt16Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt16Float64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt16Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt16Float64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt16Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt16Float64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt16Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt16Float64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt16Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt16Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -118860,93 +106858,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -118958,93 +106894,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119056,93 +106930,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119154,93 +106966,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119252,93 +107002,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt32Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Int64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119350,61 +107038,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Float32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Float32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Float32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Float32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Float32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119416,68 +107066,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt32Float64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt32Float64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt32Float64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt32Float64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt32Float64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt32Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -119489,93 +107100,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119587,93 +107136,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119685,93 +107172,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119783,93 +107208,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119881,93 +107244,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivInt64Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Int64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -119979,61 +107280,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Float32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Float32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Float32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Float32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Float32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120045,68 +107308,29 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQInt64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQInt64Float64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEInt64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEInt64Float64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTInt64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTInt64Float64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEInt64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEInt64Float64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTInt64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTInt64Float64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEInt64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEInt64Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -120118,61 +107342,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120184,61 +107370,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120250,61 +107398,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120316,61 +107426,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120382,61 +107454,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Int64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Int64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Int64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Int64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Int64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120448,93 +107482,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat32Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Float32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120546,100 +107518,37 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat32Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat32Float64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat32Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat32Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -120651,61 +107560,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64DecimalOp{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64DecimalOp{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64DecimalOp{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120717,61 +107588,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int8Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int8Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int8Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int8Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int8Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64Int8Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int8Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120783,61 +107616,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int16Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int16Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int16Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int16Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int16Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64Int16Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int16Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120849,61 +107644,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64Int32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120915,61 +107672,23 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Int64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Int64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Int64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Int64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Int64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64Int64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Int64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -120981,93 +107700,31 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat64Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Float32Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64Float32Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Float32Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -121079,104 +107736,40 @@ func GetProjectionOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
-
 				case tree.Plus:
-					return &projPlusFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projPlusFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.Minus:
-					return &projMinusFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMinusFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.Mult:
-					return &projMultFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projMultFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.Div:
-					return &projDivFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projDivFloat64Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
 			case tree.ComparisonOperator:
 				switch op {
-
 				case tree.EQ:
-					return &projEQFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projEQFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.NE:
-					return &projNEFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projNEFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.LT:
-					return &projLTFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLTFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.LE:
-					return &projLEFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projLEFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.GT:
-					return &projGTFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGTFloat64Float64Op{projOpBase: projOpBase}, nil
 				case tree.GE:
-					return &projGEFloat64Float64Op{
-						OneInputNode: NewOneInputNode(input),
-						col1Idx:      col1Idx,
-						col2Idx:      col2Idx,
-						outputIdx:    outputIdx,
-					}, nil
-
+					return &projGEFloat64Float64Op{projOpBase: projOpBase}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	default:
 		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}

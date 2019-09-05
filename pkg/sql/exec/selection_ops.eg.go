@@ -18,9 +18,7 @@ import (
 )
 
 type selEQBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg bool
 }
 
@@ -161,10 +159,7 @@ func (p selEQBoolBoolConstOp) Init() {
 }
 
 type selEQBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -315,9 +310,7 @@ func (p selEQBoolBoolOp) Init() {
 }
 
 type selNEBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg bool
 }
 
@@ -458,10 +451,7 @@ func (p selNEBoolBoolConstOp) Init() {
 }
 
 type selNEBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -612,9 +602,7 @@ func (p selNEBoolBoolOp) Init() {
 }
 
 type selLTBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg bool
 }
 
@@ -755,10 +743,7 @@ func (p selLTBoolBoolConstOp) Init() {
 }
 
 type selLTBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -909,9 +894,7 @@ func (p selLTBoolBoolOp) Init() {
 }
 
 type selLEBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg bool
 }
 
@@ -1052,10 +1035,7 @@ func (p selLEBoolBoolConstOp) Init() {
 }
 
 type selLEBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1206,9 +1186,7 @@ func (p selLEBoolBoolOp) Init() {
 }
 
 type selGTBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg bool
 }
 
@@ -1349,10 +1327,7 @@ func (p selGTBoolBoolConstOp) Init() {
 }
 
 type selGTBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1503,9 +1478,7 @@ func (p selGTBoolBoolOp) Init() {
 }
 
 type selGEBoolBoolConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg bool
 }
 
@@ -1646,10 +1619,7 @@ func (p selGEBoolBoolConstOp) Init() {
 }
 
 type selGEBoolBoolOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1800,9 +1770,7 @@ func (p selGEBoolBoolOp) Init() {
 }
 
 type selEQBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -1911,10 +1879,7 @@ func (p selEQBytesBytesConstOp) Init() {
 }
 
 type selEQBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2033,9 +1998,7 @@ func (p selEQBytesBytesOp) Init() {
 }
 
 type selNEBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -2144,10 +2107,7 @@ func (p selNEBytesBytesConstOp) Init() {
 }
 
 type selNEBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2266,9 +2226,7 @@ func (p selNEBytesBytesOp) Init() {
 }
 
 type selLTBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -2377,10 +2335,7 @@ func (p selLTBytesBytesConstOp) Init() {
 }
 
 type selLTBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2499,9 +2454,7 @@ func (p selLTBytesBytesOp) Init() {
 }
 
 type selLEBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -2610,10 +2563,7 @@ func (p selLEBytesBytesConstOp) Init() {
 }
 
 type selLEBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2732,9 +2682,7 @@ func (p selLEBytesBytesOp) Init() {
 }
 
 type selGTBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -2843,10 +2791,7 @@ func (p selGTBytesBytesConstOp) Init() {
 }
 
 type selGTBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2965,9 +2910,7 @@ func (p selGTBytesBytesOp) Init() {
 }
 
 type selGEBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -3076,10 +3019,7 @@ func (p selGEBytesBytesConstOp) Init() {
 }
 
 type selGEBytesBytesOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -3198,9 +3138,7 @@ func (p selGEBytesBytesOp) Init() {
 }
 
 type selEQDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -3309,10 +3247,7 @@ func (p selEQDecimalDecimalConstOp) Init() {
 }
 
 type selEQDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3431,9 +3366,7 @@ func (p selEQDecimalDecimalOp) Init() {
 }
 
 type selNEDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -3542,10 +3475,7 @@ func (p selNEDecimalDecimalConstOp) Init() {
 }
 
 type selNEDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3664,9 +3594,7 @@ func (p selNEDecimalDecimalOp) Init() {
 }
 
 type selLTDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -3775,10 +3703,7 @@ func (p selLTDecimalDecimalConstOp) Init() {
 }
 
 type selLTDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3897,9 +3822,7 @@ func (p selLTDecimalDecimalOp) Init() {
 }
 
 type selLEDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -4008,10 +3931,7 @@ func (p selLEDecimalDecimalConstOp) Init() {
 }
 
 type selLEDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4130,9 +4050,7 @@ func (p selLEDecimalDecimalOp) Init() {
 }
 
 type selGTDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -4241,10 +4159,7 @@ func (p selGTDecimalDecimalConstOp) Init() {
 }
 
 type selGTDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4363,9 +4278,7 @@ func (p selGTDecimalDecimalOp) Init() {
 }
 
 type selGEDecimalDecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -4474,10 +4387,7 @@ func (p selGEDecimalDecimalConstOp) Init() {
 }
 
 type selGEDecimalDecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4596,9 +4506,7 @@ func (p selGEDecimalDecimalOp) Init() {
 }
 
 type selEQDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -4731,10 +4639,7 @@ func (p selEQDecimalInt8ConstOp) Init() {
 }
 
 type selEQDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
@@ -4877,9 +4782,7 @@ func (p selEQDecimalInt8Op) Init() {
 }
 
 type selNEDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -5012,10 +4915,7 @@ func (p selNEDecimalInt8ConstOp) Init() {
 }
 
 type selNEDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
@@ -5158,9 +5058,7 @@ func (p selNEDecimalInt8Op) Init() {
 }
 
 type selLTDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -5293,10 +5191,7 @@ func (p selLTDecimalInt8ConstOp) Init() {
 }
 
 type selLTDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
@@ -5439,9 +5334,7 @@ func (p selLTDecimalInt8Op) Init() {
 }
 
 type selLEDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -5574,10 +5467,7 @@ func (p selLEDecimalInt8ConstOp) Init() {
 }
 
 type selLEDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
@@ -5720,9 +5610,7 @@ func (p selLEDecimalInt8Op) Init() {
 }
 
 type selGTDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -5855,10 +5743,7 @@ func (p selGTDecimalInt8ConstOp) Init() {
 }
 
 type selGTDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
@@ -6001,9 +5886,7 @@ func (p selGTDecimalInt8Op) Init() {
 }
 
 type selGEDecimalInt8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -6136,10 +6019,7 @@ func (p selGEDecimalInt8ConstOp) Init() {
 }
 
 type selGEDecimalInt8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalInt8Op) Next(ctx context.Context) coldata.Batch {
@@ -6282,9 +6162,7 @@ func (p selGEDecimalInt8Op) Init() {
 }
 
 type selEQDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -6417,10 +6295,7 @@ func (p selEQDecimalInt16ConstOp) Init() {
 }
 
 type selEQDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -6563,9 +6438,7 @@ func (p selEQDecimalInt16Op) Init() {
 }
 
 type selNEDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -6698,10 +6571,7 @@ func (p selNEDecimalInt16ConstOp) Init() {
 }
 
 type selNEDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -6844,9 +6714,7 @@ func (p selNEDecimalInt16Op) Init() {
 }
 
 type selLTDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -6979,10 +6847,7 @@ func (p selLTDecimalInt16ConstOp) Init() {
 }
 
 type selLTDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -7125,9 +6990,7 @@ func (p selLTDecimalInt16Op) Init() {
 }
 
 type selLEDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -7260,10 +7123,7 @@ func (p selLEDecimalInt16ConstOp) Init() {
 }
 
 type selLEDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -7406,9 +7266,7 @@ func (p selLEDecimalInt16Op) Init() {
 }
 
 type selGTDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -7541,10 +7399,7 @@ func (p selGTDecimalInt16ConstOp) Init() {
 }
 
 type selGTDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -7687,9 +7542,7 @@ func (p selGTDecimalInt16Op) Init() {
 }
 
 type selGEDecimalInt16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -7822,10 +7675,7 @@ func (p selGEDecimalInt16ConstOp) Init() {
 }
 
 type selGEDecimalInt16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -7968,9 +7818,7 @@ func (p selGEDecimalInt16Op) Init() {
 }
 
 type selEQDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -8103,10 +7951,7 @@ func (p selEQDecimalInt32ConstOp) Init() {
 }
 
 type selEQDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8249,9 +8094,7 @@ func (p selEQDecimalInt32Op) Init() {
 }
 
 type selNEDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -8384,10 +8227,7 @@ func (p selNEDecimalInt32ConstOp) Init() {
 }
 
 type selNEDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8530,9 +8370,7 @@ func (p selNEDecimalInt32Op) Init() {
 }
 
 type selLTDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -8665,10 +8503,7 @@ func (p selLTDecimalInt32ConstOp) Init() {
 }
 
 type selLTDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8811,9 +8646,7 @@ func (p selLTDecimalInt32Op) Init() {
 }
 
 type selLEDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -8946,10 +8779,7 @@ func (p selLEDecimalInt32ConstOp) Init() {
 }
 
 type selLEDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -9092,9 +8922,7 @@ func (p selLEDecimalInt32Op) Init() {
 }
 
 type selGTDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -9227,10 +9055,7 @@ func (p selGTDecimalInt32ConstOp) Init() {
 }
 
 type selGTDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -9373,9 +9198,7 @@ func (p selGTDecimalInt32Op) Init() {
 }
 
 type selGEDecimalInt32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -9508,10 +9331,7 @@ func (p selGEDecimalInt32ConstOp) Init() {
 }
 
 type selGEDecimalInt32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -9654,9 +9474,7 @@ func (p selGEDecimalInt32Op) Init() {
 }
 
 type selEQDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -9789,10 +9607,7 @@ func (p selEQDecimalInt64ConstOp) Init() {
 }
 
 type selEQDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9935,9 +9750,7 @@ func (p selEQDecimalInt64Op) Init() {
 }
 
 type selNEDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -10070,10 +9883,7 @@ func (p selNEDecimalInt64ConstOp) Init() {
 }
 
 type selNEDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10216,9 +10026,7 @@ func (p selNEDecimalInt64Op) Init() {
 }
 
 type selLTDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -10351,10 +10159,7 @@ func (p selLTDecimalInt64ConstOp) Init() {
 }
 
 type selLTDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10497,9 +10302,7 @@ func (p selLTDecimalInt64Op) Init() {
 }
 
 type selLEDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -10632,10 +10435,7 @@ func (p selLEDecimalInt64ConstOp) Init() {
 }
 
 type selLEDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10778,9 +10578,7 @@ func (p selLEDecimalInt64Op) Init() {
 }
 
 type selGTDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -10913,10 +10711,7 @@ func (p selGTDecimalInt64ConstOp) Init() {
 }
 
 type selGTDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -11059,9 +10854,7 @@ func (p selGTDecimalInt64Op) Init() {
 }
 
 type selGEDecimalInt64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -11194,10 +10987,7 @@ func (p selGEDecimalInt64ConstOp) Init() {
 }
 
 type selGEDecimalInt64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -11340,9 +11130,7 @@ func (p selGEDecimalInt64Op) Init() {
 }
 
 type selEQDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -11483,10 +11271,7 @@ func (p selEQDecimalFloat32ConstOp) Init() {
 }
 
 type selEQDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
@@ -11637,9 +11422,7 @@ func (p selEQDecimalFloat32Op) Init() {
 }
 
 type selNEDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -11780,10 +11563,7 @@ func (p selNEDecimalFloat32ConstOp) Init() {
 }
 
 type selNEDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
@@ -11934,9 +11714,7 @@ func (p selNEDecimalFloat32Op) Init() {
 }
 
 type selLTDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -12077,10 +11855,7 @@ func (p selLTDecimalFloat32ConstOp) Init() {
 }
 
 type selLTDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
@@ -12231,9 +12006,7 @@ func (p selLTDecimalFloat32Op) Init() {
 }
 
 type selLEDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -12374,10 +12147,7 @@ func (p selLEDecimalFloat32ConstOp) Init() {
 }
 
 type selLEDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
@@ -12528,9 +12298,7 @@ func (p selLEDecimalFloat32Op) Init() {
 }
 
 type selGTDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -12671,10 +12439,7 @@ func (p selGTDecimalFloat32ConstOp) Init() {
 }
 
 type selGTDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
@@ -12825,9 +12590,7 @@ func (p selGTDecimalFloat32Op) Init() {
 }
 
 type selGEDecimalFloat32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -12968,10 +12731,7 @@ func (p selGEDecimalFloat32ConstOp) Init() {
 }
 
 type selGEDecimalFloat32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalFloat32Op) Next(ctx context.Context) coldata.Batch {
@@ -13122,9 +12882,7 @@ func (p selGEDecimalFloat32Op) Init() {
 }
 
 type selEQDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -13265,10 +13023,7 @@ func (p selEQDecimalFloat64ConstOp) Init() {
 }
 
 type selEQDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -13419,9 +13174,7 @@ func (p selEQDecimalFloat64Op) Init() {
 }
 
 type selNEDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -13562,10 +13315,7 @@ func (p selNEDecimalFloat64ConstOp) Init() {
 }
 
 type selNEDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -13716,9 +13466,7 @@ func (p selNEDecimalFloat64Op) Init() {
 }
 
 type selLTDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -13859,10 +13607,7 @@ func (p selLTDecimalFloat64ConstOp) Init() {
 }
 
 type selLTDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -14013,9 +13758,7 @@ func (p selLTDecimalFloat64Op) Init() {
 }
 
 type selLEDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -14156,10 +13899,7 @@ func (p selLEDecimalFloat64ConstOp) Init() {
 }
 
 type selLEDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -14310,9 +14050,7 @@ func (p selLEDecimalFloat64Op) Init() {
 }
 
 type selGTDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -14453,10 +14191,7 @@ func (p selGTDecimalFloat64ConstOp) Init() {
 }
 
 type selGTDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -14607,9 +14342,7 @@ func (p selGTDecimalFloat64Op) Init() {
 }
 
 type selGEDecimalFloat64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -14750,10 +14483,7 @@ func (p selGEDecimalFloat64ConstOp) Init() {
 }
 
 type selGEDecimalFloat64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -14904,9 +14634,7 @@ func (p selGEDecimalFloat64Op) Init() {
 }
 
 type selEQInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -15039,10 +14767,7 @@ func (p selEQInt8DecimalConstOp) Init() {
 }
 
 type selEQInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -15185,9 +14910,7 @@ func (p selEQInt8DecimalOp) Init() {
 }
 
 type selNEInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -15320,10 +15043,7 @@ func (p selNEInt8DecimalConstOp) Init() {
 }
 
 type selNEInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -15466,9 +15186,7 @@ func (p selNEInt8DecimalOp) Init() {
 }
 
 type selLTInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -15601,10 +15319,7 @@ func (p selLTInt8DecimalConstOp) Init() {
 }
 
 type selLTInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -15747,9 +15462,7 @@ func (p selLTInt8DecimalOp) Init() {
 }
 
 type selLEInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -15882,10 +15595,7 @@ func (p selLEInt8DecimalConstOp) Init() {
 }
 
 type selLEInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -16028,9 +15738,7 @@ func (p selLEInt8DecimalOp) Init() {
 }
 
 type selGTInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -16163,10 +15871,7 @@ func (p selGTInt8DecimalConstOp) Init() {
 }
 
 type selGTInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -16309,9 +16014,7 @@ func (p selGTInt8DecimalOp) Init() {
 }
 
 type selGEInt8DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -16444,10 +16147,7 @@ func (p selGEInt8DecimalConstOp) Init() {
 }
 
 type selGEInt8DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -16590,9 +16290,7 @@ func (p selGEInt8DecimalOp) Init() {
 }
 
 type selEQInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -16745,10 +16443,7 @@ func (p selEQInt8Int8ConstOp) Init() {
 }
 
 type selEQInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -16911,9 +16606,7 @@ func (p selEQInt8Int8Op) Init() {
 }
 
 type selNEInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -17066,10 +16759,7 @@ func (p selNEInt8Int8ConstOp) Init() {
 }
 
 type selNEInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -17232,9 +16922,7 @@ func (p selNEInt8Int8Op) Init() {
 }
 
 type selLTInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -17387,10 +17075,7 @@ func (p selLTInt8Int8ConstOp) Init() {
 }
 
 type selLTInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -17553,9 +17238,7 @@ func (p selLTInt8Int8Op) Init() {
 }
 
 type selLEInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -17708,10 +17391,7 @@ func (p selLEInt8Int8ConstOp) Init() {
 }
 
 type selLEInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -17874,9 +17554,7 @@ func (p selLEInt8Int8Op) Init() {
 }
 
 type selGTInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -18029,10 +17707,7 @@ func (p selGTInt8Int8ConstOp) Init() {
 }
 
 type selGTInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -18195,9 +17870,7 @@ func (p selGTInt8Int8Op) Init() {
 }
 
 type selGEInt8Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -18350,10 +18023,7 @@ func (p selGEInt8Int8ConstOp) Init() {
 }
 
 type selGEInt8Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -18516,9 +18186,7 @@ func (p selGEInt8Int8Op) Init() {
 }
 
 type selEQInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -18671,10 +18339,7 @@ func (p selEQInt8Int16ConstOp) Init() {
 }
 
 type selEQInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -18837,9 +18502,7 @@ func (p selEQInt8Int16Op) Init() {
 }
 
 type selNEInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -18992,10 +18655,7 @@ func (p selNEInt8Int16ConstOp) Init() {
 }
 
 type selNEInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -19158,9 +18818,7 @@ func (p selNEInt8Int16Op) Init() {
 }
 
 type selLTInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -19313,10 +18971,7 @@ func (p selLTInt8Int16ConstOp) Init() {
 }
 
 type selLTInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -19479,9 +19134,7 @@ func (p selLTInt8Int16Op) Init() {
 }
 
 type selLEInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -19634,10 +19287,7 @@ func (p selLEInt8Int16ConstOp) Init() {
 }
 
 type selLEInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -19800,9 +19450,7 @@ func (p selLEInt8Int16Op) Init() {
 }
 
 type selGTInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -19955,10 +19603,7 @@ func (p selGTInt8Int16ConstOp) Init() {
 }
 
 type selGTInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -20121,9 +19766,7 @@ func (p selGTInt8Int16Op) Init() {
 }
 
 type selGEInt8Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -20276,10 +19919,7 @@ func (p selGEInt8Int16ConstOp) Init() {
 }
 
 type selGEInt8Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -20442,9 +20082,7 @@ func (p selGEInt8Int16Op) Init() {
 }
 
 type selEQInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -20597,10 +20235,7 @@ func (p selEQInt8Int32ConstOp) Init() {
 }
 
 type selEQInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -20763,9 +20398,7 @@ func (p selEQInt8Int32Op) Init() {
 }
 
 type selNEInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -20918,10 +20551,7 @@ func (p selNEInt8Int32ConstOp) Init() {
 }
 
 type selNEInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -21084,9 +20714,7 @@ func (p selNEInt8Int32Op) Init() {
 }
 
 type selLTInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -21239,10 +20867,7 @@ func (p selLTInt8Int32ConstOp) Init() {
 }
 
 type selLTInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -21405,9 +21030,7 @@ func (p selLTInt8Int32Op) Init() {
 }
 
 type selLEInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -21560,10 +21183,7 @@ func (p selLEInt8Int32ConstOp) Init() {
 }
 
 type selLEInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -21726,9 +21346,7 @@ func (p selLEInt8Int32Op) Init() {
 }
 
 type selGTInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -21881,10 +21499,7 @@ func (p selGTInt8Int32ConstOp) Init() {
 }
 
 type selGTInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -22047,9 +21662,7 @@ func (p selGTInt8Int32Op) Init() {
 }
 
 type selGEInt8Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -22202,10 +21815,7 @@ func (p selGEInt8Int32ConstOp) Init() {
 }
 
 type selGEInt8Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -22368,9 +21978,7 @@ func (p selGEInt8Int32Op) Init() {
 }
 
 type selEQInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -22523,10 +22131,7 @@ func (p selEQInt8Int64ConstOp) Init() {
 }
 
 type selEQInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -22689,9 +22294,7 @@ func (p selEQInt8Int64Op) Init() {
 }
 
 type selNEInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -22844,10 +22447,7 @@ func (p selNEInt8Int64ConstOp) Init() {
 }
 
 type selNEInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -23010,9 +22610,7 @@ func (p selNEInt8Int64Op) Init() {
 }
 
 type selLTInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -23165,10 +22763,7 @@ func (p selLTInt8Int64ConstOp) Init() {
 }
 
 type selLTInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -23331,9 +22926,7 @@ func (p selLTInt8Int64Op) Init() {
 }
 
 type selLEInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -23486,10 +23079,7 @@ func (p selLEInt8Int64ConstOp) Init() {
 }
 
 type selLEInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -23652,9 +23242,7 @@ func (p selLEInt8Int64Op) Init() {
 }
 
 type selGTInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -23807,10 +23395,7 @@ func (p selGTInt8Int64ConstOp) Init() {
 }
 
 type selGTInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -23973,9 +23558,7 @@ func (p selGTInt8Int64Op) Init() {
 }
 
 type selGEInt8Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -24128,10 +23711,7 @@ func (p selGEInt8Int64ConstOp) Init() {
 }
 
 type selGEInt8Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -24294,9 +23874,7 @@ func (p selGEInt8Int64Op) Init() {
 }
 
 type selEQInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -24481,10 +24059,7 @@ func (p selEQInt8Float32ConstOp) Init() {
 }
 
 type selEQInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -24679,9 +24254,7 @@ func (p selEQInt8Float32Op) Init() {
 }
 
 type selNEInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -24866,10 +24439,7 @@ func (p selNEInt8Float32ConstOp) Init() {
 }
 
 type selNEInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -25064,9 +24634,7 @@ func (p selNEInt8Float32Op) Init() {
 }
 
 type selLTInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -25251,10 +24819,7 @@ func (p selLTInt8Float32ConstOp) Init() {
 }
 
 type selLTInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -25449,9 +25014,7 @@ func (p selLTInt8Float32Op) Init() {
 }
 
 type selLEInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -25636,10 +25199,7 @@ func (p selLEInt8Float32ConstOp) Init() {
 }
 
 type selLEInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -25834,9 +25394,7 @@ func (p selLEInt8Float32Op) Init() {
 }
 
 type selGTInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -26021,10 +25579,7 @@ func (p selGTInt8Float32ConstOp) Init() {
 }
 
 type selGTInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -26219,9 +25774,7 @@ func (p selGTInt8Float32Op) Init() {
 }
 
 type selGEInt8Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -26406,10 +25959,7 @@ func (p selGEInt8Float32ConstOp) Init() {
 }
 
 type selGEInt8Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -26604,9 +26154,7 @@ func (p selGEInt8Float32Op) Init() {
 }
 
 type selEQInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -26791,10 +26339,7 @@ func (p selEQInt8Float64ConstOp) Init() {
 }
 
 type selEQInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt8Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -26989,9 +26534,7 @@ func (p selEQInt8Float64Op) Init() {
 }
 
 type selNEInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -27176,10 +26719,7 @@ func (p selNEInt8Float64ConstOp) Init() {
 }
 
 type selNEInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -27374,9 +26914,7 @@ func (p selNEInt8Float64Op) Init() {
 }
 
 type selLTInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -27561,10 +27099,7 @@ func (p selLTInt8Float64ConstOp) Init() {
 }
 
 type selLTInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt8Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -27759,9 +27294,7 @@ func (p selLTInt8Float64Op) Init() {
 }
 
 type selLEInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -27946,10 +27479,7 @@ func (p selLEInt8Float64ConstOp) Init() {
 }
 
 type selLEInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -28144,9 +27674,7 @@ func (p selLEInt8Float64Op) Init() {
 }
 
 type selGTInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -28331,10 +27859,7 @@ func (p selGTInt8Float64ConstOp) Init() {
 }
 
 type selGTInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt8Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -28529,9 +28054,7 @@ func (p selGTInt8Float64Op) Init() {
 }
 
 type selGEInt8Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -28716,10 +28239,7 @@ func (p selGEInt8Float64ConstOp) Init() {
 }
 
 type selGEInt8Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt8Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -28914,9 +28434,7 @@ func (p selGEInt8Float64Op) Init() {
 }
 
 type selEQInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -29049,10 +28567,7 @@ func (p selEQInt16DecimalConstOp) Init() {
 }
 
 type selEQInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -29195,9 +28710,7 @@ func (p selEQInt16DecimalOp) Init() {
 }
 
 type selNEInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -29330,10 +28843,7 @@ func (p selNEInt16DecimalConstOp) Init() {
 }
 
 type selNEInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -29476,9 +28986,7 @@ func (p selNEInt16DecimalOp) Init() {
 }
 
 type selLTInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -29611,10 +29119,7 @@ func (p selLTInt16DecimalConstOp) Init() {
 }
 
 type selLTInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -29757,9 +29262,7 @@ func (p selLTInt16DecimalOp) Init() {
 }
 
 type selLEInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -29892,10 +29395,7 @@ func (p selLEInt16DecimalConstOp) Init() {
 }
 
 type selLEInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -30038,9 +29538,7 @@ func (p selLEInt16DecimalOp) Init() {
 }
 
 type selGTInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -30173,10 +29671,7 @@ func (p selGTInt16DecimalConstOp) Init() {
 }
 
 type selGTInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -30319,9 +29814,7 @@ func (p selGTInt16DecimalOp) Init() {
 }
 
 type selGEInt16DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -30454,10 +29947,7 @@ func (p selGEInt16DecimalConstOp) Init() {
 }
 
 type selGEInt16DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -30600,9 +30090,7 @@ func (p selGEInt16DecimalOp) Init() {
 }
 
 type selEQInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -30755,10 +30243,7 @@ func (p selEQInt16Int8ConstOp) Init() {
 }
 
 type selEQInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -30921,9 +30406,7 @@ func (p selEQInt16Int8Op) Init() {
 }
 
 type selNEInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -31076,10 +30559,7 @@ func (p selNEInt16Int8ConstOp) Init() {
 }
 
 type selNEInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -31242,9 +30722,7 @@ func (p selNEInt16Int8Op) Init() {
 }
 
 type selLTInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -31397,10 +30875,7 @@ func (p selLTInt16Int8ConstOp) Init() {
 }
 
 type selLTInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -31563,9 +31038,7 @@ func (p selLTInt16Int8Op) Init() {
 }
 
 type selLEInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -31718,10 +31191,7 @@ func (p selLEInt16Int8ConstOp) Init() {
 }
 
 type selLEInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -31884,9 +31354,7 @@ func (p selLEInt16Int8Op) Init() {
 }
 
 type selGTInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -32039,10 +31507,7 @@ func (p selGTInt16Int8ConstOp) Init() {
 }
 
 type selGTInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -32205,9 +31670,7 @@ func (p selGTInt16Int8Op) Init() {
 }
 
 type selGEInt16Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -32360,10 +31823,7 @@ func (p selGEInt16Int8ConstOp) Init() {
 }
 
 type selGEInt16Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -32526,9 +31986,7 @@ func (p selGEInt16Int8Op) Init() {
 }
 
 type selEQInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -32681,10 +32139,7 @@ func (p selEQInt16Int16ConstOp) Init() {
 }
 
 type selEQInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -32847,9 +32302,7 @@ func (p selEQInt16Int16Op) Init() {
 }
 
 type selNEInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -33002,10 +32455,7 @@ func (p selNEInt16Int16ConstOp) Init() {
 }
 
 type selNEInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -33168,9 +32618,7 @@ func (p selNEInt16Int16Op) Init() {
 }
 
 type selLTInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -33323,10 +32771,7 @@ func (p selLTInt16Int16ConstOp) Init() {
 }
 
 type selLTInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -33489,9 +32934,7 @@ func (p selLTInt16Int16Op) Init() {
 }
 
 type selLEInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -33644,10 +33087,7 @@ func (p selLEInt16Int16ConstOp) Init() {
 }
 
 type selLEInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -33810,9 +33250,7 @@ func (p selLEInt16Int16Op) Init() {
 }
 
 type selGTInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -33965,10 +33403,7 @@ func (p selGTInt16Int16ConstOp) Init() {
 }
 
 type selGTInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -34131,9 +33566,7 @@ func (p selGTInt16Int16Op) Init() {
 }
 
 type selGEInt16Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -34286,10 +33719,7 @@ func (p selGEInt16Int16ConstOp) Init() {
 }
 
 type selGEInt16Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -34452,9 +33882,7 @@ func (p selGEInt16Int16Op) Init() {
 }
 
 type selEQInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -34607,10 +34035,7 @@ func (p selEQInt16Int32ConstOp) Init() {
 }
 
 type selEQInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -34773,9 +34198,7 @@ func (p selEQInt16Int32Op) Init() {
 }
 
 type selNEInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -34928,10 +34351,7 @@ func (p selNEInt16Int32ConstOp) Init() {
 }
 
 type selNEInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -35094,9 +34514,7 @@ func (p selNEInt16Int32Op) Init() {
 }
 
 type selLTInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -35249,10 +34667,7 @@ func (p selLTInt16Int32ConstOp) Init() {
 }
 
 type selLTInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -35415,9 +34830,7 @@ func (p selLTInt16Int32Op) Init() {
 }
 
 type selLEInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -35570,10 +34983,7 @@ func (p selLEInt16Int32ConstOp) Init() {
 }
 
 type selLEInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -35736,9 +35146,7 @@ func (p selLEInt16Int32Op) Init() {
 }
 
 type selGTInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -35891,10 +35299,7 @@ func (p selGTInt16Int32ConstOp) Init() {
 }
 
 type selGTInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -36057,9 +35462,7 @@ func (p selGTInt16Int32Op) Init() {
 }
 
 type selGEInt16Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -36212,10 +35615,7 @@ func (p selGEInt16Int32ConstOp) Init() {
 }
 
 type selGEInt16Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -36378,9 +35778,7 @@ func (p selGEInt16Int32Op) Init() {
 }
 
 type selEQInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -36533,10 +35931,7 @@ func (p selEQInt16Int64ConstOp) Init() {
 }
 
 type selEQInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -36699,9 +36094,7 @@ func (p selEQInt16Int64Op) Init() {
 }
 
 type selNEInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -36854,10 +36247,7 @@ func (p selNEInt16Int64ConstOp) Init() {
 }
 
 type selNEInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -37020,9 +36410,7 @@ func (p selNEInt16Int64Op) Init() {
 }
 
 type selLTInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -37175,10 +36563,7 @@ func (p selLTInt16Int64ConstOp) Init() {
 }
 
 type selLTInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -37341,9 +36726,7 @@ func (p selLTInt16Int64Op) Init() {
 }
 
 type selLEInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -37496,10 +36879,7 @@ func (p selLEInt16Int64ConstOp) Init() {
 }
 
 type selLEInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -37662,9 +37042,7 @@ func (p selLEInt16Int64Op) Init() {
 }
 
 type selGTInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -37817,10 +37195,7 @@ func (p selGTInt16Int64ConstOp) Init() {
 }
 
 type selGTInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -37983,9 +37358,7 @@ func (p selGTInt16Int64Op) Init() {
 }
 
 type selGEInt16Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -38138,10 +37511,7 @@ func (p selGEInt16Int64ConstOp) Init() {
 }
 
 type selGEInt16Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -38304,9 +37674,7 @@ func (p selGEInt16Int64Op) Init() {
 }
 
 type selEQInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -38491,10 +37859,7 @@ func (p selEQInt16Float32ConstOp) Init() {
 }
 
 type selEQInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -38689,9 +38054,7 @@ func (p selEQInt16Float32Op) Init() {
 }
 
 type selNEInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -38876,10 +38239,7 @@ func (p selNEInt16Float32ConstOp) Init() {
 }
 
 type selNEInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -39074,9 +38434,7 @@ func (p selNEInt16Float32Op) Init() {
 }
 
 type selLTInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -39261,10 +38619,7 @@ func (p selLTInt16Float32ConstOp) Init() {
 }
 
 type selLTInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -39459,9 +38814,7 @@ func (p selLTInt16Float32Op) Init() {
 }
 
 type selLEInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -39646,10 +38999,7 @@ func (p selLEInt16Float32ConstOp) Init() {
 }
 
 type selLEInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -39844,9 +39194,7 @@ func (p selLEInt16Float32Op) Init() {
 }
 
 type selGTInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -40031,10 +39379,7 @@ func (p selGTInt16Float32ConstOp) Init() {
 }
 
 type selGTInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -40229,9 +39574,7 @@ func (p selGTInt16Float32Op) Init() {
 }
 
 type selGEInt16Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -40416,10 +39759,7 @@ func (p selGEInt16Float32ConstOp) Init() {
 }
 
 type selGEInt16Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -40614,9 +39954,7 @@ func (p selGEInt16Float32Op) Init() {
 }
 
 type selEQInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -40801,10 +40139,7 @@ func (p selEQInt16Float64ConstOp) Init() {
 }
 
 type selEQInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -40999,9 +40334,7 @@ func (p selEQInt16Float64Op) Init() {
 }
 
 type selNEInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -41186,10 +40519,7 @@ func (p selNEInt16Float64ConstOp) Init() {
 }
 
 type selNEInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -41384,9 +40714,7 @@ func (p selNEInt16Float64Op) Init() {
 }
 
 type selLTInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -41571,10 +40899,7 @@ func (p selLTInt16Float64ConstOp) Init() {
 }
 
 type selLTInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -41769,9 +41094,7 @@ func (p selLTInt16Float64Op) Init() {
 }
 
 type selLEInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -41956,10 +41279,7 @@ func (p selLEInt16Float64ConstOp) Init() {
 }
 
 type selLEInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -42154,9 +41474,7 @@ func (p selLEInt16Float64Op) Init() {
 }
 
 type selGTInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -42341,10 +41659,7 @@ func (p selGTInt16Float64ConstOp) Init() {
 }
 
 type selGTInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -42539,9 +41854,7 @@ func (p selGTInt16Float64Op) Init() {
 }
 
 type selGEInt16Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -42726,10 +42039,7 @@ func (p selGEInt16Float64ConstOp) Init() {
 }
 
 type selGEInt16Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -42924,9 +42234,7 @@ func (p selGEInt16Float64Op) Init() {
 }
 
 type selEQInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -43059,10 +42367,7 @@ func (p selEQInt32DecimalConstOp) Init() {
 }
 
 type selEQInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -43205,9 +42510,7 @@ func (p selEQInt32DecimalOp) Init() {
 }
 
 type selNEInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -43340,10 +42643,7 @@ func (p selNEInt32DecimalConstOp) Init() {
 }
 
 type selNEInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -43486,9 +42786,7 @@ func (p selNEInt32DecimalOp) Init() {
 }
 
 type selLTInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -43621,10 +42919,7 @@ func (p selLTInt32DecimalConstOp) Init() {
 }
 
 type selLTInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -43767,9 +43062,7 @@ func (p selLTInt32DecimalOp) Init() {
 }
 
 type selLEInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -43902,10 +43195,7 @@ func (p selLEInt32DecimalConstOp) Init() {
 }
 
 type selLEInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -44048,9 +43338,7 @@ func (p selLEInt32DecimalOp) Init() {
 }
 
 type selGTInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -44183,10 +43471,7 @@ func (p selGTInt32DecimalConstOp) Init() {
 }
 
 type selGTInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -44329,9 +43614,7 @@ func (p selGTInt32DecimalOp) Init() {
 }
 
 type selGEInt32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -44464,10 +43747,7 @@ func (p selGEInt32DecimalConstOp) Init() {
 }
 
 type selGEInt32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -44610,9 +43890,7 @@ func (p selGEInt32DecimalOp) Init() {
 }
 
 type selEQInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -44765,10 +44043,7 @@ func (p selEQInt32Int8ConstOp) Init() {
 }
 
 type selEQInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -44931,9 +44206,7 @@ func (p selEQInt32Int8Op) Init() {
 }
 
 type selNEInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -45086,10 +44359,7 @@ func (p selNEInt32Int8ConstOp) Init() {
 }
 
 type selNEInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -45252,9 +44522,7 @@ func (p selNEInt32Int8Op) Init() {
 }
 
 type selLTInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -45407,10 +44675,7 @@ func (p selLTInt32Int8ConstOp) Init() {
 }
 
 type selLTInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -45573,9 +44838,7 @@ func (p selLTInt32Int8Op) Init() {
 }
 
 type selLEInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -45728,10 +44991,7 @@ func (p selLEInt32Int8ConstOp) Init() {
 }
 
 type selLEInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -45894,9 +45154,7 @@ func (p selLEInt32Int8Op) Init() {
 }
 
 type selGTInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -46049,10 +45307,7 @@ func (p selGTInt32Int8ConstOp) Init() {
 }
 
 type selGTInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -46215,9 +45470,7 @@ func (p selGTInt32Int8Op) Init() {
 }
 
 type selGEInt32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -46370,10 +45623,7 @@ func (p selGEInt32Int8ConstOp) Init() {
 }
 
 type selGEInt32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -46536,9 +45786,7 @@ func (p selGEInt32Int8Op) Init() {
 }
 
 type selEQInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -46691,10 +45939,7 @@ func (p selEQInt32Int16ConstOp) Init() {
 }
 
 type selEQInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -46857,9 +46102,7 @@ func (p selEQInt32Int16Op) Init() {
 }
 
 type selNEInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -47012,10 +46255,7 @@ func (p selNEInt32Int16ConstOp) Init() {
 }
 
 type selNEInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47178,9 +46418,7 @@ func (p selNEInt32Int16Op) Init() {
 }
 
 type selLTInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -47333,10 +46571,7 @@ func (p selLTInt32Int16ConstOp) Init() {
 }
 
 type selLTInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47499,9 +46734,7 @@ func (p selLTInt32Int16Op) Init() {
 }
 
 type selLEInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -47654,10 +46887,7 @@ func (p selLEInt32Int16ConstOp) Init() {
 }
 
 type selLEInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47820,9 +47050,7 @@ func (p selLEInt32Int16Op) Init() {
 }
 
 type selGTInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -47975,10 +47203,7 @@ func (p selGTInt32Int16ConstOp) Init() {
 }
 
 type selGTInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -48141,9 +47366,7 @@ func (p selGTInt32Int16Op) Init() {
 }
 
 type selGEInt32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -48296,10 +47519,7 @@ func (p selGEInt32Int16ConstOp) Init() {
 }
 
 type selGEInt32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -48462,9 +47682,7 @@ func (p selGEInt32Int16Op) Init() {
 }
 
 type selEQInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -48617,10 +47835,7 @@ func (p selEQInt32Int32ConstOp) Init() {
 }
 
 type selEQInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -48783,9 +47998,7 @@ func (p selEQInt32Int32Op) Init() {
 }
 
 type selNEInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -48938,10 +48151,7 @@ func (p selNEInt32Int32ConstOp) Init() {
 }
 
 type selNEInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -49104,9 +48314,7 @@ func (p selNEInt32Int32Op) Init() {
 }
 
 type selLTInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -49259,10 +48467,7 @@ func (p selLTInt32Int32ConstOp) Init() {
 }
 
 type selLTInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -49425,9 +48630,7 @@ func (p selLTInt32Int32Op) Init() {
 }
 
 type selLEInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -49580,10 +48783,7 @@ func (p selLEInt32Int32ConstOp) Init() {
 }
 
 type selLEInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -49746,9 +48946,7 @@ func (p selLEInt32Int32Op) Init() {
 }
 
 type selGTInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -49901,10 +49099,7 @@ func (p selGTInt32Int32ConstOp) Init() {
 }
 
 type selGTInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -50067,9 +49262,7 @@ func (p selGTInt32Int32Op) Init() {
 }
 
 type selGEInt32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -50222,10 +49415,7 @@ func (p selGEInt32Int32ConstOp) Init() {
 }
 
 type selGEInt32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -50388,9 +49578,7 @@ func (p selGEInt32Int32Op) Init() {
 }
 
 type selEQInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -50543,10 +49731,7 @@ func (p selEQInt32Int64ConstOp) Init() {
 }
 
 type selEQInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -50709,9 +49894,7 @@ func (p selEQInt32Int64Op) Init() {
 }
 
 type selNEInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -50864,10 +50047,7 @@ func (p selNEInt32Int64ConstOp) Init() {
 }
 
 type selNEInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51030,9 +50210,7 @@ func (p selNEInt32Int64Op) Init() {
 }
 
 type selLTInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -51185,10 +50363,7 @@ func (p selLTInt32Int64ConstOp) Init() {
 }
 
 type selLTInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51351,9 +50526,7 @@ func (p selLTInt32Int64Op) Init() {
 }
 
 type selLEInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -51506,10 +50679,7 @@ func (p selLEInt32Int64ConstOp) Init() {
 }
 
 type selLEInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51672,9 +50842,7 @@ func (p selLEInt32Int64Op) Init() {
 }
 
 type selGTInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -51827,10 +50995,7 @@ func (p selGTInt32Int64ConstOp) Init() {
 }
 
 type selGTInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51993,9 +51158,7 @@ func (p selGTInt32Int64Op) Init() {
 }
 
 type selGEInt32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -52148,10 +51311,7 @@ func (p selGEInt32Int64ConstOp) Init() {
 }
 
 type selGEInt32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -52314,9 +51474,7 @@ func (p selGEInt32Int64Op) Init() {
 }
 
 type selEQInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -52501,10 +51659,7 @@ func (p selEQInt32Float32ConstOp) Init() {
 }
 
 type selEQInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -52699,9 +51854,7 @@ func (p selEQInt32Float32Op) Init() {
 }
 
 type selNEInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -52886,10 +52039,7 @@ func (p selNEInt32Float32ConstOp) Init() {
 }
 
 type selNEInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -53084,9 +52234,7 @@ func (p selNEInt32Float32Op) Init() {
 }
 
 type selLTInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -53271,10 +52419,7 @@ func (p selLTInt32Float32ConstOp) Init() {
 }
 
 type selLTInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -53469,9 +52614,7 @@ func (p selLTInt32Float32Op) Init() {
 }
 
 type selLEInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -53656,10 +52799,7 @@ func (p selLEInt32Float32ConstOp) Init() {
 }
 
 type selLEInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -53854,9 +52994,7 @@ func (p selLEInt32Float32Op) Init() {
 }
 
 type selGTInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -54041,10 +53179,7 @@ func (p selGTInt32Float32ConstOp) Init() {
 }
 
 type selGTInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -54239,9 +53374,7 @@ func (p selGTInt32Float32Op) Init() {
 }
 
 type selGEInt32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -54426,10 +53559,7 @@ func (p selGEInt32Float32ConstOp) Init() {
 }
 
 type selGEInt32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -54624,9 +53754,7 @@ func (p selGEInt32Float32Op) Init() {
 }
 
 type selEQInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -54811,10 +53939,7 @@ func (p selEQInt32Float64ConstOp) Init() {
 }
 
 type selEQInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -55009,9 +54134,7 @@ func (p selEQInt32Float64Op) Init() {
 }
 
 type selNEInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -55196,10 +54319,7 @@ func (p selNEInt32Float64ConstOp) Init() {
 }
 
 type selNEInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -55394,9 +54514,7 @@ func (p selNEInt32Float64Op) Init() {
 }
 
 type selLTInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -55581,10 +54699,7 @@ func (p selLTInt32Float64ConstOp) Init() {
 }
 
 type selLTInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -55779,9 +54894,7 @@ func (p selLTInt32Float64Op) Init() {
 }
 
 type selLEInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -55966,10 +55079,7 @@ func (p selLEInt32Float64ConstOp) Init() {
 }
 
 type selLEInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -56164,9 +55274,7 @@ func (p selLEInt32Float64Op) Init() {
 }
 
 type selGTInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -56351,10 +55459,7 @@ func (p selGTInt32Float64ConstOp) Init() {
 }
 
 type selGTInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -56549,9 +55654,7 @@ func (p selGTInt32Float64Op) Init() {
 }
 
 type selGEInt32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -56736,10 +55839,7 @@ func (p selGEInt32Float64ConstOp) Init() {
 }
 
 type selGEInt32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -56934,9 +56034,7 @@ func (p selGEInt32Float64Op) Init() {
 }
 
 type selEQInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -57069,10 +56167,7 @@ func (p selEQInt64DecimalConstOp) Init() {
 }
 
 type selEQInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -57215,9 +56310,7 @@ func (p selEQInt64DecimalOp) Init() {
 }
 
 type selNEInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -57350,10 +56443,7 @@ func (p selNEInt64DecimalConstOp) Init() {
 }
 
 type selNEInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -57496,9 +56586,7 @@ func (p selNEInt64DecimalOp) Init() {
 }
 
 type selLTInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -57631,10 +56719,7 @@ func (p selLTInt64DecimalConstOp) Init() {
 }
 
 type selLTInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -57777,9 +56862,7 @@ func (p selLTInt64DecimalOp) Init() {
 }
 
 type selLEInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -57912,10 +56995,7 @@ func (p selLEInt64DecimalConstOp) Init() {
 }
 
 type selLEInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -58058,9 +57138,7 @@ func (p selLEInt64DecimalOp) Init() {
 }
 
 type selGTInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -58193,10 +57271,7 @@ func (p selGTInt64DecimalConstOp) Init() {
 }
 
 type selGTInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -58339,9 +57414,7 @@ func (p selGTInt64DecimalOp) Init() {
 }
 
 type selGEInt64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -58474,10 +57547,7 @@ func (p selGEInt64DecimalConstOp) Init() {
 }
 
 type selGEInt64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -58620,9 +57690,7 @@ func (p selGEInt64DecimalOp) Init() {
 }
 
 type selEQInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -58775,10 +57843,7 @@ func (p selEQInt64Int8ConstOp) Init() {
 }
 
 type selEQInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -58941,9 +58006,7 @@ func (p selEQInt64Int8Op) Init() {
 }
 
 type selNEInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -59096,10 +58159,7 @@ func (p selNEInt64Int8ConstOp) Init() {
 }
 
 type selNEInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -59262,9 +58322,7 @@ func (p selNEInt64Int8Op) Init() {
 }
 
 type selLTInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -59417,10 +58475,7 @@ func (p selLTInt64Int8ConstOp) Init() {
 }
 
 type selLTInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -59583,9 +58638,7 @@ func (p selLTInt64Int8Op) Init() {
 }
 
 type selLEInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -59738,10 +58791,7 @@ func (p selLEInt64Int8ConstOp) Init() {
 }
 
 type selLEInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -59904,9 +58954,7 @@ func (p selLEInt64Int8Op) Init() {
 }
 
 type selGTInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -60059,10 +59107,7 @@ func (p selGTInt64Int8ConstOp) Init() {
 }
 
 type selGTInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -60225,9 +59270,7 @@ func (p selGTInt64Int8Op) Init() {
 }
 
 type selGEInt64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -60380,10 +59423,7 @@ func (p selGEInt64Int8ConstOp) Init() {
 }
 
 type selGEInt64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -60546,9 +59586,7 @@ func (p selGEInt64Int8Op) Init() {
 }
 
 type selEQInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -60701,10 +59739,7 @@ func (p selEQInt64Int16ConstOp) Init() {
 }
 
 type selEQInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -60867,9 +59902,7 @@ func (p selEQInt64Int16Op) Init() {
 }
 
 type selNEInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -61022,10 +60055,7 @@ func (p selNEInt64Int16ConstOp) Init() {
 }
 
 type selNEInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -61188,9 +60218,7 @@ func (p selNEInt64Int16Op) Init() {
 }
 
 type selLTInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -61343,10 +60371,7 @@ func (p selLTInt64Int16ConstOp) Init() {
 }
 
 type selLTInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -61509,9 +60534,7 @@ func (p selLTInt64Int16Op) Init() {
 }
 
 type selLEInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -61664,10 +60687,7 @@ func (p selLEInt64Int16ConstOp) Init() {
 }
 
 type selLEInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -61830,9 +60850,7 @@ func (p selLEInt64Int16Op) Init() {
 }
 
 type selGTInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -61985,10 +61003,7 @@ func (p selGTInt64Int16ConstOp) Init() {
 }
 
 type selGTInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -62151,9 +61166,7 @@ func (p selGTInt64Int16Op) Init() {
 }
 
 type selGEInt64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -62306,10 +61319,7 @@ func (p selGEInt64Int16ConstOp) Init() {
 }
 
 type selGEInt64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -62472,9 +61482,7 @@ func (p selGEInt64Int16Op) Init() {
 }
 
 type selEQInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -62627,10 +61635,7 @@ func (p selEQInt64Int32ConstOp) Init() {
 }
 
 type selEQInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -62793,9 +61798,7 @@ func (p selEQInt64Int32Op) Init() {
 }
 
 type selNEInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -62948,10 +61951,7 @@ func (p selNEInt64Int32ConstOp) Init() {
 }
 
 type selNEInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -63114,9 +62114,7 @@ func (p selNEInt64Int32Op) Init() {
 }
 
 type selLTInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -63269,10 +62267,7 @@ func (p selLTInt64Int32ConstOp) Init() {
 }
 
 type selLTInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -63435,9 +62430,7 @@ func (p selLTInt64Int32Op) Init() {
 }
 
 type selLEInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -63590,10 +62583,7 @@ func (p selLEInt64Int32ConstOp) Init() {
 }
 
 type selLEInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -63756,9 +62746,7 @@ func (p selLEInt64Int32Op) Init() {
 }
 
 type selGTInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -63911,10 +62899,7 @@ func (p selGTInt64Int32ConstOp) Init() {
 }
 
 type selGTInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -64077,9 +63062,7 @@ func (p selGTInt64Int32Op) Init() {
 }
 
 type selGEInt64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -64232,10 +63215,7 @@ func (p selGEInt64Int32ConstOp) Init() {
 }
 
 type selGEInt64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -64398,9 +63378,7 @@ func (p selGEInt64Int32Op) Init() {
 }
 
 type selEQInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -64553,10 +63531,7 @@ func (p selEQInt64Int64ConstOp) Init() {
 }
 
 type selEQInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -64719,9 +63694,7 @@ func (p selEQInt64Int64Op) Init() {
 }
 
 type selNEInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -64874,10 +63847,7 @@ func (p selNEInt64Int64ConstOp) Init() {
 }
 
 type selNEInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -65040,9 +64010,7 @@ func (p selNEInt64Int64Op) Init() {
 }
 
 type selLTInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -65195,10 +64163,7 @@ func (p selLTInt64Int64ConstOp) Init() {
 }
 
 type selLTInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -65361,9 +64326,7 @@ func (p selLTInt64Int64Op) Init() {
 }
 
 type selLEInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -65516,10 +64479,7 @@ func (p selLEInt64Int64ConstOp) Init() {
 }
 
 type selLEInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -65682,9 +64642,7 @@ func (p selLEInt64Int64Op) Init() {
 }
 
 type selGTInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -65837,10 +64795,7 @@ func (p selGTInt64Int64ConstOp) Init() {
 }
 
 type selGTInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -66003,9 +64958,7 @@ func (p selGTInt64Int64Op) Init() {
 }
 
 type selGEInt64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -66158,10 +65111,7 @@ func (p selGEInt64Int64ConstOp) Init() {
 }
 
 type selGEInt64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -66324,9 +65274,7 @@ func (p selGEInt64Int64Op) Init() {
 }
 
 type selEQInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -66511,10 +65459,7 @@ func (p selEQInt64Float32ConstOp) Init() {
 }
 
 type selEQInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -66709,9 +65654,7 @@ func (p selEQInt64Float32Op) Init() {
 }
 
 type selNEInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -66896,10 +65839,7 @@ func (p selNEInt64Float32ConstOp) Init() {
 }
 
 type selNEInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -67094,9 +66034,7 @@ func (p selNEInt64Float32Op) Init() {
 }
 
 type selLTInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -67281,10 +66219,7 @@ func (p selLTInt64Float32ConstOp) Init() {
 }
 
 type selLTInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -67479,9 +66414,7 @@ func (p selLTInt64Float32Op) Init() {
 }
 
 type selLEInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -67666,10 +66599,7 @@ func (p selLEInt64Float32ConstOp) Init() {
 }
 
 type selLEInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -67864,9 +66794,7 @@ func (p selLEInt64Float32Op) Init() {
 }
 
 type selGTInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -68051,10 +66979,7 @@ func (p selGTInt64Float32ConstOp) Init() {
 }
 
 type selGTInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -68249,9 +67174,7 @@ func (p selGTInt64Float32Op) Init() {
 }
 
 type selGEInt64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -68436,10 +67359,7 @@ func (p selGEInt64Float32ConstOp) Init() {
 }
 
 type selGEInt64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -68634,9 +67554,7 @@ func (p selGEInt64Float32Op) Init() {
 }
 
 type selEQInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -68821,10 +67739,7 @@ func (p selEQInt64Float64ConstOp) Init() {
 }
 
 type selEQInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -69019,9 +67934,7 @@ func (p selEQInt64Float64Op) Init() {
 }
 
 type selNEInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -69206,10 +68119,7 @@ func (p selNEInt64Float64ConstOp) Init() {
 }
 
 type selNEInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -69404,9 +68314,7 @@ func (p selNEInt64Float64Op) Init() {
 }
 
 type selLTInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -69591,10 +68499,7 @@ func (p selLTInt64Float64ConstOp) Init() {
 }
 
 type selLTInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -69789,9 +68694,7 @@ func (p selLTInt64Float64Op) Init() {
 }
 
 type selLEInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -69976,10 +68879,7 @@ func (p selLEInt64Float64ConstOp) Init() {
 }
 
 type selLEInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -70174,9 +69074,7 @@ func (p selLEInt64Float64Op) Init() {
 }
 
 type selGTInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -70361,10 +69259,7 @@ func (p selGTInt64Float64ConstOp) Init() {
 }
 
 type selGTInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -70559,9 +69454,7 @@ func (p selGTInt64Float64Op) Init() {
 }
 
 type selGEInt64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -70746,10 +69639,7 @@ func (p selGEInt64Float64ConstOp) Init() {
 }
 
 type selGEInt64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -70944,9 +69834,7 @@ func (p selGEInt64Float64Op) Init() {
 }
 
 type selEQFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -71087,10 +69975,7 @@ func (p selEQFloat32DecimalConstOp) Init() {
 }
 
 type selEQFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -71241,9 +70126,7 @@ func (p selEQFloat32DecimalOp) Init() {
 }
 
 type selNEFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -71384,10 +70267,7 @@ func (p selNEFloat32DecimalConstOp) Init() {
 }
 
 type selNEFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -71538,9 +70418,7 @@ func (p selNEFloat32DecimalOp) Init() {
 }
 
 type selLTFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -71681,10 +70559,7 @@ func (p selLTFloat32DecimalConstOp) Init() {
 }
 
 type selLTFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -71835,9 +70710,7 @@ func (p selLTFloat32DecimalOp) Init() {
 }
 
 type selLEFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -71978,10 +70851,7 @@ func (p selLEFloat32DecimalConstOp) Init() {
 }
 
 type selLEFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -72132,9 +71002,7 @@ func (p selLEFloat32DecimalOp) Init() {
 }
 
 type selGTFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -72275,10 +71143,7 @@ func (p selGTFloat32DecimalConstOp) Init() {
 }
 
 type selGTFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -72429,9 +71294,7 @@ func (p selGTFloat32DecimalOp) Init() {
 }
 
 type selGEFloat32DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -72572,10 +71435,7 @@ func (p selGEFloat32DecimalConstOp) Init() {
 }
 
 type selGEFloat32DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -72726,9 +71586,7 @@ func (p selGEFloat32DecimalOp) Init() {
 }
 
 type selEQFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -72913,10 +71771,7 @@ func (p selEQFloat32Int8ConstOp) Init() {
 }
 
 type selEQFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -73111,9 +71966,7 @@ func (p selEQFloat32Int8Op) Init() {
 }
 
 type selNEFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -73298,10 +72151,7 @@ func (p selNEFloat32Int8ConstOp) Init() {
 }
 
 type selNEFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -73496,9 +72346,7 @@ func (p selNEFloat32Int8Op) Init() {
 }
 
 type selLTFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -73683,10 +72531,7 @@ func (p selLTFloat32Int8ConstOp) Init() {
 }
 
 type selLTFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -73881,9 +72726,7 @@ func (p selLTFloat32Int8Op) Init() {
 }
 
 type selLEFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -74068,10 +72911,7 @@ func (p selLEFloat32Int8ConstOp) Init() {
 }
 
 type selLEFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -74266,9 +73106,7 @@ func (p selLEFloat32Int8Op) Init() {
 }
 
 type selGTFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -74453,10 +73291,7 @@ func (p selGTFloat32Int8ConstOp) Init() {
 }
 
 type selGTFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -74651,9 +73486,7 @@ func (p selGTFloat32Int8Op) Init() {
 }
 
 type selGEFloat32Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -74838,10 +73671,7 @@ func (p selGEFloat32Int8ConstOp) Init() {
 }
 
 type selGEFloat32Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -75036,9 +73866,7 @@ func (p selGEFloat32Int8Op) Init() {
 }
 
 type selEQFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -75223,10 +74051,7 @@ func (p selEQFloat32Int16ConstOp) Init() {
 }
 
 type selEQFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -75421,9 +74246,7 @@ func (p selEQFloat32Int16Op) Init() {
 }
 
 type selNEFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -75608,10 +74431,7 @@ func (p selNEFloat32Int16ConstOp) Init() {
 }
 
 type selNEFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -75806,9 +74626,7 @@ func (p selNEFloat32Int16Op) Init() {
 }
 
 type selLTFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -75993,10 +74811,7 @@ func (p selLTFloat32Int16ConstOp) Init() {
 }
 
 type selLTFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -76191,9 +75006,7 @@ func (p selLTFloat32Int16Op) Init() {
 }
 
 type selLEFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -76378,10 +75191,7 @@ func (p selLEFloat32Int16ConstOp) Init() {
 }
 
 type selLEFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -76576,9 +75386,7 @@ func (p selLEFloat32Int16Op) Init() {
 }
 
 type selGTFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -76763,10 +75571,7 @@ func (p selGTFloat32Int16ConstOp) Init() {
 }
 
 type selGTFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -76961,9 +75766,7 @@ func (p selGTFloat32Int16Op) Init() {
 }
 
 type selGEFloat32Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -77148,10 +75951,7 @@ func (p selGEFloat32Int16ConstOp) Init() {
 }
 
 type selGEFloat32Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -77346,9 +76146,7 @@ func (p selGEFloat32Int16Op) Init() {
 }
 
 type selEQFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -77533,10 +76331,7 @@ func (p selEQFloat32Int32ConstOp) Init() {
 }
 
 type selEQFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -77731,9 +76526,7 @@ func (p selEQFloat32Int32Op) Init() {
 }
 
 type selNEFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -77918,10 +76711,7 @@ func (p selNEFloat32Int32ConstOp) Init() {
 }
 
 type selNEFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -78116,9 +76906,7 @@ func (p selNEFloat32Int32Op) Init() {
 }
 
 type selLTFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -78303,10 +77091,7 @@ func (p selLTFloat32Int32ConstOp) Init() {
 }
 
 type selLTFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -78501,9 +77286,7 @@ func (p selLTFloat32Int32Op) Init() {
 }
 
 type selLEFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -78688,10 +77471,7 @@ func (p selLEFloat32Int32ConstOp) Init() {
 }
 
 type selLEFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -78886,9 +77666,7 @@ func (p selLEFloat32Int32Op) Init() {
 }
 
 type selGTFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -79073,10 +77851,7 @@ func (p selGTFloat32Int32ConstOp) Init() {
 }
 
 type selGTFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -79271,9 +78046,7 @@ func (p selGTFloat32Int32Op) Init() {
 }
 
 type selGEFloat32Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -79458,10 +78231,7 @@ func (p selGEFloat32Int32ConstOp) Init() {
 }
 
 type selGEFloat32Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -79656,9 +78426,7 @@ func (p selGEFloat32Int32Op) Init() {
 }
 
 type selEQFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -79843,10 +78611,7 @@ func (p selEQFloat32Int64ConstOp) Init() {
 }
 
 type selEQFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -80041,9 +78806,7 @@ func (p selEQFloat32Int64Op) Init() {
 }
 
 type selNEFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -80228,10 +78991,7 @@ func (p selNEFloat32Int64ConstOp) Init() {
 }
 
 type selNEFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -80426,9 +79186,7 @@ func (p selNEFloat32Int64Op) Init() {
 }
 
 type selLTFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -80613,10 +79371,7 @@ func (p selLTFloat32Int64ConstOp) Init() {
 }
 
 type selLTFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -80811,9 +79566,7 @@ func (p selLTFloat32Int64Op) Init() {
 }
 
 type selLEFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -80998,10 +79751,7 @@ func (p selLEFloat32Int64ConstOp) Init() {
 }
 
 type selLEFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -81196,9 +79946,7 @@ func (p selLEFloat32Int64Op) Init() {
 }
 
 type selGTFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -81383,10 +80131,7 @@ func (p selGTFloat32Int64ConstOp) Init() {
 }
 
 type selGTFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -81581,9 +80326,7 @@ func (p selGTFloat32Int64Op) Init() {
 }
 
 type selGEFloat32Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -81768,10 +80511,7 @@ func (p selGEFloat32Int64ConstOp) Init() {
 }
 
 type selGEFloat32Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -81966,9 +80706,7 @@ func (p selGEFloat32Int64Op) Init() {
 }
 
 type selEQFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -82153,10 +80891,7 @@ func (p selEQFloat32Float32ConstOp) Init() {
 }
 
 type selEQFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -82351,9 +81086,7 @@ func (p selEQFloat32Float32Op) Init() {
 }
 
 type selNEFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -82538,10 +81271,7 @@ func (p selNEFloat32Float32ConstOp) Init() {
 }
 
 type selNEFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -82736,9 +81466,7 @@ func (p selNEFloat32Float32Op) Init() {
 }
 
 type selLTFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -82923,10 +81651,7 @@ func (p selLTFloat32Float32ConstOp) Init() {
 }
 
 type selLTFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -83121,9 +81846,7 @@ func (p selLTFloat32Float32Op) Init() {
 }
 
 type selLEFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -83308,10 +82031,7 @@ func (p selLEFloat32Float32ConstOp) Init() {
 }
 
 type selLEFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -83506,9 +82226,7 @@ func (p selLEFloat32Float32Op) Init() {
 }
 
 type selGTFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -83693,10 +82411,7 @@ func (p selGTFloat32Float32ConstOp) Init() {
 }
 
 type selGTFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -83891,9 +82606,7 @@ func (p selGTFloat32Float32Op) Init() {
 }
 
 type selGEFloat32Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -84078,10 +82791,7 @@ func (p selGEFloat32Float32ConstOp) Init() {
 }
 
 type selGEFloat32Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -84276,9 +82986,7 @@ func (p selGEFloat32Float32Op) Init() {
 }
 
 type selEQFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -84463,10 +83171,7 @@ func (p selEQFloat32Float64ConstOp) Init() {
 }
 
 type selEQFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -84661,9 +83366,7 @@ func (p selEQFloat32Float64Op) Init() {
 }
 
 type selNEFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -84848,10 +83551,7 @@ func (p selNEFloat32Float64ConstOp) Init() {
 }
 
 type selNEFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -85046,9 +83746,7 @@ func (p selNEFloat32Float64Op) Init() {
 }
 
 type selLTFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -85233,10 +83931,7 @@ func (p selLTFloat32Float64ConstOp) Init() {
 }
 
 type selLTFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -85431,9 +84126,7 @@ func (p selLTFloat32Float64Op) Init() {
 }
 
 type selLEFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -85618,10 +84311,7 @@ func (p selLEFloat32Float64ConstOp) Init() {
 }
 
 type selLEFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -85816,9 +84506,7 @@ func (p selLEFloat32Float64Op) Init() {
 }
 
 type selGTFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -86003,10 +84691,7 @@ func (p selGTFloat32Float64ConstOp) Init() {
 }
 
 type selGTFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -86201,9 +84886,7 @@ func (p selGTFloat32Float64Op) Init() {
 }
 
 type selGEFloat32Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -86388,10 +85071,7 @@ func (p selGEFloat32Float64ConstOp) Init() {
 }
 
 type selGEFloat32Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -86586,9 +85266,7 @@ func (p selGEFloat32Float64Op) Init() {
 }
 
 type selEQFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -86729,10 +85407,7 @@ func (p selEQFloat64DecimalConstOp) Init() {
 }
 
 type selEQFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -86883,9 +85558,7 @@ func (p selEQFloat64DecimalOp) Init() {
 }
 
 type selNEFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -87026,10 +85699,7 @@ func (p selNEFloat64DecimalConstOp) Init() {
 }
 
 type selNEFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -87180,9 +85850,7 @@ func (p selNEFloat64DecimalOp) Init() {
 }
 
 type selLTFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -87323,10 +85991,7 @@ func (p selLTFloat64DecimalConstOp) Init() {
 }
 
 type selLTFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -87477,9 +86142,7 @@ func (p selLTFloat64DecimalOp) Init() {
 }
 
 type selLEFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -87620,10 +86283,7 @@ func (p selLEFloat64DecimalConstOp) Init() {
 }
 
 type selLEFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -87774,9 +86434,7 @@ func (p selLEFloat64DecimalOp) Init() {
 }
 
 type selGTFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -87917,10 +86575,7 @@ func (p selGTFloat64DecimalConstOp) Init() {
 }
 
 type selGTFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -88071,9 +86726,7 @@ func (p selGTFloat64DecimalOp) Init() {
 }
 
 type selGEFloat64DecimalConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg apd.Decimal
 }
 
@@ -88214,10 +86867,7 @@ func (p selGEFloat64DecimalConstOp) Init() {
 }
 
 type selGEFloat64DecimalOp struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -88368,9 +87018,7 @@ func (p selGEFloat64DecimalOp) Init() {
 }
 
 type selEQFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -88555,10 +87203,7 @@ func (p selEQFloat64Int8ConstOp) Init() {
 }
 
 type selEQFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -88753,9 +87398,7 @@ func (p selEQFloat64Int8Op) Init() {
 }
 
 type selNEFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -88940,10 +87583,7 @@ func (p selNEFloat64Int8ConstOp) Init() {
 }
 
 type selNEFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -89138,9 +87778,7 @@ func (p selNEFloat64Int8Op) Init() {
 }
 
 type selLTFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -89325,10 +87963,7 @@ func (p selLTFloat64Int8ConstOp) Init() {
 }
 
 type selLTFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -89523,9 +88158,7 @@ func (p selLTFloat64Int8Op) Init() {
 }
 
 type selLEFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -89710,10 +88343,7 @@ func (p selLEFloat64Int8ConstOp) Init() {
 }
 
 type selLEFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -89908,9 +88538,7 @@ func (p selLEFloat64Int8Op) Init() {
 }
 
 type selGTFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -90095,10 +88723,7 @@ func (p selGTFloat64Int8ConstOp) Init() {
 }
 
 type selGTFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -90293,9 +88918,7 @@ func (p selGTFloat64Int8Op) Init() {
 }
 
 type selGEFloat64Int8ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int8
 }
 
@@ -90480,10 +89103,7 @@ func (p selGEFloat64Int8ConstOp) Init() {
 }
 
 type selGEFloat64Int8Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64Int8Op) Next(ctx context.Context) coldata.Batch {
@@ -90678,9 +89298,7 @@ func (p selGEFloat64Int8Op) Init() {
 }
 
 type selEQFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -90865,10 +89483,7 @@ func (p selEQFloat64Int16ConstOp) Init() {
 }
 
 type selEQFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -91063,9 +89678,7 @@ func (p selEQFloat64Int16Op) Init() {
 }
 
 type selNEFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -91250,10 +89863,7 @@ func (p selNEFloat64Int16ConstOp) Init() {
 }
 
 type selNEFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -91448,9 +90058,7 @@ func (p selNEFloat64Int16Op) Init() {
 }
 
 type selLTFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -91635,10 +90243,7 @@ func (p selLTFloat64Int16ConstOp) Init() {
 }
 
 type selLTFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -91833,9 +90438,7 @@ func (p selLTFloat64Int16Op) Init() {
 }
 
 type selLEFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -92020,10 +90623,7 @@ func (p selLEFloat64Int16ConstOp) Init() {
 }
 
 type selLEFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -92218,9 +90818,7 @@ func (p selLEFloat64Int16Op) Init() {
 }
 
 type selGTFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -92405,10 +91003,7 @@ func (p selGTFloat64Int16ConstOp) Init() {
 }
 
 type selGTFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -92603,9 +91198,7 @@ func (p selGTFloat64Int16Op) Init() {
 }
 
 type selGEFloat64Int16ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int16
 }
 
@@ -92790,10 +91383,7 @@ func (p selGEFloat64Int16ConstOp) Init() {
 }
 
 type selGEFloat64Int16Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -92988,9 +91578,7 @@ func (p selGEFloat64Int16Op) Init() {
 }
 
 type selEQFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -93175,10 +91763,7 @@ func (p selEQFloat64Int32ConstOp) Init() {
 }
 
 type selEQFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -93373,9 +91958,7 @@ func (p selEQFloat64Int32Op) Init() {
 }
 
 type selNEFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -93560,10 +92143,7 @@ func (p selNEFloat64Int32ConstOp) Init() {
 }
 
 type selNEFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -93758,9 +92338,7 @@ func (p selNEFloat64Int32Op) Init() {
 }
 
 type selLTFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -93945,10 +92523,7 @@ func (p selLTFloat64Int32ConstOp) Init() {
 }
 
 type selLTFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -94143,9 +92718,7 @@ func (p selLTFloat64Int32Op) Init() {
 }
 
 type selLEFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -94330,10 +92903,7 @@ func (p selLEFloat64Int32ConstOp) Init() {
 }
 
 type selLEFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -94528,9 +93098,7 @@ func (p selLEFloat64Int32Op) Init() {
 }
 
 type selGTFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -94715,10 +93283,7 @@ func (p selGTFloat64Int32ConstOp) Init() {
 }
 
 type selGTFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -94913,9 +93478,7 @@ func (p selGTFloat64Int32Op) Init() {
 }
 
 type selGEFloat64Int32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int32
 }
 
@@ -95100,10 +93663,7 @@ func (p selGEFloat64Int32ConstOp) Init() {
 }
 
 type selGEFloat64Int32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -95298,9 +93858,7 @@ func (p selGEFloat64Int32Op) Init() {
 }
 
 type selEQFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -95485,10 +94043,7 @@ func (p selEQFloat64Int64ConstOp) Init() {
 }
 
 type selEQFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -95683,9 +94238,7 @@ func (p selEQFloat64Int64Op) Init() {
 }
 
 type selNEFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -95870,10 +94423,7 @@ func (p selNEFloat64Int64ConstOp) Init() {
 }
 
 type selNEFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -96068,9 +94618,7 @@ func (p selNEFloat64Int64Op) Init() {
 }
 
 type selLTFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -96255,10 +94803,7 @@ func (p selLTFloat64Int64ConstOp) Init() {
 }
 
 type selLTFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -96453,9 +94998,7 @@ func (p selLTFloat64Int64Op) Init() {
 }
 
 type selLEFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -96640,10 +95183,7 @@ func (p selLEFloat64Int64ConstOp) Init() {
 }
 
 type selLEFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -96838,9 +95378,7 @@ func (p selLEFloat64Int64Op) Init() {
 }
 
 type selGTFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -97025,10 +95563,7 @@ func (p selGTFloat64Int64ConstOp) Init() {
 }
 
 type selGTFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -97223,9 +95758,7 @@ func (p selGTFloat64Int64Op) Init() {
 }
 
 type selGEFloat64Int64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg int64
 }
 
@@ -97410,10 +95943,7 @@ func (p selGEFloat64Int64ConstOp) Init() {
 }
 
 type selGEFloat64Int64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -97608,9 +96138,7 @@ func (p selGEFloat64Int64Op) Init() {
 }
 
 type selEQFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -97795,10 +96323,7 @@ func (p selEQFloat64Float32ConstOp) Init() {
 }
 
 type selEQFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -97993,9 +96518,7 @@ func (p selEQFloat64Float32Op) Init() {
 }
 
 type selNEFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -98180,10 +96703,7 @@ func (p selNEFloat64Float32ConstOp) Init() {
 }
 
 type selNEFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -98378,9 +96898,7 @@ func (p selNEFloat64Float32Op) Init() {
 }
 
 type selLTFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -98565,10 +97083,7 @@ func (p selLTFloat64Float32ConstOp) Init() {
 }
 
 type selLTFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -98763,9 +97278,7 @@ func (p selLTFloat64Float32Op) Init() {
 }
 
 type selLEFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -98950,10 +97463,7 @@ func (p selLEFloat64Float32ConstOp) Init() {
 }
 
 type selLEFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -99148,9 +97658,7 @@ func (p selLEFloat64Float32Op) Init() {
 }
 
 type selGTFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -99335,10 +97843,7 @@ func (p selGTFloat64Float32ConstOp) Init() {
 }
 
 type selGTFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -99533,9 +98038,7 @@ func (p selGTFloat64Float32Op) Init() {
 }
 
 type selGEFloat64Float32ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float32
 }
 
@@ -99720,10 +98223,7 @@ func (p selGEFloat64Float32ConstOp) Init() {
 }
 
 type selGEFloat64Float32Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64Float32Op) Next(ctx context.Context) coldata.Batch {
@@ -99918,9 +98418,7 @@ func (p selGEFloat64Float32Op) Init() {
 }
 
 type selEQFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -100105,10 +98603,7 @@ func (p selEQFloat64Float64ConstOp) Init() {
 }
 
 type selEQFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -100303,9 +98798,7 @@ func (p selEQFloat64Float64Op) Init() {
 }
 
 type selNEFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -100490,10 +98983,7 @@ func (p selNEFloat64Float64ConstOp) Init() {
 }
 
 type selNEFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -100688,9 +99178,7 @@ func (p selNEFloat64Float64Op) Init() {
 }
 
 type selLTFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -100875,10 +99363,7 @@ func (p selLTFloat64Float64ConstOp) Init() {
 }
 
 type selLTFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -101073,9 +99558,7 @@ func (p selLTFloat64Float64Op) Init() {
 }
 
 type selLEFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -101260,10 +99743,7 @@ func (p selLEFloat64Float64ConstOp) Init() {
 }
 
 type selLEFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -101458,9 +99938,7 @@ func (p selLEFloat64Float64Op) Init() {
 }
 
 type selGTFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -101645,10 +100123,7 @@ func (p selGTFloat64Float64ConstOp) Init() {
 }
 
 type selGTFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -101843,9 +100318,7 @@ func (p selGTFloat64Float64Op) Init() {
 }
 
 type selGEFloat64Float64ConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg float64
 }
 
@@ -102030,10 +100503,7 @@ func (p selGEFloat64Float64ConstOp) Init() {
 }
 
 type selGEFloat64Float64Op struct {
-	OneInputNode
-
-	col1Idx int
-	col2Idx int
+	selOpBase
 }
 
 func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -102241,2570 +100711,974 @@ func GetSelectionConstOperator(
 	if err != nil {
 		return nil, err
 	}
+	selConstOpBase := selConstOpBase{
+		OneInputNode: NewOneInputNode(input),
+		colIdx:       colIdx,
+	}
 	switch leftType := typeconv.FromColumnType(leftColType); leftType {
-
 	case coltypes.Bool:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Bool:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-				}, nil
-
+				return &selEQBoolBoolConstOp{selConstOpBase: selConstOpBase, constArg: c.(bool)}, nil
 			case tree.NE:
-				return &selNEBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-				}, nil
-
+				return &selNEBoolBoolConstOp{selConstOpBase: selConstOpBase, constArg: c.(bool)}, nil
 			case tree.LT:
-				return &selLTBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-				}, nil
-
+				return &selLTBoolBoolConstOp{selConstOpBase: selConstOpBase, constArg: c.(bool)}, nil
 			case tree.LE:
-				return &selLEBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-				}, nil
-
+				return &selLEBoolBoolConstOp{selConstOpBase: selConstOpBase, constArg: c.(bool)}, nil
 			case tree.GT:
-				return &selGTBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-				}, nil
-
+				return &selGTBoolBoolConstOp{selConstOpBase: selConstOpBase, constArg: c.(bool)}, nil
 			case tree.GE:
-				return &selGEBoolBoolConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(bool),
-				}, nil
-
+				return &selGEBoolBoolConstOp{selConstOpBase: selConstOpBase, constArg: c.(bool)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Bytes:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Bytes:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-				}, nil
-
+				return &selEQBytesBytesConstOp{selConstOpBase: selConstOpBase, constArg: c.([]byte)}, nil
 			case tree.NE:
-				return &selNEBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-				}, nil
-
+				return &selNEBytesBytesConstOp{selConstOpBase: selConstOpBase, constArg: c.([]byte)}, nil
 			case tree.LT:
-				return &selLTBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-				}, nil
-
+				return &selLTBytesBytesConstOp{selConstOpBase: selConstOpBase, constArg: c.([]byte)}, nil
 			case tree.LE:
-				return &selLEBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-				}, nil
-
+				return &selLEBytesBytesConstOp{selConstOpBase: selConstOpBase, constArg: c.([]byte)}, nil
 			case tree.GT:
-				return &selGTBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-				}, nil
-
+				return &selGTBytesBytesConstOp{selConstOpBase: selConstOpBase, constArg: c.([]byte)}, nil
 			case tree.GE:
-				return &selGEBytesBytesConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.([]byte),
-				}, nil
-
+				return &selGEBytesBytesConstOp{selConstOpBase: selConstOpBase, constArg: c.([]byte)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Decimal:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQDecimalDecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEDecimalDecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTDecimalDecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEDecimalDecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTDecimalDecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEDecimalDecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEDecimalDecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQDecimalInt8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEDecimalInt8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEDecimalInt8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTDecimalInt8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTDecimalInt8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEDecimalInt8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEDecimalInt8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTDecimalInt8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTDecimalInt8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEDecimalInt8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEDecimalInt8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQDecimalInt16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEDecimalInt16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEDecimalInt16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTDecimalInt16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTDecimalInt16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEDecimalInt16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEDecimalInt16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTDecimalInt16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTDecimalInt16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEDecimalInt16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEDecimalInt16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQDecimalInt32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEDecimalInt32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEDecimalInt32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTDecimalInt32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTDecimalInt32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEDecimalInt32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEDecimalInt32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTDecimalInt32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTDecimalInt32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEDecimalInt32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEDecimalInt32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQDecimalInt64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEDecimalInt64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEDecimalInt64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTDecimalInt64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTDecimalInt64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEDecimalInt64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEDecimalInt64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTDecimalInt64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTDecimalInt64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEDecimalInt64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEDecimalInt64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalFloat32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQDecimalFloat32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEDecimalFloat32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEDecimalFloat32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTDecimalFloat32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTDecimalFloat32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEDecimalFloat32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEDecimalFloat32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTDecimalFloat32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTDecimalFloat32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEDecimalFloat32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEDecimalFloat32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalFloat64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQDecimalFloat64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEDecimalFloat64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEDecimalFloat64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTDecimalFloat64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTDecimalFloat64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEDecimalFloat64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEDecimalFloat64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTDecimalFloat64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTDecimalFloat64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEDecimalFloat64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEDecimalFloat64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int8:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQInt8DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEInt8DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEInt8DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTInt8DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTInt8DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEInt8DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEInt8DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTInt8DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTInt8DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEInt8DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEInt8DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQInt8Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEInt8Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTInt8Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEInt8Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTInt8Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEInt8Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEInt8Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQInt8Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEInt8Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEInt8Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTInt8Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTInt8Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEInt8Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEInt8Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTInt8Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTInt8Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEInt8Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEInt8Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQInt8Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEInt8Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEInt8Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTInt8Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTInt8Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEInt8Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEInt8Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTInt8Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTInt8Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEInt8Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEInt8Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQInt8Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEInt8Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEInt8Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTInt8Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTInt8Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEInt8Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEInt8Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTInt8Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTInt8Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEInt8Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEInt8Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQInt8Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEInt8Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEInt8Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTInt8Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTInt8Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEInt8Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEInt8Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTInt8Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTInt8Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEInt8Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEInt8Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQInt8Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEInt8Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEInt8Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTInt8Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTInt8Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEInt8Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEInt8Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTInt8Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTInt8Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEInt8Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEInt8Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int16:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQInt16DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEInt16DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEInt16DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTInt16DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTInt16DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEInt16DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEInt16DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTInt16DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTInt16DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEInt16DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEInt16DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQInt16Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEInt16Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEInt16Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTInt16Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTInt16Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEInt16Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEInt16Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTInt16Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTInt16Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEInt16Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEInt16Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQInt16Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEInt16Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTInt16Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEInt16Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTInt16Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEInt16Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEInt16Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQInt16Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEInt16Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEInt16Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTInt16Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTInt16Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEInt16Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEInt16Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTInt16Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTInt16Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEInt16Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEInt16Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQInt16Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEInt16Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEInt16Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTInt16Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTInt16Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEInt16Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEInt16Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTInt16Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTInt16Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEInt16Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEInt16Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQInt16Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEInt16Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEInt16Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTInt16Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTInt16Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEInt16Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEInt16Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTInt16Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTInt16Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEInt16Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEInt16Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQInt16Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEInt16Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEInt16Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTInt16Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTInt16Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEInt16Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEInt16Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTInt16Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTInt16Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEInt16Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEInt16Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int32:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQInt32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEInt32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEInt32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTInt32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTInt32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEInt32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEInt32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTInt32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTInt32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEInt32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEInt32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQInt32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEInt32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEInt32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTInt32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTInt32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEInt32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEInt32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTInt32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTInt32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEInt32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEInt32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQInt32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEInt32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEInt32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTInt32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTInt32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEInt32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEInt32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTInt32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTInt32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEInt32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEInt32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQInt32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEInt32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTInt32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEInt32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTInt32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEInt32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEInt32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQInt32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEInt32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEInt32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTInt32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTInt32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEInt32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEInt32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTInt32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTInt32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEInt32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEInt32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQInt32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEInt32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEInt32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTInt32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTInt32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEInt32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEInt32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTInt32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTInt32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEInt32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEInt32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQInt32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEInt32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEInt32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTInt32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTInt32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEInt32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEInt32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTInt32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTInt32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEInt32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEInt32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int64:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQInt64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEInt64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEInt64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTInt64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTInt64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEInt64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEInt64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTInt64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTInt64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEInt64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEInt64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQInt64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEInt64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEInt64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTInt64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTInt64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEInt64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEInt64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTInt64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTInt64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEInt64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEInt64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQInt64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEInt64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEInt64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTInt64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTInt64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEInt64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEInt64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTInt64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTInt64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEInt64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEInt64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQInt64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEInt64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEInt64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTInt64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTInt64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEInt64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEInt64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTInt64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTInt64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEInt64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEInt64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQInt64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEInt64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTInt64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEInt64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTInt64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEInt64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEInt64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQInt64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEInt64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEInt64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTInt64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTInt64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEInt64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEInt64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTInt64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTInt64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEInt64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEInt64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQInt64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEInt64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEInt64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTInt64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTInt64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEInt64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEInt64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTInt64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTInt64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEInt64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEInt64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Float32:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQFloat32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEFloat32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEFloat32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTFloat32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTFloat32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEFloat32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEFloat32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTFloat32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTFloat32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEFloat32DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEFloat32DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQFloat32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEFloat32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEFloat32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTFloat32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTFloat32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEFloat32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEFloat32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTFloat32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTFloat32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEFloat32Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEFloat32Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQFloat32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEFloat32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEFloat32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTFloat32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTFloat32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEFloat32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEFloat32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTFloat32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTFloat32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEFloat32Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEFloat32Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQFloat32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEFloat32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEFloat32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTFloat32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTFloat32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEFloat32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEFloat32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTFloat32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTFloat32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEFloat32Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEFloat32Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQFloat32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEFloat32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEFloat32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTFloat32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTFloat32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEFloat32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEFloat32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTFloat32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTFloat32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEFloat32Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEFloat32Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQFloat32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEFloat32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTFloat32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEFloat32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTFloat32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEFloat32Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEFloat32Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQFloat32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEFloat32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEFloat32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTFloat32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTFloat32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEFloat32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEFloat32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTFloat32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTFloat32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEFloat32Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEFloat32Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Float64:
 		switch rightType := typeconv.FromColumnType(constColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selEQFloat64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.NE:
-				return &selNEFloat64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selNEFloat64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LT:
-				return &selLTFloat64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLTFloat64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.LE:
-				return &selLEFloat64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selLEFloat64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GT:
-				return &selGTFloat64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGTFloat64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			case tree.GE:
-				return &selGEFloat64DecimalConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(apd.Decimal),
-				}, nil
-
+				return &selGEFloat64DecimalConstOp{selConstOpBase: selConstOpBase, constArg: c.(apd.Decimal)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selEQFloat64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.NE:
-				return &selNEFloat64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selNEFloat64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LT:
-				return &selLTFloat64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLTFloat64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.LE:
-				return &selLEFloat64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selLEFloat64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GT:
-				return &selGTFloat64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGTFloat64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			case tree.GE:
-				return &selGEFloat64Int8ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int8),
-				}, nil
-
+				return &selGEFloat64Int8ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int8)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selEQFloat64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.NE:
-				return &selNEFloat64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selNEFloat64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LT:
-				return &selLTFloat64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLTFloat64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.LE:
-				return &selLEFloat64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selLEFloat64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GT:
-				return &selGTFloat64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGTFloat64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			case tree.GE:
-				return &selGEFloat64Int16ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int16),
-				}, nil
-
+				return &selGEFloat64Int16ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int16)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selEQFloat64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.NE:
-				return &selNEFloat64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selNEFloat64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LT:
-				return &selLTFloat64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLTFloat64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.LE:
-				return &selLEFloat64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selLEFloat64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GT:
-				return &selGTFloat64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGTFloat64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			case tree.GE:
-				return &selGEFloat64Int32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int32),
-				}, nil
-
+				return &selGEFloat64Int32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selEQFloat64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.NE:
-				return &selNEFloat64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selNEFloat64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LT:
-				return &selLTFloat64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLTFloat64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.LE:
-				return &selLEFloat64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selLEFloat64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GT:
-				return &selGTFloat64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGTFloat64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			case tree.GE:
-				return &selGEFloat64Int64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(int64),
-				}, nil
-
+				return &selGEFloat64Int64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(int64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selEQFloat64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.NE:
-				return &selNEFloat64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selNEFloat64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LT:
-				return &selLTFloat64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLTFloat64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.LE:
-				return &selLEFloat64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selLEFloat64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GT:
-				return &selGTFloat64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGTFloat64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			case tree.GE:
-				return &selGEFloat64Float32ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float32),
-				}, nil
-
+				return &selGEFloat64Float32ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float32)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selEQFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.NE:
-				return &selNEFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selNEFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LT:
-				return &selLTFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLTFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.LE:
-				return &selLEFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selLEFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GT:
-				return &selGTFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGTFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
-				return &selGEFloat64Float64ConstOp{
-					OneInputNode: NewOneInputNode(input),
-					colIdx:       colIdx,
-					constArg:     c.(float64),
-				}, nil
-
+				return &selGEFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	default:
 		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}
@@ -104820,2570 +101694,975 @@ func GetSelectionOperator(
 	col1Idx int,
 	col2Idx int,
 ) (Operator, error) {
+	selOpBase := selOpBase{
+		OneInputNode: NewOneInputNode(input),
+		col1Idx:      col1Idx,
+		col2Idx:      col2Idx,
+	}
 	switch leftType := typeconv.FromColumnType(leftColType); leftType {
-
 	case coltypes.Bool:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Bool:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQBoolBoolOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEBoolBoolOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTBoolBoolOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEBoolBoolOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTBoolBoolOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEBoolBoolOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEBoolBoolOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Bytes:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Bytes:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQBytesBytesOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEBytesBytesOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTBytesBytesOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEBytesBytesOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTBytesBytesOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEBytesBytesOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEBytesBytesOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Decimal:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalDecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalDecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalDecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalDecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalDecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalDecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalDecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalInt8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalInt8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalInt8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalInt8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalInt8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalInt8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalInt8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalInt16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalInt16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalInt16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalInt16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalInt16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalInt16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalInt16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalInt32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalInt32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalInt32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalInt32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalInt32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalInt32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalInt32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalInt64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalInt64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalInt64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalInt64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalInt64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalInt64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalInt64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalFloat32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalFloat32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalFloat32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalFloat32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalFloat32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalFloat32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalFloat32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQDecimalFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQDecimalFloat64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEDecimalFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEDecimalFloat64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTDecimalFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTDecimalFloat64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEDecimalFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEDecimalFloat64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTDecimalFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTDecimalFloat64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEDecimalFloat64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEDecimalFloat64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int8:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8DecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8DecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8Int8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8Int8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8Int8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8Int8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8Int8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8Int8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8Int16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8Int16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8Int16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8Int16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8Int16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8Int16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8Int32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8Int32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8Int32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8Int32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8Int32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8Int32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8Int64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8Int64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8Int64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8Int64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8Int64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8Int64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8Float32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8Float32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8Float32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8Float32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8Float32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8Float32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt8Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt8Float64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt8Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt8Float64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt8Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt8Float64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt8Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt8Float64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt8Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt8Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt8Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt8Float64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int16:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16DecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16DecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16Int8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16Int8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16Int8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16Int8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16Int8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16Int8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16Int16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16Int16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16Int16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16Int16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16Int16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16Int16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16Int32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16Int32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16Int32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16Int32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16Int32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16Int32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16Int64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16Int64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16Int64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16Int64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16Int64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16Int64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16Float32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16Float32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16Float32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16Float32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16Float32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16Float32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt16Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt16Float64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt16Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt16Float64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt16Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt16Float64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt16Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt16Float64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt16Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt16Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt16Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt16Float64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int32:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32DecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32Int8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32Int8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32Int8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32Int8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32Int8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32Int8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32Int16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32Int16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32Int16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32Int16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32Int16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32Int16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32Int32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32Int32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32Int32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32Int32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32Int32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32Int32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32Int64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32Int64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32Int64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32Int64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32Int64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32Int64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32Float32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32Float32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32Float32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32Float32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32Float32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32Float32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt32Float64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt32Float64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt32Float64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt32Float64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt32Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt32Float64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Int64:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64DecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64Int8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64Int8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64Int8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64Int8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64Int8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64Int8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64Int16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64Int16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64Int16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64Int16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64Int16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64Int16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64Int32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64Int32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64Int32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64Int32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64Int32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64Int32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64Int64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64Int64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64Int64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64Int64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64Int64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64Int64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64Float32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64Float32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64Float32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64Float32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64Float32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64Float32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQInt64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQInt64Float64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEInt64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEInt64Float64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTInt64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTInt64Float64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEInt64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEInt64Float64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTInt64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTInt64Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEInt64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEInt64Float64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Float32:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32DecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32Int8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32Int8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32Int8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32Int8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32Int8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32Int8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32Int16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32Int16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32Int16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32Int16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32Int16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32Int16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32Int32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32Int32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32Int32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32Int32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32Int32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32Int32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32Int64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32Int64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32Int64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32Int64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32Int64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32Int64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32Float32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32Float32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32Float32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32Float32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32Float32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32Float32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat32Float64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat32Float64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat32Float64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat32Float64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat32Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat32Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat32Float64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	case coltypes.Float64:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
 
 		case coltypes.Decimal:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64DecimalOp{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64DecimalOp{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64DecimalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int8:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64Int8Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64Int8Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64Int8Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64Int8Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64Int8Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64Int8Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64Int8Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int16:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64Int16Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64Int16Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64Int16Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64Int16Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64Int16Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64Int16Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64Int16Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64Int32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64Int32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64Int32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64Int32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64Int32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64Int32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64Int32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Int64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64Int64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64Int64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64Int64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64Int64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64Int64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64Int64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64Int64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float32:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64Float32Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64Float32Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64Float32Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64Float32Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64Float32Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64Float32Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64Float32Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 
 		case coltypes.Float64:
 			switch cmpOp {
-
 			case tree.EQ:
-				return &selEQFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selEQFloat64Float64Op{selOpBase: selOpBase}, nil
 			case tree.NE:
-				return &selNEFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selNEFloat64Float64Op{selOpBase: selOpBase}, nil
 			case tree.LT:
-				return &selLTFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLTFloat64Float64Op{selOpBase: selOpBase}, nil
 			case tree.LE:
-				return &selLEFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selLEFloat64Float64Op{selOpBase: selOpBase}, nil
 			case tree.GT:
-				return &selGTFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGTFloat64Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
-				return &selGEFloat64Float64Op{
-					OneInputNode: NewOneInputNode(input),
-					col1Idx:      col1Idx,
-					col2Idx:      col2Idx,
-				}, nil
-
+				return &selGEFloat64Float64Op{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
-
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
-
 	default:
 		return nil, errors.Errorf("unhandled left type: %s", leftType)
 	}

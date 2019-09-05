@@ -12,9 +12,7 @@ import (
 )
 
 type selPrefixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -99,12 +97,8 @@ func (p selPrefixBytesBytesConstOp) Init() {
 }
 
 type projPrefixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -151,9 +145,7 @@ func (p projPrefixBytesBytesConstOp) Init() {
 }
 
 type selSuffixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -238,12 +230,8 @@ func (p selSuffixBytesBytesConstOp) Init() {
 }
 
 type projSuffixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -290,9 +278,7 @@ func (p projSuffixBytesBytesConstOp) Init() {
 }
 
 type selRegexpBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg *regexp.Regexp
 }
 
@@ -377,12 +363,8 @@ func (p selRegexpBytesBytesConstOp) Init() {
 }
 
 type projRegexpBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg *regexp.Regexp
-
-	outputIdx int
 }
 
 func (p projRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -429,9 +411,7 @@ func (p projRegexpBytesBytesConstOp) Init() {
 }
 
 type selNotPrefixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -516,12 +496,8 @@ func (p selNotPrefixBytesBytesConstOp) Init() {
 }
 
 type projNotPrefixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projNotPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -568,9 +544,7 @@ func (p projNotPrefixBytesBytesConstOp) Init() {
 }
 
 type selNotSuffixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg []byte
 }
 
@@ -655,12 +629,8 @@ func (p selNotSuffixBytesBytesConstOp) Init() {
 }
 
 type projNotSuffixBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg []byte
-
-	outputIdx int
 }
 
 func (p projNotSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
@@ -707,9 +677,7 @@ func (p projNotSuffixBytesBytesConstOp) Init() {
 }
 
 type selNotRegexpBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	selConstOpBase
 	constArg *regexp.Regexp
 }
 
@@ -794,12 +762,8 @@ func (p selNotRegexpBytesBytesConstOp) Init() {
 }
 
 type projNotRegexpBytesBytesConstOp struct {
-	OneInputNode
-
-	colIdx   int
+	projConstOpBase
 	constArg *regexp.Regexp
-
-	outputIdx int
 }
 
 func (p projNotRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
