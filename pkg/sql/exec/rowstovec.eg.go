@@ -36,30 +36,6 @@ func EncDatumRowsToColVec(
 ) error {
 
 	switch columnType.Family() {
-	case types.DecimalFamily:
-
-		col := vec.Decimal()
-		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-		for i := range rows {
-			row := rows[i]
-			if row[columnIdx].Datum == nil {
-				if err := row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-					return err
-				}
-			}
-			datum := row[columnIdx].Datum
-			if datum == tree.DNull {
-				vec.Nulls().SetNull(uint16(i))
-			} else {
-				v, err := datumToPhysicalFn(datum)
-				if err != nil {
-					return err
-				}
-
-				castV := v.(apd.Decimal)
-				col[i].Set(&castV)
-			}
-		}
 	case types.OidFamily:
 
 		col := vec.Int64()
@@ -81,6 +57,30 @@ func EncDatumRowsToColVec(
 				}
 
 				castV := v.(int64)
+				col[i] = castV
+			}
+		}
+	case types.BoolFamily:
+
+		col := vec.Bool()
+		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+		for i := range rows {
+			row := rows[i]
+			if row[columnIdx].Datum == nil {
+				if err := row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+					return err
+				}
+			}
+			datum := row[columnIdx].Datum
+			if datum == tree.DNull {
+				vec.Nulls().SetNull(uint16(i))
+			} else {
+				v, err := datumToPhysicalFn(datum)
+				if err != nil {
+					return err
+				}
+
+				castV := v.(bool)
 				col[i] = castV
 			}
 		}
@@ -108,9 +108,9 @@ func EncDatumRowsToColVec(
 				col.Set(i, castV)
 			}
 		}
-	case types.BoolFamily:
+	case types.DecimalFamily:
 
-		col := vec.Bool()
+		col := vec.Decimal()
 		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -128,8 +128,8 @@ func EncDatumRowsToColVec(
 					return err
 				}
 
-				castV := v.(bool)
-				col[i] = castV
+				castV := v.(apd.Decimal)
+				col[i].Set(&castV)
 			}
 		}
 	case types.StringFamily:
