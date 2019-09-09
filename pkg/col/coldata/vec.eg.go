@@ -219,7 +219,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -263,7 +265,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -314,7 +318,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol.Get(int(selIdx))
 							toCol.Set(int(selIdx), v)
@@ -358,7 +364,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol.Get(int(selIdx))
 							toCol.Set(int(selIdx), v)
@@ -409,7 +417,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)].Set(&v)
@@ -453,7 +463,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)].Set(&v)
@@ -510,7 +522,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -554,7 +568,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -605,7 +621,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -649,7 +667,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -700,7 +720,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -744,7 +766,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -795,7 +819,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -839,7 +865,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -890,7 +918,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -934,7 +964,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -985,7 +1017,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
@@ -1029,7 +1063,9 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
 						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
 							toCol[int(selIdx)] = v
