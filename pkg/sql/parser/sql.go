@@ -15684,19 +15684,19 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 //line sql-gen.y:3447
 		{
-			sqlVAL.union.val = &tree.ShowPartitions{Object: sqlDollar[5].union.unresolvedObjectName().String(), IsTable: true, Table: sqlDollar[5].union.unresolvedObjectName()}
+			sqlVAL.union.val = &tree.ShowPartitions{IsTable: true, Table: sqlDollar[5].union.unresolvedObjectName()}
 		}
 	case 605:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 //line sql-gen.y:3451
 		{
-			sqlVAL.union.val = &tree.ShowPartitions{Object: sqlDollar[5].str, IsDB: true}
+			sqlVAL.union.val = &tree.ShowPartitions{IsDB: true, Database: tree.Name(sqlDollar[5].str)}
 		}
 	case 606:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 //line sql-gen.y:3455
 		{
-			sqlVAL.union.val = &tree.ShowPartitions{Object: sqlDollar[5].union.newTableIndexName().String(), IsIndex: true, Index: sqlDollar[5].union.tableIndexName()}
+			sqlVAL.union.val = &tree.ShowPartitions{IsIndex: true, Index: sqlDollar[5].union.tableIndexName()}
 		}
 	case 607:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
@@ -16240,7 +16240,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 //line sql-gen.y:3856
 		{
-			sqlVAL.union.val = &tree.ShowRanges{DatabaseName: sqlDollar[5].str}
+			sqlVAL.union.val = &tree.ShowRanges{DatabaseName: tree.Name(sqlDollar[5].str)}
 		}
 	case 693:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
