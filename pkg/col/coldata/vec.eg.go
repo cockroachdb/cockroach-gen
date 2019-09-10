@@ -205,7 +205,14 @@ func (m *memColumn) Append(args SliceArgs) {
 }
 
 func (m *memColumn) Copy(args CopySliceArgs) {
-	m.Nulls().UnsetNullRange(args.DestIdx, args.DestIdx+(args.SrcEndIdx-args.SrcStartIdx))
+	if !args.SelOnDest {
+		// We're about to overwrite this entire range, so unset all the nulls.
+		m.Nulls().UnsetNullRange(args.DestIdx, args.DestIdx+(args.SrcEndIdx-args.SrcStartIdx))
+	}
+	// } else {
+	// SelOnDest indicates that we're applying the input selection vector as a lens
+	// into the output vector as well. We'll set the non-nulls by hand below.
+	// }
 
 	switch args.ColType {
 	case coltypes.Bool:
@@ -224,6 +231,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -270,6 +278,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -323,6 +332,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol.Get(int(selIdx))
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol.Set(int(selIdx), v)
 						}
 					}
@@ -369,6 +379,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol.Get(int(selIdx))
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol.Set(int(selIdx), v)
 						}
 					}
@@ -422,6 +433,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)].Set(&v)
 						}
 					}
@@ -468,6 +480,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)].Set(&v)
 						}
 					}
@@ -527,6 +540,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -573,6 +587,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -626,6 +641,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -672,6 +688,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -725,6 +742,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -771,6 +789,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -824,6 +843,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -870,6 +890,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -923,6 +944,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -969,6 +991,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -1022,6 +1045,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
@@ -1068,6 +1092,7 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 							m.nulls.SetNull64(uint64(selIdx))
 						} else {
 							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
 							toCol[int(selIdx)] = v
 						}
 					}
