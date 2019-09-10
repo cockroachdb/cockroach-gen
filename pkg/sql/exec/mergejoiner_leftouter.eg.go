@@ -37698,11 +37698,6 @@ func (o *mergeJoinLeftOuterOp) Next(ctx context.Context) coldata.Batch {
 			if o.needToResetOutput {
 				o.needToResetOutput = false
 				o.output.ResetInternalBatch()
-				for _, vec := range o.output.ColVecs() {
-					// We only need to explicitly reset nulls since the values will be
-					// copied over and the correct length will be set.
-					vec.Nulls().UnsetNulls()
-				}
 			}
 			o.initProberState(ctx)
 
