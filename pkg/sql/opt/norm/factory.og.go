@@ -7979,6 +7979,19 @@ func (_f *Factory) ConstructWith(
 	input memo.RelExpr,
 	withPrivate *memo.WithPrivate,
 ) memo.RelExpr {
+	// [InlineWith]
+	{
+		if _f.funcs.CanInlineWith(binding, input, withPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.InlineWith) {
+				_expr := _f.funcs.InlineWith(binding, input, withPrivate).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.InlineWith, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeWith(binding, input, withPrivate)
 	return _f.onConstructRelational(e)
 }
