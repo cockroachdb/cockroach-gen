@@ -1726,19 +1726,23 @@ func (_f *Factory) ConstructInnerJoin(
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_arg := _f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))
-						_expr := _f.ConstructSelect(
-							_f.DynamicConstruct(
-								right.Op(),
-								_f.ConstructInnerJoinApply(
-									newLeft,
-									input,
-									memo.EmptyFiltersExpr,
-									private,
-								),
-								&_arg,
-								_f.funcs.AddColsToGrouping(groupingPrivate, _f.funcs.KeyCols(newLeft)),
-							).(memo.RelExpr),
-							on,
+						_expr := _f.ConstructProject(
+							_f.ConstructSelect(
+								_f.DynamicConstruct(
+									right.Op(),
+									_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										memo.EmptyFiltersExpr,
+										private,
+									),
+									&_arg,
+									_f.funcs.AddColsToGrouping(groupingPrivate, _f.funcs.KeyCols(newLeft)),
+								).(memo.RelExpr),
+								on,
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateGroupBy, nil, _expr)
@@ -4925,19 +4929,23 @@ func (_f *Factory) ConstructInnerJoinApply(
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateGroupBy) {
 						newLeft := _f.funcs.EnsureKey(left)
 						_arg := _f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft))
-						_expr := _f.ConstructSelect(
-							_f.DynamicConstruct(
-								right.Op(),
-								_f.ConstructInnerJoinApply(
-									newLeft,
-									input,
-									memo.EmptyFiltersExpr,
-									private,
-								),
-								&_arg,
-								_f.funcs.AddColsToGrouping(groupingPrivate, _f.funcs.KeyCols(newLeft)),
-							).(memo.RelExpr),
-							on,
+						_expr := _f.ConstructProject(
+							_f.ConstructSelect(
+								_f.DynamicConstruct(
+									right.Op(),
+									_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										memo.EmptyFiltersExpr,
+										private,
+									),
+									&_arg,
+									_f.funcs.AddColsToGrouping(groupingPrivate, _f.funcs.KeyCols(newLeft)),
+								).(memo.RelExpr),
+								on,
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateGroupBy, nil, _expr)
