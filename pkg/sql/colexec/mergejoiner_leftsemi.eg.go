@@ -60456,13 +60456,10 @@ func (o *mergeJoinLeftSemiOp) calculateOutputCount(
 }
 
 func (o *mergeJoinLeftSemiOp) Next(ctx context.Context) coldata.Batch {
+	o.output.ResetInternalBatch()
 	for {
 		switch o.state {
 		case mjEntry:
-			if o.needToResetOutput {
-				o.needToResetOutput = false
-				o.output.ResetInternalBatch()
-			}
 			o.initProberState(ctx)
 
 			if o.nonEmptyBufferedGroup() {
@@ -60501,7 +60498,6 @@ func (o *mergeJoinLeftSemiOp) Next(ctx context.Context) coldata.Batch {
 				o.output.SetLength(o.builderState.outCount)
 				// Reset builder out count.
 				o.builderState.outCount = uint16(0)
-				o.needToResetOutput = true
 				o.outputReady = false
 				return o.output
 			}
@@ -60534,13 +60530,10 @@ func (o *mergeJoinLeftSemiWithOnExprOp) calculateOutputCount(
 }
 
 func (o *mergeJoinLeftSemiWithOnExprOp) Next(ctx context.Context) coldata.Batch {
+	o.output.ResetInternalBatch()
 	for {
 		switch o.state {
 		case mjEntry:
-			if o.needToResetOutput {
-				o.needToResetOutput = false
-				o.output.ResetInternalBatch()
-			}
 			o.initProberState(ctx)
 
 			if o.nonEmptyBufferedGroup() {
@@ -60579,7 +60572,6 @@ func (o *mergeJoinLeftSemiWithOnExprOp) Next(ctx context.Context) coldata.Batch 
 				o.output.SetLength(o.builderState.outCount)
 				// Reset builder out count.
 				o.builderState.outCount = uint16(0)
-				o.needToResetOutput = true
 				o.outputReady = false
 				return o.output
 			}
