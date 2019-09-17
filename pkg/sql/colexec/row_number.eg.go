@@ -7,14 +7,13 @@
 // by the Apache License, Version 2.0, included in the file
 // licenses/APL.txt.
 
-package vecbuiltins
+package colexec
 
 import (
 	"context"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 )
 
@@ -22,7 +21,7 @@ type rowNumberNoPartitionOp struct {
 	rowNumberBase
 }
 
-var _ colexec.Operator = &rowNumberNoPartitionOp{}
+var _ Operator = &rowNumberNoPartitionOp{}
 
 func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
@@ -55,7 +54,7 @@ type rowNumberWithPartitionOp struct {
 	rowNumberBase
 }
 
-var _ colexec.Operator = &rowNumberWithPartitionOp{}
+var _ Operator = &rowNumberWithPartitionOp{}
 
 func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)

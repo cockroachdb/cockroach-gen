@@ -7,19 +7,18 @@
 // by the Apache License, Version 2.0, included in the file
 // licenses/APL.txt.
 
-package vecbuiltins
+package colexec
 
 import (
 	"context"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 )
 
 type rankInitFields struct {
-	colexec.OneInputNode
+	OneInputNode
 	// distinctCol is the output column of the chain of ordered distinct
 	// operators in which true will indicate that a new rank needs to be assigned
 	// to the corresponding tuple.
@@ -39,7 +38,7 @@ type rankNoPartitionOp struct {
 	rankIncrement int64
 }
 
-var _ colexec.Operator = &rankNoPartitionOp{}
+var _ Operator = &rankNoPartitionOp{}
 
 func (r *rankNoPartitionOp) Init() {
 	r.Input().Init()
@@ -103,7 +102,7 @@ type rankWithPartitionOp struct {
 	rankIncrement int64
 }
 
-var _ colexec.Operator = &rankWithPartitionOp{}
+var _ Operator = &rankWithPartitionOp{}
 
 func (r *rankWithPartitionOp) Init() {
 	r.Input().Init()
@@ -185,7 +184,7 @@ type denseRankNoPartitionOp struct {
 	rankIncrement int64
 }
 
-var _ colexec.Operator = &denseRankNoPartitionOp{}
+var _ Operator = &denseRankNoPartitionOp{}
 
 func (r *denseRankNoPartitionOp) Init() {
 	r.Input().Init()
@@ -247,7 +246,7 @@ type denseRankWithPartitionOp struct {
 	rankIncrement int64
 }
 
-var _ colexec.Operator = &denseRankWithPartitionOp{}
+var _ Operator = &denseRankWithPartitionOp{}
 
 func (r *denseRankWithPartitionOp) Init() {
 	r.Input().Init()
