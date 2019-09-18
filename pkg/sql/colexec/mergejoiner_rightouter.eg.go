@@ -32933,12 +32933,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 	outputBatchSize := int(o.outputBatchSize)
 	// Loop over every column.
 LeftColLoop:
-	for ; o.builderState.left.colIdx < len(input.outCols); o.builderState.left.colIdx++ {
-		colIdx := input.outCols[o.builderState.left.colIdx]
+	for outColIdx, inColIdx := range input.outCols {
 		outStartIdx := int(destStartIdx)
-		out := o.output.ColVec(int(colIdx))
-		src := batch.ColVec(int(colIdx))
-		colType := input.sourceTypes[colIdx]
+		out := o.output.ColVec(outColIdx)
+		src := batch.ColVec(int(inColIdx))
+		colType := input.sourceTypes[inColIdx]
 
 		if sel != nil {
 			if src.MaybeHasNulls() {
@@ -32994,8 +32993,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33057,8 +33055,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33120,8 +33117,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33183,8 +33179,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33246,8 +33241,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33309,8 +33303,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33372,8 +33365,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33435,8 +33427,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33498,8 +33489,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33562,8 +33552,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33620,8 +33609,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33678,8 +33666,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33736,8 +33723,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33794,8 +33780,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33852,8 +33837,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33910,8 +33894,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33968,8 +33951,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34026,8 +34008,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34096,8 +34077,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34158,8 +34138,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34220,8 +34199,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34282,8 +34260,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34344,8 +34321,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34406,8 +34382,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34468,8 +34443,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34530,8 +34504,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34592,8 +34565,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34655,8 +34627,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34712,8 +34683,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34769,8 +34739,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34826,8 +34795,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34883,8 +34851,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34940,8 +34907,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -34997,8 +34963,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -35054,8 +35019,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -35111,8 +35075,7 @@ LeftColLoop:
 								// We didn't materialize all the rows in the group so save state and
 								// move to the next column.
 								o.builderState.left.numRepeatsIdx += toAppend
-								if o.builderState.left.colIdx == len(input.outCols)-1 {
-									o.builderState.left.colIdx = zeroMJCPColIdx
+								if outColIdx == len(input.outCols)-1 {
 									return
 								}
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -35166,12 +35129,11 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 
 	// Loop over every column.
 RightColLoop:
-	for ; o.builderState.right.colIdx < len(input.outCols); o.builderState.right.colIdx++ {
-		colIdx := input.outCols[o.builderState.right.colIdx]
+	for outColIdx, inColIdx := range input.outCols {
 		outStartIdx := int(destStartIdx)
-		out := o.output.ColVec(int(colIdx) + colOffset)
-		src := batch.ColVec(int(colIdx))
-		colType := input.sourceTypes[colIdx]
+		out := o.output.ColVec(outColIdx + colOffset)
+		src := batch.ColVec(int(inColIdx))
+		colType := input.sourceTypes[inColIdx]
 
 		if sel != nil {
 			if src.MaybeHasNulls() {
@@ -35227,9 +35189,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35291,9 +35252,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35355,9 +35315,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35419,9 +35378,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35483,9 +35441,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35547,9 +35504,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35611,9 +35567,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35675,9 +35630,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35739,9 +35693,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35806,9 +35759,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35867,9 +35819,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35928,9 +35879,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -35989,9 +35939,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36050,9 +35999,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36111,9 +36059,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36172,9 +36119,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36233,9 +36179,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36294,9 +36239,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36366,9 +36310,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36430,9 +36373,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36494,9 +36436,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36558,9 +36499,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36622,9 +36562,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36686,9 +36625,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36750,9 +36688,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36814,9 +36751,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36878,9 +36814,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -36945,9 +36880,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37006,9 +36940,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37067,9 +37000,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37128,9 +37060,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37189,9 +37120,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37250,9 +37180,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37311,9 +37240,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37372,9 +37300,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37433,9 +37360,8 @@ RightColLoop:
 							// done with the current column.
 							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 								// If it's the last column, save state and return.
-								if o.builderState.right.colIdx == len(input.outCols)-1 {
+								if outColIdx == len(input.outCols)-1 {
 									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									o.builderState.right.colIdx = zeroMJCPColIdx
 									return
 								}
 								// Otherwise, reset to the initial state and begin the next column.
@@ -37556,7 +37482,7 @@ func (o *mergeJoinRightOuterOp) build() {
 	if o.output.Width() != 0 {
 		outStartIdx := o.builderState.outCount
 		o.buildLeftGroups(o.builderState.lGroups, 0 /* colOffset */, &o.left, o.builderState.lBatch, outStartIdx)
-		o.buildRightGroups(o.builderState.rGroups, len(o.left.sourceTypes), &o.right, o.builderState.rBatch, outStartIdx)
+		o.buildRightGroups(o.builderState.rGroups, len(o.left.outCols), &o.right, o.builderState.rBatch, outStartIdx)
 	}
 	o.builderState.outCount = o.calculateOutputCount(o.builderState.lGroups)
 }
