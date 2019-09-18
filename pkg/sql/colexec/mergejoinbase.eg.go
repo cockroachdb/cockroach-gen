@@ -142,45 +142,6 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			if !match {
 				return true
 			}
-		case coltypes.Int8:
-			// We perform this null check on every equality column of the last
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
-				return true
-			}
-			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Int8()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
-			var curVal int8
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Int8()
-			curVal = col[int(tupleToLookAtIdx)]
-			var match bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(prevVal), int64(curVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
-				}
-
-				match = cmpResult == 0
-			}
-
-			if !match {
-				return true
-			}
 		case coltypes.Int16:
 			// We perform this null check on every equality column of the last
 			// buffered tuple regardless of the join type since it is done only once
@@ -289,53 +250,6 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 						cmpResult = 1
 					} else {
 						cmpResult = 0
-					}
-				}
-
-				match = cmpResult == 0
-			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Float32:
-			// We perform this null check on every equality column of the last
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
-				return true
-			}
-			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Float32()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
-			var curVal float32
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Float32()
-			curVal = col[int(tupleToLookAtIdx)]
-			var match bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := float64(prevVal), float64(curVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else if a == b {
-						cmpResult = 0
-					} else if math.IsNaN(a) {
-						if math.IsNaN(b) {
-							cmpResult = 0
-						} else {
-							cmpResult = -1
-						}
-					} else {
-						cmpResult = 1
 					}
 				}
 

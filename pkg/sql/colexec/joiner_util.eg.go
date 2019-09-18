@@ -132,16 +132,12 @@ func (f *joinerFilter) setInputBatch(lBatch, rBatch coldata.Batch, lIdx, rIdx in
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Bytes())
 			case coltypes.Decimal:
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Decimal())
-			case coltypes.Int8:
-				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Int8())
 			case coltypes.Int16:
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Int16())
 			case coltypes.Int32:
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Int32())
 			case coltypes.Int64:
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Int64())
-			case coltypes.Float32:
-				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Float32())
 			case coltypes.Float64:
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Float64())
 			default:

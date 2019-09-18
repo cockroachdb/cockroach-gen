@@ -20,14 +20,10 @@ var zeroBytesColumn = make([][]byte, coldata.BatchSize)
 
 var zeroDecimalColumn = make([]apd.Decimal, coldata.BatchSize)
 
-var zeroInt8Column = make([]int8, coldata.BatchSize)
-
 var zeroInt16Column = make([]int16, coldata.BatchSize)
 
 var zeroInt32Column = make([]int32, coldata.BatchSize)
 
 var zeroInt64Column = make([]int64, coldata.BatchSize)
-
-var zeroFloat32Column = make([]float32, coldata.BatchSize)
 
 var zeroFloat64Column = make([]float64, coldata.BatchSize)

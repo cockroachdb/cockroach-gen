@@ -87,32 +87,6 @@ func tuplesDiffer(
 
 		*differ = *differ || unique
 		return nil
-	case coltypes.Int8:
-		aCol := aColVec.Int8()
-		bCol := bColVec.Int8()
-		var unique bool
-		arg1 := aCol[aTupleIdx]
-		arg2 := bCol[bTupleIdx]
-
-		{
-			var cmpResult int
-
-			{
-				a, b := int64(arg1), int64(arg2)
-				if a < b {
-					cmpResult = -1
-				} else if a > b {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
-			}
-
-			unique = cmpResult != 0
-		}
-
-		*differ = *differ || unique
-		return nil
 	case coltypes.Int16:
 		aCol := aColVec.Int16()
 		bCol := bColVec.Int16()
@@ -183,40 +157,6 @@ func tuplesDiffer(
 					cmpResult = 1
 				} else {
 					cmpResult = 0
-				}
-			}
-
-			unique = cmpResult != 0
-		}
-
-		*differ = *differ || unique
-		return nil
-	case coltypes.Float32:
-		aCol := aColVec.Float32()
-		bCol := bColVec.Float32()
-		var unique bool
-		arg1 := aCol[aTupleIdx]
-		arg2 := bCol[bTupleIdx]
-
-		{
-			var cmpResult int
-
-			{
-				a, b := float64(arg1), float64(arg2)
-				if a < b {
-					cmpResult = -1
-				} else if a > b {
-					cmpResult = 1
-				} else if a == b {
-					cmpResult = 0
-				} else if math.IsNaN(a) {
-					if math.IsNaN(b) {
-						cmpResult = 0
-					} else {
-						cmpResult = -1
-					}
-				} else {
-					cmpResult = 1
 				}
 			}
 

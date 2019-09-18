@@ -91,24 +91,6 @@ func (m *memColumn) Append(args SliceArgs) {
 		}
 		m.nulls.set(args)
 		m.col = toCol
-	case coltypes.Int8:
-		fromCol := args.Src.Int8()
-		toCol := m.Int8()
-		if args.Sel == nil {
-			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
-		} else {
-			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
-			toCol = toCol[0:int(args.DestIdx)]
-			for _, selIdx := range sel {
-				val := fromCol[int(selIdx)]
-				toCol = append(toCol, val)
-			}
-		}
-		m.nulls.set(args)
-		m.col = toCol
 	case coltypes.Int16:
 		fromCol := args.Src.Int16()
 		toCol := m.Int16()
@@ -148,24 +130,6 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Int64:
 		fromCol := args.Src.Int64()
 		toCol := m.Int64()
-		if args.Sel == nil {
-			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
-		} else {
-			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
-			toCol = toCol[0:int(args.DestIdx)]
-			for _, selIdx := range sel {
-				val := fromCol[int(selIdx)]
-				toCol = append(toCol, val)
-			}
-		}
-		m.nulls.set(args)
-		m.col = toCol
-	case coltypes.Float32:
-		fromCol := args.Src.Float32()
-		toCol := m.Float32()
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
@@ -524,107 +488,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 			}
 		}
 		m.nulls.set(args.SliceArgs)
-	case coltypes.Int8:
-		fromCol := args.Src.Int8()
-		toCol := m.Int8()
-		if args.Sel64 != nil {
-			sel := args.Sel64
-			if args.SelOnDest {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							// Remove an unused warning in some cases.
-							_ = i
-							m.nulls.SetNull64(uint64(selIdx))
-						} else {
-							v := fromCol[int(selIdx)]
-							m.nulls.UnsetNull64(uint64(selIdx))
-							toCol[int(selIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[int(selIdx)] = v
-				}
-			} else {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
-						} else {
-							v := fromCol[int(selIdx)]
-							toCol[i+int(args.DestIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[i+int(args.DestIdx)] = v
-				}
-			}
-			return
-		} else if args.Sel != nil {
-			sel := args.Sel
-			if args.SelOnDest {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							// Remove an unused warning in some cases.
-							_ = i
-							m.nulls.SetNull64(uint64(selIdx))
-						} else {
-							v := fromCol[int(selIdx)]
-							m.nulls.UnsetNull64(uint64(selIdx))
-							toCol[int(selIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[int(selIdx)] = v
-				}
-			} else {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
-						} else {
-							v := fromCol[int(selIdx)]
-							toCol[i+int(args.DestIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[i+int(args.DestIdx)] = v
-				}
-			}
-			return
-		}
-		// No Sel or Sel64.
-		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
-		m.nulls.set(args.SliceArgs)
 	case coltypes.Int16:
 		fromCol := args.Src.Int16()
 		toCol := m.Int16()
@@ -928,107 +791,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		// No Sel or Sel64.
 		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		m.nulls.set(args.SliceArgs)
-	case coltypes.Float32:
-		fromCol := args.Src.Float32()
-		toCol := m.Float32()
-		if args.Sel64 != nil {
-			sel := args.Sel64
-			if args.SelOnDest {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							// Remove an unused warning in some cases.
-							_ = i
-							m.nulls.SetNull64(uint64(selIdx))
-						} else {
-							v := fromCol[int(selIdx)]
-							m.nulls.UnsetNull64(uint64(selIdx))
-							toCol[int(selIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[int(selIdx)] = v
-				}
-			} else {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
-						} else {
-							v := fromCol[int(selIdx)]
-							toCol[i+int(args.DestIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[i+int(args.DestIdx)] = v
-				}
-			}
-			return
-		} else if args.Sel != nil {
-			sel := args.Sel
-			if args.SelOnDest {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							// Remove an unused warning in some cases.
-							_ = i
-							m.nulls.SetNull64(uint64(selIdx))
-						} else {
-							v := fromCol[int(selIdx)]
-							m.nulls.UnsetNull64(uint64(selIdx))
-							toCol[int(selIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[int(selIdx)] = v
-				}
-			} else {
-
-				if args.Src.MaybeHasNulls() {
-					nulls := args.Src.Nulls()
-					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-						if nulls.NullAt64(uint64(selIdx)) {
-							m.nulls.SetNull64(uint64(i) + args.DestIdx)
-						} else {
-							v := fromCol[int(selIdx)]
-							toCol[i+int(args.DestIdx)] = v
-						}
-					}
-					return
-				}
-				// No Nulls.
-				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
-					selIdx := sel[int(args.SrcStartIdx)+i]
-					v := fromCol[int(selIdx)]
-					toCol[i+int(args.DestIdx)] = v
-				}
-			}
-			return
-		}
-		// No Sel or Sel64.
-		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
-		m.nulls.set(args.SliceArgs)
 	case coltypes.Float64:
 		fromCol := args.Src.Float64()
 		toCol := m.Float64()
@@ -1158,13 +920,6 @@ func (m *memColumn) Slice(colType coltypes.T, start uint64, end uint64) Vec {
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
-	case coltypes.Int8:
-		col := m.Int8()
-		return &memColumn{
-			t:     colType,
-			col:   col[int(start):int(end)],
-			nulls: m.nulls.Slice(start, end),
-		}
 	case coltypes.Int16:
 		col := m.Int16()
 		return &memColumn{
@@ -1181,13 +936,6 @@ func (m *memColumn) Slice(colType coltypes.T, start uint64, end uint64) Vec {
 		}
 	case coltypes.Int64:
 		col := m.Int64()
-		return &memColumn{
-			t:     colType,
-			col:   col[int(start):int(end)],
-			nulls: m.nulls.Slice(start, end),
-		}
-	case coltypes.Float32:
-		col := m.Float32()
 		return &memColumn{
 			t:     colType,
 			col:   col[int(start):int(end)],
@@ -1222,10 +970,6 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType coltypes.T) string {
 		col := m.Decimal()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
-	case coltypes.Int8:
-		col := m.Int8()
-		v := col[int(colIdx)]
-		return fmt.Sprintf("%v", v)
 	case coltypes.Int16:
 		col := m.Int16()
 		v := col[int(colIdx)]
@@ -1236,10 +980,6 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType coltypes.T) string {
 		return fmt.Sprintf("%v", v)
 	case coltypes.Int64:
 		col := m.Int64()
-		v := col[int(colIdx)]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Float32:
-		col := m.Float32()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
 	case coltypes.Float64:
@@ -1266,10 +1006,6 @@ func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 		target := v.Decimal()
 		newVal := elem.(apd.Decimal)
 		target[int(rowIdx)].Set(&newVal)
-	case coltypes.Int8:
-		target := v.Int8()
-		newVal := elem.(int8)
-		target[int(rowIdx)] = newVal
 	case coltypes.Int16:
 		target := v.Int16()
 		newVal := elem.(int16)
@@ -1281,10 +1017,6 @@ func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 	case coltypes.Int64:
 		target := v.Int64()
 		newVal := elem.(int64)
-		target[int(rowIdx)] = newVal
-	case coltypes.Float32:
-		target := v.Float32()
-		newVal := elem.(float32)
 		target[int(rowIdx)] = newVal
 	case coltypes.Float64:
 		target := v.Float64()

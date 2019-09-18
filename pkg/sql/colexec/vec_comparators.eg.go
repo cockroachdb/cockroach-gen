@@ -149,54 +149,6 @@ func (c *DecimalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 	}
 }
 
-type Int8VecComparator struct {
-	vecs  [][]int8
-	nulls []*coldata.Nulls
-}
-
-func (c *Int8VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
-	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
-	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
-	if n1 && n2 {
-		return 0
-	} else if n1 {
-		return -1
-	} else if n2 {
-		return 1
-	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
-	var cmp int
-
-	{
-		a, b := int64(left), int64(right)
-		if a < b {
-			cmp = -1
-		} else if a > b {
-			cmp = 1
-		} else {
-			cmp = 0
-		}
-	}
-
-	return cmp
-}
-
-func (c *Int8VecComparator) setVec(idx int, vec coldata.Vec) {
-	c.vecs[idx] = vec.Int8()
-	c.nulls[idx] = vec.Nulls()
-}
-
-func (c *Int8VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
-	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
-		c.nulls[dstVecIdx].SetNull(dstIdx)
-	} else {
-		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
-	}
-}
-
 type Int16VecComparator struct {
 	vecs  [][]int16
 	nulls []*coldata.Nulls
@@ -341,62 +293,6 @@ func (c *Int64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16
 	}
 }
 
-type Float32VecComparator struct {
-	vecs  [][]float32
-	nulls []*coldata.Nulls
-}
-
-func (c *Float32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
-	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
-	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
-	if n1 && n2 {
-		return 0
-	} else if n1 {
-		return -1
-	} else if n2 {
-		return 1
-	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
-	var cmp int
-
-	{
-		a, b := float64(left), float64(right)
-		if a < b {
-			cmp = -1
-		} else if a > b {
-			cmp = 1
-		} else if a == b {
-			cmp = 0
-		} else if math.IsNaN(a) {
-			if math.IsNaN(b) {
-				cmp = 0
-			} else {
-				cmp = -1
-			}
-		} else {
-			cmp = 1
-		}
-	}
-
-	return cmp
-}
-
-func (c *Float32VecComparator) setVec(idx int, vec coldata.Vec) {
-	c.vecs[idx] = vec.Float32()
-	c.nulls[idx] = vec.Nulls()
-}
-
-func (c *Float32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
-	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
-		c.nulls[dstVecIdx].SetNull(dstIdx)
-	} else {
-		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
-	}
-}
-
 type Float64VecComparator struct {
 	vecs  [][]float64
 	nulls []*coldata.Nulls
@@ -470,11 +366,6 @@ func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 			vecs:  make([][]apd.Decimal, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
-	case coltypes.Int8:
-		return &Int8VecComparator{
-			vecs:  make([][]int8, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
-		}
 	case coltypes.Int16:
 		return &Int16VecComparator{
 			vecs:  make([][]int16, numVecs),
@@ -488,11 +379,6 @@ func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 	case coltypes.Int64:
 		return &Int64VecComparator{
 			vecs:  make([][]int64, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
-		}
-	case coltypes.Float32:
-		return &Float32VecComparator{
-			vecs:  make([][]float32, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
 	case coltypes.Float64:

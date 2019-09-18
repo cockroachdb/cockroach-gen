@@ -49,13 +49,6 @@ func NewConstOp(
 			typ:          t,
 			constVal:     constVal.(apd.Decimal),
 		}, nil
-	case coltypes.Int8:
-		return &constInt8Op{
-			OneInputNode: NewOneInputNode(input),
-			outputIdx:    outputIdx,
-			typ:          t,
-			constVal:     constVal.(int8),
-		}, nil
 	case coltypes.Int16:
 		return &constInt16Op{
 			OneInputNode: NewOneInputNode(input),
@@ -76,13 +69,6 @@ func NewConstOp(
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int64),
-		}, nil
-	case coltypes.Float32:
-		return &constFloat32Op{
-			OneInputNode: NewOneInputNode(input),
-			outputIdx:    outputIdx,
-			typ:          t,
-			constVal:     constVal.(float32),
 		}, nil
 	case coltypes.Float64:
 		return &constFloat64Op{
@@ -201,41 +187,6 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	return batch
 }
 
-type constInt8Op struct {
-	OneInputNode
-
-	typ       coltypes.T
-	outputIdx int
-	constVal  int8
-}
-
-func (c constInt8Op) Init() {
-	c.input.Init()
-}
-
-func (c constInt8Op) Next(ctx context.Context) coldata.Batch {
-	batch := c.input.Next(ctx)
-	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
-	}
-	if n == 0 {
-		return batch
-	}
-	col := batch.ColVec(c.outputIdx).Int8()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
-	return batch
-}
-
 type constInt16Op struct {
 	OneInputNode
 
@@ -328,41 +279,6 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	col := batch.ColVec(c.outputIdx).Int64()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
-	return batch
-}
-
-type constFloat32Op struct {
-	OneInputNode
-
-	typ       coltypes.T
-	outputIdx int
-	constVal  float32
-}
-
-func (c constFloat32Op) Init() {
-	c.input.Init()
-}
-
-func (c constFloat32Op) Next(ctx context.Context) coldata.Batch {
-	batch := c.input.Next(ctx)
-	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
-	}
-	if n == 0 {
-		return batch
-	}
-	col := batch.ColVec(c.outputIdx).Float32()
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
 			col[int(i)] = c.constVal
