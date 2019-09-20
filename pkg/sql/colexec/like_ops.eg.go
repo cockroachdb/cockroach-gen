@@ -102,7 +102,7 @@ type projPrefixBytesBytesConstOp struct {
 }
 
 func (p projPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -235,7 +235,7 @@ type projSuffixBytesBytesConstOp struct {
 }
 
 func (p projSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -368,7 +368,7 @@ type projRegexpBytesBytesConstOp struct {
 }
 
 func (p projRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -501,7 +501,7 @@ type projNotPrefixBytesBytesConstOp struct {
 }
 
 func (p projNotPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -634,7 +634,7 @@ type projNotSuffixBytesBytesConstOp struct {
 }
 
 func (p projNotSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -767,7 +767,7 @@ type projNotRegexpBytesBytesConstOp struct {
 }
 
 func (p projNotRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {

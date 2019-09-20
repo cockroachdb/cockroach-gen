@@ -14,16 +14,16 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 )
 
-var zeroBoolColumn = make([]bool, coldata.BatchSize)
+var zeroBoolColumn = make([]bool, coldata.BatchSize())
 
-var zeroBytesColumn = make([][]byte, coldata.BatchSize)
+var zeroBytesColumn = make([][]byte, coldata.BatchSize())
 
-var zeroDecimalColumn = make([]apd.Decimal, coldata.BatchSize)
+var zeroDecimalColumn = make([]apd.Decimal, coldata.BatchSize())
 
-var zeroInt16Column = make([]int16, coldata.BatchSize)
+var zeroInt16Column = make([]int16, coldata.BatchSize())
 
-var zeroInt32Column = make([]int32, coldata.BatchSize)
+var zeroInt32Column = make([]int32, coldata.BatchSize())
 
-var zeroInt64Column = make([]int64, coldata.BatchSize)
+var zeroInt64Column = make([]int64, coldata.BatchSize())
 
-var zeroFloat64Column = make([]float64, coldata.BatchSize)
+var zeroFloat64Column = make([]float64, coldata.BatchSize())

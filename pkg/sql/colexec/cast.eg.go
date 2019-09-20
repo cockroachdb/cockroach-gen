@@ -290,7 +290,7 @@ type castOpNullAny struct {
 var _ StaticMemoryOperator = &castOpNullAny{}
 
 func (c *castOpNullAny) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpNullAny) Init() {
@@ -342,7 +342,7 @@ type castOpBoolBool struct {
 var _ StaticMemoryOperator = &castOpBoolBool{}
 
 func (c *castOpBoolBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpBoolBool) Init() {
@@ -423,7 +423,7 @@ type castOpBoolInt16 struct {
 var _ StaticMemoryOperator = &castOpBoolInt16{}
 
 func (c *castOpBoolInt16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpBoolInt16) Init() {
@@ -524,7 +524,7 @@ type castOpBoolInt32 struct {
 var _ StaticMemoryOperator = &castOpBoolInt32{}
 
 func (c *castOpBoolInt32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpBoolInt32) Init() {
@@ -625,7 +625,7 @@ type castOpBoolInt64 struct {
 var _ StaticMemoryOperator = &castOpBoolInt64{}
 
 func (c *castOpBoolInt64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpBoolInt64) Init() {
@@ -726,7 +726,7 @@ type castOpBoolFloat64 struct {
 var _ StaticMemoryOperator = &castOpBoolFloat64{}
 
 func (c *castOpBoolFloat64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpBoolFloat64) Init() {
@@ -827,7 +827,7 @@ type castOpDecimalBool struct {
 var _ StaticMemoryOperator = &castOpDecimalBool{}
 
 func (c *castOpDecimalBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpDecimalBool) Init() {
@@ -916,7 +916,7 @@ type castOpDecimalDecimal struct {
 var _ StaticMemoryOperator = &castOpDecimalDecimal{}
 
 func (c *castOpDecimalDecimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpDecimalDecimal) Init() {
@@ -997,7 +997,7 @@ type castOpInt16Bool struct {
 var _ StaticMemoryOperator = &castOpInt16Bool{}
 
 func (c *castOpInt16Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt16Bool) Init() {
@@ -1086,7 +1086,7 @@ type castOpInt16Decimal struct {
 var _ StaticMemoryOperator = &castOpInt16Decimal{}
 
 func (c *castOpInt16Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt16Decimal) Init() {
@@ -1175,7 +1175,7 @@ type castOpInt16Int16 struct {
 var _ StaticMemoryOperator = &castOpInt16Int16{}
 
 func (c *castOpInt16Int16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt16Int16) Init() {
@@ -1256,7 +1256,7 @@ type castOpInt16Float64 struct {
 var _ StaticMemoryOperator = &castOpInt16Float64{}
 
 func (c *castOpInt16Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt16Float64) Init() {
@@ -1345,7 +1345,7 @@ type castOpInt32Bool struct {
 var _ StaticMemoryOperator = &castOpInt32Bool{}
 
 func (c *castOpInt32Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt32Bool) Init() {
@@ -1434,7 +1434,7 @@ type castOpInt32Decimal struct {
 var _ StaticMemoryOperator = &castOpInt32Decimal{}
 
 func (c *castOpInt32Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt32Decimal) Init() {
@@ -1523,7 +1523,7 @@ type castOpInt32Int32 struct {
 var _ StaticMemoryOperator = &castOpInt32Int32{}
 
 func (c *castOpInt32Int32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt32Int32) Init() {
@@ -1604,7 +1604,7 @@ type castOpInt32Float64 struct {
 var _ StaticMemoryOperator = &castOpInt32Float64{}
 
 func (c *castOpInt32Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt32Float64) Init() {
@@ -1693,7 +1693,7 @@ type castOpInt64Bool struct {
 var _ StaticMemoryOperator = &castOpInt64Bool{}
 
 func (c *castOpInt64Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt64Bool) Init() {
@@ -1782,7 +1782,7 @@ type castOpInt64Decimal struct {
 var _ StaticMemoryOperator = &castOpInt64Decimal{}
 
 func (c *castOpInt64Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt64Decimal) Init() {
@@ -1871,7 +1871,7 @@ type castOpInt64Int64 struct {
 var _ StaticMemoryOperator = &castOpInt64Int64{}
 
 func (c *castOpInt64Int64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt64Int64) Init() {
@@ -1952,7 +1952,7 @@ type castOpInt64Float64 struct {
 var _ StaticMemoryOperator = &castOpInt64Float64{}
 
 func (c *castOpInt64Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpInt64Float64) Init() {
@@ -2041,7 +2041,7 @@ type castOpFloat64Bool struct {
 var _ StaticMemoryOperator = &castOpFloat64Bool{}
 
 func (c *castOpFloat64Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpFloat64Bool) Init() {
@@ -2130,7 +2130,7 @@ type castOpFloat64Decimal struct {
 var _ StaticMemoryOperator = &castOpFloat64Decimal{}
 
 func (c *castOpFloat64Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpFloat64Decimal) Init() {
@@ -2247,7 +2247,7 @@ type castOpFloat64Int16 struct {
 var _ StaticMemoryOperator = &castOpFloat64Int16{}
 
 func (c *castOpFloat64Int16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpFloat64Int16) Init() {
@@ -2348,7 +2348,7 @@ type castOpFloat64Int32 struct {
 var _ StaticMemoryOperator = &castOpFloat64Int32{}
 
 func (c *castOpFloat64Int32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpFloat64Int32) Init() {
@@ -2449,7 +2449,7 @@ type castOpFloat64Int64 struct {
 var _ StaticMemoryOperator = &castOpFloat64Int64{}
 
 func (c *castOpFloat64Int64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpFloat64Int64) Init() {
@@ -2550,7 +2550,7 @@ type castOpFloat64Float64 struct {
 var _ StaticMemoryOperator = &castOpFloat64Float64{}
 
 func (c *castOpFloat64Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
 }
 
 func (c *castOpFloat64Float64) Init() {

@@ -23,7 +23,7 @@ type projEQBoolBoolConstOp struct {
 }
 
 func (p projEQBoolBoolConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
@@ -99,7 +99,7 @@ type projEQBoolConstBoolOp struct {
 }
 
 func (p projEQBoolConstBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -174,7 +174,7 @@ type projEQBoolBoolOp struct {
 }
 
 func (p projEQBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -254,7 +254,7 @@ type projNEBoolBoolConstOp struct {
 }
 
 func (p projNEBoolBoolConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
@@ -330,7 +330,7 @@ type projNEBoolConstBoolOp struct {
 }
 
 func (p projNEBoolConstBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -405,7 +405,7 @@ type projNEBoolBoolOp struct {
 }
 
 func (p projNEBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -485,7 +485,7 @@ type projLTBoolBoolConstOp struct {
 }
 
 func (p projLTBoolBoolConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
@@ -561,7 +561,7 @@ type projLTBoolConstBoolOp struct {
 }
 
 func (p projLTBoolConstBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -636,7 +636,7 @@ type projLTBoolBoolOp struct {
 }
 
 func (p projLTBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -716,7 +716,7 @@ type projLEBoolBoolConstOp struct {
 }
 
 func (p projLEBoolBoolConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
@@ -792,7 +792,7 @@ type projLEBoolConstBoolOp struct {
 }
 
 func (p projLEBoolConstBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -867,7 +867,7 @@ type projLEBoolBoolOp struct {
 }
 
 func (p projLEBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -947,7 +947,7 @@ type projGTBoolBoolConstOp struct {
 }
 
 func (p projGTBoolBoolConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1023,7 +1023,7 @@ type projGTBoolConstBoolOp struct {
 }
 
 func (p projGTBoolConstBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1098,7 +1098,7 @@ type projGTBoolBoolOp struct {
 }
 
 func (p projGTBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1178,7 +1178,7 @@ type projGEBoolBoolConstOp struct {
 }
 
 func (p projGEBoolBoolConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1254,7 +1254,7 @@ type projGEBoolConstBoolOp struct {
 }
 
 func (p projGEBoolConstBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1329,7 +1329,7 @@ type projGEBoolBoolOp struct {
 }
 
 func (p projGEBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
@@ -1409,7 +1409,7 @@ type projEQBytesBytesConstOp struct {
 }
 
 func (p projEQBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1469,7 +1469,7 @@ type projEQBytesConstBytesOp struct {
 }
 
 func (p projEQBytesConstBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -1528,7 +1528,7 @@ type projEQBytesBytesOp struct {
 }
 
 func (p projEQBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -1592,7 +1592,7 @@ type projNEBytesBytesConstOp struct {
 }
 
 func (p projNEBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1652,7 +1652,7 @@ type projNEBytesConstBytesOp struct {
 }
 
 func (p projNEBytesConstBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -1711,7 +1711,7 @@ type projNEBytesBytesOp struct {
 }
 
 func (p projNEBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -1775,7 +1775,7 @@ type projLTBytesBytesConstOp struct {
 }
 
 func (p projLTBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1835,7 +1835,7 @@ type projLTBytesConstBytesOp struct {
 }
 
 func (p projLTBytesConstBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -1894,7 +1894,7 @@ type projLTBytesBytesOp struct {
 }
 
 func (p projLTBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -1958,7 +1958,7 @@ type projLEBytesBytesConstOp struct {
 }
 
 func (p projLEBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -2018,7 +2018,7 @@ type projLEBytesConstBytesOp struct {
 }
 
 func (p projLEBytesConstBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2077,7 +2077,7 @@ type projLEBytesBytesOp struct {
 }
 
 func (p projLEBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2141,7 +2141,7 @@ type projGTBytesBytesConstOp struct {
 }
 
 func (p projGTBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -2201,7 +2201,7 @@ type projGTBytesConstBytesOp struct {
 }
 
 func (p projGTBytesConstBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2260,7 +2260,7 @@ type projGTBytesBytesOp struct {
 }
 
 func (p projGTBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2324,7 +2324,7 @@ type projGEBytesBytesConstOp struct {
 }
 
 func (p projGEBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -2384,7 +2384,7 @@ type projGEBytesConstBytesOp struct {
 }
 
 func (p projGEBytesConstBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2443,7 +2443,7 @@ type projGEBytesBytesOp struct {
 }
 
 func (p projGEBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
@@ -2507,7 +2507,7 @@ type projPlusDecimalDecimalConstOp struct {
 }
 
 func (p projPlusDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -2559,7 +2559,7 @@ type projPlusDecimalConstDecimalOp struct {
 }
 
 func (p projPlusDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -2610,7 +2610,7 @@ type projPlusDecimalDecimalOp struct {
 }
 
 func (p projPlusDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -2666,7 +2666,7 @@ type projMinusDecimalDecimalConstOp struct {
 }
 
 func (p projMinusDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -2718,7 +2718,7 @@ type projMinusDecimalConstDecimalOp struct {
 }
 
 func (p projMinusDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -2769,7 +2769,7 @@ type projMinusDecimalDecimalOp struct {
 }
 
 func (p projMinusDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -2825,7 +2825,7 @@ type projMultDecimalDecimalConstOp struct {
 }
 
 func (p projMultDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -2877,7 +2877,7 @@ type projMultDecimalConstDecimalOp struct {
 }
 
 func (p projMultDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -2928,7 +2928,7 @@ type projMultDecimalDecimalOp struct {
 }
 
 func (p projMultDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -2984,7 +2984,7 @@ type projDivDecimalDecimalConstOp struct {
 }
 
 func (p projDivDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -3052,7 +3052,7 @@ type projDivDecimalConstDecimalOp struct {
 }
 
 func (p projDivDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3119,7 +3119,7 @@ type projDivDecimalDecimalOp struct {
 }
 
 func (p projDivDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3191,7 +3191,7 @@ type projEQDecimalDecimalConstOp struct {
 }
 
 func (p projEQDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -3251,7 +3251,7 @@ type projEQDecimalConstDecimalOp struct {
 }
 
 func (p projEQDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3310,7 +3310,7 @@ type projEQDecimalDecimalOp struct {
 }
 
 func (p projEQDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3374,7 +3374,7 @@ type projNEDecimalDecimalConstOp struct {
 }
 
 func (p projNEDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -3434,7 +3434,7 @@ type projNEDecimalConstDecimalOp struct {
 }
 
 func (p projNEDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3493,7 +3493,7 @@ type projNEDecimalDecimalOp struct {
 }
 
 func (p projNEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3557,7 +3557,7 @@ type projLTDecimalDecimalConstOp struct {
 }
 
 func (p projLTDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -3617,7 +3617,7 @@ type projLTDecimalConstDecimalOp struct {
 }
 
 func (p projLTDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3676,7 +3676,7 @@ type projLTDecimalDecimalOp struct {
 }
 
 func (p projLTDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3740,7 +3740,7 @@ type projLEDecimalDecimalConstOp struct {
 }
 
 func (p projLEDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -3800,7 +3800,7 @@ type projLEDecimalConstDecimalOp struct {
 }
 
 func (p projLEDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3859,7 +3859,7 @@ type projLEDecimalDecimalOp struct {
 }
 
 func (p projLEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -3923,7 +3923,7 @@ type projGTDecimalDecimalConstOp struct {
 }
 
 func (p projGTDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -3983,7 +3983,7 @@ type projGTDecimalConstDecimalOp struct {
 }
 
 func (p projGTDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4042,7 +4042,7 @@ type projGTDecimalDecimalOp struct {
 }
 
 func (p projGTDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4106,7 +4106,7 @@ type projGEDecimalDecimalConstOp struct {
 }
 
 func (p projGEDecimalDecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -4166,7 +4166,7 @@ type projGEDecimalConstDecimalOp struct {
 }
 
 func (p projGEDecimalConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4225,7 +4225,7 @@ type projGEDecimalDecimalOp struct {
 }
 
 func (p projGEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -4289,7 +4289,7 @@ type projPlusDecimalInt16ConstOp struct {
 }
 
 func (p projPlusDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -4355,7 +4355,7 @@ type projPlusDecimalConstInt16Op struct {
 }
 
 func (p projPlusDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -4420,7 +4420,7 @@ type projPlusDecimalInt16Op struct {
 }
 
 func (p projPlusDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -4490,7 +4490,7 @@ type projMinusDecimalInt16ConstOp struct {
 }
 
 func (p projMinusDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -4556,7 +4556,7 @@ type projMinusDecimalConstInt16Op struct {
 }
 
 func (p projMinusDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -4621,7 +4621,7 @@ type projMinusDecimalInt16Op struct {
 }
 
 func (p projMinusDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -4691,7 +4691,7 @@ type projMultDecimalInt16ConstOp struct {
 }
 
 func (p projMultDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -4757,7 +4757,7 @@ type projMultDecimalConstInt16Op struct {
 }
 
 func (p projMultDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -4822,7 +4822,7 @@ type projMultDecimalInt16Op struct {
 }
 
 func (p projMultDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -4892,7 +4892,7 @@ type projDivDecimalInt16ConstOp struct {
 }
 
 func (p projDivDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -4966,7 +4966,7 @@ type projDivDecimalConstInt16Op struct {
 }
 
 func (p projDivDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5039,7 +5039,7 @@ type projDivDecimalInt16Op struct {
 }
 
 func (p projDivDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5117,7 +5117,7 @@ type projEQDecimalInt16ConstOp struct {
 }
 
 func (p projEQDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -5189,7 +5189,7 @@ type projEQDecimalConstInt16Op struct {
 }
 
 func (p projEQDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5260,7 +5260,7 @@ type projEQDecimalInt16Op struct {
 }
 
 func (p projEQDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5336,7 +5336,7 @@ type projNEDecimalInt16ConstOp struct {
 }
 
 func (p projNEDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -5408,7 +5408,7 @@ type projNEDecimalConstInt16Op struct {
 }
 
 func (p projNEDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5479,7 +5479,7 @@ type projNEDecimalInt16Op struct {
 }
 
 func (p projNEDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5555,7 +5555,7 @@ type projLTDecimalInt16ConstOp struct {
 }
 
 func (p projLTDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -5627,7 +5627,7 @@ type projLTDecimalConstInt16Op struct {
 }
 
 func (p projLTDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5698,7 +5698,7 @@ type projLTDecimalInt16Op struct {
 }
 
 func (p projLTDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5774,7 +5774,7 @@ type projLEDecimalInt16ConstOp struct {
 }
 
 func (p projLEDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -5846,7 +5846,7 @@ type projLEDecimalConstInt16Op struct {
 }
 
 func (p projLEDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5917,7 +5917,7 @@ type projLEDecimalInt16Op struct {
 }
 
 func (p projLEDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -5993,7 +5993,7 @@ type projGTDecimalInt16ConstOp struct {
 }
 
 func (p projGTDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -6065,7 +6065,7 @@ type projGTDecimalConstInt16Op struct {
 }
 
 func (p projGTDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -6136,7 +6136,7 @@ type projGTDecimalInt16Op struct {
 }
 
 func (p projGTDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -6212,7 +6212,7 @@ type projGEDecimalInt16ConstOp struct {
 }
 
 func (p projGEDecimalInt16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -6284,7 +6284,7 @@ type projGEDecimalConstInt16Op struct {
 }
 
 func (p projGEDecimalConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -6355,7 +6355,7 @@ type projGEDecimalInt16Op struct {
 }
 
 func (p projGEDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -6431,7 +6431,7 @@ type projPlusDecimalInt32ConstOp struct {
 }
 
 func (p projPlusDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -6497,7 +6497,7 @@ type projPlusDecimalConstInt32Op struct {
 }
 
 func (p projPlusDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -6562,7 +6562,7 @@ type projPlusDecimalInt32Op struct {
 }
 
 func (p projPlusDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -6632,7 +6632,7 @@ type projMinusDecimalInt32ConstOp struct {
 }
 
 func (p projMinusDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -6698,7 +6698,7 @@ type projMinusDecimalConstInt32Op struct {
 }
 
 func (p projMinusDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -6763,7 +6763,7 @@ type projMinusDecimalInt32Op struct {
 }
 
 func (p projMinusDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -6833,7 +6833,7 @@ type projMultDecimalInt32ConstOp struct {
 }
 
 func (p projMultDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -6899,7 +6899,7 @@ type projMultDecimalConstInt32Op struct {
 }
 
 func (p projMultDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -6964,7 +6964,7 @@ type projMultDecimalInt32Op struct {
 }
 
 func (p projMultDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7034,7 +7034,7 @@ type projDivDecimalInt32ConstOp struct {
 }
 
 func (p projDivDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -7108,7 +7108,7 @@ type projDivDecimalConstInt32Op struct {
 }
 
 func (p projDivDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7181,7 +7181,7 @@ type projDivDecimalInt32Op struct {
 }
 
 func (p projDivDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7259,7 +7259,7 @@ type projEQDecimalInt32ConstOp struct {
 }
 
 func (p projEQDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -7331,7 +7331,7 @@ type projEQDecimalConstInt32Op struct {
 }
 
 func (p projEQDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7402,7 +7402,7 @@ type projEQDecimalInt32Op struct {
 }
 
 func (p projEQDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7478,7 +7478,7 @@ type projNEDecimalInt32ConstOp struct {
 }
 
 func (p projNEDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -7550,7 +7550,7 @@ type projNEDecimalConstInt32Op struct {
 }
 
 func (p projNEDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7621,7 +7621,7 @@ type projNEDecimalInt32Op struct {
 }
 
 func (p projNEDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7697,7 +7697,7 @@ type projLTDecimalInt32ConstOp struct {
 }
 
 func (p projLTDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -7769,7 +7769,7 @@ type projLTDecimalConstInt32Op struct {
 }
 
 func (p projLTDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7840,7 +7840,7 @@ type projLTDecimalInt32Op struct {
 }
 
 func (p projLTDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -7916,7 +7916,7 @@ type projLEDecimalInt32ConstOp struct {
 }
 
 func (p projLEDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -7988,7 +7988,7 @@ type projLEDecimalConstInt32Op struct {
 }
 
 func (p projLEDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8059,7 +8059,7 @@ type projLEDecimalInt32Op struct {
 }
 
 func (p projLEDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8135,7 +8135,7 @@ type projGTDecimalInt32ConstOp struct {
 }
 
 func (p projGTDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -8207,7 +8207,7 @@ type projGTDecimalConstInt32Op struct {
 }
 
 func (p projGTDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8278,7 +8278,7 @@ type projGTDecimalInt32Op struct {
 }
 
 func (p projGTDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8354,7 +8354,7 @@ type projGEDecimalInt32ConstOp struct {
 }
 
 func (p projGEDecimalInt32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -8426,7 +8426,7 @@ type projGEDecimalConstInt32Op struct {
 }
 
 func (p projGEDecimalConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8497,7 +8497,7 @@ type projGEDecimalInt32Op struct {
 }
 
 func (p projGEDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -8573,7 +8573,7 @@ type projPlusDecimalInt64ConstOp struct {
 }
 
 func (p projPlusDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -8639,7 +8639,7 @@ type projPlusDecimalConstInt64Op struct {
 }
 
 func (p projPlusDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -8704,7 +8704,7 @@ type projPlusDecimalInt64Op struct {
 }
 
 func (p projPlusDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -8774,7 +8774,7 @@ type projMinusDecimalInt64ConstOp struct {
 }
 
 func (p projMinusDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -8840,7 +8840,7 @@ type projMinusDecimalConstInt64Op struct {
 }
 
 func (p projMinusDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -8905,7 +8905,7 @@ type projMinusDecimalInt64Op struct {
 }
 
 func (p projMinusDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -8975,7 +8975,7 @@ type projMultDecimalInt64ConstOp struct {
 }
 
 func (p projMultDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -9041,7 +9041,7 @@ type projMultDecimalConstInt64Op struct {
 }
 
 func (p projMultDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9106,7 +9106,7 @@ type projMultDecimalInt64Op struct {
 }
 
 func (p projMultDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9176,7 +9176,7 @@ type projDivDecimalInt64ConstOp struct {
 }
 
 func (p projDivDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -9250,7 +9250,7 @@ type projDivDecimalConstInt64Op struct {
 }
 
 func (p projDivDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9323,7 +9323,7 @@ type projDivDecimalInt64Op struct {
 }
 
 func (p projDivDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9401,7 +9401,7 @@ type projEQDecimalInt64ConstOp struct {
 }
 
 func (p projEQDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -9473,7 +9473,7 @@ type projEQDecimalConstInt64Op struct {
 }
 
 func (p projEQDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9544,7 +9544,7 @@ type projEQDecimalInt64Op struct {
 }
 
 func (p projEQDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9620,7 +9620,7 @@ type projNEDecimalInt64ConstOp struct {
 }
 
 func (p projNEDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -9692,7 +9692,7 @@ type projNEDecimalConstInt64Op struct {
 }
 
 func (p projNEDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9763,7 +9763,7 @@ type projNEDecimalInt64Op struct {
 }
 
 func (p projNEDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9839,7 +9839,7 @@ type projLTDecimalInt64ConstOp struct {
 }
 
 func (p projLTDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -9911,7 +9911,7 @@ type projLTDecimalConstInt64Op struct {
 }
 
 func (p projLTDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -9982,7 +9982,7 @@ type projLTDecimalInt64Op struct {
 }
 
 func (p projLTDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10058,7 +10058,7 @@ type projLEDecimalInt64ConstOp struct {
 }
 
 func (p projLEDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -10130,7 +10130,7 @@ type projLEDecimalConstInt64Op struct {
 }
 
 func (p projLEDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10201,7 +10201,7 @@ type projLEDecimalInt64Op struct {
 }
 
 func (p projLEDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10277,7 +10277,7 @@ type projGTDecimalInt64ConstOp struct {
 }
 
 func (p projGTDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -10349,7 +10349,7 @@ type projGTDecimalConstInt64Op struct {
 }
 
 func (p projGTDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10420,7 +10420,7 @@ type projGTDecimalInt64Op struct {
 }
 
 func (p projGTDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10496,7 +10496,7 @@ type projGEDecimalInt64ConstOp struct {
 }
 
 func (p projGEDecimalInt64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -10568,7 +10568,7 @@ type projGEDecimalConstInt64Op struct {
 }
 
 func (p projGEDecimalConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10639,7 +10639,7 @@ type projGEDecimalInt64Op struct {
 }
 
 func (p projGEDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -10715,7 +10715,7 @@ type projEQDecimalFloat64ConstOp struct {
 }
 
 func (p projEQDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -10791,7 +10791,7 @@ type projEQDecimalConstFloat64Op struct {
 }
 
 func (p projEQDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -10866,7 +10866,7 @@ type projEQDecimalFloat64Op struct {
 }
 
 func (p projEQDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -10946,7 +10946,7 @@ type projNEDecimalFloat64ConstOp struct {
 }
 
 func (p projNEDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -11022,7 +11022,7 @@ type projNEDecimalConstFloat64Op struct {
 }
 
 func (p projNEDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11097,7 +11097,7 @@ type projNEDecimalFloat64Op struct {
 }
 
 func (p projNEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11177,7 +11177,7 @@ type projLTDecimalFloat64ConstOp struct {
 }
 
 func (p projLTDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -11253,7 +11253,7 @@ type projLTDecimalConstFloat64Op struct {
 }
 
 func (p projLTDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11328,7 +11328,7 @@ type projLTDecimalFloat64Op struct {
 }
 
 func (p projLTDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11408,7 +11408,7 @@ type projLEDecimalFloat64ConstOp struct {
 }
 
 func (p projLEDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -11484,7 +11484,7 @@ type projLEDecimalConstFloat64Op struct {
 }
 
 func (p projLEDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11559,7 +11559,7 @@ type projLEDecimalFloat64Op struct {
 }
 
 func (p projLEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11639,7 +11639,7 @@ type projGTDecimalFloat64ConstOp struct {
 }
 
 func (p projGTDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -11715,7 +11715,7 @@ type projGTDecimalConstFloat64Op struct {
 }
 
 func (p projGTDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11790,7 +11790,7 @@ type projGTDecimalFloat64Op struct {
 }
 
 func (p projGTDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -11870,7 +11870,7 @@ type projGEDecimalFloat64ConstOp struct {
 }
 
 func (p projGEDecimalFloat64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -11946,7 +11946,7 @@ type projGEDecimalConstFloat64Op struct {
 }
 
 func (p projGEDecimalConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -12021,7 +12021,7 @@ type projGEDecimalFloat64Op struct {
 }
 
 func (p projGEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -12101,7 +12101,7 @@ type projPlusInt16DecimalConstOp struct {
 }
 
 func (p projPlusInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -12171,7 +12171,7 @@ type projPlusInt16ConstDecimalOp struct {
 }
 
 func (p projPlusInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12240,7 +12240,7 @@ type projPlusInt16DecimalOp struct {
 }
 
 func (p projPlusInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12314,7 +12314,7 @@ type projMinusInt16DecimalConstOp struct {
 }
 
 func (p projMinusInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -12384,7 +12384,7 @@ type projMinusInt16ConstDecimalOp struct {
 }
 
 func (p projMinusInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12453,7 +12453,7 @@ type projMinusInt16DecimalOp struct {
 }
 
 func (p projMinusInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12527,7 +12527,7 @@ type projMultInt16DecimalConstOp struct {
 }
 
 func (p projMultInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -12597,7 +12597,7 @@ type projMultInt16ConstDecimalOp struct {
 }
 
 func (p projMultInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12666,7 +12666,7 @@ type projMultInt16DecimalOp struct {
 }
 
 func (p projMultInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12740,7 +12740,7 @@ type projDivInt16DecimalConstOp struct {
 }
 
 func (p projDivInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -12816,7 +12816,7 @@ type projDivInt16ConstDecimalOp struct {
 }
 
 func (p projDivInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12891,7 +12891,7 @@ type projDivInt16DecimalOp struct {
 }
 
 func (p projDivInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -12971,7 +12971,7 @@ type projEQInt16DecimalConstOp struct {
 }
 
 func (p projEQInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -13043,7 +13043,7 @@ type projEQInt16ConstDecimalOp struct {
 }
 
 func (p projEQInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13114,7 +13114,7 @@ type projEQInt16DecimalOp struct {
 }
 
 func (p projEQInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13190,7 +13190,7 @@ type projNEInt16DecimalConstOp struct {
 }
 
 func (p projNEInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -13262,7 +13262,7 @@ type projNEInt16ConstDecimalOp struct {
 }
 
 func (p projNEInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13333,7 +13333,7 @@ type projNEInt16DecimalOp struct {
 }
 
 func (p projNEInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13409,7 +13409,7 @@ type projLTInt16DecimalConstOp struct {
 }
 
 func (p projLTInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -13481,7 +13481,7 @@ type projLTInt16ConstDecimalOp struct {
 }
 
 func (p projLTInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13552,7 +13552,7 @@ type projLTInt16DecimalOp struct {
 }
 
 func (p projLTInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13628,7 +13628,7 @@ type projLEInt16DecimalConstOp struct {
 }
 
 func (p projLEInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -13700,7 +13700,7 @@ type projLEInt16ConstDecimalOp struct {
 }
 
 func (p projLEInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13771,7 +13771,7 @@ type projLEInt16DecimalOp struct {
 }
 
 func (p projLEInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13847,7 +13847,7 @@ type projGTInt16DecimalConstOp struct {
 }
 
 func (p projGTInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -13919,7 +13919,7 @@ type projGTInt16ConstDecimalOp struct {
 }
 
 func (p projGTInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -13990,7 +13990,7 @@ type projGTInt16DecimalOp struct {
 }
 
 func (p projGTInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -14066,7 +14066,7 @@ type projGEInt16DecimalConstOp struct {
 }
 
 func (p projGEInt16DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -14138,7 +14138,7 @@ type projGEInt16ConstDecimalOp struct {
 }
 
 func (p projGEInt16ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -14209,7 +14209,7 @@ type projGEInt16DecimalOp struct {
 }
 
 func (p projGEInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -14285,7 +14285,7 @@ type projPlusInt16Int16ConstOp struct {
 }
 
 func (p projPlusInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -14349,7 +14349,7 @@ type projPlusInt16ConstInt16Op struct {
 }
 
 func (p projPlusInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -14412,7 +14412,7 @@ type projPlusInt16Int16Op struct {
 }
 
 func (p projPlusInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -14480,7 +14480,7 @@ type projMinusInt16Int16ConstOp struct {
 }
 
 func (p projMinusInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -14544,7 +14544,7 @@ type projMinusInt16ConstInt16Op struct {
 }
 
 func (p projMinusInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -14607,7 +14607,7 @@ type projMinusInt16Int16Op struct {
 }
 
 func (p projMinusInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -14675,7 +14675,7 @@ type projMultInt16Int16ConstOp struct {
 }
 
 func (p projMultInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -14753,7 +14753,7 @@ type projMultInt16ConstInt16Op struct {
 }
 
 func (p projMultInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -14830,7 +14830,7 @@ type projMultInt16Int16Op struct {
 }
 
 func (p projMultInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -14912,7 +14912,7 @@ type projDivInt16Int16ConstOp struct {
 }
 
 func (p projDivInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -14984,7 +14984,7 @@ type projDivInt16ConstInt16Op struct {
 }
 
 func (p projDivInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -15055,7 +15055,7 @@ type projDivInt16Int16Op struct {
 }
 
 func (p projDivInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -15131,7 +15131,7 @@ type projEQInt16Int16ConstOp struct {
 }
 
 func (p projEQInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -15213,7 +15213,7 @@ type projEQInt16ConstInt16Op struct {
 }
 
 func (p projEQInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -15294,7 +15294,7 @@ type projEQInt16Int16Op struct {
 }
 
 func (p projEQInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -15380,7 +15380,7 @@ type projNEInt16Int16ConstOp struct {
 }
 
 func (p projNEInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -15462,7 +15462,7 @@ type projNEInt16ConstInt16Op struct {
 }
 
 func (p projNEInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -15543,7 +15543,7 @@ type projNEInt16Int16Op struct {
 }
 
 func (p projNEInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -15629,7 +15629,7 @@ type projLTInt16Int16ConstOp struct {
 }
 
 func (p projLTInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -15711,7 +15711,7 @@ type projLTInt16ConstInt16Op struct {
 }
 
 func (p projLTInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -15792,7 +15792,7 @@ type projLTInt16Int16Op struct {
 }
 
 func (p projLTInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -15878,7 +15878,7 @@ type projLEInt16Int16ConstOp struct {
 }
 
 func (p projLEInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -15960,7 +15960,7 @@ type projLEInt16ConstInt16Op struct {
 }
 
 func (p projLEInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -16041,7 +16041,7 @@ type projLEInt16Int16Op struct {
 }
 
 func (p projLEInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -16127,7 +16127,7 @@ type projGTInt16Int16ConstOp struct {
 }
 
 func (p projGTInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -16209,7 +16209,7 @@ type projGTInt16ConstInt16Op struct {
 }
 
 func (p projGTInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -16290,7 +16290,7 @@ type projGTInt16Int16Op struct {
 }
 
 func (p projGTInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -16376,7 +16376,7 @@ type projGEInt16Int16ConstOp struct {
 }
 
 func (p projGEInt16Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -16458,7 +16458,7 @@ type projGEInt16ConstInt16Op struct {
 }
 
 func (p projGEInt16ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -16539,7 +16539,7 @@ type projGEInt16Int16Op struct {
 }
 
 func (p projGEInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -16625,7 +16625,7 @@ type projPlusInt16Int32ConstOp struct {
 }
 
 func (p projPlusInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -16689,7 +16689,7 @@ type projPlusInt16ConstInt32Op struct {
 }
 
 func (p projPlusInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -16752,7 +16752,7 @@ type projPlusInt16Int32Op struct {
 }
 
 func (p projPlusInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -16820,7 +16820,7 @@ type projMinusInt16Int32ConstOp struct {
 }
 
 func (p projMinusInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -16884,7 +16884,7 @@ type projMinusInt16ConstInt32Op struct {
 }
 
 func (p projMinusInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -16947,7 +16947,7 @@ type projMinusInt16Int32Op struct {
 }
 
 func (p projMinusInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -17015,7 +17015,7 @@ type projMultInt16Int32ConstOp struct {
 }
 
 func (p projMultInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -17093,7 +17093,7 @@ type projMultInt16ConstInt32Op struct {
 }
 
 func (p projMultInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -17170,7 +17170,7 @@ type projMultInt16Int32Op struct {
 }
 
 func (p projMultInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -17252,7 +17252,7 @@ type projDivInt16Int32ConstOp struct {
 }
 
 func (p projDivInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -17324,7 +17324,7 @@ type projDivInt16ConstInt32Op struct {
 }
 
 func (p projDivInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -17395,7 +17395,7 @@ type projDivInt16Int32Op struct {
 }
 
 func (p projDivInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -17471,7 +17471,7 @@ type projEQInt16Int32ConstOp struct {
 }
 
 func (p projEQInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -17553,7 +17553,7 @@ type projEQInt16ConstInt32Op struct {
 }
 
 func (p projEQInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -17634,7 +17634,7 @@ type projEQInt16Int32Op struct {
 }
 
 func (p projEQInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -17720,7 +17720,7 @@ type projNEInt16Int32ConstOp struct {
 }
 
 func (p projNEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -17802,7 +17802,7 @@ type projNEInt16ConstInt32Op struct {
 }
 
 func (p projNEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -17883,7 +17883,7 @@ type projNEInt16Int32Op struct {
 }
 
 func (p projNEInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -17969,7 +17969,7 @@ type projLTInt16Int32ConstOp struct {
 }
 
 func (p projLTInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -18051,7 +18051,7 @@ type projLTInt16ConstInt32Op struct {
 }
 
 func (p projLTInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -18132,7 +18132,7 @@ type projLTInt16Int32Op struct {
 }
 
 func (p projLTInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -18218,7 +18218,7 @@ type projLEInt16Int32ConstOp struct {
 }
 
 func (p projLEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -18300,7 +18300,7 @@ type projLEInt16ConstInt32Op struct {
 }
 
 func (p projLEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -18381,7 +18381,7 @@ type projLEInt16Int32Op struct {
 }
 
 func (p projLEInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -18467,7 +18467,7 @@ type projGTInt16Int32ConstOp struct {
 }
 
 func (p projGTInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -18549,7 +18549,7 @@ type projGTInt16ConstInt32Op struct {
 }
 
 func (p projGTInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -18630,7 +18630,7 @@ type projGTInt16Int32Op struct {
 }
 
 func (p projGTInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -18716,7 +18716,7 @@ type projGEInt16Int32ConstOp struct {
 }
 
 func (p projGEInt16Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -18798,7 +18798,7 @@ type projGEInt16ConstInt32Op struct {
 }
 
 func (p projGEInt16ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -18879,7 +18879,7 @@ type projGEInt16Int32Op struct {
 }
 
 func (p projGEInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -18965,7 +18965,7 @@ type projPlusInt16Int64ConstOp struct {
 }
 
 func (p projPlusInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -19029,7 +19029,7 @@ type projPlusInt16ConstInt64Op struct {
 }
 
 func (p projPlusInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -19092,7 +19092,7 @@ type projPlusInt16Int64Op struct {
 }
 
 func (p projPlusInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -19160,7 +19160,7 @@ type projMinusInt16Int64ConstOp struct {
 }
 
 func (p projMinusInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -19224,7 +19224,7 @@ type projMinusInt16ConstInt64Op struct {
 }
 
 func (p projMinusInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -19287,7 +19287,7 @@ type projMinusInt16Int64Op struct {
 }
 
 func (p projMinusInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -19355,7 +19355,7 @@ type projMultInt16Int64ConstOp struct {
 }
 
 func (p projMultInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -19433,7 +19433,7 @@ type projMultInt16ConstInt64Op struct {
 }
 
 func (p projMultInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -19510,7 +19510,7 @@ type projMultInt16Int64Op struct {
 }
 
 func (p projMultInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -19592,7 +19592,7 @@ type projDivInt16Int64ConstOp struct {
 }
 
 func (p projDivInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -19664,7 +19664,7 @@ type projDivInt16ConstInt64Op struct {
 }
 
 func (p projDivInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -19735,7 +19735,7 @@ type projDivInt16Int64Op struct {
 }
 
 func (p projDivInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -19811,7 +19811,7 @@ type projEQInt16Int64ConstOp struct {
 }
 
 func (p projEQInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -19893,7 +19893,7 @@ type projEQInt16ConstInt64Op struct {
 }
 
 func (p projEQInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -19974,7 +19974,7 @@ type projEQInt16Int64Op struct {
 }
 
 func (p projEQInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -20060,7 +20060,7 @@ type projNEInt16Int64ConstOp struct {
 }
 
 func (p projNEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -20142,7 +20142,7 @@ type projNEInt16ConstInt64Op struct {
 }
 
 func (p projNEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -20223,7 +20223,7 @@ type projNEInt16Int64Op struct {
 }
 
 func (p projNEInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -20309,7 +20309,7 @@ type projLTInt16Int64ConstOp struct {
 }
 
 func (p projLTInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -20391,7 +20391,7 @@ type projLTInt16ConstInt64Op struct {
 }
 
 func (p projLTInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -20472,7 +20472,7 @@ type projLTInt16Int64Op struct {
 }
 
 func (p projLTInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -20558,7 +20558,7 @@ type projLEInt16Int64ConstOp struct {
 }
 
 func (p projLEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -20640,7 +20640,7 @@ type projLEInt16ConstInt64Op struct {
 }
 
 func (p projLEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -20721,7 +20721,7 @@ type projLEInt16Int64Op struct {
 }
 
 func (p projLEInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -20807,7 +20807,7 @@ type projGTInt16Int64ConstOp struct {
 }
 
 func (p projGTInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -20889,7 +20889,7 @@ type projGTInt16ConstInt64Op struct {
 }
 
 func (p projGTInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -20970,7 +20970,7 @@ type projGTInt16Int64Op struct {
 }
 
 func (p projGTInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -21056,7 +21056,7 @@ type projGEInt16Int64ConstOp struct {
 }
 
 func (p projGEInt16Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -21138,7 +21138,7 @@ type projGEInt16ConstInt64Op struct {
 }
 
 func (p projGEInt16ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -21219,7 +21219,7 @@ type projGEInt16Int64Op struct {
 }
 
 func (p projGEInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -21305,7 +21305,7 @@ type projEQInt16Float64ConstOp struct {
 }
 
 func (p projEQInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -21403,7 +21403,7 @@ type projEQInt16ConstFloat64Op struct {
 }
 
 func (p projEQInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -21500,7 +21500,7 @@ type projEQInt16Float64Op struct {
 }
 
 func (p projEQInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -21602,7 +21602,7 @@ type projNEInt16Float64ConstOp struct {
 }
 
 func (p projNEInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -21700,7 +21700,7 @@ type projNEInt16ConstFloat64Op struct {
 }
 
 func (p projNEInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -21797,7 +21797,7 @@ type projNEInt16Float64Op struct {
 }
 
 func (p projNEInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -21899,7 +21899,7 @@ type projLTInt16Float64ConstOp struct {
 }
 
 func (p projLTInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -21997,7 +21997,7 @@ type projLTInt16ConstFloat64Op struct {
 }
 
 func (p projLTInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -22094,7 +22094,7 @@ type projLTInt16Float64Op struct {
 }
 
 func (p projLTInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -22196,7 +22196,7 @@ type projLEInt16Float64ConstOp struct {
 }
 
 func (p projLEInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -22294,7 +22294,7 @@ type projLEInt16ConstFloat64Op struct {
 }
 
 func (p projLEInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -22391,7 +22391,7 @@ type projLEInt16Float64Op struct {
 }
 
 func (p projLEInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -22493,7 +22493,7 @@ type projGTInt16Float64ConstOp struct {
 }
 
 func (p projGTInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -22591,7 +22591,7 @@ type projGTInt16ConstFloat64Op struct {
 }
 
 func (p projGTInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -22688,7 +22688,7 @@ type projGTInt16Float64Op struct {
 }
 
 func (p projGTInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -22790,7 +22790,7 @@ type projGEInt16Float64ConstOp struct {
 }
 
 func (p projGEInt16Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -22888,7 +22888,7 @@ type projGEInt16ConstFloat64Op struct {
 }
 
 func (p projGEInt16ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -22985,7 +22985,7 @@ type projGEInt16Float64Op struct {
 }
 
 func (p projGEInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -23087,7 +23087,7 @@ type projPlusInt32DecimalConstOp struct {
 }
 
 func (p projPlusInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -23157,7 +23157,7 @@ type projPlusInt32ConstDecimalOp struct {
 }
 
 func (p projPlusInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23226,7 +23226,7 @@ type projPlusInt32DecimalOp struct {
 }
 
 func (p projPlusInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23300,7 +23300,7 @@ type projMinusInt32DecimalConstOp struct {
 }
 
 func (p projMinusInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -23370,7 +23370,7 @@ type projMinusInt32ConstDecimalOp struct {
 }
 
 func (p projMinusInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23439,7 +23439,7 @@ type projMinusInt32DecimalOp struct {
 }
 
 func (p projMinusInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23513,7 +23513,7 @@ type projMultInt32DecimalConstOp struct {
 }
 
 func (p projMultInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -23583,7 +23583,7 @@ type projMultInt32ConstDecimalOp struct {
 }
 
 func (p projMultInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23652,7 +23652,7 @@ type projMultInt32DecimalOp struct {
 }
 
 func (p projMultInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23726,7 +23726,7 @@ type projDivInt32DecimalConstOp struct {
 }
 
 func (p projDivInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -23802,7 +23802,7 @@ type projDivInt32ConstDecimalOp struct {
 }
 
 func (p projDivInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23877,7 +23877,7 @@ type projDivInt32DecimalOp struct {
 }
 
 func (p projDivInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -23957,7 +23957,7 @@ type projEQInt32DecimalConstOp struct {
 }
 
 func (p projEQInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -24029,7 +24029,7 @@ type projEQInt32ConstDecimalOp struct {
 }
 
 func (p projEQInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24100,7 +24100,7 @@ type projEQInt32DecimalOp struct {
 }
 
 func (p projEQInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24176,7 +24176,7 @@ type projNEInt32DecimalConstOp struct {
 }
 
 func (p projNEInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -24248,7 +24248,7 @@ type projNEInt32ConstDecimalOp struct {
 }
 
 func (p projNEInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24319,7 +24319,7 @@ type projNEInt32DecimalOp struct {
 }
 
 func (p projNEInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24395,7 +24395,7 @@ type projLTInt32DecimalConstOp struct {
 }
 
 func (p projLTInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -24467,7 +24467,7 @@ type projLTInt32ConstDecimalOp struct {
 }
 
 func (p projLTInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24538,7 +24538,7 @@ type projLTInt32DecimalOp struct {
 }
 
 func (p projLTInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24614,7 +24614,7 @@ type projLEInt32DecimalConstOp struct {
 }
 
 func (p projLEInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -24686,7 +24686,7 @@ type projLEInt32ConstDecimalOp struct {
 }
 
 func (p projLEInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24757,7 +24757,7 @@ type projLEInt32DecimalOp struct {
 }
 
 func (p projLEInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24833,7 +24833,7 @@ type projGTInt32DecimalConstOp struct {
 }
 
 func (p projGTInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -24905,7 +24905,7 @@ type projGTInt32ConstDecimalOp struct {
 }
 
 func (p projGTInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -24976,7 +24976,7 @@ type projGTInt32DecimalOp struct {
 }
 
 func (p projGTInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -25052,7 +25052,7 @@ type projGEInt32DecimalConstOp struct {
 }
 
 func (p projGEInt32DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -25124,7 +25124,7 @@ type projGEInt32ConstDecimalOp struct {
 }
 
 func (p projGEInt32ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -25195,7 +25195,7 @@ type projGEInt32DecimalOp struct {
 }
 
 func (p projGEInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -25271,7 +25271,7 @@ type projPlusInt32Int16ConstOp struct {
 }
 
 func (p projPlusInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -25335,7 +25335,7 @@ type projPlusInt32ConstInt16Op struct {
 }
 
 func (p projPlusInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -25398,7 +25398,7 @@ type projPlusInt32Int16Op struct {
 }
 
 func (p projPlusInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -25466,7 +25466,7 @@ type projMinusInt32Int16ConstOp struct {
 }
 
 func (p projMinusInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -25530,7 +25530,7 @@ type projMinusInt32ConstInt16Op struct {
 }
 
 func (p projMinusInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -25593,7 +25593,7 @@ type projMinusInt32Int16Op struct {
 }
 
 func (p projMinusInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -25661,7 +25661,7 @@ type projMultInt32Int16ConstOp struct {
 }
 
 func (p projMultInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -25739,7 +25739,7 @@ type projMultInt32ConstInt16Op struct {
 }
 
 func (p projMultInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -25816,7 +25816,7 @@ type projMultInt32Int16Op struct {
 }
 
 func (p projMultInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -25898,7 +25898,7 @@ type projDivInt32Int16ConstOp struct {
 }
 
 func (p projDivInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -25970,7 +25970,7 @@ type projDivInt32ConstInt16Op struct {
 }
 
 func (p projDivInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -26041,7 +26041,7 @@ type projDivInt32Int16Op struct {
 }
 
 func (p projDivInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -26117,7 +26117,7 @@ type projEQInt32Int16ConstOp struct {
 }
 
 func (p projEQInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -26199,7 +26199,7 @@ type projEQInt32ConstInt16Op struct {
 }
 
 func (p projEQInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -26280,7 +26280,7 @@ type projEQInt32Int16Op struct {
 }
 
 func (p projEQInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -26366,7 +26366,7 @@ type projNEInt32Int16ConstOp struct {
 }
 
 func (p projNEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -26448,7 +26448,7 @@ type projNEInt32ConstInt16Op struct {
 }
 
 func (p projNEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -26529,7 +26529,7 @@ type projNEInt32Int16Op struct {
 }
 
 func (p projNEInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -26615,7 +26615,7 @@ type projLTInt32Int16ConstOp struct {
 }
 
 func (p projLTInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -26697,7 +26697,7 @@ type projLTInt32ConstInt16Op struct {
 }
 
 func (p projLTInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -26778,7 +26778,7 @@ type projLTInt32Int16Op struct {
 }
 
 func (p projLTInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -26864,7 +26864,7 @@ type projLEInt32Int16ConstOp struct {
 }
 
 func (p projLEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -26946,7 +26946,7 @@ type projLEInt32ConstInt16Op struct {
 }
 
 func (p projLEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -27027,7 +27027,7 @@ type projLEInt32Int16Op struct {
 }
 
 func (p projLEInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -27113,7 +27113,7 @@ type projGTInt32Int16ConstOp struct {
 }
 
 func (p projGTInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -27195,7 +27195,7 @@ type projGTInt32ConstInt16Op struct {
 }
 
 func (p projGTInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -27276,7 +27276,7 @@ type projGTInt32Int16Op struct {
 }
 
 func (p projGTInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -27362,7 +27362,7 @@ type projGEInt32Int16ConstOp struct {
 }
 
 func (p projGEInt32Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -27444,7 +27444,7 @@ type projGEInt32ConstInt16Op struct {
 }
 
 func (p projGEInt32ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -27525,7 +27525,7 @@ type projGEInt32Int16Op struct {
 }
 
 func (p projGEInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -27611,7 +27611,7 @@ type projPlusInt32Int32ConstOp struct {
 }
 
 func (p projPlusInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -27675,7 +27675,7 @@ type projPlusInt32ConstInt32Op struct {
 }
 
 func (p projPlusInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -27738,7 +27738,7 @@ type projPlusInt32Int32Op struct {
 }
 
 func (p projPlusInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -27806,7 +27806,7 @@ type projMinusInt32Int32ConstOp struct {
 }
 
 func (p projMinusInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -27870,7 +27870,7 @@ type projMinusInt32ConstInt32Op struct {
 }
 
 func (p projMinusInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -27933,7 +27933,7 @@ type projMinusInt32Int32Op struct {
 }
 
 func (p projMinusInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -28001,7 +28001,7 @@ type projMultInt32Int32ConstOp struct {
 }
 
 func (p projMultInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -28079,7 +28079,7 @@ type projMultInt32ConstInt32Op struct {
 }
 
 func (p projMultInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -28156,7 +28156,7 @@ type projMultInt32Int32Op struct {
 }
 
 func (p projMultInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -28238,7 +28238,7 @@ type projDivInt32Int32ConstOp struct {
 }
 
 func (p projDivInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -28310,7 +28310,7 @@ type projDivInt32ConstInt32Op struct {
 }
 
 func (p projDivInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -28381,7 +28381,7 @@ type projDivInt32Int32Op struct {
 }
 
 func (p projDivInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -28457,7 +28457,7 @@ type projEQInt32Int32ConstOp struct {
 }
 
 func (p projEQInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -28539,7 +28539,7 @@ type projEQInt32ConstInt32Op struct {
 }
 
 func (p projEQInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -28620,7 +28620,7 @@ type projEQInt32Int32Op struct {
 }
 
 func (p projEQInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -28706,7 +28706,7 @@ type projNEInt32Int32ConstOp struct {
 }
 
 func (p projNEInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -28788,7 +28788,7 @@ type projNEInt32ConstInt32Op struct {
 }
 
 func (p projNEInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -28869,7 +28869,7 @@ type projNEInt32Int32Op struct {
 }
 
 func (p projNEInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -28955,7 +28955,7 @@ type projLTInt32Int32ConstOp struct {
 }
 
 func (p projLTInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -29037,7 +29037,7 @@ type projLTInt32ConstInt32Op struct {
 }
 
 func (p projLTInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -29118,7 +29118,7 @@ type projLTInt32Int32Op struct {
 }
 
 func (p projLTInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -29204,7 +29204,7 @@ type projLEInt32Int32ConstOp struct {
 }
 
 func (p projLEInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -29286,7 +29286,7 @@ type projLEInt32ConstInt32Op struct {
 }
 
 func (p projLEInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -29367,7 +29367,7 @@ type projLEInt32Int32Op struct {
 }
 
 func (p projLEInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -29453,7 +29453,7 @@ type projGTInt32Int32ConstOp struct {
 }
 
 func (p projGTInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -29535,7 +29535,7 @@ type projGTInt32ConstInt32Op struct {
 }
 
 func (p projGTInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -29616,7 +29616,7 @@ type projGTInt32Int32Op struct {
 }
 
 func (p projGTInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -29702,7 +29702,7 @@ type projGEInt32Int32ConstOp struct {
 }
 
 func (p projGEInt32Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -29784,7 +29784,7 @@ type projGEInt32ConstInt32Op struct {
 }
 
 func (p projGEInt32ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -29865,7 +29865,7 @@ type projGEInt32Int32Op struct {
 }
 
 func (p projGEInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -29951,7 +29951,7 @@ type projPlusInt32Int64ConstOp struct {
 }
 
 func (p projPlusInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -30015,7 +30015,7 @@ type projPlusInt32ConstInt64Op struct {
 }
 
 func (p projPlusInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -30078,7 +30078,7 @@ type projPlusInt32Int64Op struct {
 }
 
 func (p projPlusInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -30146,7 +30146,7 @@ type projMinusInt32Int64ConstOp struct {
 }
 
 func (p projMinusInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -30210,7 +30210,7 @@ type projMinusInt32ConstInt64Op struct {
 }
 
 func (p projMinusInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -30273,7 +30273,7 @@ type projMinusInt32Int64Op struct {
 }
 
 func (p projMinusInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -30341,7 +30341,7 @@ type projMultInt32Int64ConstOp struct {
 }
 
 func (p projMultInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -30419,7 +30419,7 @@ type projMultInt32ConstInt64Op struct {
 }
 
 func (p projMultInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -30496,7 +30496,7 @@ type projMultInt32Int64Op struct {
 }
 
 func (p projMultInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -30578,7 +30578,7 @@ type projDivInt32Int64ConstOp struct {
 }
 
 func (p projDivInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -30650,7 +30650,7 @@ type projDivInt32ConstInt64Op struct {
 }
 
 func (p projDivInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -30721,7 +30721,7 @@ type projDivInt32Int64Op struct {
 }
 
 func (p projDivInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -30797,7 +30797,7 @@ type projEQInt32Int64ConstOp struct {
 }
 
 func (p projEQInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -30879,7 +30879,7 @@ type projEQInt32ConstInt64Op struct {
 }
 
 func (p projEQInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -30960,7 +30960,7 @@ type projEQInt32Int64Op struct {
 }
 
 func (p projEQInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -31046,7 +31046,7 @@ type projNEInt32Int64ConstOp struct {
 }
 
 func (p projNEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -31128,7 +31128,7 @@ type projNEInt32ConstInt64Op struct {
 }
 
 func (p projNEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -31209,7 +31209,7 @@ type projNEInt32Int64Op struct {
 }
 
 func (p projNEInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -31295,7 +31295,7 @@ type projLTInt32Int64ConstOp struct {
 }
 
 func (p projLTInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -31377,7 +31377,7 @@ type projLTInt32ConstInt64Op struct {
 }
 
 func (p projLTInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -31458,7 +31458,7 @@ type projLTInt32Int64Op struct {
 }
 
 func (p projLTInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -31544,7 +31544,7 @@ type projLEInt32Int64ConstOp struct {
 }
 
 func (p projLEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -31626,7 +31626,7 @@ type projLEInt32ConstInt64Op struct {
 }
 
 func (p projLEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -31707,7 +31707,7 @@ type projLEInt32Int64Op struct {
 }
 
 func (p projLEInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -31793,7 +31793,7 @@ type projGTInt32Int64ConstOp struct {
 }
 
 func (p projGTInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -31875,7 +31875,7 @@ type projGTInt32ConstInt64Op struct {
 }
 
 func (p projGTInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -31956,7 +31956,7 @@ type projGTInt32Int64Op struct {
 }
 
 func (p projGTInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -32042,7 +32042,7 @@ type projGEInt32Int64ConstOp struct {
 }
 
 func (p projGEInt32Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -32124,7 +32124,7 @@ type projGEInt32ConstInt64Op struct {
 }
 
 func (p projGEInt32ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -32205,7 +32205,7 @@ type projGEInt32Int64Op struct {
 }
 
 func (p projGEInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -32291,7 +32291,7 @@ type projEQInt32Float64ConstOp struct {
 }
 
 func (p projEQInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -32389,7 +32389,7 @@ type projEQInt32ConstFloat64Op struct {
 }
 
 func (p projEQInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -32486,7 +32486,7 @@ type projEQInt32Float64Op struct {
 }
 
 func (p projEQInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -32588,7 +32588,7 @@ type projNEInt32Float64ConstOp struct {
 }
 
 func (p projNEInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -32686,7 +32686,7 @@ type projNEInt32ConstFloat64Op struct {
 }
 
 func (p projNEInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -32783,7 +32783,7 @@ type projNEInt32Float64Op struct {
 }
 
 func (p projNEInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -32885,7 +32885,7 @@ type projLTInt32Float64ConstOp struct {
 }
 
 func (p projLTInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -32983,7 +32983,7 @@ type projLTInt32ConstFloat64Op struct {
 }
 
 func (p projLTInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -33080,7 +33080,7 @@ type projLTInt32Float64Op struct {
 }
 
 func (p projLTInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -33182,7 +33182,7 @@ type projLEInt32Float64ConstOp struct {
 }
 
 func (p projLEInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -33280,7 +33280,7 @@ type projLEInt32ConstFloat64Op struct {
 }
 
 func (p projLEInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -33377,7 +33377,7 @@ type projLEInt32Float64Op struct {
 }
 
 func (p projLEInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -33479,7 +33479,7 @@ type projGTInt32Float64ConstOp struct {
 }
 
 func (p projGTInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -33577,7 +33577,7 @@ type projGTInt32ConstFloat64Op struct {
 }
 
 func (p projGTInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -33674,7 +33674,7 @@ type projGTInt32Float64Op struct {
 }
 
 func (p projGTInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -33776,7 +33776,7 @@ type projGEInt32Float64ConstOp struct {
 }
 
 func (p projGEInt32Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -33874,7 +33874,7 @@ type projGEInt32ConstFloat64Op struct {
 }
 
 func (p projGEInt32ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -33971,7 +33971,7 @@ type projGEInt32Float64Op struct {
 }
 
 func (p projGEInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -34073,7 +34073,7 @@ type projPlusInt64DecimalConstOp struct {
 }
 
 func (p projPlusInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -34143,7 +34143,7 @@ type projPlusInt64ConstDecimalOp struct {
 }
 
 func (p projPlusInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34212,7 +34212,7 @@ type projPlusInt64DecimalOp struct {
 }
 
 func (p projPlusInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34286,7 +34286,7 @@ type projMinusInt64DecimalConstOp struct {
 }
 
 func (p projMinusInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -34356,7 +34356,7 @@ type projMinusInt64ConstDecimalOp struct {
 }
 
 func (p projMinusInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34425,7 +34425,7 @@ type projMinusInt64DecimalOp struct {
 }
 
 func (p projMinusInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34499,7 +34499,7 @@ type projMultInt64DecimalConstOp struct {
 }
 
 func (p projMultInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -34569,7 +34569,7 @@ type projMultInt64ConstDecimalOp struct {
 }
 
 func (p projMultInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34638,7 +34638,7 @@ type projMultInt64DecimalOp struct {
 }
 
 func (p projMultInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34712,7 +34712,7 @@ type projDivInt64DecimalConstOp struct {
 }
 
 func (p projDivInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -34788,7 +34788,7 @@ type projDivInt64ConstDecimalOp struct {
 }
 
 func (p projDivInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34863,7 +34863,7 @@ type projDivInt64DecimalOp struct {
 }
 
 func (p projDivInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -34943,7 +34943,7 @@ type projEQInt64DecimalConstOp struct {
 }
 
 func (p projEQInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -35015,7 +35015,7 @@ type projEQInt64ConstDecimalOp struct {
 }
 
 func (p projEQInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35086,7 +35086,7 @@ type projEQInt64DecimalOp struct {
 }
 
 func (p projEQInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35162,7 +35162,7 @@ type projNEInt64DecimalConstOp struct {
 }
 
 func (p projNEInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -35234,7 +35234,7 @@ type projNEInt64ConstDecimalOp struct {
 }
 
 func (p projNEInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35305,7 +35305,7 @@ type projNEInt64DecimalOp struct {
 }
 
 func (p projNEInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35381,7 +35381,7 @@ type projLTInt64DecimalConstOp struct {
 }
 
 func (p projLTInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -35453,7 +35453,7 @@ type projLTInt64ConstDecimalOp struct {
 }
 
 func (p projLTInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35524,7 +35524,7 @@ type projLTInt64DecimalOp struct {
 }
 
 func (p projLTInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35600,7 +35600,7 @@ type projLEInt64DecimalConstOp struct {
 }
 
 func (p projLEInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -35672,7 +35672,7 @@ type projLEInt64ConstDecimalOp struct {
 }
 
 func (p projLEInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35743,7 +35743,7 @@ type projLEInt64DecimalOp struct {
 }
 
 func (p projLEInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35819,7 +35819,7 @@ type projGTInt64DecimalConstOp struct {
 }
 
 func (p projGTInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -35891,7 +35891,7 @@ type projGTInt64ConstDecimalOp struct {
 }
 
 func (p projGTInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -35962,7 +35962,7 @@ type projGTInt64DecimalOp struct {
 }
 
 func (p projGTInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -36038,7 +36038,7 @@ type projGEInt64DecimalConstOp struct {
 }
 
 func (p projGEInt64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -36110,7 +36110,7 @@ type projGEInt64ConstDecimalOp struct {
 }
 
 func (p projGEInt64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -36181,7 +36181,7 @@ type projGEInt64DecimalOp struct {
 }
 
 func (p projGEInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -36257,7 +36257,7 @@ type projPlusInt64Int16ConstOp struct {
 }
 
 func (p projPlusInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -36321,7 +36321,7 @@ type projPlusInt64ConstInt16Op struct {
 }
 
 func (p projPlusInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -36384,7 +36384,7 @@ type projPlusInt64Int16Op struct {
 }
 
 func (p projPlusInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -36452,7 +36452,7 @@ type projMinusInt64Int16ConstOp struct {
 }
 
 func (p projMinusInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -36516,7 +36516,7 @@ type projMinusInt64ConstInt16Op struct {
 }
 
 func (p projMinusInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -36579,7 +36579,7 @@ type projMinusInt64Int16Op struct {
 }
 
 func (p projMinusInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -36647,7 +36647,7 @@ type projMultInt64Int16ConstOp struct {
 }
 
 func (p projMultInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -36725,7 +36725,7 @@ type projMultInt64ConstInt16Op struct {
 }
 
 func (p projMultInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -36802,7 +36802,7 @@ type projMultInt64Int16Op struct {
 }
 
 func (p projMultInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -36884,7 +36884,7 @@ type projDivInt64Int16ConstOp struct {
 }
 
 func (p projDivInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -36956,7 +36956,7 @@ type projDivInt64ConstInt16Op struct {
 }
 
 func (p projDivInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -37027,7 +37027,7 @@ type projDivInt64Int16Op struct {
 }
 
 func (p projDivInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -37103,7 +37103,7 @@ type projEQInt64Int16ConstOp struct {
 }
 
 func (p projEQInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -37185,7 +37185,7 @@ type projEQInt64ConstInt16Op struct {
 }
 
 func (p projEQInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -37266,7 +37266,7 @@ type projEQInt64Int16Op struct {
 }
 
 func (p projEQInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -37352,7 +37352,7 @@ type projNEInt64Int16ConstOp struct {
 }
 
 func (p projNEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -37434,7 +37434,7 @@ type projNEInt64ConstInt16Op struct {
 }
 
 func (p projNEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -37515,7 +37515,7 @@ type projNEInt64Int16Op struct {
 }
 
 func (p projNEInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -37601,7 +37601,7 @@ type projLTInt64Int16ConstOp struct {
 }
 
 func (p projLTInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -37683,7 +37683,7 @@ type projLTInt64ConstInt16Op struct {
 }
 
 func (p projLTInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -37764,7 +37764,7 @@ type projLTInt64Int16Op struct {
 }
 
 func (p projLTInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -37850,7 +37850,7 @@ type projLEInt64Int16ConstOp struct {
 }
 
 func (p projLEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -37932,7 +37932,7 @@ type projLEInt64ConstInt16Op struct {
 }
 
 func (p projLEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -38013,7 +38013,7 @@ type projLEInt64Int16Op struct {
 }
 
 func (p projLEInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -38099,7 +38099,7 @@ type projGTInt64Int16ConstOp struct {
 }
 
 func (p projGTInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -38181,7 +38181,7 @@ type projGTInt64ConstInt16Op struct {
 }
 
 func (p projGTInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -38262,7 +38262,7 @@ type projGTInt64Int16Op struct {
 }
 
 func (p projGTInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -38348,7 +38348,7 @@ type projGEInt64Int16ConstOp struct {
 }
 
 func (p projGEInt64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -38430,7 +38430,7 @@ type projGEInt64ConstInt16Op struct {
 }
 
 func (p projGEInt64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -38511,7 +38511,7 @@ type projGEInt64Int16Op struct {
 }
 
 func (p projGEInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -38597,7 +38597,7 @@ type projPlusInt64Int32ConstOp struct {
 }
 
 func (p projPlusInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -38661,7 +38661,7 @@ type projPlusInt64ConstInt32Op struct {
 }
 
 func (p projPlusInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -38724,7 +38724,7 @@ type projPlusInt64Int32Op struct {
 }
 
 func (p projPlusInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -38792,7 +38792,7 @@ type projMinusInt64Int32ConstOp struct {
 }
 
 func (p projMinusInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -38856,7 +38856,7 @@ type projMinusInt64ConstInt32Op struct {
 }
 
 func (p projMinusInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -38919,7 +38919,7 @@ type projMinusInt64Int32Op struct {
 }
 
 func (p projMinusInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -38987,7 +38987,7 @@ type projMultInt64Int32ConstOp struct {
 }
 
 func (p projMultInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -39065,7 +39065,7 @@ type projMultInt64ConstInt32Op struct {
 }
 
 func (p projMultInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -39142,7 +39142,7 @@ type projMultInt64Int32Op struct {
 }
 
 func (p projMultInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -39224,7 +39224,7 @@ type projDivInt64Int32ConstOp struct {
 }
 
 func (p projDivInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -39296,7 +39296,7 @@ type projDivInt64ConstInt32Op struct {
 }
 
 func (p projDivInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -39367,7 +39367,7 @@ type projDivInt64Int32Op struct {
 }
 
 func (p projDivInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -39443,7 +39443,7 @@ type projEQInt64Int32ConstOp struct {
 }
 
 func (p projEQInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -39525,7 +39525,7 @@ type projEQInt64ConstInt32Op struct {
 }
 
 func (p projEQInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -39606,7 +39606,7 @@ type projEQInt64Int32Op struct {
 }
 
 func (p projEQInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -39692,7 +39692,7 @@ type projNEInt64Int32ConstOp struct {
 }
 
 func (p projNEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -39774,7 +39774,7 @@ type projNEInt64ConstInt32Op struct {
 }
 
 func (p projNEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -39855,7 +39855,7 @@ type projNEInt64Int32Op struct {
 }
 
 func (p projNEInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -39941,7 +39941,7 @@ type projLTInt64Int32ConstOp struct {
 }
 
 func (p projLTInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -40023,7 +40023,7 @@ type projLTInt64ConstInt32Op struct {
 }
 
 func (p projLTInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -40104,7 +40104,7 @@ type projLTInt64Int32Op struct {
 }
 
 func (p projLTInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -40190,7 +40190,7 @@ type projLEInt64Int32ConstOp struct {
 }
 
 func (p projLEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -40272,7 +40272,7 @@ type projLEInt64ConstInt32Op struct {
 }
 
 func (p projLEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -40353,7 +40353,7 @@ type projLEInt64Int32Op struct {
 }
 
 func (p projLEInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -40439,7 +40439,7 @@ type projGTInt64Int32ConstOp struct {
 }
 
 func (p projGTInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -40521,7 +40521,7 @@ type projGTInt64ConstInt32Op struct {
 }
 
 func (p projGTInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -40602,7 +40602,7 @@ type projGTInt64Int32Op struct {
 }
 
 func (p projGTInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -40688,7 +40688,7 @@ type projGEInt64Int32ConstOp struct {
 }
 
 func (p projGEInt64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -40770,7 +40770,7 @@ type projGEInt64ConstInt32Op struct {
 }
 
 func (p projGEInt64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -40851,7 +40851,7 @@ type projGEInt64Int32Op struct {
 }
 
 func (p projGEInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -40937,7 +40937,7 @@ type projPlusInt64Int64ConstOp struct {
 }
 
 func (p projPlusInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -41001,7 +41001,7 @@ type projPlusInt64ConstInt64Op struct {
 }
 
 func (p projPlusInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -41064,7 +41064,7 @@ type projPlusInt64Int64Op struct {
 }
 
 func (p projPlusInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -41132,7 +41132,7 @@ type projMinusInt64Int64ConstOp struct {
 }
 
 func (p projMinusInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -41196,7 +41196,7 @@ type projMinusInt64ConstInt64Op struct {
 }
 
 func (p projMinusInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -41259,7 +41259,7 @@ type projMinusInt64Int64Op struct {
 }
 
 func (p projMinusInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -41327,7 +41327,7 @@ type projMultInt64Int64ConstOp struct {
 }
 
 func (p projMultInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -41405,7 +41405,7 @@ type projMultInt64ConstInt64Op struct {
 }
 
 func (p projMultInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -41482,7 +41482,7 @@ type projMultInt64Int64Op struct {
 }
 
 func (p projMultInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
 }
 
 func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -41564,7 +41564,7 @@ type projDivInt64Int64ConstOp struct {
 }
 
 func (p projDivInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -41636,7 +41636,7 @@ type projDivInt64ConstInt64Op struct {
 }
 
 func (p projDivInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -41707,7 +41707,7 @@ type projDivInt64Int64Op struct {
 }
 
 func (p projDivInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
 }
 
 func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -41783,7 +41783,7 @@ type projEQInt64Int64ConstOp struct {
 }
 
 func (p projEQInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -41865,7 +41865,7 @@ type projEQInt64ConstInt64Op struct {
 }
 
 func (p projEQInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -41946,7 +41946,7 @@ type projEQInt64Int64Op struct {
 }
 
 func (p projEQInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -42032,7 +42032,7 @@ type projNEInt64Int64ConstOp struct {
 }
 
 func (p projNEInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -42114,7 +42114,7 @@ type projNEInt64ConstInt64Op struct {
 }
 
 func (p projNEInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -42195,7 +42195,7 @@ type projNEInt64Int64Op struct {
 }
 
 func (p projNEInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -42281,7 +42281,7 @@ type projLTInt64Int64ConstOp struct {
 }
 
 func (p projLTInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -42363,7 +42363,7 @@ type projLTInt64ConstInt64Op struct {
 }
 
 func (p projLTInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -42444,7 +42444,7 @@ type projLTInt64Int64Op struct {
 }
 
 func (p projLTInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -42530,7 +42530,7 @@ type projLEInt64Int64ConstOp struct {
 }
 
 func (p projLEInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -42612,7 +42612,7 @@ type projLEInt64ConstInt64Op struct {
 }
 
 func (p projLEInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -42693,7 +42693,7 @@ type projLEInt64Int64Op struct {
 }
 
 func (p projLEInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -42779,7 +42779,7 @@ type projGTInt64Int64ConstOp struct {
 }
 
 func (p projGTInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -42861,7 +42861,7 @@ type projGTInt64ConstInt64Op struct {
 }
 
 func (p projGTInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -42942,7 +42942,7 @@ type projGTInt64Int64Op struct {
 }
 
 func (p projGTInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -43028,7 +43028,7 @@ type projGEInt64Int64ConstOp struct {
 }
 
 func (p projGEInt64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -43110,7 +43110,7 @@ type projGEInt64ConstInt64Op struct {
 }
 
 func (p projGEInt64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -43191,7 +43191,7 @@ type projGEInt64Int64Op struct {
 }
 
 func (p projGEInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -43277,7 +43277,7 @@ type projEQInt64Float64ConstOp struct {
 }
 
 func (p projEQInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -43375,7 +43375,7 @@ type projEQInt64ConstFloat64Op struct {
 }
 
 func (p projEQInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -43472,7 +43472,7 @@ type projEQInt64Float64Op struct {
 }
 
 func (p projEQInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -43574,7 +43574,7 @@ type projNEInt64Float64ConstOp struct {
 }
 
 func (p projNEInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -43672,7 +43672,7 @@ type projNEInt64ConstFloat64Op struct {
 }
 
 func (p projNEInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -43769,7 +43769,7 @@ type projNEInt64Float64Op struct {
 }
 
 func (p projNEInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -43871,7 +43871,7 @@ type projLTInt64Float64ConstOp struct {
 }
 
 func (p projLTInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -43969,7 +43969,7 @@ type projLTInt64ConstFloat64Op struct {
 }
 
 func (p projLTInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -44066,7 +44066,7 @@ type projLTInt64Float64Op struct {
 }
 
 func (p projLTInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -44168,7 +44168,7 @@ type projLEInt64Float64ConstOp struct {
 }
 
 func (p projLEInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -44266,7 +44266,7 @@ type projLEInt64ConstFloat64Op struct {
 }
 
 func (p projLEInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -44363,7 +44363,7 @@ type projLEInt64Float64Op struct {
 }
 
 func (p projLEInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -44465,7 +44465,7 @@ type projGTInt64Float64ConstOp struct {
 }
 
 func (p projGTInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -44563,7 +44563,7 @@ type projGTInt64ConstFloat64Op struct {
 }
 
 func (p projGTInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -44660,7 +44660,7 @@ type projGTInt64Float64Op struct {
 }
 
 func (p projGTInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -44762,7 +44762,7 @@ type projGEInt64Float64ConstOp struct {
 }
 
 func (p projGEInt64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -44860,7 +44860,7 @@ type projGEInt64ConstFloat64Op struct {
 }
 
 func (p projGEInt64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -44957,7 +44957,7 @@ type projGEInt64Float64Op struct {
 }
 
 func (p projGEInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -45059,7 +45059,7 @@ type projEQFloat64DecimalConstOp struct {
 }
 
 func (p projEQFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -45135,7 +45135,7 @@ type projEQFloat64ConstDecimalOp struct {
 }
 
 func (p projEQFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45210,7 +45210,7 @@ type projEQFloat64DecimalOp struct {
 }
 
 func (p projEQFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45290,7 +45290,7 @@ type projNEFloat64DecimalConstOp struct {
 }
 
 func (p projNEFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -45366,7 +45366,7 @@ type projNEFloat64ConstDecimalOp struct {
 }
 
 func (p projNEFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45441,7 +45441,7 @@ type projNEFloat64DecimalOp struct {
 }
 
 func (p projNEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45521,7 +45521,7 @@ type projLTFloat64DecimalConstOp struct {
 }
 
 func (p projLTFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -45597,7 +45597,7 @@ type projLTFloat64ConstDecimalOp struct {
 }
 
 func (p projLTFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45672,7 +45672,7 @@ type projLTFloat64DecimalOp struct {
 }
 
 func (p projLTFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45752,7 +45752,7 @@ type projLEFloat64DecimalConstOp struct {
 }
 
 func (p projLEFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -45828,7 +45828,7 @@ type projLEFloat64ConstDecimalOp struct {
 }
 
 func (p projLEFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45903,7 +45903,7 @@ type projLEFloat64DecimalOp struct {
 }
 
 func (p projLEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -45983,7 +45983,7 @@ type projGTFloat64DecimalConstOp struct {
 }
 
 func (p projGTFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -46059,7 +46059,7 @@ type projGTFloat64ConstDecimalOp struct {
 }
 
 func (p projGTFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -46134,7 +46134,7 @@ type projGTFloat64DecimalOp struct {
 }
 
 func (p projGTFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -46214,7 +46214,7 @@ type projGEFloat64DecimalConstOp struct {
 }
 
 func (p projGEFloat64DecimalConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
@@ -46290,7 +46290,7 @@ type projGEFloat64ConstDecimalOp struct {
 }
 
 func (p projGEFloat64ConstDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -46365,7 +46365,7 @@ type projGEFloat64DecimalOp struct {
 }
 
 func (p projGEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
@@ -46445,7 +46445,7 @@ type projEQFloat64Int16ConstOp struct {
 }
 
 func (p projEQFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -46543,7 +46543,7 @@ type projEQFloat64ConstInt16Op struct {
 }
 
 func (p projEQFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -46640,7 +46640,7 @@ type projEQFloat64Int16Op struct {
 }
 
 func (p projEQFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -46742,7 +46742,7 @@ type projNEFloat64Int16ConstOp struct {
 }
 
 func (p projNEFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -46840,7 +46840,7 @@ type projNEFloat64ConstInt16Op struct {
 }
 
 func (p projNEFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -46937,7 +46937,7 @@ type projNEFloat64Int16Op struct {
 }
 
 func (p projNEFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47039,7 +47039,7 @@ type projLTFloat64Int16ConstOp struct {
 }
 
 func (p projLTFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -47137,7 +47137,7 @@ type projLTFloat64ConstInt16Op struct {
 }
 
 func (p projLTFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -47234,7 +47234,7 @@ type projLTFloat64Int16Op struct {
 }
 
 func (p projLTFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47336,7 +47336,7 @@ type projLEFloat64Int16ConstOp struct {
 }
 
 func (p projLEFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -47434,7 +47434,7 @@ type projLEFloat64ConstInt16Op struct {
 }
 
 func (p projLEFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -47531,7 +47531,7 @@ type projLEFloat64Int16Op struct {
 }
 
 func (p projLEFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47633,7 +47633,7 @@ type projGTFloat64Int16ConstOp struct {
 }
 
 func (p projGTFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -47731,7 +47731,7 @@ type projGTFloat64ConstInt16Op struct {
 }
 
 func (p projGTFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -47828,7 +47828,7 @@ type projGTFloat64Int16Op struct {
 }
 
 func (p projGTFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -47930,7 +47930,7 @@ type projGEFloat64Int16ConstOp struct {
 }
 
 func (p projGEFloat64Int16ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -48028,7 +48028,7 @@ type projGEFloat64ConstInt16Op struct {
 }
 
 func (p projGEFloat64ConstInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
@@ -48125,7 +48125,7 @@ type projGEFloat64Int16Op struct {
 }
 
 func (p projGEFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
@@ -48227,7 +48227,7 @@ type projEQFloat64Int32ConstOp struct {
 }
 
 func (p projEQFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -48325,7 +48325,7 @@ type projEQFloat64ConstInt32Op struct {
 }
 
 func (p projEQFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -48422,7 +48422,7 @@ type projEQFloat64Int32Op struct {
 }
 
 func (p projEQFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -48524,7 +48524,7 @@ type projNEFloat64Int32ConstOp struct {
 }
 
 func (p projNEFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -48622,7 +48622,7 @@ type projNEFloat64ConstInt32Op struct {
 }
 
 func (p projNEFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -48719,7 +48719,7 @@ type projNEFloat64Int32Op struct {
 }
 
 func (p projNEFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -48821,7 +48821,7 @@ type projLTFloat64Int32ConstOp struct {
 }
 
 func (p projLTFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -48919,7 +48919,7 @@ type projLTFloat64ConstInt32Op struct {
 }
 
 func (p projLTFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -49016,7 +49016,7 @@ type projLTFloat64Int32Op struct {
 }
 
 func (p projLTFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -49118,7 +49118,7 @@ type projLEFloat64Int32ConstOp struct {
 }
 
 func (p projLEFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -49216,7 +49216,7 @@ type projLEFloat64ConstInt32Op struct {
 }
 
 func (p projLEFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -49313,7 +49313,7 @@ type projLEFloat64Int32Op struct {
 }
 
 func (p projLEFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -49415,7 +49415,7 @@ type projGTFloat64Int32ConstOp struct {
 }
 
 func (p projGTFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -49513,7 +49513,7 @@ type projGTFloat64ConstInt32Op struct {
 }
 
 func (p projGTFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -49610,7 +49610,7 @@ type projGTFloat64Int32Op struct {
 }
 
 func (p projGTFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -49712,7 +49712,7 @@ type projGEFloat64Int32ConstOp struct {
 }
 
 func (p projGEFloat64Int32ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -49810,7 +49810,7 @@ type projGEFloat64ConstInt32Op struct {
 }
 
 func (p projGEFloat64ConstInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
@@ -49907,7 +49907,7 @@ type projGEFloat64Int32Op struct {
 }
 
 func (p projGEFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
@@ -50009,7 +50009,7 @@ type projEQFloat64Int64ConstOp struct {
 }
 
 func (p projEQFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -50107,7 +50107,7 @@ type projEQFloat64ConstInt64Op struct {
 }
 
 func (p projEQFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -50204,7 +50204,7 @@ type projEQFloat64Int64Op struct {
 }
 
 func (p projEQFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -50306,7 +50306,7 @@ type projNEFloat64Int64ConstOp struct {
 }
 
 func (p projNEFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -50404,7 +50404,7 @@ type projNEFloat64ConstInt64Op struct {
 }
 
 func (p projNEFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -50501,7 +50501,7 @@ type projNEFloat64Int64Op struct {
 }
 
 func (p projNEFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -50603,7 +50603,7 @@ type projLTFloat64Int64ConstOp struct {
 }
 
 func (p projLTFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -50701,7 +50701,7 @@ type projLTFloat64ConstInt64Op struct {
 }
 
 func (p projLTFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -50798,7 +50798,7 @@ type projLTFloat64Int64Op struct {
 }
 
 func (p projLTFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -50900,7 +50900,7 @@ type projLEFloat64Int64ConstOp struct {
 }
 
 func (p projLEFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -50998,7 +50998,7 @@ type projLEFloat64ConstInt64Op struct {
 }
 
 func (p projLEFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -51095,7 +51095,7 @@ type projLEFloat64Int64Op struct {
 }
 
 func (p projLEFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51197,7 +51197,7 @@ type projGTFloat64Int64ConstOp struct {
 }
 
 func (p projGTFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -51295,7 +51295,7 @@ type projGTFloat64ConstInt64Op struct {
 }
 
 func (p projGTFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -51392,7 +51392,7 @@ type projGTFloat64Int64Op struct {
 }
 
 func (p projGTFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51494,7 +51494,7 @@ type projGEFloat64Int64ConstOp struct {
 }
 
 func (p projGEFloat64Int64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -51592,7 +51592,7 @@ type projGEFloat64ConstInt64Op struct {
 }
 
 func (p projGEFloat64ConstInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
@@ -51689,7 +51689,7 @@ type projGEFloat64Int64Op struct {
 }
 
 func (p projGEFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
@@ -51791,7 +51791,7 @@ type projPlusFloat64Float64ConstOp struct {
 }
 
 func (p projPlusFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -51839,7 +51839,7 @@ type projPlusFloat64ConstFloat64Op struct {
 }
 
 func (p projPlusFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -51886,7 +51886,7 @@ type projPlusFloat64Float64Op struct {
 }
 
 func (p projPlusFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -51938,7 +51938,7 @@ type projMinusFloat64Float64ConstOp struct {
 }
 
 func (p projMinusFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -51986,7 +51986,7 @@ type projMinusFloat64ConstFloat64Op struct {
 }
 
 func (p projMinusFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -52033,7 +52033,7 @@ type projMinusFloat64Float64Op struct {
 }
 
 func (p projMinusFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -52085,7 +52085,7 @@ type projMultFloat64Float64ConstOp struct {
 }
 
 func (p projMultFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -52133,7 +52133,7 @@ type projMultFloat64ConstFloat64Op struct {
 }
 
 func (p projMultFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -52180,7 +52180,7 @@ type projMultFloat64Float64Op struct {
 }
 
 func (p projMultFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -52232,7 +52232,7 @@ type projDivFloat64Float64ConstOp struct {
 }
 
 func (p projDivFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -52280,7 +52280,7 @@ type projDivFloat64ConstFloat64Op struct {
 }
 
 func (p projDivFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -52327,7 +52327,7 @@ type projDivFloat64Float64Op struct {
 }
 
 func (p projDivFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
 }
 
 func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -52379,7 +52379,7 @@ type projEQFloat64Float64ConstOp struct {
 }
 
 func (p projEQFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -52477,7 +52477,7 @@ type projEQFloat64ConstFloat64Op struct {
 }
 
 func (p projEQFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -52574,7 +52574,7 @@ type projEQFloat64Float64Op struct {
 }
 
 func (p projEQFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -52676,7 +52676,7 @@ type projNEFloat64Float64ConstOp struct {
 }
 
 func (p projNEFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -52774,7 +52774,7 @@ type projNEFloat64ConstFloat64Op struct {
 }
 
 func (p projNEFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -52871,7 +52871,7 @@ type projNEFloat64Float64Op struct {
 }
 
 func (p projNEFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -52973,7 +52973,7 @@ type projLTFloat64Float64ConstOp struct {
 }
 
 func (p projLTFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -53071,7 +53071,7 @@ type projLTFloat64ConstFloat64Op struct {
 }
 
 func (p projLTFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -53168,7 +53168,7 @@ type projLTFloat64Float64Op struct {
 }
 
 func (p projLTFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -53270,7 +53270,7 @@ type projLEFloat64Float64ConstOp struct {
 }
 
 func (p projLEFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -53368,7 +53368,7 @@ type projLEFloat64ConstFloat64Op struct {
 }
 
 func (p projLEFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -53465,7 +53465,7 @@ type projLEFloat64Float64Op struct {
 }
 
 func (p projLEFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -53567,7 +53567,7 @@ type projGTFloat64Float64ConstOp struct {
 }
 
 func (p projGTFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -53665,7 +53665,7 @@ type projGTFloat64ConstFloat64Op struct {
 }
 
 func (p projGTFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -53762,7 +53762,7 @@ type projGTFloat64Float64Op struct {
 }
 
 func (p projGTFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
@@ -53864,7 +53864,7 @@ type projGEFloat64Float64ConstOp struct {
 }
 
 func (p projGEFloat64Float64ConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
@@ -53962,7 +53962,7 @@ type projGEFloat64ConstFloat64Op struct {
 }
 
 func (p projGEFloat64ConstFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
@@ -54059,7 +54059,7 @@ type projGEFloat64Float64Op struct {
 }
 
 func (p projGEFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {

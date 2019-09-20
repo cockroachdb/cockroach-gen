@@ -237,7 +237,7 @@ type projectInOpBool struct {
 var _ StaticMemoryOperator = &projectInOpBool{}
 
 func (p *projectInOpBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowBool(ct *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
@@ -471,7 +471,7 @@ type projectInOpBytes struct {
 var _ StaticMemoryOperator = &projectInOpBytes{}
 
 func (p *projectInOpBytes) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowBytes(ct *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
@@ -697,7 +697,7 @@ type projectInOpDecimal struct {
 var _ StaticMemoryOperator = &projectInOpDecimal{}
 
 func (p *projectInOpDecimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowDecimal(ct *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
@@ -923,7 +923,7 @@ type projectInOpInt16 struct {
 var _ StaticMemoryOperator = &projectInOpInt16{}
 
 func (p *projectInOpInt16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowInt16(ct *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
@@ -1160,7 +1160,7 @@ type projectInOpInt32 struct {
 var _ StaticMemoryOperator = &projectInOpInt32{}
 
 func (p *projectInOpInt32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowInt32(ct *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
@@ -1397,7 +1397,7 @@ type projectInOpInt64 struct {
 var _ StaticMemoryOperator = &projectInOpInt64{}
 
 func (p *projectInOpInt64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowInt64(ct *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
@@ -1634,7 +1634,7 @@ type projectInOpFloat64 struct {
 var _ StaticMemoryOperator = &projectInOpFloat64{}
 
 func (p *projectInOpFloat64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, coldata.BatchSize)
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
 }
 
 func fillDatumRowFloat64(ct *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {

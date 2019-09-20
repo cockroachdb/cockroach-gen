@@ -4249,7 +4249,7 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 				}
 
 				for {
-					if nResults >= coldata.BatchSize {
+					if nResults >= coldata.BatchSize() {
 						prober.prevBatch = batch
 						return nResults
 					}
@@ -4282,7 +4282,7 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 				}
 
 				for {
-					if nResults >= coldata.BatchSize {
+					if nResults >= coldata.BatchSize() {
 						prober.prevBatch = batch
 						return nResults
 					}
@@ -4313,7 +4313,7 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 			for i := uint16(0); i < batchSize; i++ {
 				currentID := prober.ht.headID[i]
 				for currentID != 0 {
-					if nResults >= coldata.BatchSize {
+					if nResults >= coldata.BatchSize() {
 						prober.prevBatch = batch
 						return nResults
 					}
@@ -4332,7 +4332,7 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 			for i := uint16(0); i < batchSize; i++ {
 				currentID := prober.ht.headID[i]
 				for currentID != 0 {
-					if nResults >= coldata.BatchSize {
+					if nResults >= coldata.BatchSize() {
 						prober.prevBatch = batch
 						return nResults
 					}
