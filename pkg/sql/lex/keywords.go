@@ -201,6 +201,7 @@ var KeywordsCategories = map[string]string{
 	"local":                     "U",
 	"localtime":                 "R",
 	"localtimestamp":            "R",
+	"locked":                    "U",
 	"lookup":                    "U",
 	"low":                       "U",
 	"match":                     "U",
@@ -220,6 +221,7 @@ var KeywordsCategories = map[string]string{
 	"not":                       "R",
 	"nothing":                   "R",
 	"notnull":                   "T",
+	"nowait":                    "U",
 	"no_index_join":             "U",
 	"null":                      "R",
 	"nullif":                    "C",
@@ -321,6 +323,7 @@ var KeywordsCategories = map[string]string{
 	"show":                      "U",
 	"similar":                   "T",
 	"simple":                    "U",
+	"skip":                      "U",
 	"smallint":                  "C",
 	"smallserial":               "U",
 	"snapshot":                  "U",
@@ -603,6 +606,7 @@ var KeywordNames = []string{
 	"local",
 	"localtime",
 	"localtimestamp",
+	"locked",
 	"lookup",
 	"low",
 	"match",
@@ -622,6 +626,7 @@ var KeywordNames = []string{
 	"not",
 	"nothing",
 	"notnull",
+	"nowait",
 	"no_index_join",
 	"null",
 	"nullif",
@@ -723,6 +728,7 @@ var KeywordNames = []string{
 	"show",
 	"similar",
 	"simple",
+	"skip",
 	"smallint",
 	"smallserial",
 	"snapshot",
@@ -1208,6 +1214,8 @@ func GetKeywordID(k string) int32 {
 		return LOCALTIME
 	case "localtimestamp":
 		return LOCALTIMESTAMP
+	case "locked":
+		return LOCKED
 	case "lookup":
 		return LOOKUP
 	case "low":
@@ -1246,6 +1254,8 @@ func GetKeywordID(k string) int32 {
 		return NOTHING
 	case "notnull":
 		return NOTNULL
+	case "nowait":
+		return NOWAIT
 	case "no_index_join":
 		return NO_INDEX_JOIN
 	case "null":
@@ -1448,6 +1458,8 @@ func GetKeywordID(k string) int32 {
 		return SIMILAR
 	case "simple":
 		return SIMPLE
+	case "skip":
+		return SKIP
 	case "smallint":
 		return SMALLINT
 	case "smallserial":
