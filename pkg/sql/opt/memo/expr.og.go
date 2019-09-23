@@ -1037,6 +1037,11 @@ type ScanPrivate struct {
 
 	// Flags modify how the table is scanned, such as which index is used to scan.
 	Flags ScanFlags
+
+	// PartitionConstrainedScan records whether or not we were able to use partitions
+	// to constrain the lookup spans further. This flag is used to record telemetry
+	// about how often this optimization is getting applied.
+	PartitionConstrainedScan bool
 }
 
 // VirtualScanExpr returns a result set containing every row in a virtual table.
@@ -19370,6 +19375,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
+	in.hasher.HashBool(val.PartitionConstrainedScan)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -19379,7 +19385,8 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
-				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) {
+				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
+				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
 				return existing
 			}
 		}
