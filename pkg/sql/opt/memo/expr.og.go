@@ -5822,12 +5822,12 @@ type WindowPrivate struct {
 	Ordering physical.OrderingChoice
 }
 
-// WithExpr executes Binding, making its results available to Input. Within Input,
-// Binding may be referenced by a WithScan expression containing the ID of this
-// With.
+// WithExpr executes Binding, making its results available to Main. Within Main, the
+// results of Binding may be referenced by a WithScan expression containing the
+// ID of this With.
 type WithExpr struct {
 	Binding RelExpr
-	Input   RelExpr
+	Main    RelExpr
 	WithPrivate
 
 	grp  exprGroup
@@ -5849,7 +5849,7 @@ func (e *WithExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Binding
 	case 1:
-		return e.Input
+		return e.Main
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -5870,7 +5870,7 @@ func (e *WithExpr) SetChild(nth int, child opt.Expr) {
 		e.Binding = child.(RelExpr)
 		return
 	case 1:
-		e.Input = child.(RelExpr)
+		e.Main = child.(RelExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -5955,9 +5955,9 @@ func (g *withGroup) bestProps() *bestProps {
 type WithPrivate struct {
 	ID opt.WithID
 
-	// OriginalExpr contains the original Subquery expression if it's a SELECT
-	// so that we can display it in the EXPLAIN plan.
-	OriginalExpr *tree.Subquery
+	// OriginalExpr contains the original CTE expression (so that we can display
+	// it in the EXPLAIN plan).
+	OriginalExpr tree.Statement
 
 	// Name is used to identify the with for debugging purposes.
 	Name string
@@ -15813,13 +15813,13 @@ func (m *Memo) MemoizeWindow(
 
 func (m *Memo) MemoizeWith(
 	binding RelExpr,
-	input RelExpr,
+	main RelExpr,
 	withPrivate *WithPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(withGroup{}))
 	grp := &withGroup{mem: m, first: WithExpr{
 		Binding:     binding,
-		Input:       input,
+		Main:        main,
 		WithPrivate: *withPrivate,
 	}}
 	e := &grp.first
@@ -20226,18 +20226,18 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.WithOp)
 	in.hasher.HashRelExpr(val.Binding)
-	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashRelExpr(val.Main)
 	in.hasher.HashWithID(val.ID)
-	in.hasher.HashPointer(unsafe.Pointer(val.OriginalExpr))
+	in.hasher.HashStatement(val.OriginalExpr)
 	in.hasher.HashString(val.Name)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*WithExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Binding, existing.Binding) &&
-				in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsRelExprEqual(val.Main, existing.Main) &&
 				in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
-				in.hasher.IsPointerEqual(unsafe.Pointer(val.OriginalExpr), unsafe.Pointer(existing.OriginalExpr)) &&
+				in.hasher.IsStatementEqual(val.OriginalExpr, existing.OriginalExpr) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) {
 				return existing
 			}

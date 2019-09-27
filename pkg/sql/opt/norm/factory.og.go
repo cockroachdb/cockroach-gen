@@ -7979,16 +7979,17 @@ func (_f *Factory) ConstructWindow(
 }
 
 // ConstructWith constructs an expression for the With operator.
-// With executes Binding, making its results available to Input. Within Input,
-// Binding may be referenced by a WithScan expression containing the ID of this
-// With.
+// With executes Binding, making its results available to Main. Within Main, the
+// results of Binding may be referenced by a WithScan expression containing the
+// ID of this With.
 func (_f *Factory) ConstructWith(
 	binding memo.RelExpr,
-	input memo.RelExpr,
+	main memo.RelExpr,
 	withPrivate *memo.WithPrivate,
 ) memo.RelExpr {
 	// [InlineWith]
 	{
+		input := main
 		if _f.funcs.CanInlineWith(binding, input, withPrivate) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.InlineWith) {
 				_expr := _f.funcs.InlineWith(binding, input, withPrivate).(memo.RelExpr)
@@ -8000,7 +8001,7 @@ func (_f *Factory) ConstructWith(
 		}
 	}
 
-	e := _f.mem.MemoizeWith(binding, input, withPrivate)
+	e := _f.mem.MemoizeWith(binding, main, withPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -14417,9 +14418,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 
 	case *memo.WithExpr:
 		binding := replace(t.Binding).(memo.RelExpr)
-		input := replace(t.Input).(memo.RelExpr)
-		if binding != t.Binding || input != t.Input {
-			return f.ConstructWith(binding, input, &t.WithPrivate)
+		main := replace(t.Main).(memo.RelExpr)
+		if binding != t.Binding || main != t.Main {
+			return f.ConstructWith(binding, main, &t.WithPrivate)
 		}
 		return t
 
@@ -15777,7 +15778,7 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.WithExpr:
 		return f.ConstructWith(
 			f.invokeReplace(t.Binding, replace).(memo.RelExpr),
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Main, replace).(memo.RelExpr),
 			&t.WithPrivate,
 		)
 

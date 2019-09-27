@@ -1035,9 +1035,9 @@ const (
 
 	WindowsItemPrivateOp
 
-	// With executes Binding, making its results available to Input. Within Input,
-	// Binding may be referenced by a WithScan expression containing the ID of this
-	// With.
+	// With executes Binding, making its results available to Main. Within Main, the
+	// results of Binding may be referenced by a WithScan expression containing the
+	// ID of this With.
 	WithOp
 
 	WithPrivateOp
