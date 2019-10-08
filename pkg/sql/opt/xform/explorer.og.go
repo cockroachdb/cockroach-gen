@@ -408,15 +408,17 @@ func (_e *explorer) exploreInnerJoin(
 							private := &_root.JoinPrivate
 							if _e.funcs.NoJoinHints(private) {
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.AssociateJoin) {
+									cols := _e.funcs.OutputCols2(innerRight, right)
+									newOn := _e.funcs.MapJoinOpEqualities(_e.funcs.ConcatFilters(on, innerOn), _e.funcs.OutputCols(innerLeft), cols)
 									_expr := &memo.InnerJoinExpr{
 										Left: innerLeft,
 										Right: _e.f.ConstructInnerJoin(
 											innerRight,
 											right,
-											_e.funcs.ExtractBoundConditions(on, _e.funcs.OutputCols2(innerRight, right)),
+											_e.funcs.SortFilters(_e.funcs.ExtractBoundConditions(newOn, cols)),
 											_e.funcs.EmptyJoinPrivate(),
 										),
-										On:          _e.funcs.SortFilters(_e.funcs.ConcatFilters(_e.funcs.ExtractUnboundConditions(on, _e.funcs.OutputCols2(innerRight, right)), innerOn)),
+										On:          _e.funcs.SortFilters(_e.funcs.ExtractUnboundConditions(newOn, cols)),
 										JoinPrivate: *_e.funcs.EmptyJoinPrivate(),
 									}
 									_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)

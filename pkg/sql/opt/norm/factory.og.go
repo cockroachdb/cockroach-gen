@@ -2200,6 +2200,31 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructInnerJoin(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		if !_f.funcs.HasOuterCols(left) {
@@ -2778,6 +2803,31 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructLeftJoin(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinRight]
 	{
 		if !_f.funcs.HasOuterCols(right) {
@@ -3208,6 +3258,31 @@ func (_f *Factory) ConstructRightJoin(
 								return _expr
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructRightJoin(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
 					}
 				}
 			}
@@ -4085,6 +4160,31 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructSemiJoin(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		if !_f.funcs.HasOuterCols(left) {
@@ -4560,6 +4660,31 @@ func (_f *Factory) ConstructAntiJoin(
 								return _expr
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructAntiJoin(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
 					}
 				}
 			}
@@ -5375,6 +5500,31 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructInnerJoinApply(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		if !_f.funcs.HasOuterCols(left) {
@@ -5983,6 +6133,31 @@ func (_f *Factory) ConstructLeftJoinApply(
 		}
 	}
 
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructLeftJoinApply(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinRight]
 	{
 		if !_f.funcs.HasOuterCols(right) {
@@ -6511,6 +6686,31 @@ func (_f *Factory) ConstructSemiJoinApply(
 		}
 	}
 
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructSemiJoinApply(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoJoinLeft]
 	{
 		if !_f.funcs.HasOuterCols(left) {
@@ -6953,6 +7153,31 @@ func (_f *Factory) ConstructAntiJoinApply(
 								return _expr
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [MapEqualityIntoJoinLeftAndRight]
+	{
+		if !_f.funcs.HasOuterCols(left) {
+			if !_f.funcs.HasOuterCols(right) {
+				leftCols := _f.funcs.OutputCols(left)
+				rightCols := _f.funcs.OutputCols(right)
+				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
+						_expr := _f.ConstructAntiJoinApply(
+							left,
+							right,
+							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
+						}
+						return _expr
 					}
 				}
 			}

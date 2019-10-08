@@ -97,6 +97,7 @@ const (
 	PushFilterIntoJoinLeftAndRight
 	MapFilterIntoJoinLeft
 	MapFilterIntoJoinRight
+	MapEqualityIntoJoinLeftAndRight
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
 	SimplifyLeftJoinWithoutFilters
