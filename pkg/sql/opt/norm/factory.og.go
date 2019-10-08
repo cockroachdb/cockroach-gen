@@ -1519,6 +1519,52 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PruneWithScanCols]
+	{
+		_withScan, _ := input.(*memo.WithScanExpr)
+		if _withScan != nil {
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			if _f.funcs.CanPruneCols(input, needed) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PruneWithScanCols) {
+					_expr := _f.ConstructProject(
+						_f.funcs.PruneCols(input, needed),
+						projections,
+						passthrough,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PruneWithScanCols, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [PruneWithCols]
+	{
+		_with, _ := input.(*memo.WithExpr)
+		if _with != nil {
+			binding := _with.Binding
+			input := _with.Main
+			private := &_with.WithPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneWithCols) {
+				_expr := _f.ConstructWith(
+					binding,
+					_f.ConstructProject(
+						input,
+						projections,
+						passthrough,
+					),
+					private,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneWithCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [HoistProjectSubquery]
 	{
 		for i := range projections {
