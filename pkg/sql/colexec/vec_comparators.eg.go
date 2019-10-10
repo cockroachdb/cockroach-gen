@@ -18,12 +18,25 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
-// Use execgen package to remove unused import warning.
-var _ interface{} = execgen.UNSAFEGET
+// vecComparator is a helper for the ordered synchronizer. It stores multiple
+// column vectors of a single type and facilitates comparing values between
+// them.
+type vecComparator interface {
+	// compare compares values from two vectors. vecIdx is the index of the vector
+	// and valIdx is the index of the value in that vector to compare. Returns -1,
+	// 0, or 1.
+	compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int
+
+	// set sets the value of the vector at dstVecIdx at index dstValIdx to the value
+	// at the vector at srcVecIdx at index srcValIdx.
+	set(srcVecIdx, dstVecIdx int, srcValIdx, dstValIdx uint16)
+
+	// setVec updates the vector at idx.
+	setVec(idx int, vec coldata.Vec)
+}
 
 type BoolVecComparator struct {
 	vecs  [][]bool
