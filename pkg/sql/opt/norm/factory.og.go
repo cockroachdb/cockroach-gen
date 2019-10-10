@@ -8286,6 +8286,23 @@ func (_f *Factory) ConstructWithScan(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructRecursiveCTE constructs an expression for the RecursiveCTE operator.
+// RecursiveCTE implements the logic of a recursive CTE:
+//  * the Initial query is evaluated; the results are emitted and also saved into
+//    a "working table".
+//  * so long as the working table is not empty:
+//    - the Recursive query (which refers to the working table using a specific
+//      WithID) is evaluated; the results are emitted and also saved into a new
+//      "working table" for the next iteration.
+func (_f *Factory) ConstructRecursiveCTE(
+	initial memo.RelExpr,
+	recursive memo.RelExpr,
+	recursiveCTEPrivate *memo.RecursiveCTEPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeRecursiveCTE(initial, recursive, recursiveCTEPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructFakeRel constructs an expression for the FakeRel operator.
 // FakeRel is a mock relational operator used for testing; its logical properties
 // are pre-determined and stored in the private. It can be used as the child of
@@ -14698,6 +14715,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.WithScanExpr:
 		return t
 
+	case *memo.RecursiveCTEExpr:
+		initial := replace(t.Initial).(memo.RelExpr)
+		recursive := replace(t.Recursive).(memo.RelExpr)
+		if initial != t.Initial || recursive != t.Recursive {
+			return f.ConstructRecursiveCTE(initial, recursive, &t.RecursiveCTEPrivate)
+		}
+		return t
+
 	case *memo.FakeRelExpr:
 		return t
 
@@ -16056,6 +16081,13 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.WithScanExpr:
 		return f.mem.MemoizeWithScan(&t.WithScanPrivate)
 
+	case *memo.RecursiveCTEExpr:
+		return f.ConstructRecursiveCTE(
+			f.invokeReplace(t.Initial, replace).(memo.RelExpr),
+			f.invokeReplace(t.Recursive, replace).(memo.RelExpr),
+			&t.RecursiveCTEPrivate,
+		)
+
 	case *memo.FakeRelExpr:
 		return f.mem.MemoizeFakeRel(&t.FakeRelPrivate)
 
@@ -17051,6 +17083,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.WithScanOp:
 		return f.ConstructWithScan(
 			args[0].(*memo.WithScanPrivate),
+		)
+	case opt.RecursiveCTEOp:
+		return f.ConstructRecursiveCTE(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.RecursiveCTEPrivate),
 		)
 	case opt.FakeRelOp:
 		return f.ConstructFakeRel(

@@ -6098,6 +6098,165 @@ type WithScanPrivate struct {
 	OutCols opt.ColList
 }
 
+// RecursiveCTEExpr implements the logic of a recursive CTE:
+//  * the Initial query is evaluated; the results are emitted and also saved into
+//    a "working table".
+//  * so long as the working table is not empty:
+//    - the Recursive query (which refers to the working table using a specific
+//      WithID) is evaluated; the results are emitted and also saved into a new
+//      "working table" for the next iteration.
+type RecursiveCTEExpr struct {
+	Initial   RelExpr
+	Recursive RelExpr
+	RecursiveCTEPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &RecursiveCTEExpr{}
+
+func (e *RecursiveCTEExpr) Op() opt.Operator {
+	return opt.RecursiveCTEOp
+}
+
+func (e *RecursiveCTEExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RecursiveCTEExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Initial
+	case 1:
+		return e.Recursive
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RecursiveCTEExpr) Private() interface{} {
+	return &e.RecursiveCTEPrivate
+}
+
+func (e *RecursiveCTEExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RecursiveCTEExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Initial = child.(RelExpr)
+		return
+	case 1:
+		e.Recursive = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RecursiveCTEExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *RecursiveCTEExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *RecursiveCTEExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *RecursiveCTEExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *RecursiveCTEExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *RecursiveCTEExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *RecursiveCTEExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *RecursiveCTEExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *RecursiveCTEExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *RecursiveCTEExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *RecursiveCTEExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type recursiveCTEGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first RecursiveCTEExpr
+	best  bestProps
+}
+
+var _ exprGroup = &recursiveCTEGroup{}
+
+func (g *recursiveCTEGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *recursiveCTEGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *recursiveCTEGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *recursiveCTEGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type RecursiveCTEPrivate struct {
+	// Name is used to identify the CTE being referenced for debugging purposes.
+	Name string
+
+	// WithID is the ID through which the Recursive expression refers to the
+	// current working table.
+	WithID opt.WithID
+
+	// InitialCols are the columns produced by the initial expression.
+	InitialCols opt.ColList
+
+	// RecursiveCols are the columns produced by the recursive expression, that
+	// map 1-1 to InitialCols.
+	RecursiveCols opt.ColList
+
+	// OutCols are the columns produced by the RecursiveCTE operator; they map
+	// 1-1 to InitialCols and to RecursiveCols. Similar to Union, we don't want
+	// to reuse column IDs from one side because the columns contain values from
+	// both sides.
+	//
+	// These columns are also used by the Recursive query to refer to the working
+	// table (see WithID).
+	OutCols opt.ColList
+}
+
 // FakeRelExpr is a mock relational operator used for testing; its logical properties
 // are pre-determined and stored in the private. It can be used as the child of
 // an operator for which we are calculating properties or statistics.
@@ -15851,6 +16010,28 @@ func (m *Memo) MemoizeWithScan(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeRecursiveCTE(
+	initial RelExpr,
+	recursive RelExpr,
+	recursiveCTEPrivate *RecursiveCTEPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(recursiveCTEGroup{}))
+	grp := &recursiveCTEGroup{mem: m, first: RecursiveCTEExpr{
+		Initial:             initial,
+		Recursive:           recursive,
+		RecursiveCTEPrivate: *recursiveCTEPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternRecursiveCTE(e)
+	if interned == e {
+		m.logPropsBuilder.buildRecursiveCTEProps(e, &grp.rel)
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeFakeRel(
 	fakeRelPrivate *FakeRelPrivate,
 ) RelExpr {
@@ -18575,6 +18756,20 @@ func (m *Memo) AddWithScanToGroup(e *WithScanExpr, grp RelExpr) *WithScanExpr {
 	return interned
 }
 
+func (m *Memo) AddRecursiveCTEToGroup(e *RecursiveCTEExpr, grp RelExpr) *RecursiveCTEExpr {
+	const size = int64(unsafe.Sizeof(RecursiveCTEExpr{}))
+	interned := m.interner.InternRecursiveCTE(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.checkExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
 	const size = int64(unsafe.Sizeof(FakeRelExpr{}))
 	interned := m.interner.InternFakeRel(e)
@@ -18887,6 +19082,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternWith(t)
 	case *WithScanExpr:
 		return in.InternWithScan(t)
+	case *RecursiveCTEExpr:
+		return in.InternRecursiveCTE(t)
 	case *FakeRelExpr:
 		return in.InternFakeRel(t)
 	case *SubqueryExpr:
@@ -20264,6 +20461,36 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.BindingProps), unsafe.Pointer(existing.BindingProps)) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsColListEqual(val.InCols, existing.InCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRecursiveCTE(val *RecursiveCTEExpr) *RecursiveCTEExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RecursiveCTEOp)
+	in.hasher.HashRelExpr(val.Initial)
+	in.hasher.HashRelExpr(val.Recursive)
+	in.hasher.HashString(val.Name)
+	in.hasher.HashWithID(val.WithID)
+	in.hasher.HashColList(val.InitialCols)
+	in.hasher.HashColList(val.RecursiveCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RecursiveCTEExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Initial, existing.Initial) &&
+				in.hasher.IsRelExprEqual(val.Recursive, existing.Recursive) &&
+				in.hasher.IsStringEqual(val.Name, existing.Name) &&
+				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
+				in.hasher.IsColListEqual(val.InitialCols, existing.InitialCols) &&
+				in.hasher.IsColListEqual(val.RecursiveCols, existing.RecursiveCols) &&
 				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
 				return existing
 			}
@@ -23082,6 +23309,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildWithProps(t, rel)
 	case *WithScanExpr:
 		b.buildWithScanProps(t, rel)
+	case *RecursiveCTEExpr:
+		b.buildRecursiveCTEProps(t, rel)
 	case *FakeRelExpr:
 		b.buildFakeRelProps(t, rel)
 	case *CreateTableExpr:
