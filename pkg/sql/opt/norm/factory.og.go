@@ -1565,6 +1565,46 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PruneUnionAllCols]
+	{
+		_unionAll, _ := input.(*memo.UnionAllExpr)
+		if _unionAll != nil {
+			left := _unionAll.Left
+			right := _unionAll.Right
+			colmap := &_unionAll.SetPrivate
+			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
+			neededLeft := _f.funcs.NeededColMapLeft(needed, colmap)
+			if _f.funcs.CanPruneCols(left, neededLeft) {
+				neededRight := _f.funcs.NeededColMapRight(needed, colmap)
+				if _f.funcs.CanPruneCols(right, neededRight) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PruneUnionAllCols) {
+						_expr := _f.ConstructProject(
+							_f.ConstructUnionAll(
+								_f.ConstructProject(
+									left,
+									memo.EmptyProjectionsExpr,
+									neededLeft,
+								),
+								_f.ConstructProject(
+									right,
+									memo.EmptyProjectionsExpr,
+									neededRight,
+								),
+								_f.funcs.PruneSetPrivate(needed, colmap),
+							),
+							projections,
+							passthrough,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PruneUnionAllCols, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistProjectSubquery]
 	{
 		for i := range projections {

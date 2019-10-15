@@ -158,6 +158,7 @@ const (
 	PruneMutationReturnCols
 	PruneWithScanCols
 	PruneWithCols
+	PruneUnionAllCols
 	RejectNullsLeftJoin
 	RejectNullsRightJoin
 	RejectNullsGroupBy
