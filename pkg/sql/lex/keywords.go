@@ -186,6 +186,7 @@ var KeywordsCategories = map[string]string{
 	"keys":                      "U",
 	"kv":                        "U",
 	"language":                  "U",
+	"last":                      "U",
 	"lateral":                   "R",
 	"lc_collate":                "U",
 	"lc_ctype":                  "U",
@@ -225,6 +226,7 @@ var KeywordsCategories = map[string]string{
 	"no_index_join":             "U",
 	"null":                      "R",
 	"nullif":                    "C",
+	"nulls":                     "U",
 	"numeric":                   "C",
 	"of":                        "U",
 	"off":                       "U",
@@ -591,6 +593,7 @@ var KeywordNames = []string{
 	"keys",
 	"kv",
 	"language",
+	"last",
 	"lateral",
 	"lc_collate",
 	"lc_ctype",
@@ -630,6 +633,7 @@ var KeywordNames = []string{
 	"no_index_join",
 	"null",
 	"nullif",
+	"nulls",
 	"numeric",
 	"of",
 	"off",
@@ -1184,6 +1188,8 @@ func GetKeywordID(k string) int32 {
 		return KV
 	case "language":
 		return LANGUAGE
+	case "last":
+		return LAST
 	case "lateral":
 		return LATERAL
 	case "lc_collate":
@@ -1262,6 +1268,8 @@ func GetKeywordID(k string) int32 {
 		return NULL
 	case "nullif":
 		return NULLIF
+	case "nulls":
+		return NULLS
 	case "numeric":
 		return NUMERIC
 	case "of":
