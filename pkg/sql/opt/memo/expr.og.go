@@ -11061,6 +11061,110 @@ func (e *AvgExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type BitAndAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &BitAndAggExpr{}
+
+func (e *BitAndAggExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *BitAndAggExpr) Op() opt.Operator {
+	return opt.BitAndAggOp
+}
+
+func (e *BitAndAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *BitAndAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BitAndAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *BitAndAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *BitAndAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BitAndAggExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type BitOrAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &BitOrAggExpr{}
+
+func (e *BitOrAggExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *BitOrAggExpr) Op() opt.Operator {
+	return opt.BitOrAggOp
+}
+
+func (e *BitOrAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *BitOrAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BitOrAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *BitOrAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *BitOrAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BitOrAggExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type BoolAndExpr struct {
 	Input opt.ScalarExpr
 
@@ -17354,6 +17458,40 @@ func (m *Memo) MemoizeAvg(
 	return interned
 }
 
+func (m *Memo) MemoizeBitAndAgg(
+	input opt.ScalarExpr,
+) *BitAndAggExpr {
+	const size = int64(unsafe.Sizeof(BitAndAggExpr{}))
+	e := &BitAndAggExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBitAndAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBitOrAgg(
+	input opt.ScalarExpr,
+) *BitOrAggExpr {
+	const size = int64(unsafe.Sizeof(BitOrAggExpr{}))
+	e := &BitOrAggExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternBitOrAgg(e)
+	if interned == e {
+		m.memEstimate += size
+		m.checkExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeBoolAnd(
 	input opt.ScalarExpr,
 ) *BoolAndExpr {
@@ -19248,6 +19386,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternArrayAgg(t)
 	case *AvgExpr:
 		return in.InternAvg(t)
+	case *BitAndAggExpr:
+		return in.InternBitAndAgg(t)
+	case *BitOrAggExpr:
+		return in.InternBitOrAgg(t)
 	case *BoolAndExpr:
 		return in.InternBoolAnd(t)
 	case *BoolOrExpr:
@@ -22131,6 +22273,42 @@ func (in *interner) InternAvg(val *AvgExpr) *AvgExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AvgExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBitAndAgg(val *BitAndAggExpr) *BitAndAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BitAndAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BitAndAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBitOrAgg(val *BitOrAggExpr) *BitOrAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BitOrAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BitOrAggExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}

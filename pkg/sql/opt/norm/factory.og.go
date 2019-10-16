@@ -13820,6 +13820,22 @@ func (_f *Factory) ConstructAvg(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructBitAndAgg constructs an expression for the BitAndAgg operator.
+func (_f *Factory) ConstructBitAndAgg(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeBitAndAgg(input)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructBitOrAgg constructs an expression for the BitOrAgg operator.
+func (_f *Factory) ConstructBitOrAgg(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeBitOrAgg(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructBoolAnd constructs an expression for the BoolAnd operator.
 func (_f *Factory) ConstructBoolAnd(
 	input opt.ScalarExpr,
@@ -15325,6 +15341,20 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.BitAndAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructBitAndAgg(input)
+		}
+		return t
+
+	case *memo.BitOrAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructBitOrAgg(input)
+		}
+		return t
+
 	case *memo.BoolAndExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -16545,6 +16575,16 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.BitAndAggExpr:
+		return f.ConstructBitAndAgg(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.BitOrAggExpr:
+		return f.ConstructBitOrAgg(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.BoolAndExpr:
 		return f.ConstructBoolAnd(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -17483,6 +17523,14 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.AvgOp:
 		return f.ConstructAvg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.BitAndAggOp:
+		return f.ConstructBitAndAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.BitOrAggOp:
+		return f.ConstructBitOrAgg(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.BoolAndOp:
