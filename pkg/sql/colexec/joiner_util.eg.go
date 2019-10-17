@@ -49,6 +49,7 @@ func (o *filterFeedOperator) Next(context.Context) coldata.Batch {
 }
 
 func (o *filterFeedOperator) reset() {
+	o.batch.ResetInternalBatch()
 	o.nexted = false
 }
 
