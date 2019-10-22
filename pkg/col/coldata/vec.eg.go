@@ -185,7 +185,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -208,7 +207,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -232,7 +230,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -255,7 +252,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -286,7 +282,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -309,7 +304,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol.Set(int(selIdx), v)
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -333,7 +327,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -356,7 +349,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol.Set(int(selIdx), v)
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -387,7 +379,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -410,7 +401,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)].Set(&v)
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -434,7 +424,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -457,7 +446,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)].Set(&v)
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -494,7 +482,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -517,7 +504,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -541,7 +527,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -564,7 +549,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -595,7 +579,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -618,7 +601,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -642,7 +624,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -665,7 +646,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -696,7 +676,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -719,7 +698,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -743,7 +721,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -766,7 +743,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -797,7 +773,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		if args.Sel64 != nil {
 			sel := args.Sel64
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -820,7 +795,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -844,7 +818,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		} else if args.Sel != nil {
 			sel := args.Sel
 			if args.SelOnDest {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
@@ -867,7 +840,6 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 					toCol[int(selIdx)] = v
 				}
 			} else {
-
 				if args.Src.MaybeHasNulls() {
 					nulls := args.Src.Nulls()
 					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
