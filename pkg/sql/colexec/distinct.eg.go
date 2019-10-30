@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -133,6 +134,12 @@ func newSingleOrderedDistinct(
 			sortedDistinctCol: distinctColIdx,
 			outputCol:         outputCol,
 		}, nil
+	case coltypes.Timestamp:
+		return &sortedDistinctTimestampOp{
+			OneInputNode:      NewOneInputNode(input),
+			sortedDistinctCol: distinctColIdx,
+			outputCol:         outputCol,
+		}, nil
 	default:
 		return nil, errors.Errorf("unsupported distinct type %s", t)
 	}
@@ -172,6 +179,8 @@ func newPartitioner(t coltypes.T) (partitioner, error) {
 		return partitionerInt64{}, nil
 	case coltypes.Float64:
 		return partitionerFloat64{}, nil
+	case coltypes.Timestamp:
+		return partitionerTimestamp{}, nil
 	default:
 		return nil, errors.Errorf("unsupported partition type %s", t)
 	}
@@ -2657,6 +2666,349 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n ui
 					}
 				}
 
+				unique = cmpResult != 0
+			}
+
+			outputCol[outputIdx] = outputCol[outputIdx] || unique
+			lastVal = v
+		}
+	}
+}
+
+// sortedDistinctTimestampOp runs a distinct on the column in sortedDistinctCol,
+// writing true to the resultant bool column for every value that differs from
+// the previous one.
+// TODO(solon): Update this name to remove "sorted". The input values are not
+// necessarily in sorted order.
+type sortedDistinctTimestampOp struct {
+	OneInputNode
+
+	// sortedDistinctCol is the index of the column to distinct upon.
+	sortedDistinctCol int
+
+	// outputCol is the boolean output column. It is shared by all of the
+	// other distinct operators in a distinct operator set.
+	outputCol []bool
+
+	// Set to true at runtime when we've seen the first row. Distinct always
+	// outputs the first row that it sees.
+	foundFirstRow bool
+
+	// lastVal is the last value seen by the operator, so that the distincting
+	// still works across batch boundaries.
+	lastVal     time.Time
+	lastValNull bool
+}
+
+var _ resettableOperator = &sortedDistinctTimestampOp{}
+
+func (p *sortedDistinctTimestampOp) Init() {
+	p.input.Init()
+}
+
+func (p *sortedDistinctTimestampOp) reset() {
+	p.foundFirstRow = false
+	p.lastValNull = false
+	if resetter, ok := p.input.(resetter); ok {
+		resetter.reset()
+	}
+}
+
+func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	if batch.Length() == 0 {
+		return batch
+	}
+	outputCol := p.outputCol
+	vec := batch.ColVec(p.sortedDistinctCol)
+	var nulls *coldata.Nulls
+	if vec.MaybeHasNulls() {
+		nulls = vec.Nulls()
+	}
+	col := vec.Timestamp()
+
+	// We always output the first row.
+	lastVal := p.lastVal
+	lastValNull := p.lastValNull
+	sel := batch.Selection()
+	firstIdx := uint16(0)
+	if sel != nil {
+		firstIdx = sel[0]
+	}
+	if !p.foundFirstRow {
+		outputCol[firstIdx] = true
+		p.foundFirstRow = true
+	} else if nulls == nil && lastValNull {
+		// The last value of the previous batch was null, so the first value of this
+		// non-null batch is distinct.
+		outputCol[firstIdx] = true
+		lastValNull = false
+	}
+
+	n := batch.Length()
+	if sel != nil {
+		// Bounds check elimination.
+		sel = sel[:n]
+		if nulls != nil {
+			for _, checkIdx := range sel {
+				outputIdx := checkIdx
+
+				null := nulls.NullAt(uint16(checkIdx))
+				v := col[int(checkIdx)]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[outputIdx] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+
+					{
+						var cmpResult int
+
+						if v.Before(lastVal) {
+							cmpResult = -1
+						} else if lastVal.Before(v) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						unique = cmpResult != 0
+					}
+
+					outputCol[outputIdx] = outputCol[outputIdx] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for _, checkIdx := range sel {
+				outputIdx := checkIdx
+
+				v := col[int(checkIdx)]
+				var unique bool
+
+				{
+					var cmpResult int
+
+					if v.Before(lastVal) {
+						cmpResult = -1
+					} else if lastVal.Before(v) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					unique = cmpResult != 0
+				}
+
+				outputCol[outputIdx] = outputCol[outputIdx] || unique
+				lastVal = v
+			}
+		}
+	} else {
+		// Bounds check elimination.
+		col = col[0:int(n)]
+		outputCol = outputCol[:n]
+		_ = outputCol[len(col)-1]
+		if nulls != nil {
+			for checkIdx := range col {
+				outputIdx := checkIdx
+
+				null := nulls.NullAt(uint16(checkIdx))
+				v := col[int(checkIdx)]
+				if null != lastValNull {
+					// Either the current value is null and the previous was not or vice-versa.
+					outputCol[outputIdx] = true
+				} else if !null {
+					// Neither value is null, so we must compare.
+					var unique bool
+
+					{
+						var cmpResult int
+
+						if v.Before(lastVal) {
+							cmpResult = -1
+						} else if lastVal.Before(v) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						unique = cmpResult != 0
+					}
+
+					outputCol[outputIdx] = outputCol[outputIdx] || unique
+				}
+				lastVal = v
+				lastValNull = null
+			}
+		} else {
+			for checkIdx := range col {
+				outputIdx := checkIdx
+
+				v := col[int(checkIdx)]
+				var unique bool
+
+				{
+					var cmpResult int
+
+					if v.Before(lastVal) {
+						cmpResult = -1
+					} else if lastVal.Before(v) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					unique = cmpResult != 0
+				}
+
+				outputCol[outputIdx] = outputCol[outputIdx] || unique
+				lastVal = v
+			}
+		}
+	}
+
+	p.lastVal = lastVal
+	p.lastValNull = lastValNull
+
+	return batch
+}
+
+// partitionerTimestamp partitions an arbitrary-length colVec by running a distinct
+// operation over it. It writes the same format to outputCol that sorted
+// distinct does: true for every row that differs from the previous row in the
+// input column.
+type partitionerTimestamp struct{}
+
+func (p partitionerTimestamp) partitionWithOrder(
+	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+) {
+	var lastVal time.Time
+	var lastValNull bool
+	var nulls *coldata.Nulls
+	if colVec.MaybeHasNulls() {
+		nulls = colVec.Nulls()
+	}
+
+	col := colVec.Timestamp()
+	col = col[0:int(n)]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for outputIdx, checkIdx := range order {
+
+			null := nulls.NullAt(uint16(checkIdx))
+			v := col[int(checkIdx)]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[outputIdx] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+
+				{
+					var cmpResult int
+
+					if v.Before(lastVal) {
+						cmpResult = -1
+					} else if lastVal.Before(v) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					unique = cmpResult != 0
+				}
+
+				outputCol[outputIdx] = outputCol[outputIdx] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+
+			v := col[int(checkIdx)]
+			var unique bool
+
+			{
+				var cmpResult int
+
+				if v.Before(lastVal) {
+					cmpResult = -1
+				} else if lastVal.Before(v) {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+				unique = cmpResult != 0
+			}
+
+			outputCol[outputIdx] = outputCol[outputIdx] || unique
+			lastVal = v
+		}
+	}
+}
+
+func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+	var (
+		lastVal     time.Time
+		lastValNull bool
+		nulls       *coldata.Nulls
+	)
+	if colVec.MaybeHasNulls() {
+		nulls = colVec.Nulls()
+	}
+
+	col := colVec.Timestamp()
+	col = col[0:int(n)]
+	outputCol = outputCol[:n]
+	outputCol[0] = true
+	if nulls != nil {
+		for checkIdx := range col {
+			outputIdx := checkIdx
+
+			null := nulls.NullAt(uint16(checkIdx))
+			v := col[int(checkIdx)]
+			if null != lastValNull {
+				// Either the current value is null and the previous was not or vice-versa.
+				outputCol[outputIdx] = true
+			} else if !null {
+				// Neither value is null, so we must compare.
+				var unique bool
+
+				{
+					var cmpResult int
+
+					if v.Before(lastVal) {
+						cmpResult = -1
+					} else if lastVal.Before(v) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					unique = cmpResult != 0
+				}
+
+				outputCol[outputIdx] = outputCol[outputIdx] || unique
+			}
+			lastVal = v
+			lastValNull = null
+		}
+	} else {
+		for checkIdx := range col {
+			outputIdx := checkIdx
+
+			v := col[int(checkIdx)]
+			var unique bool
+
+			{
+				var cmpResult int
+
+				if v.Before(lastVal) {
+					cmpResult = -1
+				} else if lastVal.Before(v) {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
 				unique = cmpResult != 0
 			}
 

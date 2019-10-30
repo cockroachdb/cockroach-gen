@@ -11,6 +11,7 @@ package coldata
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
@@ -148,6 +149,24 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Float64:
 		fromCol := args.Src.Float64()
 		toCol := m.Float64()
+		if args.Sel == nil {
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			// TODO(asubiotto): We could be more efficient for fixed width types by
+			// preallocating a destination slice (not so for variable length types).
+			// Improve this.
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
+			}
+		}
+		m.nulls.set(args)
+		m.col = toCol
+	case coltypes.Timestamp:
+		fromCol := args.Src.Timestamp()
+		toCol := m.Timestamp()
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
@@ -864,6 +883,103 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		// No Sel or Sel64.
 		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		m.nulls.set(args.SliceArgs)
+	case coltypes.Timestamp:
+		fromCol := args.Src.Timestamp()
+		toCol := m.Timestamp()
+		if args.Sel64 != nil {
+			sel := args.Sel64
+			if args.SelOnDest {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
+						} else {
+							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
+							toCol[int(selIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[int(selIdx)] = v
+				}
+			} else {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+						} else {
+							v := fromCol[int(selIdx)]
+							toCol[i+int(args.DestIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[i+int(args.DestIdx)] = v
+				}
+			}
+			return
+		} else if args.Sel != nil {
+			sel := args.Sel
+			if args.SelOnDest {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
+						} else {
+							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
+							toCol[int(selIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[int(selIdx)] = v
+				}
+			} else {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+						} else {
+							v := fromCol[int(selIdx)]
+							toCol[i+int(args.DestIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[i+int(args.DestIdx)] = v
+				}
+			}
+			return
+		}
+		// No Sel or Sel64.
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
+		m.nulls.set(args.SliceArgs)
 	default:
 		panic(fmt.Sprintf("unhandled type %s", args.ColType))
 	}
@@ -920,6 +1036,13 @@ func (m *memColumn) Slice(colType coltypes.T, start uint64, end uint64) Vec {
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
+	case coltypes.Timestamp:
+		col := m.Timestamp()
+		return &memColumn{
+			t:     colType,
+			col:   col[int(start):int(end)],
+			nulls: m.nulls.Slice(start, end),
+		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
@@ -958,6 +1081,10 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType coltypes.T) string {
 		col := m.Float64()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
+	case coltypes.Timestamp:
+		col := m.Timestamp()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
@@ -993,6 +1120,10 @@ func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 	case coltypes.Float64:
 		target := v.Float64()
 		newVal := elem.(float64)
+		target[int(rowIdx)] = newVal
+	case coltypes.Timestamp:
+		target := v.Timestamp()
+		newVal := elem.(time.Time)
 		target[int(rowIdx)] = newVal
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))

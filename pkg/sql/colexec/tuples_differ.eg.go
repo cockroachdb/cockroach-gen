@@ -199,6 +199,28 @@ func tuplesDiffer(
 
 		*differ = *differ || unique
 		return nil
+	case coltypes.Timestamp:
+		aCol := aColVec.Timestamp()
+		bCol := bColVec.Timestamp()
+		var unique bool
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+
+		{
+			var cmpResult int
+
+			if arg1.Before(arg2) {
+				cmpResult = -1
+			} else if arg2.Before(arg1) {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+			unique = cmpResult != 0
+		}
+
+		*differ = *differ || unique
+		return nil
 	default:
 		return errors.Errorf("unsupported tuplesDiffer type %s", t)
 	}

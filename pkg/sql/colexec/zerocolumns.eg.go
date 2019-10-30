@@ -10,6 +10,8 @@
 package colexec
 
 import (
+	"time"
+
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 )
@@ -27,3 +29,5 @@ var zeroInt32Column = make([]int32, coldata.BatchSize())
 var zeroInt64Column = make([]int64, coldata.BatchSize())
 
 var zeroFloat64Column = make([]float64, coldata.BatchSize())
+
+var zeroTimestampColumn = make([]time.Time, coldata.BatchSize())

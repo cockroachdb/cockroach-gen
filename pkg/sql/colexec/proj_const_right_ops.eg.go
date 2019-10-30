@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -29906,6 +29907,744 @@ func (p projGEFloat64Float64ConstOp) Init() {
 	p.input.Init()
 }
 
+type projEQTimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projEQTimestampTimestampConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func (p projEQTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult == 0
+					}
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult == 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult == 0
+				}
+
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult == 0
+				}
+
+			}
+		}
+	}
+	return batch
+}
+
+func (p projEQTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projNETimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projNETimestampTimestampConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func (p projNETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult != 0
+					}
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult != 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult != 0
+				}
+
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult != 0
+				}
+
+			}
+		}
+	}
+	return batch
+}
+
+func (p projNETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projLTTimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projLTTimestampTimestampConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func (p projLTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult < 0
+					}
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult < 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult < 0
+				}
+
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult < 0
+				}
+
+			}
+		}
+	}
+	return batch
+}
+
+func (p projLTTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projLETimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projLETimestampTimestampConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func (p projLETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult <= 0
+					}
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult <= 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult <= 0
+				}
+
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult <= 0
+				}
+
+			}
+		}
+	}
+	return batch
+}
+
+func (p projLETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projGTTimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projGTTimestampTimestampConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func (p projGTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult > 0
+					}
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult > 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult > 0
+				}
+
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult > 0
+				}
+
+			}
+		}
+	}
+	return batch
+}
+
+func (p projGTTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projGETimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projGETimestampTimestampConstOp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func (p projGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if p.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if n == 0 {
+		return batch
+	}
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult >= 0
+					}
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						projCol[i] = cmpResult >= 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult >= 0
+				}
+
+			}
+		} else {
+			col = col[0:int(n)]
+			colLen := len(col)
+			_ = projCol[colLen-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				{
+					var cmpResult int
+
+					if arg.Before(p.constArg) {
+						cmpResult = -1
+					} else if p.constArg.Before(arg) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					projCol[i] = cmpResult >= 0
+				}
+
+			}
+		}
+	}
+	return batch
+}
+
+func (p projGETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
 // GetProjectionRConstOperator returns the appropriate constant
 // projection operator for the given left and right column types and operation.
 func GetProjectionRConstOperator(
@@ -31507,6 +32246,56 @@ func GetProjectionRConstOperator(
 					return &projGEFloat64Float64ConstOp{
 						projConstOpBase: projConstOpBase,
 						constArg:        c.(float64),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		default:
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
+		}
+	case coltypes.Timestamp:
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		case coltypes.Timestamp:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				case tree.EQ:
+					return &projEQTimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
+				case tree.NE:
+					return &projNETimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
+				case tree.LT:
+					return &projLTTimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
+				case tree.LE:
+					return &projLETimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
+				case tree.GT:
+					return &projGTTimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
+				case tree.GE:
+					return &projGETimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
 					}, nil
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)

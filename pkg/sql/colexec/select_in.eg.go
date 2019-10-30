@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -125,6 +126,18 @@ func GetInProjectionOperator(
 			return nil, err
 		}
 		return obj, nil
+	case coltypes.Timestamp:
+		obj := &projectInOpTimestamp{
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			outputIdx:    resultIdx,
+			negate:       negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
 	default:
 		return nil, errors.Errorf("unhandled type: %s", t)
 	}
@@ -208,6 +221,17 @@ func GetInOperator(
 			negate:       negate,
 		}
 		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(ct, datumTuple)
+		if err != nil {
+			return nil, err
+		}
+		return obj, nil
+	case coltypes.Timestamp:
+		obj := &selectInOpTimestamp{
+			OneInputNode: NewOneInputNode(input),
+			colIdx:       colIdx,
+			negate:       negate,
+		}
+		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(ct, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -1848,6 +1872,239 @@ func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				v := col[i]
 				cmpRes := cmpInFloat64(v, pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		}
+	}
+	return batch
+}
+
+type selectInOpTimestamp struct {
+	OneInputNode
+	colIdx    int
+	filterRow []time.Time
+	hasNulls  bool
+	negate    bool
+}
+
+type projectInOpTimestamp struct {
+	OneInputNode
+	colIdx    int
+	outputIdx int
+	filterRow []time.Time
+	hasNulls  bool
+	negate    bool
+}
+
+var _ StaticMemoryOperator = &projectInOpTimestamp{}
+
+func (p *projectInOpTimestamp) EstimateStaticMemoryUsage() int {
+	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
+}
+
+func fillDatumRowTimestamp(ct *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
+	conv := typeconv.GetDatumToPhysicalFn(ct)
+	var result []time.Time
+	hasNulls := false
+	for _, d := range datumTuple.D {
+		if d == tree.DNull {
+			hasNulls = true
+		} else {
+			convRaw, err := conv(d)
+			if err != nil {
+				return nil, false, err
+			}
+			converted := convRaw.(time.Time)
+			result = append(result, converted)
+		}
+	}
+	return result, hasNulls, nil
+}
+
+func cmpInTimestamp(target time.Time, filterRow []time.Time, hasNulls bool) comparisonResult {
+	for i := range filterRow {
+		var cmp bool
+
+		{
+			var cmpResult int
+
+			if target.Before(filterRow[i]) {
+				cmpResult = -1
+			} else if filterRow[i].Before(target) {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+			cmp = cmpResult == 0
+		}
+
+		if cmp {
+			return siTrue
+		}
+	}
+	if hasNulls {
+		return siNull
+	} else {
+		return siFalse
+	}
+}
+
+func (si *selectInOpTimestamp) Init() {
+	si.input.Init()
+}
+
+func (pi *projectInOpTimestamp) Init() {
+	pi.input.Init()
+}
+
+func (si *selectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := si.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(si.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+
+		compVal := siTrue
+		if si.negate {
+			compVal = siFalse
+		}
+
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					v := col[int(i)]
+					if !nulls.NullAt(uint16(i)) && cmpInTimestamp(v, si.filterRow, si.hasNulls) == compVal {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					v := col[i]
+					if !nulls.NullAt(uint16(i)) && cmpInTimestamp(v, si.filterRow, si.hasNulls) == compVal {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					v := col[int(i)]
+					if cmpInTimestamp(v, si.filterRow, si.hasNulls) == compVal {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					v := col[i]
+					if cmpInTimestamp(v, si.filterRow, si.hasNulls) == compVal {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (pi *projectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
+	batch := pi.input.Next(ctx)
+	if pi.outputIdx == batch.Width() {
+		batch.AppendCol(coltypes.Bool)
+	}
+	if batch.Length() == 0 {
+		return batch
+	}
+
+	vec := batch.ColVec(pi.colIdx)
+	col := vec.Timestamp()
+
+	projVec := batch.ColVec(pi.outputIdx)
+	projCol := projVec.Bool()
+	projNulls := projVec.Nulls()
+
+	n := batch.Length()
+
+	cmpVal := siTrue
+	if pi.negate {
+		cmpVal = siFalse
+	}
+
+	if vec.MaybeHasNulls() {
+		nulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					v := col[int(i)]
+					cmpRes := cmpInTimestamp(v, pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			for i := range col {
+				if nulls.NullAt(uint16(i)) {
+					projNulls.SetNull(uint16(i))
+				} else {
+					v := col[i]
+					cmpRes := cmpInTimestamp(v, pi.filterRow, pi.hasNulls)
+					if cmpRes == siNull {
+						projNulls.SetNull(uint16(i))
+					} else {
+						projCol[i] = cmpRes == cmpVal
+					}
+				}
+			}
+		}
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				v := col[int(i)]
+				cmpRes := cmpInTimestamp(v, pi.filterRow, pi.hasNulls)
+				if cmpRes == siNull {
+					projNulls.SetNull(uint16(i))
+				} else {
+					projCol[i] = cmpRes == cmpVal
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			for i := range col {
+				v := col[i]
+				cmpRes := cmpInTimestamp(v, pi.filterRow, pi.hasNulls)
 				if cmpRes == siNull {
 					projNulls.SetNull(uint16(i))
 				} else {

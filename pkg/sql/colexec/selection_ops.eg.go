@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -50976,6 +50977,1710 @@ func (p *selGEFloat64Float64Op) Init() {
 	p.input.Init()
 }
 
+type selEQTimestampTimestampConstOp struct {
+	selConstOpBase
+	constArg time.Time
+}
+
+func (p *selEQTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selEQTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQTimestampTimestampOp struct {
+	selOpBase
+}
+
+func (p *selEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Timestamp()
+		col2 := vec2.Timestamp()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selEQTimestampTimestampOp) Init() {
+	p.input.Init()
+}
+
+type selNETimestampTimestampConstOp struct {
+	selConstOpBase
+	constArg time.Time
+}
+
+func (p *selNETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selNETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type selNETimestampTimestampOp struct {
+	selOpBase
+}
+
+func (p *selNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Timestamp()
+		col2 := vec2.Timestamp()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selNETimestampTimestampOp) Init() {
+	p.input.Init()
+}
+
+type selLTTimestampTimestampConstOp struct {
+	selConstOpBase
+	constArg time.Time
+}
+
+func (p *selLTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLTTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTTimestampTimestampOp struct {
+	selOpBase
+}
+
+func (p *selLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Timestamp()
+		col2 := vec2.Timestamp()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLTTimestampTimestampOp) Init() {
+	p.input.Init()
+}
+
+type selLETimestampTimestampConstOp struct {
+	selConstOpBase
+	constArg time.Time
+}
+
+func (p *selLETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type selLETimestampTimestampOp struct {
+	selOpBase
+}
+
+func (p *selLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Timestamp()
+		col2 := vec2.Timestamp()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLETimestampTimestampOp) Init() {
+	p.input.Init()
+}
+
+type selGTTimestampTimestampConstOp struct {
+	selConstOpBase
+	constArg time.Time
+}
+
+func (p *selGTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGTTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTTimestampTimestampOp struct {
+	selOpBase
+}
+
+func (p *selGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Timestamp()
+		col2 := vec2.Timestamp()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGTTimestampTimestampOp) Init() {
+	p.input.Init()
+}
+
+type selGETimestampTimestampConstOp struct {
+	selConstOpBase
+	constArg time.Time
+}
+
+func (p *selGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Timestamp()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+
+						if arg.Before(p.constArg) {
+							cmpResult = -1
+						} else if p.constArg.Before(arg) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type selGETimestampTimestampOp struct {
+	selOpBase
+}
+
+func (p *selGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Timestamp()
+		col2 := vec2.Timestamp()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+
+						if arg1.Before(arg2) {
+							cmpResult = -1
+						} else if arg2.Before(arg1) {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGETimestampTimestampOp) Init() {
+	p.input.Init()
+}
+
 // GetSelectionConstOperator returns the appropriate constant selection operator
 // for the given left and right column types and comparison.
 func GetSelectionConstOperator(
@@ -51483,6 +53188,28 @@ func GetSelectionConstOperator(
 				return &selGTFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
 			case tree.GE:
 				return &selGEFloat64Float64ConstOp{selConstOpBase: selConstOpBase, constArg: c.(float64)}, nil
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+		default:
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
+		}
+	case coltypes.Timestamp:
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		case coltypes.Timestamp:
+			switch cmpOp {
+			case tree.EQ:
+				return &selEQTimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
+			case tree.NE:
+				return &selNETimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
+			case tree.LT:
+				return &selLTTimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
+			case tree.LE:
+				return &selLETimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
+			case tree.GT:
+				return &selGTTimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
+			case tree.GE:
+				return &selGETimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
@@ -51998,6 +53725,28 @@ func GetSelectionOperator(
 				return &selGTFloat64Float64Op{selOpBase: selOpBase}, nil
 			case tree.GE:
 				return &selGEFloat64Float64Op{selOpBase: selOpBase}, nil
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+		default:
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
+		}
+	case coltypes.Timestamp:
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		case coltypes.Timestamp:
+			switch cmpOp {
+			case tree.EQ:
+				return &selEQTimestampTimestampOp{selOpBase: selOpBase}, nil
+			case tree.NE:
+				return &selNETimestampTimestampOp{selOpBase: selOpBase}, nil
+			case tree.LT:
+				return &selLTTimestampTimestampOp{selOpBase: selOpBase}, nil
+			case tree.LE:
+				return &selLETimestampTimestampOp{selOpBase: selOpBase}, nil
+			case tree.GT:
+				return &selGTTimestampTimestampOp{selOpBase: selOpBase}, nil
+			case tree.GE:
+				return &selGETimestampTimestampOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}

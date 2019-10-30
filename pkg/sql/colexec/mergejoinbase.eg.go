@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -300,6 +301,41 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 					}
 				}
 
+				match = cmpResult == 0
+			}
+
+			if !match {
+				return true
+			}
+		case coltypes.Timestamp:
+			// We perform this null check on every equality column of the last
+			// buffered tuple regardless of the join type since it is done only once
+			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+			// right side being an input) this check will always return false since
+			// nulls couldn't be buffered up though.
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+				return true
+			}
+			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Timestamp()
+			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			var curVal time.Time
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+				return true
+			}
+			col := batch.ColVec(int(colIdx)).Timestamp()
+			curVal = col[int(tupleToLookAtIdx)]
+			var match bool
+
+			{
+				var cmpResult int
+
+				if prevVal.Before(curVal) {
+					cmpResult = -1
+				} else if curVal.Before(prevVal) {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
 				match = cmpResult == 0
 			}
 

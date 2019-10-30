@@ -10,6 +10,8 @@
 package colexec
 
 import (
+	"time"
+
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
@@ -33,6 +35,8 @@ func newAnyNotNullAgg(t coltypes.T) (aggregateFunc, error) {
 		return &anyNotNullInt64Agg{}, nil
 	case coltypes.Float64:
 		return &anyNotNullFloat64Agg{}, nil
+	case coltypes.Timestamp:
+		return &anyNotNullTimestampAgg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported any not null agg type %s", t)
 	}
@@ -1319,5 +1323,188 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 }
 
 func (a *anyNotNullFloat64Agg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
+// anyNotNullTimestampAgg implements the ANY_NOT_NULL aggregate, returning the
+// first non-null value in the input column.
+type anyNotNullTimestampAgg struct {
+	done                        bool
+	groups                      []bool
+	vec                         []time.Time
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
+}
+
+func (a *anyNotNullTimestampAgg) Init(groups []bool, vec coldata.Vec) {
+	a.groups = groups
+	a.vec = vec.Timestamp()
+	a.nulls = vec.Nulls()
+	a.Reset()
+}
+
+func (a *anyNotNullTimestampAgg) Reset() {
+	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroTimestampColumn) {
+	}
+	a.curIdx = -1
+	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
+}
+
+func (a *anyNotNullTimestampAgg) CurrentOutputIndex() int {
+	return a.curIdx
+}
+
+func (a *anyNotNullTimestampAgg) SetOutputIndex(idx int) {
+	if a.curIdx != -1 {
+		a.curIdx = idx
+		vecLen := len(a.vec)
+		target := a.vec[idx+1 : vecLen]
+		for n := 0; n < len(target); n += copy(target[n:], zeroTimestampColumn) {
+		}
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+	}
+}
+
+func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	if a.done {
+		return
+	}
+	inputLen := b.Length()
+	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
+		a.curIdx++
+		a.done = true
+		return
+	}
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Timestamp(), vec.Nulls()
+
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[0:int(inputLen)]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	} else {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[0:int(inputLen)]
+			for i := range col {
+
+				if a.groups[i] {
+					// If this is a new group, check if any non-nulls have been found for the
+					// current group. The `a.curIdx` check is necessary because for the first
+					// group in the result set there is no "current group."
+					if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+						a.nulls.SetNull(uint16(a.curIdx))
+					}
+					a.curIdx++
+					a.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = false
+				if !a.foundNonNullForCurrentGroup && !isNull {
+					// If we haven't seen any non-nulls for the current group yet, and the
+					// current value is non-null, then we can pick the current value to be the
+					// output.
+					// Explicit template language is used here because the type receiver differs
+					// from the rest of the template file.
+					// TODO(asubiotto): Figure out a way to alias this.
+					v := col[int(i)]
+					a.vec[a.curIdx] = v
+					a.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	}
+}
+
+func (a *anyNotNullTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }

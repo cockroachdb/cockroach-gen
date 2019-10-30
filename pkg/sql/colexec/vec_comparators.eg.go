@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -362,6 +363,50 @@ func (c *Float64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint
 	}
 }
 
+type TimestampVecComparator struct {
+	vecs  [][]time.Time
+	nulls []*coldata.Nulls
+}
+
+func (c *TimestampVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
+	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
+	if n1 && n2 {
+		return 0
+	} else if n1 {
+		return -1
+	} else if n2 {
+		return 1
+	}
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
+	var cmp int
+
+	if left.Before(right) {
+		cmp = -1
+	} else if right.Before(left) {
+		cmp = 1
+	} else {
+		cmp = 0
+	}
+	return cmp
+}
+
+func (c *TimestampVecComparator) setVec(idx int, vec coldata.Vec) {
+	c.vecs[idx] = vec.Timestamp()
+	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *TimestampVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
+	}
+}
+
 func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 	switch t {
 	case coltypes.Bool:
@@ -397,6 +442,11 @@ func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 	case coltypes.Float64:
 		return &Float64VecComparator{
 			vecs:  make([][]float64, numVecs),
+			nulls: make([]*coldata.Nulls, numVecs),
+		}
+	case coltypes.Timestamp:
+		return &TimestampVecComparator{
+			vecs:  make([][]time.Time, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
 	}

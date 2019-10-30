@@ -141,6 +141,8 @@ func (f *joinerFilter) setInputBatch(lBatch, rBatch coldata.Batch, lIdx, rIdx in
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Int64())
 			case coltypes.Float64:
 				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Float64())
+			case coltypes.Timestamp:
+				f.input.batch.ColVec(colOffset + colIdx).SetCol(memCol.Timestamp())
 			default:
 				execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
 			}

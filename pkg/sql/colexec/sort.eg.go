@@ -14,6 +14,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -84,6 +85,15 @@ func isSorterSupported(t coltypes.T, dir execinfrapb.Ordering_Column_Direction) 
 			return false
 		}
 	case coltypes.Float64:
+		switch dir {
+		case execinfrapb.Ordering_Column_ASC:
+			return true
+		case execinfrapb.Ordering_Column_DESC:
+			return true
+		default:
+			return false
+		}
+	case coltypes.Timestamp:
 		switch dir {
 		case execinfrapb.Ordering_Column_ASC:
 			return true
@@ -256,6 +266,29 @@ func newSingleSorter(
 				return &sortFloat64AscWithNullsOp{}
 			case execinfrapb.Ordering_Column_DESC:
 				return &sortFloat64DescWithNullsOp{}
+			default:
+				execerror.VectorizedInternalPanic("nulls switch failed")
+			}
+		default:
+			execerror.VectorizedInternalPanic("nulls switch failed")
+		}
+	case coltypes.Timestamp:
+		switch hasNulls {
+		case false:
+			switch dir {
+			case execinfrapb.Ordering_Column_ASC:
+				return &sortTimestampAscOp{}
+			case execinfrapb.Ordering_Column_DESC:
+				return &sortTimestampDescOp{}
+			default:
+				execerror.VectorizedInternalPanic("nulls switch failed")
+			}
+		case true:
+			switch dir {
+			case execinfrapb.Ordering_Column_ASC:
+				return &sortTimestampAscWithNullsOp{}
+			case execinfrapb.Ordering_Column_DESC:
+				return &sortTimestampDescWithNullsOp{}
 			default:
 				execerror.VectorizedInternalPanic("nulls switch failed")
 			}
@@ -2326,5 +2359,293 @@ func (s *sortFloat64DescWithNullsOp) Swap(i, j int) {
 }
 
 func (s *sortFloat64DescWithNullsOp) Len() int {
+	return len(s.order)
+}
+
+type sortTimestampAscOp struct {
+	sortCol       []time.Time
+	nulls         *coldata.Nulls
+	order         []uint64
+	cancelChecker CancelChecker
+}
+
+func (s *sortTimestampAscOp) init(col coldata.Vec, order []uint64) {
+	s.sortCol = col.Timestamp()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortTimestampAscOp) sort(ctx context.Context) {
+	n := len(s.sortCol)
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortTimestampAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+	if len(partitions) < 1 {
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd uint64
+		if i == len(partitions)-1 {
+			partitionEnd = uint64(len(order))
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := int(partitionEnd - partitionStart)
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortTimestampAscOp) Less(i, j int) bool {
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
+
+	{
+		var cmpResult int
+
+		if arg1.Before(arg2) {
+			cmpResult = -1
+		} else if arg2.Before(arg1) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		lt = cmpResult < 0
+	}
+
+	return lt
+}
+
+func (s *sortTimestampAscOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortTimestampAscOp) Len() int {
+	return len(s.order)
+}
+
+type sortTimestampDescOp struct {
+	sortCol       []time.Time
+	nulls         *coldata.Nulls
+	order         []uint64
+	cancelChecker CancelChecker
+}
+
+func (s *sortTimestampDescOp) init(col coldata.Vec, order []uint64) {
+	s.sortCol = col.Timestamp()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortTimestampDescOp) sort(ctx context.Context) {
+	n := len(s.sortCol)
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortTimestampDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+	if len(partitions) < 1 {
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd uint64
+		if i == len(partitions)-1 {
+			partitionEnd = uint64(len(order))
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := int(partitionEnd - partitionStart)
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortTimestampDescOp) Less(i, j int) bool {
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
+
+	{
+		var cmpResult int
+
+		if arg1.Before(arg2) {
+			cmpResult = -1
+		} else if arg2.Before(arg1) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		lt = cmpResult > 0
+	}
+
+	return lt
+}
+
+func (s *sortTimestampDescOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortTimestampDescOp) Len() int {
+	return len(s.order)
+}
+
+type sortTimestampAscWithNullsOp struct {
+	sortCol       []time.Time
+	nulls         *coldata.Nulls
+	order         []uint64
+	cancelChecker CancelChecker
+}
+
+func (s *sortTimestampAscWithNullsOp) init(col coldata.Vec, order []uint64) {
+	s.sortCol = col.Timestamp()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortTimestampAscWithNullsOp) sort(ctx context.Context) {
+	n := len(s.sortCol)
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortTimestampAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+	if len(partitions) < 1 {
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd uint64
+		if i == len(partitions)-1 {
+			partitionEnd = uint64(len(order))
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := int(partitionEnd - partitionStart)
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortTimestampAscWithNullsOp) Less(i, j int) bool {
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	// If ascending, nulls always sort first, so we encode that logic here.
+	if n1 && n2 {
+		return false
+	} else if n1 {
+		return true
+	} else if n2 {
+		return false
+	}
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
+
+	{
+		var cmpResult int
+
+		if arg1.Before(arg2) {
+			cmpResult = -1
+		} else if arg2.Before(arg1) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		lt = cmpResult < 0
+	}
+
+	return lt
+}
+
+func (s *sortTimestampAscWithNullsOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortTimestampAscWithNullsOp) Len() int {
+	return len(s.order)
+}
+
+type sortTimestampDescWithNullsOp struct {
+	sortCol       []time.Time
+	nulls         *coldata.Nulls
+	order         []uint64
+	cancelChecker CancelChecker
+}
+
+func (s *sortTimestampDescWithNullsOp) init(col coldata.Vec, order []uint64) {
+	s.sortCol = col.Timestamp()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortTimestampDescWithNullsOp) sort(ctx context.Context) {
+	n := len(s.sortCol)
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortTimestampDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+	if len(partitions) < 1 {
+		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd uint64
+		if i == len(partitions)-1 {
+			partitionEnd = uint64(len(order))
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := int(partitionEnd - partitionStart)
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortTimestampDescWithNullsOp) Less(i, j int) bool {
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	// If descending, nulls always sort last, so we encode that logic here.
+	if n1 && n2 {
+		return false
+	} else if n1 {
+		return false
+	} else if n2 {
+		return true
+	}
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol[int(s.order[i])]
+	arg2 := s.sortCol[int(s.order[j])]
+
+	{
+		var cmpResult int
+
+		if arg1.Before(arg2) {
+			cmpResult = -1
+		} else if arg2.Before(arg1) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		lt = cmpResult > 0
+	}
+
+	return lt
+}
+
+func (s *sortTimestampDescWithNullsOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortTimestampDescWithNullsOp) Len() int {
 	return len(s.order)
 }

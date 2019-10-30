@@ -5,6 +5,7 @@ package colexec
 import (
 	"bytes"
 	"math"
+	"time"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
@@ -4773,6 +4774,120 @@ func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQTimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNETimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTTimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLETimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTTimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGETimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
 		r = cmpResult >= 0
 	}
 
