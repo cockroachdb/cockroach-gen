@@ -7979,6 +7979,34 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [PushLimitIntoOrdinality]
+	{
+		_ordinality, _ := input.(*memo.OrdinalityExpr)
+		if _ordinality != nil {
+			input := _ordinality.Input
+			private := &_ordinality.OrdinalityPrivate
+			limitOrdering := ordering
+			if _f.funcs.HasColsInOrdering(input, limitOrdering) {
+				if _f.funcs.OrderingIntersects(_f.funcs.OrdinalityOrdering(private), limitOrdering) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoOrdinality) {
+						_expr := _f.ConstructOrdinality(
+							_f.ConstructLimit(
+								input,
+								limit,
+								_f.funcs.OrderingIntersection(_f.funcs.OrdinalityOrdering(private), limitOrdering),
+							),
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushLimitIntoOrdinality, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [SimplifyLimitOrdering]
 	{
 		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {
