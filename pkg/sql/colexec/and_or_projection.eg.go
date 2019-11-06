@@ -124,9 +124,10 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	var curIdx uint16
 	if usesSel {
 		sel := batch.Selection()
+		origSel := o.origSel[:origLen]
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
-			for _, i := range o.origSel[:origLen] {
+			for _, i := range origSel {
 				isLeftNull := leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -136,7 +137,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for _, i := range o.origSel {
+			for _, i := range origSel {
 				isLeftNull := false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -547,9 +548,10 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	var curIdx uint16
 	if usesSel {
 		sel := batch.Selection()
+		origSel := o.origSel[:origLen]
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
-			for _, i := range o.origSel[:origLen] {
+			for _, i := range origSel {
 				isLeftNull := leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -559,7 +561,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for _, i := range o.origSel {
+			for _, i := range origSel {
 				isLeftNull := false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
