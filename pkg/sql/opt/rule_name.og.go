@@ -194,6 +194,7 @@ const (
 	PushSelectIntoJoinRight
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
+	InlineConstVar
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
 	PushFilterIntoSetOp

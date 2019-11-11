@@ -814,6 +814,22 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [InlineConstVar]
+	{
+		if _f.funcs.CanInlineConstVar(filters) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.InlineConstVar) {
+				_expr := _f.ConstructSelect(
+					input,
+					_f.funcs.InlineConstVar(filters),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.InlineConstVar, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [PushFilterIntoSetOp]
 	{
 		if opt.IsSetOp(input) {
