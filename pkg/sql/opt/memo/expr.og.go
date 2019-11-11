@@ -15242,6 +15242,9 @@ func (m *Memo) MemoizeInsert(
 	e.grp = grp
 	interned := m.interner.InternInsert(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildInsertProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15264,6 +15267,9 @@ func (m *Memo) MemoizeUpdate(
 	e.grp = grp
 	interned := m.interner.InternUpdate(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildUpdateProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15286,6 +15292,9 @@ func (m *Memo) MemoizeUpsert(
 	e.grp = grp
 	interned := m.interner.InternUpsert(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildUpsertProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15308,6 +15317,9 @@ func (m *Memo) MemoizeDelete(
 	e.grp = grp
 	interned := m.interner.InternDelete(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildDeleteProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15326,6 +15338,9 @@ func (m *Memo) MemoizeScan(
 	e.grp = grp
 	interned := m.interner.InternScan(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildScanProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15344,6 +15359,9 @@ func (m *Memo) MemoizeVirtualScan(
 	e.grp = grp
 	interned := m.interner.InternVirtualScan(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildVirtualScanProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15362,6 +15380,9 @@ func (m *Memo) MemoizeSequenceSelect(
 	e.grp = grp
 	interned := m.interner.InternSequenceSelect(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildSequenceSelectProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15382,6 +15403,9 @@ func (m *Memo) MemoizeValues(
 	e.grp = grp
 	interned := m.interner.InternValues(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildValuesProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15402,6 +15426,9 @@ func (m *Memo) MemoizeSelect(
 	e.grp = grp
 	interned := m.interner.InternSelect(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildSelectProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15424,6 +15451,9 @@ func (m *Memo) MemoizeProject(
 	e.grp = grp
 	interned := m.interner.InternProject(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildProjectProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15448,6 +15478,9 @@ func (m *Memo) MemoizeInnerJoin(
 	e.grp = grp
 	interned := m.interner.InternInnerJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildInnerJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15472,6 +15505,9 @@ func (m *Memo) MemoizeLeftJoin(
 	e.grp = grp
 	interned := m.interner.InternLeftJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildLeftJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15496,6 +15532,9 @@ func (m *Memo) MemoizeRightJoin(
 	e.grp = grp
 	interned := m.interner.InternRightJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildRightJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15520,6 +15559,9 @@ func (m *Memo) MemoizeFullJoin(
 	e.grp = grp
 	interned := m.interner.InternFullJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildFullJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15544,6 +15586,9 @@ func (m *Memo) MemoizeSemiJoin(
 	e.grp = grp
 	interned := m.interner.InternSemiJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildSemiJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15568,6 +15613,9 @@ func (m *Memo) MemoizeAntiJoin(
 	e.grp = grp
 	interned := m.interner.InternAntiJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildAntiJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15588,6 +15636,9 @@ func (m *Memo) MemoizeIndexJoin(
 	e.grp = grp
 	interned := m.interner.InternIndexJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildIndexJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15610,6 +15661,9 @@ func (m *Memo) MemoizeLookupJoin(
 	e.grp = grp
 	interned := m.interner.InternLookupJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildLookupJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15634,6 +15688,9 @@ func (m *Memo) MemoizeMergeJoin(
 	e.grp = grp
 	interned := m.interner.InternMergeJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildMergeJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15654,6 +15711,9 @@ func (m *Memo) MemoizeZigzagJoin(
 	e.grp = grp
 	interned := m.interner.InternZigzagJoin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildZigzagJoinProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15678,6 +15738,9 @@ func (m *Memo) MemoizeInnerJoinApply(
 	e.grp = grp
 	interned := m.interner.InternInnerJoinApply(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildInnerJoinApplyProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15702,6 +15765,9 @@ func (m *Memo) MemoizeLeftJoinApply(
 	e.grp = grp
 	interned := m.interner.InternLeftJoinApply(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildLeftJoinApplyProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15726,6 +15792,9 @@ func (m *Memo) MemoizeSemiJoinApply(
 	e.grp = grp
 	interned := m.interner.InternSemiJoinApply(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildSemiJoinApplyProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15750,6 +15819,9 @@ func (m *Memo) MemoizeAntiJoinApply(
 	e.grp = grp
 	interned := m.interner.InternAntiJoinApply(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildAntiJoinApplyProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15772,6 +15844,9 @@ func (m *Memo) MemoizeGroupBy(
 	e.grp = grp
 	interned := m.interner.InternGroupBy(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildGroupByProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15794,6 +15869,9 @@ func (m *Memo) MemoizeScalarGroupBy(
 	e.grp = grp
 	interned := m.interner.InternScalarGroupBy(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildScalarGroupByProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15816,6 +15894,9 @@ func (m *Memo) MemoizeDistinctOn(
 	e.grp = grp
 	interned := m.interner.InternDistinctOn(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildDistinctOnProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15838,6 +15919,9 @@ func (m *Memo) MemoizeUnion(
 	e.grp = grp
 	interned := m.interner.InternUnion(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildUnionProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15860,6 +15944,9 @@ func (m *Memo) MemoizeIntersect(
 	e.grp = grp
 	interned := m.interner.InternIntersect(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildIntersectProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15882,6 +15969,9 @@ func (m *Memo) MemoizeExcept(
 	e.grp = grp
 	interned := m.interner.InternExcept(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildExceptProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15904,6 +15994,9 @@ func (m *Memo) MemoizeUnionAll(
 	e.grp = grp
 	interned := m.interner.InternUnionAll(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildUnionAllProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15926,6 +16019,9 @@ func (m *Memo) MemoizeIntersectAll(
 	e.grp = grp
 	interned := m.interner.InternIntersectAll(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildIntersectAllProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15948,6 +16044,9 @@ func (m *Memo) MemoizeExceptAll(
 	e.grp = grp
 	interned := m.interner.InternExceptAll(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildExceptAllProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15970,6 +16069,9 @@ func (m *Memo) MemoizeLimit(
 	e.grp = grp
 	interned := m.interner.InternLimit(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildLimitProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -15992,6 +16094,9 @@ func (m *Memo) MemoizeOffset(
 	e.grp = grp
 	interned := m.interner.InternOffset(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildOffsetProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16010,6 +16115,9 @@ func (m *Memo) MemoizeMax1Row(
 	e.grp = grp
 	interned := m.interner.InternMax1Row(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildMax1RowProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16030,6 +16138,9 @@ func (m *Memo) MemoizeOrdinality(
 	e.grp = grp
 	interned := m.interner.InternOrdinality(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildOrdinalityProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16050,6 +16161,9 @@ func (m *Memo) MemoizeProjectSet(
 	e.grp = grp
 	interned := m.interner.InternProjectSet(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildProjectSetProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16072,6 +16186,9 @@ func (m *Memo) MemoizeWindow(
 	e.grp = grp
 	interned := m.interner.InternWindow(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildWindowProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16094,6 +16211,9 @@ func (m *Memo) MemoizeWith(
 	e.grp = grp
 	interned := m.interner.InternWith(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildWithProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16112,6 +16232,9 @@ func (m *Memo) MemoizeWithScan(
 	e.grp = grp
 	interned := m.interner.InternWithScan(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildWithScanProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16134,6 +16257,9 @@ func (m *Memo) MemoizeRecursiveCTE(
 	e.grp = grp
 	interned := m.interner.InternRecursiveCTE(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildRecursiveCTEProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16152,6 +16278,9 @@ func (m *Memo) MemoizeFakeRel(
 	e.grp = grp
 	interned := m.interner.InternFakeRel(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildFakeRelProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -16172,6 +16301,9 @@ func (m *Memo) MemoizeSubquery(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSubquery(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16192,6 +16324,9 @@ func (m *Memo) MemoizeAny(
 	}
 	interned := m.interner.InternAny(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16210,6 +16345,9 @@ func (m *Memo) MemoizeExists(
 	}
 	interned := m.interner.InternExists(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16227,6 +16365,9 @@ func (m *Memo) MemoizeVariable(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternVariable(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16244,6 +16385,9 @@ func (m *Memo) MemoizeConst(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConst(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16260,6 +16404,9 @@ func (m *Memo) MemoizeNull(
 	}
 	interned := m.interner.InternNull(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16285,6 +16432,9 @@ func (m *Memo) MemoizePlaceholder(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternPlaceholder(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16303,6 +16453,9 @@ func (m *Memo) MemoizeTuple(
 	}
 	interned := m.interner.InternTuple(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16321,6 +16474,9 @@ func (m *Memo) MemoizeAnd(
 	}
 	interned := m.interner.InternAnd(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16339,6 +16495,9 @@ func (m *Memo) MemoizeOr(
 	}
 	interned := m.interner.InternOr(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16355,6 +16514,9 @@ func (m *Memo) MemoizeRange(
 	}
 	interned := m.interner.InternRange(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16371,6 +16533,9 @@ func (m *Memo) MemoizeNot(
 	}
 	interned := m.interner.InternNot(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16389,6 +16554,9 @@ func (m *Memo) MemoizeEq(
 	}
 	interned := m.interner.InternEq(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16407,6 +16575,9 @@ func (m *Memo) MemoizeLt(
 	}
 	interned := m.interner.InternLt(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16425,6 +16596,9 @@ func (m *Memo) MemoizeGt(
 	}
 	interned := m.interner.InternGt(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16443,6 +16617,9 @@ func (m *Memo) MemoizeLe(
 	}
 	interned := m.interner.InternLe(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16461,6 +16638,9 @@ func (m *Memo) MemoizeGe(
 	}
 	interned := m.interner.InternGe(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16479,6 +16659,9 @@ func (m *Memo) MemoizeNe(
 	}
 	interned := m.interner.InternNe(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16497,6 +16680,9 @@ func (m *Memo) MemoizeIn(
 	}
 	interned := m.interner.InternIn(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16515,6 +16701,9 @@ func (m *Memo) MemoizeNotIn(
 	}
 	interned := m.interner.InternNotIn(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16533,6 +16722,9 @@ func (m *Memo) MemoizeLike(
 	}
 	interned := m.interner.InternLike(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16551,6 +16743,9 @@ func (m *Memo) MemoizeNotLike(
 	}
 	interned := m.interner.InternNotLike(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16569,6 +16764,9 @@ func (m *Memo) MemoizeILike(
 	}
 	interned := m.interner.InternILike(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16587,6 +16785,9 @@ func (m *Memo) MemoizeNotILike(
 	}
 	interned := m.interner.InternNotILike(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16605,6 +16806,9 @@ func (m *Memo) MemoizeSimilarTo(
 	}
 	interned := m.interner.InternSimilarTo(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16623,6 +16827,9 @@ func (m *Memo) MemoizeNotSimilarTo(
 	}
 	interned := m.interner.InternNotSimilarTo(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16641,6 +16848,9 @@ func (m *Memo) MemoizeRegMatch(
 	}
 	interned := m.interner.InternRegMatch(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16659,6 +16869,9 @@ func (m *Memo) MemoizeNotRegMatch(
 	}
 	interned := m.interner.InternNotRegMatch(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16677,6 +16890,9 @@ func (m *Memo) MemoizeRegIMatch(
 	}
 	interned := m.interner.InternRegIMatch(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16695,6 +16911,9 @@ func (m *Memo) MemoizeNotRegIMatch(
 	}
 	interned := m.interner.InternNotRegIMatch(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16713,6 +16932,9 @@ func (m *Memo) MemoizeIs(
 	}
 	interned := m.interner.InternIs(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16731,6 +16953,9 @@ func (m *Memo) MemoizeIsNot(
 	}
 	interned := m.interner.InternIsNot(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16749,6 +16974,9 @@ func (m *Memo) MemoizeContains(
 	}
 	interned := m.interner.InternContains(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16767,6 +16995,9 @@ func (m *Memo) MemoizeJsonExists(
 	}
 	interned := m.interner.InternJsonExists(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16785,6 +17016,9 @@ func (m *Memo) MemoizeJsonAllExists(
 	}
 	interned := m.interner.InternJsonAllExists(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16803,6 +17037,9 @@ func (m *Memo) MemoizeJsonSomeExists(
 	}
 	interned := m.interner.InternJsonSomeExists(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16821,6 +17058,9 @@ func (m *Memo) MemoizeOverlaps(
 	}
 	interned := m.interner.InternOverlaps(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16841,6 +17081,9 @@ func (m *Memo) MemoizeAnyScalar(
 	}
 	interned := m.interner.InternAnyScalar(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16860,6 +17103,9 @@ func (m *Memo) MemoizeBitand(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitand(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16879,6 +17125,9 @@ func (m *Memo) MemoizeBitor(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitor(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16898,6 +17147,9 @@ func (m *Memo) MemoizeBitxor(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitxor(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16917,6 +17169,9 @@ func (m *Memo) MemoizePlus(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternPlus(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16936,6 +17191,9 @@ func (m *Memo) MemoizeMinus(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMinus(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16955,6 +17213,9 @@ func (m *Memo) MemoizeMult(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMult(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16974,6 +17235,9 @@ func (m *Memo) MemoizeDiv(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternDiv(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -16993,6 +17257,9 @@ func (m *Memo) MemoizeFloorDiv(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFloorDiv(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17012,6 +17279,9 @@ func (m *Memo) MemoizeMod(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMod(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17031,6 +17301,9 @@ func (m *Memo) MemoizePow(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternPow(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17050,6 +17323,9 @@ func (m *Memo) MemoizeConcat(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConcat(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17069,6 +17345,9 @@ func (m *Memo) MemoizeLShift(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternLShift(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17088,6 +17367,9 @@ func (m *Memo) MemoizeRShift(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternRShift(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17107,6 +17389,9 @@ func (m *Memo) MemoizeFetchVal(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchVal(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17126,6 +17411,9 @@ func (m *Memo) MemoizeFetchText(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchText(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17145,6 +17433,9 @@ func (m *Memo) MemoizeFetchValPath(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchValPath(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17164,6 +17455,9 @@ func (m *Memo) MemoizeFetchTextPath(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFetchTextPath(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17181,6 +17475,9 @@ func (m *Memo) MemoizeUnaryMinus(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternUnaryMinus(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17198,6 +17495,9 @@ func (m *Memo) MemoizeUnaryComplement(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternUnaryComplement(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17216,6 +17516,9 @@ func (m *Memo) MemoizeCast(
 	}
 	interned := m.interner.InternCast(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17237,6 +17540,9 @@ func (m *Memo) MemoizeIfErr(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternIfErr(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17258,6 +17564,9 @@ func (m *Memo) MemoizeCase(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCase(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17277,6 +17586,9 @@ func (m *Memo) MemoizeWhen(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternWhen(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17295,6 +17607,9 @@ func (m *Memo) MemoizeArray(
 	}
 	interned := m.interner.InternArray(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17314,6 +17629,9 @@ func (m *Memo) MemoizeIndirection(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternIndirection(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17333,6 +17651,9 @@ func (m *Memo) MemoizeArrayFlatten(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternArrayFlatten(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17351,6 +17672,9 @@ func (m *Memo) MemoizeFunction(
 	}
 	interned := m.interner.InternFunction(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17370,6 +17694,9 @@ func (m *Memo) MemoizeCollate(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCollate(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17387,6 +17714,9 @@ func (m *Memo) MemoizeCoalesce(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCoalesce(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17406,6 +17736,9 @@ func (m *Memo) MemoizeColumnAccess(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternColumnAccess(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17423,6 +17756,9 @@ func (m *Memo) MemoizeUnsupportedExpr(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternUnsupportedExpr(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17440,6 +17776,9 @@ func (m *Memo) MemoizeArrayAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternArrayAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17457,6 +17796,9 @@ func (m *Memo) MemoizeAvg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAvg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17474,6 +17816,9 @@ func (m *Memo) MemoizeBitAndAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitAndAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17491,6 +17836,9 @@ func (m *Memo) MemoizeBitOrAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBitOrAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17508,6 +17856,9 @@ func (m *Memo) MemoizeBoolAnd(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBoolAnd(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17525,6 +17876,9 @@ func (m *Memo) MemoizeBoolOr(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternBoolOr(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17542,6 +17896,9 @@ func (m *Memo) MemoizeConcatAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConcatAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17559,6 +17916,9 @@ func (m *Memo) MemoizeCount(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternCount(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17580,6 +17940,9 @@ func (m *Memo) MemoizeMax(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMax(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17597,6 +17960,9 @@ func (m *Memo) MemoizeMin(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternMin(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17614,6 +17980,9 @@ func (m *Memo) MemoizeSumInt(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSumInt(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17631,6 +18000,9 @@ func (m *Memo) MemoizeSum(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSum(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17648,6 +18020,9 @@ func (m *Memo) MemoizeSqrDiff(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternSqrDiff(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17665,6 +18040,9 @@ func (m *Memo) MemoizeVariance(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternVariance(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17682,6 +18060,9 @@ func (m *Memo) MemoizeStdDev(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternStdDev(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17699,6 +18080,9 @@ func (m *Memo) MemoizeXorAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternXorAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17716,6 +18100,9 @@ func (m *Memo) MemoizeJsonAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternJsonAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17733,6 +18120,9 @@ func (m *Memo) MemoizeJsonbAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternJsonbAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17752,6 +18142,9 @@ func (m *Memo) MemoizeStringAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternStringAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17769,6 +18162,9 @@ func (m *Memo) MemoizeConstAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConstAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17786,6 +18182,9 @@ func (m *Memo) MemoizeConstNotNullAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternConstNotNullAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17803,6 +18202,9 @@ func (m *Memo) MemoizeAnyNotNullAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAnyNotNullAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17820,6 +18222,9 @@ func (m *Memo) MemoizeFirstAgg(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFirstAgg(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17837,6 +18242,9 @@ func (m *Memo) MemoizeAggDistinct(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAggDistinct(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17856,6 +18264,9 @@ func (m *Memo) MemoizeAggFilter(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternAggFilter(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17875,6 +18286,9 @@ func (m *Memo) MemoizeWindowFromOffset(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternWindowFromOffset(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17894,6 +18308,9 @@ func (m *Memo) MemoizeWindowToOffset(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternWindowToOffset(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17930,6 +18347,9 @@ func (m *Memo) MemoizeNtile(
 	}
 	interned := m.interner.InternNtile(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17951,6 +18371,9 @@ func (m *Memo) MemoizeLag(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternLag(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17972,6 +18395,9 @@ func (m *Memo) MemoizeLead(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternLead(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -17989,6 +18415,9 @@ func (m *Memo) MemoizeFirstValue(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternFirstValue(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -18006,6 +18435,9 @@ func (m *Memo) MemoizeLastValue(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternLastValue(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -18025,6 +18457,9 @@ func (m *Memo) MemoizeNthValue(
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternNthValue(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.memEstimate += size
 		m.checkExpr(e)
 	}
@@ -18044,6 +18479,9 @@ func (m *Memo) MemoizeCreateTable(
 	e.grp = grp
 	interned := m.interner.InternCreateTable(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildCreateTableProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18062,6 +18500,9 @@ func (m *Memo) MemoizeCreateView(
 	e.grp = grp
 	interned := m.interner.InternCreateView(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildCreateViewProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18082,6 +18523,9 @@ func (m *Memo) MemoizeExplain(
 	e.grp = grp
 	interned := m.interner.InternExplain(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildExplainProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18100,6 +18544,9 @@ func (m *Memo) MemoizeShowTraceForSession(
 	e.grp = grp
 	interned := m.interner.InternShowTraceForSession(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildShowTraceForSessionProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18118,6 +18565,9 @@ func (m *Memo) MemoizeOpaqueRel(
 	e.grp = grp
 	interned := m.interner.InternOpaqueRel(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildOpaqueRelProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18136,6 +18586,9 @@ func (m *Memo) MemoizeOpaqueMutation(
 	e.grp = grp
 	interned := m.interner.InternOpaqueMutation(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildOpaqueMutationProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18154,6 +18607,9 @@ func (m *Memo) MemoizeOpaqueDDL(
 	e.grp = grp
 	interned := m.interner.InternOpaqueDDL(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildOpaqueDDLProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18176,6 +18632,9 @@ func (m *Memo) MemoizeAlterTableSplit(
 	e.grp = grp
 	interned := m.interner.InternAlterTableSplit(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildAlterTableSplitProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18196,6 +18655,9 @@ func (m *Memo) MemoizeAlterTableUnsplit(
 	e.grp = grp
 	interned := m.interner.InternAlterTableUnsplit(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildAlterTableUnsplitProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18214,6 +18676,9 @@ func (m *Memo) MemoizeAlterTableUnsplitAll(
 	e.grp = grp
 	interned := m.interner.InternAlterTableUnsplitAll(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildAlterTableUnsplitAllProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18234,6 +18699,9 @@ func (m *Memo) MemoizeAlterTableRelocate(
 	e.grp = grp
 	interned := m.interner.InternAlterTableRelocate(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildAlterTableRelocateProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18254,6 +18722,9 @@ func (m *Memo) MemoizeControlJobs(
 	e.grp = grp
 	interned := m.interner.InternControlJobs(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildControlJobsProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18274,6 +18745,9 @@ func (m *Memo) MemoizeCancelQueries(
 	e.grp = grp
 	interned := m.interner.InternCancelQueries(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildCancelQueriesProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18294,6 +18768,9 @@ func (m *Memo) MemoizeCancelSessions(
 	e.grp = grp
 	interned := m.interner.InternCancelSessions(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildCancelSessionsProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
@@ -18318,6 +18795,9 @@ func (m *Memo) MemoizeExport(
 	e.grp = grp
 	interned := m.interner.InternExport(e)
 	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
 		m.logPropsBuilder.buildExportProps(e, &grp.rel)
 		m.memEstimate += size
 		m.checkExpr(e)
