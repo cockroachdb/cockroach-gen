@@ -328,6 +328,7 @@ type MutationPrivate struct {
 	//
 	// Since the check constraint for column "a" can be statically proven to be
 	// true, CheckCols would contain [0, b_colid].
+	// TODO(radu): we don't actually implement this optimization currently.
 	CheckCols opt.ColList
 
 	// CanaryCol is used only with the Upsert operator. It identifies the column
