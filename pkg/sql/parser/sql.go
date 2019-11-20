@@ -20316,7 +20316,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7304
 		{
-			return unimplementedWithIssueDetail(sqllex, 26097, "type")
+			sqlVAL.union.val = types.TimeTZ
 		}
 	case 1283:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
