@@ -36,8 +36,8 @@ func EncDatumRowsToColVec(
 	alloc *sqlbase.DatumAlloc,
 ) error {
 	switch columnType.Family() {
-	case types.UuidFamily:
-		col := vec.Bytes()
+	case types.BoolFamily:
+		col := vec.Bool()
 		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -55,31 +55,8 @@ func EncDatumRowsToColVec(
 					return err
 				}
 
-				castV := v.([]byte)
-				col.Set(i, castV)
-			}
-		}
-	case types.DecimalFamily:
-		col := vec.Decimal()
-		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-		for i := range rows {
-			row := rows[i]
-			if row[columnIdx].Datum == nil {
-				if err := row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-					return err
-				}
-			}
-			datum := row[columnIdx].Datum
-			if datum == tree.DNull {
-				vec.Nulls().SetNull(uint16(i))
-			} else {
-				v, err := datumToPhysicalFn(datum)
-				if err != nil {
-					return err
-				}
-
-				castV := v.(apd.Decimal)
-				col[i].Set(&castV)
+				castV := v.(bool)
+				col[i] = castV
 			}
 		}
 	case types.IntFamily:
@@ -156,30 +133,7 @@ func EncDatumRowsToColVec(
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
 		}
-	case types.DateFamily:
-		col := vec.Int64()
-		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-		for i := range rows {
-			row := rows[i]
-			if row[columnIdx].Datum == nil {
-				if err := row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-					return err
-				}
-			}
-			datum := row[columnIdx].Datum
-			if datum == tree.DNull {
-				vec.Nulls().SetNull(uint16(i))
-			} else {
-				v, err := datumToPhysicalFn(datum)
-				if err != nil {
-					return err
-				}
-
-				castV := v.(int64)
-				col[i] = castV
-			}
-		}
-	case types.StringFamily:
+	case types.UuidFamily:
 		col := vec.Bytes()
 		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
@@ -202,8 +156,8 @@ func EncDatumRowsToColVec(
 				col.Set(i, castV)
 			}
 		}
-	case types.BoolFamily:
-		col := vec.Bool()
+	case types.DecimalFamily:
+		col := vec.Decimal()
 		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -221,7 +175,30 @@ func EncDatumRowsToColVec(
 					return err
 				}
 
-				castV := v.(bool)
+				castV := v.(apd.Decimal)
+				col[i].Set(&castV)
+			}
+		}
+	case types.DateFamily:
+		col := vec.Int64()
+		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+		for i := range rows {
+			row := rows[i]
+			if row[columnIdx].Datum == nil {
+				if err := row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+					return err
+				}
+			}
+			datum := row[columnIdx].Datum
+			if datum == tree.DNull {
+				vec.Nulls().SetNull(uint16(i))
+			} else {
+				v, err := datumToPhysicalFn(datum)
+				if err != nil {
+					return err
+				}
+
+				castV := v.(int64)
 				col[i] = castV
 			}
 		}
@@ -299,7 +276,30 @@ func EncDatumRowsToColVec(
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
 		}
-	case types.BytesFamily:
+	case types.TimestampFamily:
+		col := vec.Timestamp()
+		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+		for i := range rows {
+			row := rows[i]
+			if row[columnIdx].Datum == nil {
+				if err := row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+					return err
+				}
+			}
+			datum := row[columnIdx].Datum
+			if datum == tree.DNull {
+				vec.Nulls().SetNull(uint16(i))
+			} else {
+				v, err := datumToPhysicalFn(datum)
+				if err != nil {
+					return err
+				}
+
+				castV := v.(time.Time)
+				col[i] = castV
+			}
+		}
+	case types.StringFamily:
 		col := vec.Bytes()
 		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
@@ -322,8 +322,8 @@ func EncDatumRowsToColVec(
 				col.Set(i, castV)
 			}
 		}
-	case types.TimestampFamily:
-		col := vec.Timestamp()
+	case types.BytesFamily:
+		col := vec.Bytes()
 		datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 		for i := range rows {
 			row := rows[i]
@@ -341,8 +341,8 @@ func EncDatumRowsToColVec(
 					return err
 				}
 
-				castV := v.(time.Time)
-				col[i] = castV
+				castV := v.([]byte)
+				col.Set(i, castV)
 			}
 		}
 	default:
