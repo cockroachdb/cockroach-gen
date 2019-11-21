@@ -93,6 +93,7 @@ var reservedKeywords = map[string]struct{}{
 	"localtime":         {},
 	"localtimestamp":    {},
 	"natural":           {},
+	"none":              {},
 	"not":               {},
 	"nothing":           {},
 	"notnull":           {},

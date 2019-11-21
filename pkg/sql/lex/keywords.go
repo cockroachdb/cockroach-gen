@@ -218,6 +218,7 @@ var KeywordsCategories = map[string]string{
 	"natural":                   "T",
 	"next":                      "U",
 	"no":                        "U",
+	"none":                      "T",
 	"normal":                    "U",
 	"not":                       "R",
 	"nothing":                   "R",
@@ -625,6 +626,7 @@ var KeywordNames = []string{
 	"natural",
 	"next",
 	"no",
+	"none",
 	"normal",
 	"not",
 	"nothing",
@@ -1252,6 +1254,8 @@ func GetKeywordID(k string) int32 {
 		return NEXT
 	case "no":
 		return NO
+	case "none":
+		return NONE
 	case "normal":
 		return NORMAL
 	case "not":
