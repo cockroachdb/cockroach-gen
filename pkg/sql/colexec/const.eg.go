@@ -26,12 +26,13 @@ var _ interface{} = execgen.UNSAFEGET
 // NewConstOp creates a new operator that produces a constant value constVal of
 // type t at index outputIdx.
 func NewConstOp(
-	input Operator, t coltypes.T, constVal interface{}, outputIdx int,
+	allocator *Allocator, input Operator, t coltypes.T, constVal interface{}, outputIdx int,
 ) (Operator, error) {
 	switch t {
 	case coltypes.Bool:
 		return &constBoolOp{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(bool),
@@ -39,6 +40,7 @@ func NewConstOp(
 	case coltypes.Bytes:
 		return &constBytesOp{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.([]byte),
@@ -46,6 +48,7 @@ func NewConstOp(
 	case coltypes.Decimal:
 		return &constDecimalOp{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(apd.Decimal),
@@ -53,6 +56,7 @@ func NewConstOp(
 	case coltypes.Int16:
 		return &constInt16Op{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int16),
@@ -60,6 +64,7 @@ func NewConstOp(
 	case coltypes.Int32:
 		return &constInt32Op{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int32),
@@ -67,6 +72,7 @@ func NewConstOp(
 	case coltypes.Int64:
 		return &constInt64Op{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(int64),
@@ -74,6 +80,7 @@ func NewConstOp(
 	case coltypes.Float64:
 		return &constFloat64Op{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(float64),
@@ -81,6 +88,7 @@ func NewConstOp(
 	case coltypes.Timestamp:
 		return &constTimestampOp{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(time.Time),
@@ -93,6 +101,7 @@ func NewConstOp(
 type constBoolOp struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  bool
@@ -106,7 +115,7 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -128,6 +137,7 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 type constBytesOp struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  []byte
@@ -141,7 +151,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -163,6 +173,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 type constDecimalOp struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  apd.Decimal
@@ -176,7 +187,7 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -198,6 +209,7 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 type constInt16Op struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  int16
@@ -211,7 +223,7 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -233,6 +245,7 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 type constInt32Op struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  int32
@@ -246,7 +259,7 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -268,6 +281,7 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 type constInt64Op struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  int64
@@ -281,7 +295,7 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -303,6 +317,7 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 type constFloat64Op struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  float64
@@ -316,7 +331,7 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -338,6 +353,7 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 type constTimestampOp struct {
 	OneInputNode
 
+	allocator *Allocator
 	typ       coltypes.T
 	outputIdx int
 	constVal  time.Time
@@ -351,7 +367,7 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 	if n == 0 {
 		return batch
@@ -372,9 +388,10 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 // NewConstNullOp creates a new operator that produces a constant (untyped) NULL
 // value at index outputIdx.
-func NewConstNullOp(input Operator, outputIdx int, typ coltypes.T) Operator {
+func NewConstNullOp(allocator *Allocator, input Operator, outputIdx int, typ coltypes.T) Operator {
 	return &constNullOp{
 		OneInputNode: NewOneInputNode(input),
+		allocator:    allocator,
 		outputIdx:    outputIdx,
 		typ:          typ,
 	}
@@ -382,15 +399,12 @@ func NewConstNullOp(input Operator, outputIdx int, typ coltypes.T) Operator {
 
 type constNullOp struct {
 	OneInputNode
+	allocator *Allocator
 	outputIdx int
 	typ       coltypes.T
 }
 
-var _ StaticMemoryOperator = &constNullOp{}
-
-func (c constNullOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.typ}, int(coldata.BatchSize()))
-}
+var _ Operator = &constNullOp{}
 
 func (c constNullOp) Init() {
 	c.input.Init()
@@ -401,7 +415,7 @@ func (c constNullOp) Next(ctx context.Context) coldata.Batch {
 	n := batch.Length()
 
 	if batch.Width() == c.outputIdx {
-		batch.AppendCol(c.typ)
+		c.allocator.AppendColumn(batch, c.typ)
 	}
 
 	if n == 0 {

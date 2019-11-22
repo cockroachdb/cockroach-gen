@@ -32,13 +32,13 @@ type mergeJoinLeftAntiOp struct {
 	mergeJoinBase
 }
 
-var _ StaticMemoryOperator = &mergeJoinLeftAntiOp{}
+var _ InternalMemoryOperator = &mergeJoinLeftAntiOp{}
 
 type mergeJoinLeftAntiWithOnExprOp struct {
 	mergeJoinBase
 }
 
-var _ StaticMemoryOperator = &mergeJoinLeftAntiWithOnExprOp{}
+var _ InternalMemoryOperator = &mergeJoinLeftAntiWithOnExprOp{}
 
 func (o *mergeJoinLeftAntiOp) probeBodyLSeltrueRSeltrue(
 	ctx context.Context,

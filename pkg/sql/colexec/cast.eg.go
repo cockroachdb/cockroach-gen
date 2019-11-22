@@ -29,11 +29,17 @@ import (
 var _ interface{} = execgen.UNSAFEGET
 
 func GetCastOperator(
-	input Operator, colIdx int, resultIdx int, fromType *semtypes.T, toType *semtypes.T,
+	allocator *Allocator,
+	input Operator,
+	colIdx int,
+	resultIdx int,
+	fromType *semtypes.T,
+	toType *semtypes.T,
 ) (Operator, error) {
 	if fromType.Family() == semtypes.UnknownFamily {
 		return &castOpNullAny{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			toType:       typeconv.FromColumnType(toType),
@@ -45,6 +51,7 @@ func GetCastOperator(
 		case coltypes.Bool:
 			return &castOpBoolBool{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -53,6 +60,7 @@ func GetCastOperator(
 		case coltypes.Int16:
 			return &castOpBoolInt16{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -61,6 +69,7 @@ func GetCastOperator(
 		case coltypes.Int32:
 			return &castOpBoolInt32{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -69,6 +78,7 @@ func GetCastOperator(
 		case coltypes.Int64:
 			return &castOpBoolInt64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -77,6 +87,7 @@ func GetCastOperator(
 		case coltypes.Float64:
 			return &castOpBoolFloat64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -95,6 +106,7 @@ func GetCastOperator(
 		case coltypes.Bool:
 			return &castOpDecimalBool{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -103,6 +115,7 @@ func GetCastOperator(
 		case coltypes.Decimal:
 			return &castOpDecimalDecimal{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -116,6 +129,7 @@ func GetCastOperator(
 		case coltypes.Bool:
 			return &castOpInt16Bool{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -124,6 +138,7 @@ func GetCastOperator(
 		case coltypes.Decimal:
 			return &castOpInt16Decimal{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -132,6 +147,7 @@ func GetCastOperator(
 		case coltypes.Int16:
 			return &castOpInt16Int16{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -140,6 +156,7 @@ func GetCastOperator(
 		case coltypes.Float64:
 			return &castOpInt16Float64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -153,6 +170,7 @@ func GetCastOperator(
 		case coltypes.Bool:
 			return &castOpInt32Bool{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -161,6 +179,7 @@ func GetCastOperator(
 		case coltypes.Decimal:
 			return &castOpInt32Decimal{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -169,6 +188,7 @@ func GetCastOperator(
 		case coltypes.Int32:
 			return &castOpInt32Int32{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -177,6 +197,7 @@ func GetCastOperator(
 		case coltypes.Float64:
 			return &castOpInt32Float64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -190,6 +211,7 @@ func GetCastOperator(
 		case coltypes.Bool:
 			return &castOpInt64Bool{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -198,6 +220,7 @@ func GetCastOperator(
 		case coltypes.Decimal:
 			return &castOpInt64Decimal{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -206,6 +229,7 @@ func GetCastOperator(
 		case coltypes.Int64:
 			return &castOpInt64Int64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -214,6 +238,7 @@ func GetCastOperator(
 		case coltypes.Float64:
 			return &castOpInt64Float64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -227,6 +252,7 @@ func GetCastOperator(
 		case coltypes.Bool:
 			return &castOpFloat64Bool{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -235,6 +261,7 @@ func GetCastOperator(
 		case coltypes.Decimal:
 			return &castOpFloat64Decimal{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -243,6 +270,7 @@ func GetCastOperator(
 		case coltypes.Int16:
 			return &castOpFloat64Int16{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -251,6 +279,7 @@ func GetCastOperator(
 		case coltypes.Int32:
 			return &castOpFloat64Int32{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -259,6 +288,7 @@ func GetCastOperator(
 		case coltypes.Int64:
 			return &castOpFloat64Int64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -267,6 +297,7 @@ func GetCastOperator(
 		case coltypes.Float64:
 			return &castOpFloat64Float64{
 				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
 				fromType:     from,
@@ -282,16 +313,13 @@ func GetCastOperator(
 
 type castOpNullAny struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpNullAny{}
-
-func (c *castOpNullAny) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpNullAny{}
 
 func (c *castOpNullAny) Init() {
 	c.input.Init()
@@ -300,7 +328,7 @@ func (c *castOpNullAny) Init() {
 func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(c.toType)
+		c.allocator.AppendColumn(batch, c.toType)
 	}
 	n := batch.Length()
 	if n == 0 {
@@ -333,17 +361,14 @@ func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 
 type castOpBoolBool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpBoolBool{}
-
-func (c *castOpBoolBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpBoolBool{}
 
 func (c *castOpBoolBool) Init() {
 	c.input.Init()
@@ -356,7 +381,7 @@ func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -414,17 +439,14 @@ func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 
 type castOpBoolInt16 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpBoolInt16{}
-
-func (c *castOpBoolInt16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpBoolInt16{}
 
 func (c *castOpBoolInt16) Init() {
 	c.input.Init()
@@ -437,7 +459,7 @@ func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		c.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -515,17 +537,14 @@ func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 
 type castOpBoolInt32 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpBoolInt32{}
-
-func (c *castOpBoolInt32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpBoolInt32{}
 
 func (c *castOpBoolInt32) Init() {
 	c.input.Init()
@@ -538,7 +557,7 @@ func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		c.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -616,17 +635,14 @@ func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 
 type castOpBoolInt64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpBoolInt64{}
-
-func (c *castOpBoolInt64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpBoolInt64{}
 
 func (c *castOpBoolInt64) Init() {
 	c.input.Init()
@@ -639,7 +655,7 @@ func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		c.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -717,17 +733,14 @@ func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 
 type castOpBoolFloat64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpBoolFloat64{}
-
-func (c *castOpBoolFloat64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpBoolFloat64{}
 
 func (c *castOpBoolFloat64) Init() {
 	c.input.Init()
@@ -740,7 +753,7 @@ func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -818,17 +831,14 @@ func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 
 type castOpDecimalBool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpDecimalBool{}
-
-func (c *castOpDecimalBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpDecimalBool{}
 
 func (c *castOpDecimalBool) Init() {
 	c.input.Init()
@@ -841,7 +851,7 @@ func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Decimal()
@@ -907,17 +917,14 @@ func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 
 type castOpDecimalDecimal struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpDecimalDecimal{}
-
-func (c *castOpDecimalDecimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpDecimalDecimal{}
 
 func (c *castOpDecimalDecimal) Init() {
 	c.input.Init()
@@ -930,7 +937,7 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Decimal()
@@ -988,17 +995,14 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt16Bool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt16Bool{}
-
-func (c *castOpInt16Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt16Bool{}
 
 func (c *castOpInt16Bool) Init() {
 	c.input.Init()
@@ -1011,7 +1015,7 @@ func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1077,17 +1081,14 @@ func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt16Decimal struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt16Decimal{}
-
-func (c *castOpInt16Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt16Decimal{}
 
 func (c *castOpInt16Decimal) Init() {
 	c.input.Init()
@@ -1100,7 +1101,7 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1166,17 +1167,14 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt16Int16 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt16Int16{}
-
-func (c *castOpInt16Int16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt16Int16{}
 
 func (c *castOpInt16Int16) Init() {
 	c.input.Init()
@@ -1189,7 +1187,7 @@ func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		c.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1247,17 +1245,14 @@ func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt16Float64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt16Float64{}
-
-func (c *castOpInt16Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt16Float64{}
 
 func (c *castOpInt16Float64) Init() {
 	c.input.Init()
@@ -1270,7 +1265,7 @@ func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1336,17 +1331,14 @@ func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt32Bool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt32Bool{}
-
-func (c *castOpInt32Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt32Bool{}
 
 func (c *castOpInt32Bool) Init() {
 	c.input.Init()
@@ -1359,7 +1351,7 @@ func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1425,17 +1417,14 @@ func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt32Decimal struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt32Decimal{}
-
-func (c *castOpInt32Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt32Decimal{}
 
 func (c *castOpInt32Decimal) Init() {
 	c.input.Init()
@@ -1448,7 +1437,7 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1514,17 +1503,14 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt32Int32 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt32Int32{}
-
-func (c *castOpInt32Int32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt32Int32{}
 
 func (c *castOpInt32Int32) Init() {
 	c.input.Init()
@@ -1537,7 +1523,7 @@ func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		c.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1595,17 +1581,14 @@ func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt32Float64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt32Float64{}
-
-func (c *castOpInt32Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt32Float64{}
 
 func (c *castOpInt32Float64) Init() {
 	c.input.Init()
@@ -1618,7 +1601,7 @@ func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1684,17 +1667,14 @@ func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt64Bool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt64Bool{}
-
-func (c *castOpInt64Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt64Bool{}
 
 func (c *castOpInt64Bool) Init() {
 	c.input.Init()
@@ -1707,7 +1687,7 @@ func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -1773,17 +1753,14 @@ func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt64Decimal struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt64Decimal{}
-
-func (c *castOpInt64Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt64Decimal{}
 
 func (c *castOpInt64Decimal) Init() {
 	c.input.Init()
@@ -1796,7 +1773,7 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -1862,17 +1839,14 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt64Int64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt64Int64{}
-
-func (c *castOpInt64Int64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt64Int64{}
 
 func (c *castOpInt64Int64) Init() {
 	c.input.Init()
@@ -1885,7 +1859,7 @@ func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		c.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -1943,17 +1917,14 @@ func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 
 type castOpInt64Float64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpInt64Float64{}
-
-func (c *castOpInt64Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpInt64Float64{}
 
 func (c *castOpInt64Float64) Init() {
 	c.input.Init()
@@ -1966,7 +1937,7 @@ func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -2032,17 +2003,14 @@ func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 
 type castOpFloat64Bool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpFloat64Bool{}
-
-func (c *castOpFloat64Bool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpFloat64Bool{}
 
 func (c *castOpFloat64Bool) Init() {
 	c.input.Init()
@@ -2055,7 +2023,7 @@ func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2121,17 +2089,14 @@ func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 
 type castOpFloat64Decimal struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpFloat64Decimal{}
-
-func (c *castOpFloat64Decimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpFloat64Decimal{}
 
 func (c *castOpFloat64Decimal) Init() {
 	c.input.Init()
@@ -2144,7 +2109,7 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2238,17 +2203,14 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 
 type castOpFloat64Int16 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpFloat64Int16{}
-
-func (c *castOpFloat64Int16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpFloat64Int16{}
 
 func (c *castOpFloat64Int16) Init() {
 	c.input.Init()
@@ -2261,7 +2223,7 @@ func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		c.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2339,17 +2301,14 @@ func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 
 type castOpFloat64Int32 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpFloat64Int32{}
-
-func (c *castOpFloat64Int32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpFloat64Int32{}
 
 func (c *castOpFloat64Int32) Init() {
 	c.input.Init()
@@ -2362,7 +2321,7 @@ func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		c.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2440,17 +2399,14 @@ func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 
 type castOpFloat64Int64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpFloat64Int64{}
-
-func (c *castOpFloat64Int64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpFloat64Int64{}
 
 func (c *castOpFloat64Int64) Init() {
 	c.input.Init()
@@ -2463,7 +2419,7 @@ func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		c.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2541,17 +2497,14 @@ func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 
 type castOpFloat64Float64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	fromType  coltypes.T
 	toType    coltypes.T
 }
 
-var _ StaticMemoryOperator = &castOpFloat64Float64{}
-
-func (c *castOpFloat64Float64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{c.toType}, int(coldata.BatchSize()))
-}
+var _ Operator = &castOpFloat64Float64{}
 
 func (c *castOpFloat64Float64) Init() {
 	c.input.Init()
@@ -2564,7 +2517,7 @@ func (c *castOpFloat64Float64) Next(ctx context.Context) coldata.Batch {
 		return batch
 	}
 	if c.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()

@@ -25,6 +25,7 @@ import (
 // specifies in which coldata.Vec the operator should put its output (if there
 // is no such column, a new column is appended).
 func NewRankOperator(
+	allocator *Allocator,
 	input Operator,
 	inputTyps []coltypes.T,
 	dense bool,
@@ -33,7 +34,7 @@ func NewRankOperator(
 	partitionColIdx int,
 ) (Operator, error) {
 	if len(orderingCols) == 0 {
-		return NewConstOp(input, coltypes.Int64, int64(1), outputColIdx)
+		return NewConstOp(allocator, input, coltypes.Int64, int64(1), outputColIdx)
 	}
 	op, outputCol, err := OrderedDistinctColsToOperators(input, orderingCols, inputTyps)
 	if err != nil {
@@ -41,6 +42,7 @@ func NewRankOperator(
 	}
 	initFields := rankInitFields{
 		OneInputNode:    NewOneInputNode(op),
+		allocator:       allocator,
 		distinctCol:     outputCol,
 		outputColIdx:    outputColIdx,
 		partitionColIdx: partitionColIdx,
@@ -59,6 +61,7 @@ func NewRankOperator(
 
 type rankInitFields struct {
 	OneInputNode
+	allocator *Allocator
 	// distinctCol is the output column of the chain of ordered distinct
 	// operators in which true will indicate that a new rank needs to be assigned
 	// to the corresponding tuple.
@@ -93,7 +96,7 @@ func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
 
 	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		r.allocator.AppendColumn(batch, coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
@@ -156,14 +159,14 @@ func (r *rankWithPartitionOp) Init() {
 func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
 	if r.partitionColIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		r.allocator.AppendColumn(batch, coltypes.Bool)
 	} else if r.partitionColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column partitionColIdx is neither present nor the next to be appended")
 	}
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 
 	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		r.allocator.AppendColumn(batch, coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
@@ -239,7 +242,7 @@ func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
 
 	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		r.allocator.AppendColumn(batch, coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
@@ -300,14 +303,14 @@ func (r *denseRankWithPartitionOp) Init() {
 func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
 	if r.partitionColIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		r.allocator.AppendColumn(batch, coltypes.Bool)
 	} else if r.partitionColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column partitionColIdx is neither present nor the next to be appended")
 	}
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 
 	if r.outputColIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		r.allocator.AppendColumn(batch, coltypes.Int64)
 	} else if r.outputColIdx > batch.Width() {
 		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}

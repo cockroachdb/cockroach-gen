@@ -32,7 +32,7 @@ type mergeJoinRightOuterOp struct {
 	mergeJoinBase
 }
 
-var _ StaticMemoryOperator = &mergeJoinRightOuterOp{}
+var _ InternalMemoryOperator = &mergeJoinRightOuterOp{}
 
 func (o *mergeJoinRightOuterOp) probeBodyLSeltrueRSeltrue(
 	ctx context.Context,

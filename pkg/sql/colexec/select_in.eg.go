@@ -38,13 +38,20 @@ const (
 )
 
 func GetInProjectionOperator(
-	ct *types.T, input Operator, colIdx int, resultIdx int, datumTuple *tree.DTuple, negate bool,
+	allocator *Allocator,
+	ct *types.T,
+	input Operator,
+	colIdx int,
+	resultIdx int,
+	datumTuple *tree.DTuple,
+	negate bool,
 ) (Operator, error) {
 	var err error
 	switch t := typeconv.FromColumnType(ct); t {
 	case coltypes.Bool:
 		obj := &projectInOpBool{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -57,6 +64,7 @@ func GetInProjectionOperator(
 	case coltypes.Bytes:
 		obj := &projectInOpBytes{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -69,6 +77,7 @@ func GetInProjectionOperator(
 	case coltypes.Decimal:
 		obj := &projectInOpDecimal{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -81,6 +90,7 @@ func GetInProjectionOperator(
 	case coltypes.Int16:
 		obj := &projectInOpInt16{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -93,6 +103,7 @@ func GetInProjectionOperator(
 	case coltypes.Int32:
 		obj := &projectInOpInt32{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -105,6 +116,7 @@ func GetInProjectionOperator(
 	case coltypes.Int64:
 		obj := &projectInOpInt64{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -117,6 +129,7 @@ func GetInProjectionOperator(
 	case coltypes.Float64:
 		obj := &projectInOpFloat64{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -129,6 +142,7 @@ func GetInProjectionOperator(
 	case coltypes.Timestamp:
 		obj := &projectInOpTimestamp{
 			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
 			negate:       negate,
@@ -251,6 +265,7 @@ type selectInOpBool struct {
 
 type projectInOpBool struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []bool
@@ -258,11 +273,7 @@ type projectInOpBool struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpBool{}
-
-func (p *projectInOpBool) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpBool{}
 
 func fillDatumRowBool(ct *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -394,7 +405,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -485,6 +496,7 @@ type selectInOpBytes struct {
 
 type projectInOpBytes struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow [][]byte
@@ -492,11 +504,7 @@ type projectInOpBytes struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpBytes{}
-
-func (p *projectInOpBytes) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpBytes{}
 
 func fillDatumRowBytes(ct *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -620,7 +628,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -711,6 +719,7 @@ type selectInOpDecimal struct {
 
 type projectInOpDecimal struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []apd.Decimal
@@ -718,11 +727,7 @@ type projectInOpDecimal struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpDecimal{}
-
-func (p *projectInOpDecimal) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpDecimal{}
 
 func fillDatumRowDecimal(ct *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -846,7 +851,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -937,6 +942,7 @@ type selectInOpInt16 struct {
 
 type projectInOpInt16 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []int16
@@ -944,11 +950,7 @@ type projectInOpInt16 struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpInt16{}
-
-func (p *projectInOpInt16) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpInt16{}
 
 func fillDatumRowInt16(ct *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -1083,7 +1085,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -1174,6 +1176,7 @@ type selectInOpInt32 struct {
 
 type projectInOpInt32 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []int32
@@ -1181,11 +1184,7 @@ type projectInOpInt32 struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpInt32{}
-
-func (p *projectInOpInt32) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpInt32{}
 
 func fillDatumRowInt32(ct *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -1320,7 +1319,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -1411,6 +1410,7 @@ type selectInOpInt64 struct {
 
 type projectInOpInt64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []int64
@@ -1418,11 +1418,7 @@ type projectInOpInt64 struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpInt64{}
-
-func (p *projectInOpInt64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpInt64{}
 
 func fillDatumRowInt64(ct *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -1557,7 +1553,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -1648,6 +1644,7 @@ type selectInOpFloat64 struct {
 
 type projectInOpFloat64 struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []float64
@@ -1655,11 +1652,7 @@ type projectInOpFloat64 struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpFloat64{}
-
-func (p *projectInOpFloat64) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpFloat64{}
 
 func fillDatumRowFloat64(ct *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -1802,7 +1795,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch
@@ -1893,6 +1886,7 @@ type selectInOpTimestamp struct {
 
 type projectInOpTimestamp struct {
 	OneInputNode
+	allocator *Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []time.Time
@@ -1900,11 +1894,7 @@ type projectInOpTimestamp struct {
 	negate    bool
 }
 
-var _ StaticMemoryOperator = &projectInOpTimestamp{}
-
-func (p *projectInOpTimestamp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
+var _ Operator = &projectInOpTimestamp{}
 
 func fillDatumRowTimestamp(ct *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
 	conv := typeconv.GetDatumToPhysicalFn(ct)
@@ -2035,7 +2025,7 @@ func (si *selectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 func (pi *projectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
 	if pi.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		pi.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if batch.Length() == 0 {
 		return batch

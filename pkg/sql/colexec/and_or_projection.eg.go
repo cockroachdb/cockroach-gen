@@ -20,7 +20,8 @@ import (
 )
 
 type andProjOp struct {
-	input Operator
+	allocator *Allocator
+	input     Operator
 
 	leftProjOpChain  Operator
 	rightProjOpChain Operator
@@ -41,11 +42,13 @@ type andProjOp struct {
 // the boolean columns at leftIdx and rightIdx, returning the result in
 // outputIdx.
 func NewAndProjOp(
+	allocator *Allocator,
 	input, leftProjOpChain, rightProjOpChain Operator,
 	leftFeedOp, rightFeedOp *feedOperator,
 	leftIdx, rightIdx, outputIdx int,
 ) Operator {
 	return &andProjOp{
+		allocator:        allocator,
 		input:            input,
 		leftProjOpChain:  leftProjOpChain,
 		rightProjOpChain: rightProjOpChain,
@@ -94,7 +97,7 @@ func (o *andProjOp) Init() {
 func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	batch := o.input.Next(ctx)
 	if o.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		o.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	origLen := batch.Length()
 	// NB: we don't short-circuit if the batch is length 0 here, because we have
@@ -444,7 +447,8 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 }
 
 type orProjOp struct {
-	input Operator
+	allocator *Allocator
+	input     Operator
 
 	leftProjOpChain  Operator
 	rightProjOpChain Operator
@@ -465,11 +469,13 @@ type orProjOp struct {
 // the boolean columns at leftIdx and rightIdx, returning the result in
 // outputIdx.
 func NewOrProjOp(
+	allocator *Allocator,
 	input, leftProjOpChain, rightProjOpChain Operator,
 	leftFeedOp, rightFeedOp *feedOperator,
 	leftIdx, rightIdx, outputIdx int,
 ) Operator {
 	return &orProjOp{
+		allocator:        allocator,
 		input:            input,
 		leftProjOpChain:  leftProjOpChain,
 		rightProjOpChain: rightProjOpChain,
@@ -518,7 +524,7 @@ func (o *orProjOp) Init() {
 func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	batch := o.input.Next(ctx)
 	if o.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		o.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	origLen := batch.Length()
 	// NB: we don't short-circuit if the batch is length 0 here, because we have

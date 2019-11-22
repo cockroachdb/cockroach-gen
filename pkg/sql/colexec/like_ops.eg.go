@@ -101,15 +101,11 @@ type projPrefixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p projPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -257,15 +253,11 @@ type projSuffixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p projSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -413,15 +405,11 @@ type projRegexpBytesBytesConstOp struct {
 	constArg *regexp.Regexp
 }
 
-func (p projRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -569,15 +557,11 @@ type projNotPrefixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p projNotPrefixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -725,15 +709,11 @@ type projNotSuffixBytesBytesConstOp struct {
 	constArg []byte
 }
 
-func (p projNotSuffixBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -881,15 +861,11 @@ type projNotRegexpBytesBytesConstOp struct {
 	constArg *regexp.Regexp
 }
 
-func (p projNotRegexpBytesBytesConstOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch

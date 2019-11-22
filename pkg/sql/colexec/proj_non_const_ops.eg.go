@@ -28,15 +28,11 @@ type projEQBoolBoolOp struct {
 	projOpBase
 }
 
-func (p projEQBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -165,15 +161,11 @@ type projNEBoolBoolOp struct {
 	projOpBase
 }
 
-func (p projNEBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -302,15 +294,11 @@ type projLTBoolBoolOp struct {
 	projOpBase
 }
 
-func (p projLTBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -439,15 +427,11 @@ type projLEBoolBoolOp struct {
 	projOpBase
 }
 
-func (p projLEBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -576,15 +560,11 @@ type projGTBoolBoolOp struct {
 	projOpBase
 }
 
-func (p projGTBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -713,15 +693,11 @@ type projGEBoolBoolOp struct {
 	projOpBase
 }
 
-func (p projGEBoolBoolOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -850,15 +826,11 @@ type projEQBytesBytesOp struct {
 	projOpBase
 }
 
-func (p projEQBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -955,15 +927,11 @@ type projNEBytesBytesOp struct {
 	projOpBase
 }
 
-func (p projNEBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -1060,15 +1028,11 @@ type projLTBytesBytesOp struct {
 	projOpBase
 }
 
-func (p projLTBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -1165,15 +1129,11 @@ type projLEBytesBytesOp struct {
 	projOpBase
 }
 
-func (p projLEBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -1270,15 +1230,11 @@ type projGTBytesBytesOp struct {
 	projOpBase
 }
 
-func (p projGTBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -1375,15 +1331,11 @@ type projGEBytesBytesOp struct {
 	projOpBase
 }
 
-func (p projGEBytesBytesOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -1480,15 +1432,11 @@ type projPlusDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projPlusDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -1569,15 +1517,11 @@ type projMinusDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projMinusDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -1658,15 +1602,11 @@ type projMultDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projMultDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -1747,15 +1687,11 @@ type projDivDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projDivDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -1868,15 +1804,11 @@ type projEQDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projEQDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -1973,15 +1905,11 @@ type projNEDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projNEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -2078,15 +2006,11 @@ type projLTDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projLTDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -2183,15 +2107,11 @@ type projLEDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projLEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -2288,15 +2208,11 @@ type projGTDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projGTDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -2393,15 +2309,11 @@ type projGEDecimalDecimalOp struct {
 	projOpBase
 }
 
-func (p projGEDecimalDecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -2498,15 +2410,11 @@ type projPlusDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projPlusDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -2615,15 +2523,11 @@ type projMinusDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projMinusDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -2732,15 +2636,11 @@ type projMultDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projMultDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -2849,15 +2749,11 @@ type projDivDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projDivDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -2982,15 +2878,11 @@ type projEQDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projEQDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -3111,15 +3003,11 @@ type projNEDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projNEDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -3240,15 +3128,11 @@ type projLTDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projLTDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -3369,15 +3253,11 @@ type projLEDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projLEDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -3498,15 +3378,11 @@ type projGTDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projGTDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -3627,15 +3503,11 @@ type projGEDecimalInt16Op struct {
 	projOpBase
 }
 
-func (p projGEDecimalInt16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -3756,15 +3628,11 @@ type projPlusDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projPlusDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -3873,15 +3741,11 @@ type projMinusDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projMinusDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -3990,15 +3854,11 @@ type projMultDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projMultDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -4107,15 +3967,11 @@ type projDivDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projDivDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -4240,15 +4096,11 @@ type projEQDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projEQDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -4369,15 +4221,11 @@ type projNEDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projNEDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -4498,15 +4346,11 @@ type projLTDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projLTDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -4627,15 +4471,11 @@ type projLEDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projLEDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -4756,15 +4596,11 @@ type projGTDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projGTDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -4885,15 +4721,11 @@ type projGEDecimalInt32Op struct {
 	projOpBase
 }
 
-func (p projGEDecimalInt32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -5014,15 +4846,11 @@ type projPlusDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projPlusDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -5131,15 +4959,11 @@ type projMinusDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projMinusDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -5248,15 +5072,11 @@ type projMultDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projMultDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -5365,15 +5185,11 @@ type projDivDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projDivDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -5498,15 +5314,11 @@ type projEQDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projEQDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -5627,15 +5439,11 @@ type projNEDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projNEDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -5756,15 +5564,11 @@ type projLTDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projLTDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -5885,15 +5689,11 @@ type projLEDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projLEDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6014,15 +5814,11 @@ type projGTDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projGTDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6143,15 +5939,11 @@ type projGEDecimalInt64Op struct {
 	projOpBase
 }
 
-func (p projGEDecimalInt64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6272,15 +6064,11 @@ type projEQDecimalFloat64Op struct {
 	projOpBase
 }
 
-func (p projEQDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6409,15 +6197,11 @@ type projNEDecimalFloat64Op struct {
 	projOpBase
 }
 
-func (p projNEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6546,15 +6330,11 @@ type projLTDecimalFloat64Op struct {
 	projOpBase
 }
 
-func (p projLTDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6683,15 +6463,11 @@ type projLEDecimalFloat64Op struct {
 	projOpBase
 }
 
-func (p projLEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6820,15 +6596,11 @@ type projGTDecimalFloat64Op struct {
 	projOpBase
 }
 
-func (p projGTDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -6957,15 +6729,11 @@ type projGEDecimalFloat64Op struct {
 	projOpBase
 }
 
-func (p projGEDecimalFloat64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -7094,15 +6862,11 @@ type projPlusInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projPlusInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -7219,15 +6983,11 @@ type projMinusInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projMinusInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -7344,15 +7104,11 @@ type projMultInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projMultInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -7469,15 +7225,11 @@ type projDivInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projDivInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -7606,15 +7358,11 @@ type projEQInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projEQInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -7735,15 +7483,11 @@ type projNEInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projNEInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -7864,15 +7608,11 @@ type projLTInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projLTInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -7993,15 +7733,11 @@ type projLEInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projLEInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -8122,15 +7858,11 @@ type projGTInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projGTInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -8251,15 +7983,11 @@ type projGEInt16DecimalOp struct {
 	projOpBase
 }
 
-func (p projGEInt16DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -8380,15 +8108,11 @@ type projPlusInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projPlusInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		p.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	if n == 0 {
 		return batch
@@ -8493,15 +8217,11 @@ type projMinusInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projMinusInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		p.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	if n == 0 {
 		return batch
@@ -8606,15 +8326,11 @@ type projMultInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projMultInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int16}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int16)
+		p.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	if n == 0 {
 		return batch
@@ -8747,15 +8463,11 @@ type projDivInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projDivInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -8876,15 +8588,11 @@ type projEQInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projEQInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -9025,15 +8733,11 @@ type projNEInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projNEInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -9174,15 +8878,11 @@ type projLTInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projLTInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -9323,15 +9023,11 @@ type projLEInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projLEInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -9472,15 +9168,11 @@ type projGTInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projGTInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -9621,15 +9313,11 @@ type projGEInt16Int16Op struct {
 	projOpBase
 }
 
-func (p projGEInt16Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -9770,15 +9458,11 @@ type projPlusInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projPlusInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -9883,15 +9567,11 @@ type projMinusInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projMinusInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -9996,15 +9676,11 @@ type projMultInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projMultInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -10137,15 +9813,11 @@ type projDivInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projDivInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -10266,15 +9938,11 @@ type projEQInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projEQInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -10415,15 +10083,11 @@ type projNEInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projNEInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -10564,15 +10228,11 @@ type projLTInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projLTInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -10713,15 +10373,11 @@ type projLEInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projLEInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -10862,15 +10518,11 @@ type projGTInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projGTInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -11011,15 +10663,11 @@ type projGEInt16Int32Op struct {
 	projOpBase
 }
 
-func (p projGEInt16Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -11160,15 +10808,11 @@ type projPlusInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projPlusInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -11273,15 +10917,11 @@ type projMinusInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projMinusInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -11386,15 +11026,11 @@ type projMultInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projMultInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -11527,15 +11163,11 @@ type projDivInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projDivInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -11656,15 +11288,11 @@ type projEQInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projEQInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -11805,15 +11433,11 @@ type projNEInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projNEInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -11954,15 +11578,11 @@ type projLTInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projLTInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -12103,15 +11723,11 @@ type projLEInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projLEInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -12252,15 +11868,11 @@ type projGTInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projGTInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -12401,15 +12013,11 @@ type projGEInt16Int64Op struct {
 	projOpBase
 }
 
-func (p projGEInt16Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -12550,15 +12158,11 @@ type projEQInt16Float64Op struct {
 	projOpBase
 }
 
-func (p projEQInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -12731,15 +12335,11 @@ type projNEInt16Float64Op struct {
 	projOpBase
 }
 
-func (p projNEInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -12912,15 +12512,11 @@ type projLTInt16Float64Op struct {
 	projOpBase
 }
 
-func (p projLTInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -13093,15 +12689,11 @@ type projLEInt16Float64Op struct {
 	projOpBase
 }
 
-func (p projLEInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -13274,15 +12866,11 @@ type projGTInt16Float64Op struct {
 	projOpBase
 }
 
-func (p projGTInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -13455,15 +13043,11 @@ type projGEInt16Float64Op struct {
 	projOpBase
 }
 
-func (p projGEInt16Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -13636,15 +13220,11 @@ type projPlusInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projPlusInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -13761,15 +13341,11 @@ type projMinusInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projMinusInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -13886,15 +13462,11 @@ type projMultInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projMultInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -14011,15 +13583,11 @@ type projDivInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projDivInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -14148,15 +13716,11 @@ type projEQInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projEQInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -14277,15 +13841,11 @@ type projNEInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projNEInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -14406,15 +13966,11 @@ type projLTInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projLTInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -14535,15 +14091,11 @@ type projLEInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projLEInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -14664,15 +14216,11 @@ type projGTInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projGTInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -14793,15 +14341,11 @@ type projGEInt32DecimalOp struct {
 	projOpBase
 }
 
-func (p projGEInt32DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -14922,15 +14466,11 @@ type projPlusInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projPlusInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -15035,15 +14575,11 @@ type projMinusInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projMinusInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -15148,15 +14684,11 @@ type projMultInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projMultInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -15289,15 +14821,11 @@ type projDivInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projDivInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -15418,15 +14946,11 @@ type projEQInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projEQInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -15567,15 +15091,11 @@ type projNEInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projNEInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -15716,15 +15236,11 @@ type projLTInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projLTInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -15865,15 +15381,11 @@ type projLEInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projLEInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -16014,15 +15526,11 @@ type projGTInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projGTInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -16163,15 +15671,11 @@ type projGEInt32Int16Op struct {
 	projOpBase
 }
 
-func (p projGEInt32Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -16312,15 +15816,11 @@ type projPlusInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projPlusInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		p.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	if n == 0 {
 		return batch
@@ -16425,15 +15925,11 @@ type projMinusInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projMinusInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		p.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	if n == 0 {
 		return batch
@@ -16538,15 +16034,11 @@ type projMultInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projMultInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int32}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int32)
+		p.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	if n == 0 {
 		return batch
@@ -16679,15 +16171,11 @@ type projDivInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projDivInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -16808,15 +16296,11 @@ type projEQInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projEQInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -16957,15 +16441,11 @@ type projNEInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projNEInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -17106,15 +16586,11 @@ type projLTInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projLTInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -17255,15 +16731,11 @@ type projLEInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projLEInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -17404,15 +16876,11 @@ type projGTInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projGTInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -17553,15 +17021,11 @@ type projGEInt32Int32Op struct {
 	projOpBase
 }
 
-func (p projGEInt32Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -17702,15 +17166,11 @@ type projPlusInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projPlusInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -17815,15 +17275,11 @@ type projMinusInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projMinusInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -17928,15 +17384,11 @@ type projMultInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projMultInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -18069,15 +17521,11 @@ type projDivInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projDivInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -18198,15 +17646,11 @@ type projEQInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projEQInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -18347,15 +17791,11 @@ type projNEInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projNEInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -18496,15 +17936,11 @@ type projLTInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projLTInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -18645,15 +18081,11 @@ type projLEInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projLEInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -18794,15 +18226,11 @@ type projGTInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projGTInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -18943,15 +18371,11 @@ type projGEInt32Int64Op struct {
 	projOpBase
 }
 
-func (p projGEInt32Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -19092,15 +18516,11 @@ type projEQInt32Float64Op struct {
 	projOpBase
 }
 
-func (p projEQInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -19273,15 +18693,11 @@ type projNEInt32Float64Op struct {
 	projOpBase
 }
 
-func (p projNEInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -19454,15 +18870,11 @@ type projLTInt32Float64Op struct {
 	projOpBase
 }
 
-func (p projLTInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -19635,15 +19047,11 @@ type projLEInt32Float64Op struct {
 	projOpBase
 }
 
-func (p projLEInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -19816,15 +19224,11 @@ type projGTInt32Float64Op struct {
 	projOpBase
 }
 
-func (p projGTInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -19997,15 +19401,11 @@ type projGEInt32Float64Op struct {
 	projOpBase
 }
 
-func (p projGEInt32Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -20178,15 +19578,11 @@ type projPlusInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projPlusInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -20303,15 +19699,11 @@ type projMinusInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projMinusInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -20428,15 +19820,11 @@ type projMultInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projMultInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -20553,15 +19941,11 @@ type projDivInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projDivInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -20690,15 +20074,11 @@ type projEQInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projEQInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -20819,15 +20199,11 @@ type projNEInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projNEInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -20948,15 +20324,11 @@ type projLTInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projLTInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -21077,15 +20449,11 @@ type projLEInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projLEInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -21206,15 +20574,11 @@ type projGTInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projGTInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -21335,15 +20699,11 @@ type projGEInt64DecimalOp struct {
 	projOpBase
 }
 
-func (p projGEInt64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -21464,15 +20824,11 @@ type projPlusInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projPlusInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -21577,15 +20933,11 @@ type projMinusInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projMinusInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -21690,15 +21042,11 @@ type projMultInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projMultInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -21831,15 +21179,11 @@ type projDivInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projDivInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -21960,15 +21304,11 @@ type projEQInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projEQInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -22109,15 +21449,11 @@ type projNEInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projNEInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -22258,15 +21594,11 @@ type projLTInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projLTInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -22407,15 +21739,11 @@ type projLEInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projLEInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -22556,15 +21884,11 @@ type projGTInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projGTInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -22705,15 +22029,11 @@ type projGEInt64Int16Op struct {
 	projOpBase
 }
 
-func (p projGEInt64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -22854,15 +22174,11 @@ type projPlusInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projPlusInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -22967,15 +22283,11 @@ type projMinusInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projMinusInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -23080,15 +22392,11 @@ type projMultInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projMultInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -23221,15 +22529,11 @@ type projDivInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projDivInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -23350,15 +22654,11 @@ type projEQInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projEQInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -23499,15 +22799,11 @@ type projNEInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projNEInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -23648,15 +22944,11 @@ type projLTInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projLTInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -23797,15 +23089,11 @@ type projLEInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projLEInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -23946,15 +23234,11 @@ type projGTInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projGTInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -24095,15 +23379,11 @@ type projGEInt64Int32Op struct {
 	projOpBase
 }
 
-func (p projGEInt64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -24244,15 +23524,11 @@ type projPlusInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projPlusInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -24357,15 +23633,11 @@ type projMinusInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projMinusInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -24470,15 +23742,11 @@ type projMultInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projMultInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Int64}, int(coldata.BatchSize()))
-}
-
 func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Int64)
+		p.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	if n == 0 {
 		return batch
@@ -24611,15 +23879,11 @@ type projDivInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projDivInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Decimal}, int(coldata.BatchSize()))
-}
-
 func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Decimal)
+		p.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	if n == 0 {
 		return batch
@@ -24740,15 +24004,11 @@ type projEQInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projEQInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -24889,15 +24149,11 @@ type projNEInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projNEInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25038,15 +24294,11 @@ type projLTInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projLTInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25187,15 +24439,11 @@ type projLEInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projLEInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25336,15 +24584,11 @@ type projGTInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projGTInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25485,15 +24729,11 @@ type projGEInt64Int64Op struct {
 	projOpBase
 }
 
-func (p projGEInt64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25634,15 +24874,11 @@ type projEQInt64Float64Op struct {
 	projOpBase
 }
 
-func (p projEQInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25815,15 +25051,11 @@ type projNEInt64Float64Op struct {
 	projOpBase
 }
 
-func (p projNEInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -25996,15 +25228,11 @@ type projLTInt64Float64Op struct {
 	projOpBase
 }
 
-func (p projLTInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -26177,15 +25405,11 @@ type projLEInt64Float64Op struct {
 	projOpBase
 }
 
-func (p projLEInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -26358,15 +25582,11 @@ type projGTInt64Float64Op struct {
 	projOpBase
 }
 
-func (p projGTInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -26539,15 +25759,11 @@ type projGEInt64Float64Op struct {
 	projOpBase
 }
 
-func (p projGEInt64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -26720,15 +25936,11 @@ type projEQFloat64DecimalOp struct {
 	projOpBase
 }
 
-func (p projEQFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -26857,15 +26069,11 @@ type projNEFloat64DecimalOp struct {
 	projOpBase
 }
 
-func (p projNEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -26994,15 +26202,11 @@ type projLTFloat64DecimalOp struct {
 	projOpBase
 }
 
-func (p projLTFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -27131,15 +26335,11 @@ type projLEFloat64DecimalOp struct {
 	projOpBase
 }
 
-func (p projLEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -27268,15 +26468,11 @@ type projGTFloat64DecimalOp struct {
 	projOpBase
 }
 
-func (p projGTFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -27405,15 +26601,11 @@ type projGEFloat64DecimalOp struct {
 	projOpBase
 }
 
-func (p projGEFloat64DecimalOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -27542,15 +26734,11 @@ type projEQFloat64Int16Op struct {
 	projOpBase
 }
 
-func (p projEQFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -27723,15 +26911,11 @@ type projNEFloat64Int16Op struct {
 	projOpBase
 }
 
-func (p projNEFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -27904,15 +27088,11 @@ type projLTFloat64Int16Op struct {
 	projOpBase
 }
 
-func (p projLTFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -28085,15 +27265,11 @@ type projLEFloat64Int16Op struct {
 	projOpBase
 }
 
-func (p projLEFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -28266,15 +27442,11 @@ type projGTFloat64Int16Op struct {
 	projOpBase
 }
 
-func (p projGTFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -28447,15 +27619,11 @@ type projGEFloat64Int16Op struct {
 	projOpBase
 }
 
-func (p projGEFloat64Int16Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -28628,15 +27796,11 @@ type projEQFloat64Int32Op struct {
 	projOpBase
 }
 
-func (p projEQFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -28809,15 +27973,11 @@ type projNEFloat64Int32Op struct {
 	projOpBase
 }
 
-func (p projNEFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -28990,15 +28150,11 @@ type projLTFloat64Int32Op struct {
 	projOpBase
 }
 
-func (p projLTFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -29171,15 +28327,11 @@ type projLEFloat64Int32Op struct {
 	projOpBase
 }
 
-func (p projLEFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -29352,15 +28504,11 @@ type projGTFloat64Int32Op struct {
 	projOpBase
 }
 
-func (p projGTFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -29533,15 +28681,11 @@ type projGEFloat64Int32Op struct {
 	projOpBase
 }
 
-func (p projGEFloat64Int32Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -29714,15 +28858,11 @@ type projEQFloat64Int64Op struct {
 	projOpBase
 }
 
-func (p projEQFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -29895,15 +29035,11 @@ type projNEFloat64Int64Op struct {
 	projOpBase
 }
 
-func (p projNEFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -30076,15 +29212,11 @@ type projLTFloat64Int64Op struct {
 	projOpBase
 }
 
-func (p projLTFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -30257,15 +29389,11 @@ type projLEFloat64Int64Op struct {
 	projOpBase
 }
 
-func (p projLEFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -30438,15 +29566,11 @@ type projGTFloat64Int64Op struct {
 	projOpBase
 }
 
-func (p projGTFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -30619,15 +29743,11 @@ type projGEFloat64Int64Op struct {
 	projOpBase
 }
 
-func (p projGEFloat64Int64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -30800,15 +29920,11 @@ type projPlusFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projPlusFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
-}
-
 func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		p.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	if n == 0 {
 		return batch
@@ -30881,15 +29997,11 @@ type projMinusFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projMinusFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
-}
-
 func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		p.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	if n == 0 {
 		return batch
@@ -30962,15 +30074,11 @@ type projMultFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projMultFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
-}
-
 func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		p.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	if n == 0 {
 		return batch
@@ -31043,15 +30151,11 @@ type projDivFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projDivFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Float64}, int(coldata.BatchSize()))
-}
-
 func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Float64)
+		p.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	if n == 0 {
 		return batch
@@ -31124,15 +30228,11 @@ type projEQFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projEQFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -31305,15 +30405,11 @@ type projNEFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projNEFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -31486,15 +30582,11 @@ type projLTFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projLTFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -31667,15 +30759,11 @@ type projLEFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projLEFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -31848,15 +30936,11 @@ type projGTFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projGTFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32029,15 +31113,11 @@ type projGEFloat64Float64Op struct {
 	projOpBase
 }
 
-func (p projGEFloat64Float64Op) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32210,15 +31290,11 @@ type projEQTimestampTimestampOp struct {
 	projOpBase
 }
 
-func (p projEQTimestampTimestampOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32343,15 +31419,11 @@ type projNETimestampTimestampOp struct {
 	projOpBase
 }
 
-func (p projNETimestampTimestampOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32476,15 +31548,11 @@ type projLTTimestampTimestampOp struct {
 	projOpBase
 }
 
-func (p projLTTimestampTimestampOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32609,15 +31677,11 @@ type projLETimestampTimestampOp struct {
 	projOpBase
 }
 
-func (p projLETimestampTimestampOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32742,15 +31806,11 @@ type projGTTimestampTimestampOp struct {
 	projOpBase
 }
 
-func (p projGTTimestampTimestampOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -32875,15 +31935,11 @@ type projGETimestampTimestampOp struct {
 	projOpBase
 }
 
-func (p projGETimestampTimestampOp) EstimateStaticMemoryUsage() int {
-	return EstimateBatchSizeBytes([]coltypes.T{coltypes.Bool}, int(coldata.BatchSize()))
-}
-
 func (p projGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if p.outputIdx == batch.Width() {
-		batch.AppendCol(coltypes.Bool)
+		p.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	if n == 0 {
 		return batch
@@ -33007,6 +32063,7 @@ func (p projGETimestampTimestampOp) Init() {
 // GetProjectionOperator returns the appropriate projection operator for the
 // given left and right column types and operation.
 func GetProjectionOperator(
+	allocator *Allocator,
 	leftColType *types.T,
 	rightColType *types.T,
 	op tree.Operator,
@@ -33015,7 +32072,13 @@ func GetProjectionOperator(
 	col2Idx int,
 	outputIdx int,
 ) (Operator, error) {
-	projOpBase := projOpBase{OneInputNode: NewOneInputNode(input), col1Idx: col1Idx, col2Idx: col2Idx, outputIdx: outputIdx}
+	projOpBase := projOpBase{
+		OneInputNode: NewOneInputNode(input),
+		allocator:    allocator,
+		col1Idx:      col1Idx,
+		col2Idx:      col2Idx,
+		outputIdx:    outputIdx,
+	}
 	switch leftType := typeconv.FromColumnType(leftColType); leftType {
 	case coltypes.Bool:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
