@@ -28388,1838 +28388,1843 @@ func (o *mergeJoinLeftOuterOp) buildLeftGroups(
 	sel := batch.Selection()
 	initialBuilderState := o.builderState.left
 	outputBatchSize := int(o.outputBatchSize)
-	// Loop over every column.
-LeftColLoop:
-	for outColIdx, inColIdx := range input.outCols {
-		outStartIdx := int(destStartIdx)
-		out := o.output.ColVec(outColIdx)
-		src := batch.ColVec(int(inColIdx))
-		colType := input.sourceTypes[inColIdx]
+	o.allocator.performOperation(
+		o.output.ColVecs()[:len(input.outCols)],
+		func() {
+			// Loop over every column.
+		LeftColLoop:
+			for outColIdx, inColIdx := range input.outCols {
+				outStartIdx := int(destStartIdx)
+				out := o.output.ColVec(outColIdx)
+				src := batch.ColVec(int(inColIdx))
+				colType := input.sourceTypes[inColIdx]
 
-		if sel != nil {
-			if src.MaybeHasNulls() {
+				if sel != nil {
+					if src.MaybeHasNulls() {
 
-				switch colType {
-				case coltypes.Bool:
-					srcCol := src.Bool()
-					outCol := out.Bool()
-					var val bool
-					var srcStartIdx int
+						switch colType {
+						case coltypes.Bool:
+							srcCol := src.Bool()
+							outCol := out.Bool()
+							var val bool
+							var srcStartIdx int
 
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
 								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
 
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
 									}
-								}
-							}
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
 
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					srcCol := src.Bytes()
-					outCol := out.Bytes()
-					var val []byte
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol.Get(srcStartIdx)
-									for i := 0; i < toAppend; i++ {
-										outCol.Set(outStartIdx, val)
-										outStartIdx++
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
 									}
-								}
-							}
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					srcCol := src.Decimal()
-					outCol := out.Decimal()
-					var val apd.Decimal
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx].Set(&val)
-										outStartIdx++
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
 									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
 								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
 							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							srcCol := src.Bytes()
+							outCol := out.Bytes()
+							var val []byte
+							var srcStartIdx int
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
 								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
 
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					srcCol := src.Int16()
-					outCol := out.Int16()
-					var val int16
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
 									}
-								}
-							}
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
 
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					srcCol := src.Int32()
-					outCol := out.Int32()
-					var val int32
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
+										if !isNull {
+											val = srcCol.Get(srcStartIdx)
+											for i := 0; i < toAppend; i++ {
+												outCol.Set(outStartIdx, val)
+												outStartIdx++
+											}
+										}
 									}
-								}
-							}
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					srcCol := src.Int64()
-					outCol := out.Int64()
-					var val int64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
 									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
 								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
 							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							srcCol := src.Decimal()
+							outCol := out.Decimal()
+							var val apd.Decimal
+							var srcStartIdx int
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
 								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
 
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					srcCol := src.Float64()
-					outCol := out.Float64()
-					var val float64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
 									}
-								}
-							}
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
 
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
-					outCol := out.Timestamp()
-					var val time.Time
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx].Set(&val)
+												outStartIdx++
+											}
+										}
 									}
-								}
-							}
 
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
 
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							srcCol := src.Int16()
+							outCol := out.Int16()
+							var val int16
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							srcCol := src.Int32()
+							outCol := out.Int32()
+							var val int32
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							srcCol := src.Int64()
+							outCol := out.Int64()
+							var val int64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							srcCol := src.Float64()
+							outCol := out.Float64()
+							var val float64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							srcCol := src.Timestamp()
+							outCol := out.Timestamp()
+							var val time.Time
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
 						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+					} else {
+
+						switch colType {
+						case coltypes.Bool:
+							srcCol := src.Bool()
+							outCol := out.Bool()
+							var val bool
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							srcCol := src.Bytes()
+							outCol := out.Bytes()
+							var val []byte
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol.Get(srcStartIdx)
+											for i := 0; i < toAppend; i++ {
+												outCol.Set(outStartIdx, val)
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							srcCol := src.Decimal()
+							outCol := out.Decimal()
+							var val apd.Decimal
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx].Set(&val)
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							srcCol := src.Int16()
+							outCol := out.Int16()
+							var val int16
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							srcCol := src.Int32()
+							outCol := out.Int32()
+							var val int32
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							srcCol := src.Int64()
+							outCol := out.Int64()
+							var val int64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							srcCol := src.Float64()
+							outCol := out.Float64()
+							var val float64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							srcCol := src.Timestamp()
+							outCol := out.Timestamp()
+							var val time.Time
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+									srcStartIdx = int(sel[srcStartIdx])
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
 					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+				} else {
+					if src.MaybeHasNulls() {
+
+						switch colType {
+						case coltypes.Bool:
+							srcCol := src.Bool()
+							outCol := out.Bool()
+							var val bool
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							srcCol := src.Bytes()
+							outCol := out.Bytes()
+							var val []byte
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol.Get(srcStartIdx)
+											for i := 0; i < toAppend; i++ {
+												outCol.Set(outStartIdx, val)
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							srcCol := src.Decimal()
+							outCol := out.Decimal()
+							var val apd.Decimal
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx].Set(&val)
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							srcCol := src.Int16()
+							outCol := out.Int16()
+							var val int16
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							srcCol := src.Int32()
+							outCol := out.Int32()
+							var val int32
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							srcCol := src.Int64()
+							outCol := out.Int64()
+							var val int64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							srcCol := src.Float64()
+							outCol := out.Float64()
+							var val float64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							srcCol := src.Timestamp()
+							outCol := out.Timestamp()
+							var val time.Time
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
+										if isNull {
+											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+											outStartIdx += toAppend
+										}
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
+					} else {
+
+						switch colType {
+						case coltypes.Bool:
+							srcCol := src.Bool()
+							outCol := out.Bool()
+							var val bool
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							srcCol := src.Bytes()
+							outCol := out.Bytes()
+							var val []byte
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol.Get(srcStartIdx)
+											for i := 0; i < toAppend; i++ {
+												outCol.Set(outStartIdx, val)
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							srcCol := src.Decimal()
+							outCol := out.Decimal()
+							var val apd.Decimal
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx].Set(&val)
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							srcCol := src.Int16()
+							outCol := out.Int16()
+							var val int16
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							srcCol := src.Int32()
+							outCol := out.Int32()
+							var val int32
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							srcCol := src.Int64()
+							outCol := out.Int64()
+							var val int64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							srcCol := src.Float64()
+							outCol := out.Float64()
+							var val float64
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							srcCol := src.Timestamp()
+							outCol := out.Timestamp()
+							var val time.Time
+							var srcStartIdx int
+
+							// Loop over every group.
+							for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+								leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+								// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+								// Otherwise continue where we left off.
+								if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+									o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+								}
+								// Loop over every row in the group.
+								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+									// Repeat each row numRepeats times.
+									srcStartIdx = o.builderState.left.curSrcStartIdx
+
+									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+									toAppend := repeatsLeft
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									{
+										var isNull bool
+
+										if !isNull {
+											val = srcCol[srcStartIdx]
+											for i := 0; i < toAppend; i++ {
+												outCol[outStartIdx] = val
+												outStartIdx++
+											}
+										}
+									}
+
+									if toAppend < repeatsLeft {
+										// We didn't materialize all the rows in the group so save state and
+										// move to the next column.
+										o.builderState.left.numRepeatsIdx += toAppend
+										if outColIdx == len(input.outCols)-1 {
+											return
+										}
+										o.builderState.left.setBuilderColumnState(initialBuilderState)
+										continue LeftColLoop
+									}
+
+									o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							}
+							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
+					}
 				}
-			} else {
-
-				switch colType {
-				case coltypes.Bool:
-					srcCol := src.Bool()
-					outCol := out.Bool()
-					var val bool
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					srcCol := src.Bytes()
-					outCol := out.Bytes()
-					var val []byte
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol.Get(srcStartIdx)
-									for i := 0; i < toAppend; i++ {
-										outCol.Set(outStartIdx, val)
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					srcCol := src.Decimal()
-					outCol := out.Decimal()
-					var val apd.Decimal
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx].Set(&val)
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					srcCol := src.Int16()
-					outCol := out.Int16()
-					var val int16
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					srcCol := src.Int32()
-					outCol := out.Int32()
-					var val int32
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					srcCol := src.Int64()
-					outCol := out.Int64()
-					var val int64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					srcCol := src.Float64()
-					outCol := out.Float64()
-					var val float64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
-					outCol := out.Timestamp()
-					var val time.Time
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-							srcStartIdx = int(sel[srcStartIdx])
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
-				}
+				o.builderState.left.setBuilderColumnState(initialBuilderState)
 			}
-		} else {
-			if src.MaybeHasNulls() {
-
-				switch colType {
-				case coltypes.Bool:
-					srcCol := src.Bool()
-					outCol := out.Bool()
-					var val bool
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					srcCol := src.Bytes()
-					outCol := out.Bytes()
-					var val []byte
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol.Get(srcStartIdx)
-									for i := 0; i < toAppend; i++ {
-										outCol.Set(outStartIdx, val)
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					srcCol := src.Decimal()
-					outCol := out.Decimal()
-					var val apd.Decimal
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx].Set(&val)
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					srcCol := src.Int16()
-					outCol := out.Int16()
-					var val int16
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					srcCol := src.Int32()
-					outCol := out.Int32()
-					var val int32
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					srcCol := src.Int64()
-					outCol := out.Int64()
-					var val int64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					srcCol := src.Float64()
-					outCol := out.Float64()
-					var val float64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
-					outCol := out.Timestamp()
-					var val time.Time
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-								isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-								if isNull {
-									out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-									outStartIdx += toAppend
-								}
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
-				}
-			} else {
-
-				switch colType {
-				case coltypes.Bool:
-					srcCol := src.Bool()
-					outCol := out.Bool()
-					var val bool
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					srcCol := src.Bytes()
-					outCol := out.Bytes()
-					var val []byte
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol.Get(srcStartIdx)
-									for i := 0; i < toAppend; i++ {
-										outCol.Set(outStartIdx, val)
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					srcCol := src.Decimal()
-					outCol := out.Decimal()
-					var val apd.Decimal
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx].Set(&val)
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					srcCol := src.Int16()
-					outCol := out.Int16()
-					var val int16
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					srcCol := src.Int32()
-					outCol := out.Int32()
-					var val int32
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					srcCol := src.Int64()
-					outCol := out.Int64()
-					var val int64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					srcCol := src.Float64()
-					outCol := out.Float64()
-					var val float64
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
-					outCol := out.Timestamp()
-					var val time.Time
-					var srcStartIdx int
-
-					// Loop over every group.
-					for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
-						leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-						// If curSrcStartIdx is uninitialized, start it at the group's start idx.
-						// Otherwise continue where we left off.
-						if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-							o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
-						}
-						// Loop over every row in the group.
-						for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
-							// Repeat each row numRepeats times.
-							srcStartIdx = o.builderState.left.curSrcStartIdx
-
-							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
-							toAppend := repeatsLeft
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							{
-								var isNull bool
-
-								if !isNull {
-									val = srcCol[srcStartIdx]
-									for i := 0; i < toAppend; i++ {
-										outCol[outStartIdx] = val
-										outStartIdx++
-									}
-								}
-							}
-
-							if toAppend < repeatsLeft {
-								// We didn't materialize all the rows in the group so save state and
-								// move to the next column.
-								o.builderState.left.numRepeatsIdx += toAppend
-								if outColIdx == len(input.outCols)-1 {
-									return
-								}
-								o.builderState.left.setBuilderColumnState(initialBuilderState)
-								continue LeftColLoop
-							}
-
-							o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-						}
-						o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-					}
-					o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
-				}
-			}
-		}
-		o.builderState.left.setBuilderColumnState(initialBuilderState)
-	}
-	o.builderState.left.reset()
+			o.builderState.left.reset()
+		},
+	)
 }
 
 // buildRightGroups takes a []group and repeats each group numRepeats times.
@@ -30287,15 +30292,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30352,15 +30360,23 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-									outCol.Set(outStartIdx, v)
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
+									o.allocator.performOperation(
+										[]coldata.Vec{out},
+										func() {
+											outCol.Set(outStartIdx, v)
+										},
+									)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30417,15 +30433,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx].Set(&v)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30482,15 +30501,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30547,15 +30569,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30612,15 +30637,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30677,15 +30705,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30742,15 +30773,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30813,12 +30847,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30875,12 +30912,20 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-									outCol.Set(outStartIdx, v)
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
+									o.allocator.performOperation(
+										[]coldata.Vec{out},
+										func() {
+											outCol.Set(outStartIdx, v)
+										},
+									)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30937,12 +30982,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx].Set(&v)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -30999,12 +31047,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31061,12 +31112,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31123,12 +31177,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31185,12 +31242,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31247,12 +31307,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31317,15 +31380,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31382,15 +31448,23 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-									outCol.Set(outStartIdx, v)
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
+									o.allocator.performOperation(
+										[]coldata.Vec{out},
+										func() {
+											outCol.Set(outStartIdx, v)
+										},
+									)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31447,15 +31521,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx].Set(&v)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31512,15 +31589,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31577,15 +31657,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31642,15 +31725,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31707,15 +31793,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31772,15 +31861,18 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
 									}
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31843,12 +31935,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31905,12 +32000,20 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-									outCol.Set(outStartIdx, v)
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
+									o.allocator.performOperation(
+										[]coldata.Vec{out},
+										func() {
+											outCol.Set(outStartIdx, v)
+										},
+									)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -31967,12 +32070,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx].Set(&v)
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -32029,12 +32135,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -32091,12 +32200,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -32153,12 +32265,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -32215,12 +32330,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,
@@ -32277,12 +32395,15 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									// TODO(yuzefovich): think about making execgen.SET set both the
-									// value and the null.
 									v := srcCol[o.builderState.right.curSrcStartIdx]
+									// We are in the fast path (we're setting a single element), so in
+									// order to not kill the performance, we only update the memory
+									// account in case of Bytes type (other types will not change the
+									// amount of memory accounted for).
 									outCol[outStartIdx] = v
 								} else {
-									out.Copy(
+									o.allocator.Copy(
+										out,
 										coldata.CopySliceArgs{
 											SliceArgs: coldata.SliceArgs{
 												ColType:     colType,

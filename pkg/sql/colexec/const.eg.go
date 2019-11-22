@@ -120,17 +120,23 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Bool()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Bool()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -156,17 +162,23 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Bytes()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col.Set(int(i), c.constVal)
-		}
-	} else {
-		col = col.Slice(0, int(n))
-		for i := 0; i < col.Len(); i++ {
-			col.Set(i, c.constVal)
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Bytes()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col.Set(int(i), c.constVal)
+				}
+			} else {
+				col = col.Slice(0, int(n))
+				for i := 0; i < col.Len(); i++ {
+					col.Set(i, c.constVal)
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -192,17 +204,23 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Decimal()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)].Set(&c.constVal)
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i].Set(&c.constVal)
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Decimal()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)].Set(&c.constVal)
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i].Set(&c.constVal)
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -228,17 +246,23 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Int16()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Int16()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -264,17 +288,23 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Int32()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Int32()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -300,17 +330,23 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Int64()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Int64()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -336,17 +372,23 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Float64()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Float64()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
 	return batch
 }
 
@@ -372,17 +414,23 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return batch
 	}
-	col := batch.ColVec(c.outputIdx).Timestamp()
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			col[int(i)] = c.constVal
-		}
-	} else {
-		col = col[0:int(n)]
-		for i := range col {
-			col[i] = c.constVal
-		}
-	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Timestamp()
+	c.allocator.performOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
 	return batch
 }
 

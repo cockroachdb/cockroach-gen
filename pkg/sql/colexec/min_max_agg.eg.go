@@ -25,38 +25,41 @@ import (
 // Use execgen package to remove unused import warning.
 var _ interface{} = execgen.UNSAFEGET
 
-func newMinAgg(t coltypes.T) (aggregateFunc, error) {
+func newMinAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
 	switch t {
 	case coltypes.Bool:
-		return &minBoolAgg{}, nil
+		return &minBoolAgg{allocator: allocator}, nil
 	case coltypes.Bytes:
-		return &minBytesAgg{}, nil
+		return &minBytesAgg{allocator: allocator}, nil
 	case coltypes.Decimal:
-		return &minDecimalAgg{}, nil
+		return &minDecimalAgg{allocator: allocator}, nil
 	case coltypes.Int16:
-		return &minInt16Agg{}, nil
+		return &minInt16Agg{allocator: allocator}, nil
 	case coltypes.Int32:
-		return &minInt32Agg{}, nil
+		return &minInt32Agg{allocator: allocator}, nil
 	case coltypes.Int64:
-		return &minInt64Agg{}, nil
+		return &minInt64Agg{allocator: allocator}, nil
 	case coltypes.Float64:
-		return &minFloat64Agg{}, nil
+		return &minFloat64Agg{allocator: allocator}, nil
 	case coltypes.Timestamp:
-		return &minTimestampAgg{}, nil
+		return &minTimestampAgg{allocator: allocator}, nil
 	default:
 		return nil, errors.Errorf("unsupported min agg type %s", t)
 	}
 }
 
 type minBoolAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg bool
-	// vec points to the output vector we are updating.
-	vec []bool
+	// col points to the output vector we are updating.
+	col []bool
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -68,14 +71,15 @@ var _ aggregateFunc = &minBoolAgg{}
 
 func (a *minBoolAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Bool()
+	a.vec = v
+	a.col = v.Bool()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minBoolAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroBoolColumn) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroBoolColumn) {
 	}
 	a.curAgg = zeroBoolColumn[0]
 	a.curIdx = -1
@@ -91,8 +95,8 @@ func (a *minBoolAgg) CurrentOutputIndex() int {
 func (a *minBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroBoolColumn) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -111,222 +115,232 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
 							}
-
-							cmp = cmpResult < 0
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minBoolAgg) HandleEmptyInputScalar() {
@@ -334,14 +348,17 @@ func (a *minBoolAgg) HandleEmptyInputScalar() {
 }
 
 type minBytesAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg []byte
-	// vec points to the output vector we are updating.
-	vec *coldata.Bytes
+	// col points to the output vector we are updating.
+	col *coldata.Bytes
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -353,14 +370,15 @@ var _ aggregateFunc = &minBytesAgg{}
 
 func (a *minBytesAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Bytes()
+	a.vec = v
+	a.col = v.Bytes()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minBytesAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	a.vec.Zero()
+	a.col.Zero()
 	a.curAgg = zeroBytesColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -375,8 +393,8 @@ func (a *minBytesAgg) CurrentOutputIndex() int {
 func (a *minBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := a.vec.Len()
-		target := a.vec.Slice(idx+1, vecLen)
+		vecLen := a.col.Len()
+		target := a.col.Slice(idx+1, vecLen)
 		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -394,190 +412,200 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec.Set(a.curIdx, a.curAgg)
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col.Set(a.curIdx, a.curAgg)
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
 						}
-						a.vec.Set(a.curIdx, a.curAgg)
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
 					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
+				} else {
+					col = col.Slice(0, int(inputLen))
+					for i := 0; i < col.Len(); i++ {
 
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult < 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col.Slice(0, int(inputLen))
+					for i := 0; i < col.Len(); i++ {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col.Slice(0, int(inputLen))
-			for i := 0; i < col.Len(); i++ {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec.Set(a.curIdx, a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
-
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec.Set(a.curIdx, a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
-
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col.Slice(0, int(inputLen))
-			for i := 0; i < col.Len(); i++ {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec.Set(a.curIdx, a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
-
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minBytesAgg) HandleEmptyInputScalar() {
@@ -585,14 +613,17 @@ func (a *minBytesAgg) HandleEmptyInputScalar() {
 }
 
 type minDecimalAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg apd.Decimal
-	// vec points to the output vector we are updating.
-	vec []apd.Decimal
+	// col points to the output vector we are updating.
+	col []apd.Decimal
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -604,15 +635,16 @@ var _ aggregateFunc = &minDecimalAgg{}
 
 func (a *minDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Decimal()
+	a.vec = v
+	a.col = v.Decimal()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minDecimalAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n++ {
-		a.vec[n].SetInt64(0)
+	for n := 0; n < len(a.col); n++ {
+		a.col[n].SetInt64(0)
 	}
 	a.curAgg = zeroDecimalColumn[0]
 	a.curIdx = -1
@@ -628,8 +660,8 @@ func (a *minDecimalAgg) CurrentOutputIndex() int {
 func (a *minDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n++ {
 			target[n].SetInt64(0)
 		}
@@ -649,190 +681,200 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx].Set(&a.curAgg)
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx].Set(&a.curAgg)
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx].Set(&a.curAgg)
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
 					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult < 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx].Set(&a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx].Set(&a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx].Set(&a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minDecimalAgg) HandleEmptyInputScalar() {
@@ -840,14 +882,17 @@ func (a *minDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type minInt16Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg int16
-	// vec points to the output vector we are updating.
-	vec []int16
+	// col points to the output vector we are updating.
+	col []int16
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -859,14 +904,15 @@ var _ aggregateFunc = &minInt16Agg{}
 
 func (a *minInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Int16()
+	a.vec = v
+	a.col = v.Int16()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minInt16Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt16Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroInt16Column) {
 	}
 	a.curAgg = zeroInt16Column[0]
 	a.curIdx = -1
@@ -882,8 +928,8 @@ func (a *minInt16Agg) CurrentOutputIndex() int {
 func (a *minInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroInt16Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -902,234 +948,244 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult < 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minInt16Agg) HandleEmptyInputScalar() {
@@ -1137,14 +1193,17 @@ func (a *minInt16Agg) HandleEmptyInputScalar() {
 }
 
 type minInt32Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg int32
-	// vec points to the output vector we are updating.
-	vec []int32
+	// col points to the output vector we are updating.
+	col []int32
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -1156,14 +1215,15 @@ var _ aggregateFunc = &minInt32Agg{}
 
 func (a *minInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Int32()
+	a.vec = v
+	a.col = v.Int32()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minInt32Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt32Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroInt32Column) {
 	}
 	a.curAgg = zeroInt32Column[0]
 	a.curIdx = -1
@@ -1179,8 +1239,8 @@ func (a *minInt32Agg) CurrentOutputIndex() int {
 func (a *minInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroInt32Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -1199,234 +1259,244 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult < 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minInt32Agg) HandleEmptyInputScalar() {
@@ -1434,14 +1504,17 @@ func (a *minInt32Agg) HandleEmptyInputScalar() {
 }
 
 type minInt64Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg int64
-	// vec points to the output vector we are updating.
-	vec []int64
+	// col points to the output vector we are updating.
+	col []int64
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -1453,14 +1526,15 @@ var _ aggregateFunc = &minInt64Agg{}
 
 func (a *minInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Int64()
+	a.vec = v
+	a.col = v.Int64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minInt64Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt64Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroInt64Column) {
 	}
 	a.curAgg = zeroInt64Column[0]
 	a.curIdx = -1
@@ -1476,8 +1550,8 @@ func (a *minInt64Agg) CurrentOutputIndex() int {
 func (a *minInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroInt64Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -1496,234 +1570,244 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult < 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minInt64Agg) HandleEmptyInputScalar() {
@@ -1731,14 +1815,17 @@ func (a *minInt64Agg) HandleEmptyInputScalar() {
 }
 
 type minFloat64Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg float64
-	// vec points to the output vector we are updating.
-	vec []float64
+	// col points to the output vector we are updating.
+	col []float64
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -1750,14 +1837,15 @@ var _ aggregateFunc = &minFloat64Agg{}
 
 func (a *minFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Float64()
+	a.vec = v
+	a.col = v.Float64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minFloat64Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat64Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroFloat64Column) {
 	}
 	a.curAgg = zeroFloat64Column[0]
 	a.curIdx = -1
@@ -1773,8 +1861,8 @@ func (a *minFloat64Agg) CurrentOutputIndex() int {
 func (a *minFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroFloat64Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -1793,266 +1881,276 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
 									}
-								} else {
-									cmpResult = 1
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult < 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
-									}
-								} else {
-									cmpResult = 1
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
-									}
-								} else {
-									cmpResult = 1
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
-									}
-								} else {
-									cmpResult = 1
-								}
-							}
-
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minFloat64Agg) HandleEmptyInputScalar() {
@@ -2060,14 +2158,17 @@ func (a *minFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type minTimestampAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg time.Time
-	// vec points to the output vector we are updating.
-	vec []time.Time
+	// col points to the output vector we are updating.
+	col []time.Time
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -2079,14 +2180,15 @@ var _ aggregateFunc = &minTimestampAgg{}
 
 func (a *minTimestampAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Timestamp()
+	a.vec = v
+	a.col = v.Timestamp()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *minTimestampAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroTimestampColumn) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroTimestampColumn) {
 	}
 	a.curAgg = zeroTimestampColumn[0]
 	a.curIdx = -1
@@ -2102,8 +2204,8 @@ func (a *minTimestampAgg) CurrentOutputIndex() int {
 func (a *minTimestampAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroTimestampColumn) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -2122,256 +2224,269 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
 							}
-							cmp = cmpResult < 0
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-							cmp = cmpResult < 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *minTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
-func newMaxAgg(t coltypes.T) (aggregateFunc, error) {
+func newMaxAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
 	switch t {
 	case coltypes.Bool:
-		return &maxBoolAgg{}, nil
+		return &maxBoolAgg{allocator: allocator}, nil
 	case coltypes.Bytes:
-		return &maxBytesAgg{}, nil
+		return &maxBytesAgg{allocator: allocator}, nil
 	case coltypes.Decimal:
-		return &maxDecimalAgg{}, nil
+		return &maxDecimalAgg{allocator: allocator}, nil
 	case coltypes.Int16:
-		return &maxInt16Agg{}, nil
+		return &maxInt16Agg{allocator: allocator}, nil
 	case coltypes.Int32:
-		return &maxInt32Agg{}, nil
+		return &maxInt32Agg{allocator: allocator}, nil
 	case coltypes.Int64:
-		return &maxInt64Agg{}, nil
+		return &maxInt64Agg{allocator: allocator}, nil
 	case coltypes.Float64:
-		return &maxFloat64Agg{}, nil
+		return &maxFloat64Agg{allocator: allocator}, nil
 	case coltypes.Timestamp:
-		return &maxTimestampAgg{}, nil
+		return &maxTimestampAgg{allocator: allocator}, nil
 	default:
 		return nil, errors.Errorf("unsupported min agg type %s", t)
 	}
 }
 
 type maxBoolAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg bool
-	// vec points to the output vector we are updating.
-	vec []bool
+	// col points to the output vector we are updating.
+	col []bool
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -2383,14 +2498,15 @@ var _ aggregateFunc = &maxBoolAgg{}
 
 func (a *maxBoolAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Bool()
+	a.vec = v
+	a.col = v.Bool()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxBoolAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroBoolColumn) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroBoolColumn) {
 	}
 	a.curAgg = zeroBoolColumn[0]
 	a.curIdx = -1
@@ -2406,8 +2522,8 @@ func (a *maxBoolAgg) CurrentOutputIndex() int {
 func (a *maxBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroBoolColumn) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -2426,222 +2542,232 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
 							}
-
-							cmp = cmpResult > 0
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBoolColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if !candidate && a.curAgg {
+										cmpResult = -1
+									} else if candidate && !a.curAgg {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBoolColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if !candidate && a.curAgg {
-								cmpResult = -1
-							} else if candidate && !a.curAgg {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxBoolAgg) HandleEmptyInputScalar() {
@@ -2649,14 +2775,17 @@ func (a *maxBoolAgg) HandleEmptyInputScalar() {
 }
 
 type maxBytesAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg []byte
-	// vec points to the output vector we are updating.
-	vec *coldata.Bytes
+	// col points to the output vector we are updating.
+	col *coldata.Bytes
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -2668,14 +2797,15 @@ var _ aggregateFunc = &maxBytesAgg{}
 
 func (a *maxBytesAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Bytes()
+	a.vec = v
+	a.col = v.Bytes()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxBytesAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	a.vec.Zero()
+	a.col.Zero()
 	a.curAgg = zeroBytesColumn[0]
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
@@ -2690,8 +2820,8 @@ func (a *maxBytesAgg) CurrentOutputIndex() int {
 func (a *maxBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := a.vec.Len()
-		target := a.vec.Slice(idx+1, vecLen)
+		vecLen := a.col.Len()
+		target := a.col.Slice(idx+1, vecLen)
 		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -2709,190 +2839,200 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec.Set(a.curIdx, a.curAgg)
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col.Set(a.curIdx, a.curAgg)
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
 						}
-						a.vec.Set(a.curIdx, a.curAgg)
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
 					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
+				} else {
+					col = col.Slice(0, int(inputLen))
+					for i := 0; i < col.Len(); i++ {
 
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult > 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col.Slice(0, int(inputLen))
+					for i := 0; i < col.Len(); i++ {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col.Set(a.curIdx, a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroBytesColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col.Get(a.curIdx)
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col.Get(int(i))
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(int(i))
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(candidate, a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col.Slice(0, int(inputLen))
-			for i := 0; i < col.Len(); i++ {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec.Set(a.curIdx, a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
-
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec.Set(a.curIdx, a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
-
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col.Slice(0, int(inputLen))
-			for i := 0; i < col.Len(); i++ {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec.Set(a.curIdx, a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroBytesColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec.Get(a.curIdx)
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col.Get(int(i))
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col.Get(int(i))
-
-						{
-							var cmpResult int
-							cmpResult = bytes.Compare(candidate, a.curAgg)
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxBytesAgg) HandleEmptyInputScalar() {
@@ -2900,14 +3040,17 @@ func (a *maxBytesAgg) HandleEmptyInputScalar() {
 }
 
 type maxDecimalAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg apd.Decimal
-	// vec points to the output vector we are updating.
-	vec []apd.Decimal
+	// col points to the output vector we are updating.
+	col []apd.Decimal
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -2919,15 +3062,16 @@ var _ aggregateFunc = &maxDecimalAgg{}
 
 func (a *maxDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Decimal()
+	a.vec = v
+	a.col = v.Decimal()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxDecimalAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n++ {
-		a.vec[n].SetInt64(0)
+	for n := 0; n < len(a.col); n++ {
+		a.col[n].SetInt64(0)
 	}
 	a.curAgg = zeroDecimalColumn[0]
 	a.curIdx = -1
@@ -2943,8 +3087,8 @@ func (a *maxDecimalAgg) CurrentOutputIndex() int {
 func (a *maxDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n++ {
 			target[n].SetInt64(0)
 		}
@@ -2964,190 +3108,200 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx].Set(&a.curAgg)
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx].Set(&a.curAgg)
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx].Set(&a.curAgg)
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
 					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult > 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx].Set(&a.curAgg)
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroDecimalColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx].Set(&a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx].Set(&a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx].Set(&a.curAgg)
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroDecimalColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-							cmpResult = tree.CompareDecimals(&candidate, &a.curAgg)
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxDecimalAgg) HandleEmptyInputScalar() {
@@ -3155,14 +3309,17 @@ func (a *maxDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type maxInt16Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg int16
-	// vec points to the output vector we are updating.
-	vec []int16
+	// col points to the output vector we are updating.
+	col []int16
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -3174,14 +3331,15 @@ var _ aggregateFunc = &maxInt16Agg{}
 
 func (a *maxInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Int16()
+	a.vec = v
+	a.col = v.Int16()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxInt16Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt16Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroInt16Column) {
 	}
 	a.curAgg = zeroInt16Column[0]
 	a.curIdx = -1
@@ -3197,8 +3355,8 @@ func (a *maxInt16Agg) CurrentOutputIndex() int {
 func (a *maxInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroInt16Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -3217,234 +3375,244 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult > 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt16Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt16Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxInt16Agg) HandleEmptyInputScalar() {
@@ -3452,14 +3620,17 @@ func (a *maxInt16Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt32Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg int32
-	// vec points to the output vector we are updating.
-	vec []int32
+	// col points to the output vector we are updating.
+	col []int32
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -3471,14 +3642,15 @@ var _ aggregateFunc = &maxInt32Agg{}
 
 func (a *maxInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Int32()
+	a.vec = v
+	a.col = v.Int32()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxInt32Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt32Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroInt32Column) {
 	}
 	a.curAgg = zeroInt32Column[0]
 	a.curIdx = -1
@@ -3494,8 +3666,8 @@ func (a *maxInt32Agg) CurrentOutputIndex() int {
 func (a *maxInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroInt32Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -3514,234 +3686,244 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult > 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt32Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt32Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxInt32Agg) HandleEmptyInputScalar() {
@@ -3749,14 +3931,17 @@ func (a *maxInt32Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt64Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg int64
-	// vec points to the output vector we are updating.
-	vec []int64
+	// col points to the output vector we are updating.
+	col []int64
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -3768,14 +3953,15 @@ var _ aggregateFunc = &maxInt64Agg{}
 
 func (a *maxInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Int64()
+	a.vec = v
+	a.col = v.Int64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxInt64Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt64Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroInt64Column) {
 	}
 	a.curAgg = zeroInt64Column[0]
 	a.curIdx = -1
@@ -3791,8 +3977,8 @@ func (a *maxInt64Agg) CurrentOutputIndex() int {
 func (a *maxInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroInt64Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -3811,234 +3997,244 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult > 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroInt64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(candidate), int64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroInt64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := int64(candidate), int64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxInt64Agg) HandleEmptyInputScalar() {
@@ -4046,14 +4242,17 @@ func (a *maxInt64Agg) HandleEmptyInputScalar() {
 }
 
 type maxFloat64Agg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg float64
-	// vec points to the output vector we are updating.
-	vec []float64
+	// col points to the output vector we are updating.
+	col []float64
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -4065,14 +4264,15 @@ var _ aggregateFunc = &maxFloat64Agg{}
 
 func (a *maxFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Float64()
+	a.vec = v
+	a.col = v.Float64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxFloat64Agg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat64Column) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroFloat64Column) {
 	}
 	a.curAgg = zeroFloat64Column[0]
 	a.curIdx = -1
@@ -4088,8 +4288,8 @@ func (a *maxFloat64Agg) CurrentOutputIndex() int {
 func (a *maxFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroFloat64Column) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -4108,266 +4308,276 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						{
-							var cmpResult int
+								{
+									var cmpResult int
 
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
 									}
-								} else {
-									cmpResult = 1
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
 								}
 							}
-
-							cmp = cmpResult > 0
 						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
 
-						if cmp {
-							a.curAgg = candidate
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroFloat64Column here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(candidate), float64(a.curAgg)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
-									}
-								} else {
-									cmpResult = 1
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
-									}
-								} else {
-									cmpResult = 1
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroFloat64Column here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							{
-								a, b := float64(candidate), float64(a.curAgg)
-								if a < b {
-									cmpResult = -1
-								} else if a > b {
-									cmpResult = 1
-								} else if a == b {
-									cmpResult = 0
-								} else if math.IsNaN(a) {
-									if math.IsNaN(b) {
-										cmpResult = 0
-									} else {
-										cmpResult = -1
-									}
-								} else {
-									cmpResult = 1
-								}
-							}
-
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxFloat64Agg) HandleEmptyInputScalar() {
@@ -4375,14 +4585,17 @@ func (a *maxFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type maxTimestampAgg struct {
-	done   bool
-	groups []bool
-	curIdx int
+	allocator *Allocator
+	done      bool
+	groups    []bool
+	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	curAgg time.Time
-	// vec points to the output vector we are updating.
-	vec []time.Time
+	// col points to the output vector we are updating.
+	col []time.Time
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
 	nulls *coldata.Nulls
 	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
@@ -4394,14 +4607,15 @@ var _ aggregateFunc = &maxTimestampAgg{}
 
 func (a *maxTimestampAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
-	a.vec = v.Timestamp()
+	a.vec = v
+	a.col = v.Timestamp()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
 
 func (a *maxTimestampAgg) Reset() {
 	// TODO(asubiotto): Zeros don't seem necessary.
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroTimestampColumn) {
+	for n := 0; n < len(a.col); n += copy(a.col[n:], zeroTimestampColumn) {
 	}
 	a.curAgg = zeroTimestampColumn[0]
 	a.curIdx = -1
@@ -4417,8 +4631,8 @@ func (a *maxTimestampAgg) CurrentOutputIndex() int {
 func (a *maxTimestampAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
+		vecLen := len(a.col)
+		target := a.col[idx+1 : vecLen]
 		for n := 0; n < len(target); n += copy(target[n:], zeroTimestampColumn) {
 		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
@@ -4437,218 +4651,228 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
 		}
-		a.vec[a.curIdx] = a.curAgg
+		a.allocator.performOperation(
+			[]coldata.Vec{a.vec},
+			func() {
+				a.col[a.curIdx] = a.curAgg
+			},
+		)
 		a.curIdx++
 		a.done = true
 		return
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
-	if nulls.MaybeHasNulls() {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
+	a.allocator.performOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
 
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
 							}
-							cmp = cmpResult > 0
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
 						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
 
-						if cmp {
-							a.curAgg = candidate
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								}
+								a.col[a.curIdx] = a.curAgg
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+							// The next element of vec is guaranteed  to be initialized to the zero
+							// value. We can't use zeroTimestampColumn here because this is outside of
+							// the earlier template block.
+							a.curAgg = a.col[a.curIdx]
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								a.curAgg = col[int(i)]
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col[int(i)]
+
+								{
+									var cmpResult int
+
+									if candidate.Before(a.curAgg) {
+										cmpResult = -1
+									} else if a.curAgg.Before(candidate) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
 						}
 					}
 				}
 			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	} else {
-		if sel != nil {
-			sel = sel[:inputLen]
-			for _, i := range sel {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		} else {
-			col = col[0:int(inputLen)]
-			for i := range col {
-
-				if a.groups[i] {
-					// If we encounter a new group, and we haven't found any non-nulls for the
-					// current group, the output for this group should be null. If a.curIdx is
-					// negative, it means that this is the first group.
-					if a.curIdx >= 0 {
-						if !a.foundNonNullForCurrentGroup {
-							a.nulls.SetNull(uint16(a.curIdx))
-						}
-						a.vec[a.curIdx] = a.curAgg
-					}
-					a.curIdx++
-					a.foundNonNullForCurrentGroup = false
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zeroTimestampColumn here because this is outside of
-					// the earlier template block.
-					a.curAgg = a.vec[a.curIdx]
-				}
-				var isNull bool
-				isNull = false
-				if !isNull {
-					if !a.foundNonNullForCurrentGroup {
-						a.curAgg = col[int(i)]
-						a.foundNonNullForCurrentGroup = true
-					} else {
-						var cmp bool
-						candidate := col[int(i)]
-
-						{
-							var cmpResult int
-
-							if candidate.Before(a.curAgg) {
-								cmpResult = -1
-							} else if a.curAgg.Before(candidate) {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
-							cmp = cmpResult > 0
-						}
-
-						if cmp {
-							a.curAgg = candidate
-						}
-					}
-				}
-			}
-		}
-	}
+		},
+	)
 }
 
 func (a *maxTimestampAgg) HandleEmptyInputScalar() {

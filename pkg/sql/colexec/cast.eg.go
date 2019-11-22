@@ -387,53 +387,58 @@ func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r bool
+							r = v
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r bool
-					r = v
-					projCol[int(i)] = r
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r bool
+							r = v
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r bool
+						r = v
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r bool
+						r = v
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r bool
-					r = v
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r bool
-				r = v
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r bool
-				r = v
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -465,73 +470,78 @@ func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int16()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r int16
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int16
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r int16
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int16
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int16
 
-					projCol[int(i)] = r
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int16
+
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int16
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int16
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -563,73 +573,78 @@ func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int32()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r int32
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int32
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r int32
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int32
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int32
 
-					projCol[int(i)] = r
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int32
+
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int32
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int32
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -661,73 +676,78 @@ func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r int64
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int64
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r int64
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int64
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int64
 
-					projCol[int(i)] = r
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int64
+
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int64
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int64
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -759,73 +779,78 @@ func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r float64
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r float64
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r float64
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r float64
 
-					r = 0
-					if v {
-						r = 1
+							r = 0
+							if v {
+								r = 1
+							}
+
+							projCol[int(i)] = r
+						}
 					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r float64
 
-					projCol[int(i)] = r
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r float64
+
+						r = 0
+						if v {
+							r = 1
+						}
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r float64
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r float64
-
-				r = 0
-				if v {
-					r = 1
-				}
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -857,61 +882,66 @@ func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Decimal()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r bool
+
+							r = v.Sign() != 0
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r bool
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r bool
 
-					r = v.Sign() != 0
+							r = v.Sign() != 0
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r bool
+
+						r = v.Sign() != 0
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r bool
+
+						r = v.Sign() != 0
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r bool
-
-					r = v.Sign() != 0
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r bool
-
-				r = v.Sign() != 0
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r bool
-
-				r = v.Sign() != 0
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -943,53 +973,58 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Decimal()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
+							r = v
+							projCol[int(i)].Set(&r)
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r apd.Decimal
-					r = v
-					projCol[int(i)].Set(&r)
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
+							r = v
+							projCol[int(i)].Set(&r)
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r apd.Decimal
+						r = v
+						projCol[int(i)].Set(&r)
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r apd.Decimal
+						r = v
+						projCol[int(i)].Set(&r)
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r apd.Decimal
-					r = v
-					projCol[int(i)].Set(&r)
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r apd.Decimal
-				r = v
-				projCol[int(i)].Set(&r)
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r apd.Decimal
-				r = v
-				projCol[int(i)].Set(&r)
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1021,61 +1056,66 @@ func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r bool
+
+							r = v != 0
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r bool
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r bool
 
-					r = v != 0
+							r = v != 0
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r bool
-
-					r = v != 0
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1107,61 +1147,66 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
+
+							r = *apd.New(int64(v), 0)
+
+							projCol[int(i)].Set(&r)
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r apd.Decimal
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
 
-					r = *apd.New(int64(v), 0)
+							r = *apd.New(int64(v), 0)
 
-					projCol[int(i)].Set(&r)
+							projCol[int(i)].Set(&r)
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						r = *apd.New(int64(v), 0)
+
+						projCol[int(i)].Set(&r)
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						r = *apd.New(int64(v), 0)
+
+						projCol[int(i)].Set(&r)
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r apd.Decimal
-
-					r = *apd.New(int64(v), 0)
-
-					projCol[int(i)].Set(&r)
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				r = *apd.New(int64(v), 0)
-
-				projCol[int(i)].Set(&r)
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				r = *apd.New(int64(v), 0)
-
-				projCol[int(i)].Set(&r)
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1193,53 +1238,58 @@ func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int16()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int16
+							r = v
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r int16
-					r = v
-					projCol[int(i)] = r
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int16
+							r = v
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int16
+						r = v
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int16
+						r = v
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r int16
-					r = v
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int16
-				r = v
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int16
-				r = v
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1271,61 +1321,66 @@ func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r float64
+
+							r = float64(v)
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r float64
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r float64
 
-					r = float64(v)
+							r = float64(v)
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r float64
+
+						r = float64(v)
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r float64
+
+						r = float64(v)
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r float64
-
-					r = float64(v)
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r float64
-
-				r = float64(v)
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r float64
-
-				r = float64(v)
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1357,61 +1412,66 @@ func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r bool
+
+							r = v != 0
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r bool
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r bool
 
-					r = v != 0
+							r = v != 0
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r bool
-
-					r = v != 0
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1443,61 +1503,66 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
+
+							r = *apd.New(int64(v), 0)
+
+							projCol[int(i)].Set(&r)
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r apd.Decimal
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
 
-					r = *apd.New(int64(v), 0)
+							r = *apd.New(int64(v), 0)
 
-					projCol[int(i)].Set(&r)
+							projCol[int(i)].Set(&r)
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						r = *apd.New(int64(v), 0)
+
+						projCol[int(i)].Set(&r)
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						r = *apd.New(int64(v), 0)
+
+						projCol[int(i)].Set(&r)
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r apd.Decimal
-
-					r = *apd.New(int64(v), 0)
-
-					projCol[int(i)].Set(&r)
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				r = *apd.New(int64(v), 0)
-
-				projCol[int(i)].Set(&r)
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				r = *apd.New(int64(v), 0)
-
-				projCol[int(i)].Set(&r)
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1529,53 +1594,58 @@ func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int32()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int32
+							r = v
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r int32
-					r = v
-					projCol[int(i)] = r
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int32
+							r = v
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int32
+						r = v
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int32
+						r = v
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r int32
-					r = v
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int32
-				r = v
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int32
-				r = v
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1607,61 +1677,66 @@ func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r float64
+
+							r = float64(v)
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r float64
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r float64
 
-					r = float64(v)
+							r = float64(v)
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r float64
+
+						r = float64(v)
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r float64
+
+						r = float64(v)
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r float64
-
-					r = float64(v)
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r float64
-
-				r = float64(v)
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r float64
-
-				r = float64(v)
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1693,61 +1768,66 @@ func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r bool
+
+							r = v != 0
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r bool
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r bool
 
-					r = v != 0
+							r = v != 0
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r bool
-
-					r = v != 0
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1779,61 +1859,66 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
+
+							r = *apd.New(int64(v), 0)
+
+							projCol[int(i)].Set(&r)
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r apd.Decimal
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
 
-					r = *apd.New(int64(v), 0)
+							r = *apd.New(int64(v), 0)
 
-					projCol[int(i)].Set(&r)
+							projCol[int(i)].Set(&r)
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						r = *apd.New(int64(v), 0)
+
+						projCol[int(i)].Set(&r)
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						r = *apd.New(int64(v), 0)
+
+						projCol[int(i)].Set(&r)
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r apd.Decimal
-
-					r = *apd.New(int64(v), 0)
-
-					projCol[int(i)].Set(&r)
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				r = *apd.New(int64(v), 0)
-
-				projCol[int(i)].Set(&r)
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				r = *apd.New(int64(v), 0)
-
-				projCol[int(i)].Set(&r)
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1865,53 +1950,58 @@ func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int64
+							r = v
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r int64
-					r = v
-					projCol[int(i)] = r
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int64
+							r = v
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int64
+						r = v
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int64
+						r = v
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r int64
-					r = v
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int64
-				r = v
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int64
-				r = v
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -1943,61 +2033,66 @@ func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r float64
+
+							r = float64(v)
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r float64
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r float64
 
-					r = float64(v)
+							r = float64(v)
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r float64
+
+						r = float64(v)
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r float64
+
+						r = float64(v)
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r float64
-
-					r = float64(v)
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r float64
-
-				r = float64(v)
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r float64
-
-				r = float64(v)
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -2029,61 +2124,66 @@ func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r bool
+
+							r = v != 0
+
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r bool
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r bool
 
-					r = v != 0
+							r = v != 0
 
-					projCol[int(i)] = r
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r bool
+
+						r = v != 0
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r bool
-
-					r = v != 0
-
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r bool
-
-				r = v != 0
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -2115,89 +2215,94 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r apd.Decimal
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
 
-					{
-						var tmpDec apd.Decimal
-						_, tmpErr := tmpDec.SetFloat64(float64(v))
-						if tmpErr != nil {
-							execerror.NonVectorizedPanic(tmpErr)
+							{
+								var tmpDec apd.Decimal
+								_, tmpErr := tmpDec.SetFloat64(float64(v))
+								if tmpErr != nil {
+									execerror.NonVectorizedPanic(tmpErr)
+								}
+								r = tmpDec
+							}
+
+							projCol[int(i)].Set(&r)
 						}
-						r = tmpDec
 					}
-
-					projCol[int(i)].Set(&r)
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r apd.Decimal
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r apd.Decimal
 
-					{
-						var tmpDec apd.Decimal
-						_, tmpErr := tmpDec.SetFloat64(float64(v))
-						if tmpErr != nil {
-							execerror.NonVectorizedPanic(tmpErr)
+							{
+								var tmpDec apd.Decimal
+								_, tmpErr := tmpDec.SetFloat64(float64(v))
+								if tmpErr != nil {
+									execerror.NonVectorizedPanic(tmpErr)
+								}
+								r = tmpDec
+							}
+
+							projCol[int(i)].Set(&r)
 						}
-						r = tmpDec
 					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r apd.Decimal
 
-					projCol[int(i)].Set(&r)
+						{
+							var tmpDec apd.Decimal
+							_, tmpErr := tmpDec.SetFloat64(float64(v))
+							if tmpErr != nil {
+								execerror.NonVectorizedPanic(tmpErr)
+							}
+							r = tmpDec
+						}
+
+						projCol[int(i)].Set(&r)
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r apd.Decimal
+
+						{
+							var tmpDec apd.Decimal
+							_, tmpErr := tmpDec.SetFloat64(float64(v))
+							if tmpErr != nil {
+								execerror.NonVectorizedPanic(tmpErr)
+							}
+							r = tmpDec
+						}
+
+						projCol[int(i)].Set(&r)
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				{
-					var tmpDec apd.Decimal
-					_, tmpErr := tmpDec.SetFloat64(float64(v))
-					if tmpErr != nil {
-						execerror.NonVectorizedPanic(tmpErr)
-					}
-					r = tmpDec
-				}
-
-				projCol[int(i)].Set(&r)
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r apd.Decimal
-
-				{
-					var tmpDec apd.Decimal
-					_, tmpErr := tmpDec.SetFloat64(float64(v))
-					if tmpErr != nil {
-						execerror.NonVectorizedPanic(tmpErr)
-					}
-					r = tmpDec
-				}
-
-				projCol[int(i)].Set(&r)
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -2229,73 +2334,78 @@ func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int16()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r int16
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int16
 
-					if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-						execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							}
+							r = int16(v)
+
+							projCol[int(i)] = r
+						}
 					}
-					r = int16(v)
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r int16
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int16
 
-					if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-						execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							}
+							r = int16(v)
+
+							projCol[int(i)] = r
+						}
 					}
-					r = int16(v)
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int16
 
-					projCol[int(i)] = r
+						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+						r = int16(v)
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int16
+
+						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+						r = int16(v)
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int16
-
-				if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				}
-				r = int16(v)
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int16
-
-				if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				}
-				r = int16(v)
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -2327,73 +2437,78 @@ func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int32()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r int32
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int32
 
-					if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-						execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							}
+							r = int32(v)
+
+							projCol[int(i)] = r
+						}
 					}
-					r = int32(v)
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r int32
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int32
 
-					if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-						execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							}
+							r = int32(v)
+
+							projCol[int(i)] = r
+						}
 					}
-					r = int32(v)
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int32
 
-					projCol[int(i)] = r
+						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+						r = int32(v)
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int32
+
+						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+						r = int32(v)
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int32
-
-				if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				}
-				r = int32(v)
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int32
-
-				if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				}
-				r = int32(v)
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -2425,73 +2540,78 @@ func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
-				} else {
-					v := col[int(i)]
-					var r int64
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r int64
 
-					if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-						execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							}
+							r = int64(v)
+
+							projCol[int(i)] = r
+						}
 					}
-					r = int64(v)
-
-					projCol[int(i)] = r
-				}
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
 				} else {
-					v := col[int(i)]
-					var r int64
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r int64
 
-					if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-						execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							}
+							r = int64(v)
+
+							projCol[int(i)] = r
+						}
 					}
-					r = int64(v)
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r int64
 
-					projCol[int(i)] = r
+						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+						r = int64(v)
+
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r int64
+
+						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+						}
+						r = int64(v)
+
+						projCol[int(i)] = r
+					}
 				}
 			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r int64
-
-				if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				}
-				r = int64(v)
-
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r int64
-
-				if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
-				}
-				r = int64(v)
-
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
 
@@ -2523,52 +2643,57 @@ func (c *castOpFloat64Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	if vec.MaybeHasNulls() {
-		vecNulls := vec.Nulls()
-		projNulls := projVec.Nulls()
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				if vecNulls.NullAt(i) {
-					projNulls.SetNull(i)
+	c.allocator.performOperation(
+		[]coldata.Vec{projVec},
+		func() {
+			if vec.MaybeHasNulls() {
+				vecNulls := vec.Nulls()
+				projNulls := projVec.Nulls()
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						if vecNulls.NullAt(i) {
+							projNulls.SetNull(i)
+						} else {
+							v := col[int(i)]
+							var r float64
+							r = v
+							projCol[int(i)] = r
+						}
+					}
 				} else {
-					v := col[int(i)]
-					var r float64
-					r = v
-					projCol[int(i)] = r
+					col = col[0:int(n)]
+					for i := range col {
+						if vecNulls.NullAt(uint16(i)) {
+							projNulls.SetNull(uint16(i))
+						} else {
+							v := col[int(i)]
+							var r float64
+							r = v
+							projCol[int(i)] = r
+						}
+					}
+				}
+			} else {
+				if sel := batch.Selection(); sel != nil {
+					sel = sel[:n]
+					for _, i := range sel {
+						v := col[int(i)]
+						var r float64
+						r = v
+						projCol[int(i)] = r
+					}
+				} else {
+					col = col[0:int(n)]
+					for i := range col {
+						v := col[int(i)]
+						var r float64
+						r = v
+						projCol[int(i)] = r
+					}
 				}
 			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				if vecNulls.NullAt(uint16(i)) {
-					projNulls.SetNull(uint16(i))
-				} else {
-					v := col[int(i)]
-					var r float64
-					r = v
-					projCol[int(i)] = r
-				}
-			}
-		}
-	} else {
-		if sel := batch.Selection(); sel != nil {
-			sel = sel[:n]
-			for _, i := range sel {
-				v := col[int(i)]
-				var r float64
-				r = v
-				projCol[int(i)] = r
-			}
-		} else {
-			col = col[0:int(n)]
-			for i := range col {
-				v := col[int(i)]
-				var r float64
-				r = v
-				projCol[int(i)] = r
-			}
-		}
-	}
+		},
+	)
 	return batch
 }
