@@ -80,6 +80,7 @@ const (
 	FoldIndirection
 	FoldColumnAccess
 	FoldFunction
+	FoldEqualsAnyNull
 	ConvertGroupByToDistinct
 	EliminateDistinct
 	EliminateGroupByProject

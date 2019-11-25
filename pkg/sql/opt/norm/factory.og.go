@@ -11947,6 +11947,22 @@ func (_f *Factory) ConstructAnyScalar(
 	right opt.ScalarExpr,
 	cmp opt.Operator,
 ) opt.ScalarExpr {
+	// [FoldEqualsAnyNull]
+	{
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldEqualsAnyNull) {
+				_expr := _f.ConstructNull(
+					_f.funcs.BoolType(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldEqualsAnyNull, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [SimplifyEqualsAnyTuple]
 	{
 		input := left
