@@ -57659,14 +57659,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -57721,14 +57717,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -57783,14 +57775,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -57845,14 +57833,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -57907,14 +57891,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -57969,14 +57949,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58031,14 +58007,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58093,14 +58065,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58161,9 +58129,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58218,9 +58184,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -58275,9 +58239,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -58332,9 +58294,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58389,9 +58349,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58446,9 +58404,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58503,9 +58459,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58560,9 +58514,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58624,14 +58576,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58685,14 +58633,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -58746,14 +58690,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -58807,14 +58747,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58868,14 +58804,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58929,14 +58861,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -58990,14 +58918,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59051,14 +58975,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59118,9 +59038,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59174,9 +59092,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -59230,9 +59146,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -59286,9 +59200,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59342,9 +59254,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59398,9 +59308,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59454,9 +59362,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59510,9 +59416,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59624,14 +59528,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59686,14 +59586,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -59748,14 +59644,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -59810,14 +59702,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59872,14 +59760,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59934,14 +59818,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -59996,14 +59876,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60058,14 +59934,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60126,9 +59998,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60183,9 +60053,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -60240,9 +60108,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -60297,9 +60163,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60354,9 +60218,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60411,9 +60273,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60468,9 +60328,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60525,9 +60383,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60589,14 +60445,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60650,14 +60502,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -60711,14 +60559,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -60772,14 +60616,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60833,14 +60673,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60894,14 +60730,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -60955,14 +60787,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61016,14 +60844,10 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-										isNull = src.Nulls().NullAt64(uint64(srcStartIdx))
-										if isNull {
+										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
 											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
 											outStartIdx += toAppend
-										}
-
-										if !isNull {
+										} else {
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61083,9 +60907,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61139,9 +60961,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol.Get(srcStartIdx)
 											for i := 0; i < toAppend; i++ {
 												outCol.Set(outStartIdx, val)
@@ -61195,9 +61015,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx].Set(&val)
@@ -61251,9 +61069,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61307,9 +61123,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61363,9 +61177,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61419,9 +61231,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61475,9 +61285,7 @@ func (o *mergeJoinLeftAntiWithOnExprOp) buildLeftGroups(
 									}
 
 									{
-										var isNull bool
-
-										if !isNull {
+										{
 											val = srcCol[srcStartIdx]
 											for i := 0; i < toAppend; i++ {
 												outCol[outStartIdx] = val
@@ -61579,13 +61387,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -61645,18 +61454,19 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
 									}
-									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -61716,13 +61526,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -61782,13 +61593,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -61848,13 +61660,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -61914,13 +61727,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -61980,13 +61794,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62046,13 +61861,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62116,12 +61932,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62179,17 +61997,19 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
+									{
+										v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62247,12 +62067,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62310,12 +62132,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62373,12 +62197,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62436,12 +62262,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62499,12 +62327,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62562,12 +62392,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62635,13 +62467,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62701,18 +62534,19 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
 									}
-									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62772,13 +62606,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62838,13 +62673,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62904,13 +62740,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -62970,13 +62807,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63036,13 +62874,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63102,13 +62941,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63172,12 +63012,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63235,17 +63077,19 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
+									{
+										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63303,12 +63147,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63366,12 +63212,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63429,12 +63277,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63492,12 +63342,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63555,12 +63407,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63618,12 +63472,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63736,13 +63592,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63802,18 +63659,19 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
 									}
-									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63873,13 +63731,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -63939,13 +63798,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64005,13 +63865,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64071,13 +63932,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64137,13 +63999,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64203,13 +64066,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64273,12 +64137,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64336,17 +64202,19 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
+									{
+										v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64404,12 +64272,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64467,12 +64337,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64530,12 +64402,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64593,12 +64467,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64656,12 +64532,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64719,12 +64597,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64792,13 +64672,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64858,18 +64739,19 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
 									}
-									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64929,13 +64811,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
 								} else {
 									o.allocator.Copy(
 										out,
@@ -64995,13 +64878,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65061,13 +64945,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65127,13 +65012,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65193,13 +65079,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65259,13 +65146,14 @@ RightColLoop:
 								if toAppend == 1 {
 									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
 										out.Nulls().SetNull(uint16(outStartIdx))
+									} else {
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
 									}
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65329,12 +65217,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65392,17 +65282,19 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									o.allocator.performOperation(
-										[]coldata.Vec{out},
-										func() {
-											outCol.Set(outStartIdx, v)
-										},
-									)
+									{
+										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										o.allocator.performOperation(
+											[]coldata.Vec{out},
+											func() {
+												outCol.Set(outStartIdx, v)
+											},
+										)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65460,12 +65352,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx].Set(&v)
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx].Set(&v)
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65523,12 +65417,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65586,12 +65482,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65649,12 +65547,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65712,12 +65612,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
@@ -65775,12 +65677,14 @@ RightColLoop:
 								// Optimization in the case that group length is 1, use assign
 								// instead of copy.
 								if toAppend == 1 {
-									v := srcCol[o.builderState.right.curSrcStartIdx]
-									// We are in the fast path (we're setting a single element), so in
-									// order to not kill the performance, we only update the memory
-									// account in case of Bytes type (other types will not change the
-									// amount of memory accounted for).
-									outCol[outStartIdx] = v
+									{
+										v := srcCol[o.builderState.right.curSrcStartIdx]
+										// We are in the fast path (we're setting a single element), so in
+										// order to not kill the performance, we only update the memory
+										// account in case of Bytes type (other types will not change the
+										// amount of memory accounted for).
+										outCol[outStartIdx] = v
+									}
 								} else {
 									o.allocator.Copy(
 										out,
