@@ -267,6 +267,7 @@ var KeywordsCategories = map[string]string{
 	"prepare":                   "U",
 	"primary":                   "R",
 	"priority":                  "U",
+	"public":                    "U",
 	"publication":               "U",
 	"queries":                   "U",
 	"query":                     "U",
@@ -675,6 +676,7 @@ var KeywordNames = []string{
 	"prepare",
 	"primary",
 	"priority",
+	"public",
 	"publication",
 	"queries",
 	"query",
@@ -1352,6 +1354,8 @@ func GetKeywordID(k string) int32 {
 		return PRIMARY
 	case "priority":
 		return PRIORITY
+	case "public":
+		return PUBLIC
 	case "publication":
 		return PUBLICATION
 	case "queries":
