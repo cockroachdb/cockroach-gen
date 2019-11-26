@@ -8020,6 +8020,92 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [PushLimitIntoLeftJoin]
+	{
+		_leftJoin, _ := input.(*memo.LeftJoinExpr)
+		if _leftJoin != nil {
+			left := _leftJoin.Left
+			right := _leftJoin.Right
+			on := _leftJoin.On
+			private := &_leftJoin.JoinPrivate
+			_const, _ := limit.(*memo.ConstExpr)
+			if _const != nil {
+				limit := _const.Value
+				if !_f.funcs.LimitGeMaxRows(limit, left) {
+					if _f.funcs.HasColsInOrdering(left, ordering) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoLeftJoin) {
+							_expr := _f.ConstructLimit(
+								_f.ConstructLeftJoin(
+									_f.ConstructLimit(
+										left,
+										_f.ConstructConst(
+											limit,
+										),
+										_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(left)),
+									),
+									right,
+									on,
+									private,
+								),
+								_f.ConstructConst(
+									limit,
+								),
+								ordering,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushLimitIntoLeftJoin, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [PushLimitIntoRightJoin]
+	{
+		_rightJoin, _ := input.(*memo.RightJoinExpr)
+		if _rightJoin != nil {
+			left := _rightJoin.Left
+			right := _rightJoin.Right
+			on := _rightJoin.On
+			private := &_rightJoin.JoinPrivate
+			_const, _ := limit.(*memo.ConstExpr)
+			if _const != nil {
+				limit := _const.Value
+				if !_f.funcs.LimitGeMaxRows(limit, right) {
+					if _f.funcs.HasColsInOrdering(right, ordering) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoRightJoin) {
+							_expr := _f.ConstructLimit(
+								_f.ConstructRightJoin(
+									left,
+									_f.ConstructLimit(
+										right,
+										_f.ConstructConst(
+											limit,
+										),
+										_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(right)),
+									),
+									on,
+									private,
+								),
+								_f.ConstructConst(
+									limit,
+								),
+								ordering,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushLimitIntoRightJoin, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [SimplifyLimitOrdering]
 	{
 		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {

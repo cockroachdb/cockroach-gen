@@ -122,6 +122,8 @@ const (
 	PushOffsetIntoProject
 	PushLimitIntoOffset
 	PushLimitIntoOrdinality
+	PushLimitIntoLeftJoin
+	PushLimitIntoRightJoin
 	EliminateMax1Row
 	FoldPlusZero
 	FoldZeroPlus
