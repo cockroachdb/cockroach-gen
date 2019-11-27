@@ -1347,12 +1347,12 @@ UPSERT INTO <tablename> [AS <name>] [( <colnames...> )]
 		SeeAlso: `INSERT, UPDATE, DELETE, WEBDOCS/upsert.html
 `,
 	},
-	//line sql.y: 5767
+	//line sql.y: 5771
 	`UPDATE`: {
 		ShortDescription: `update rows of a table`,
-		//line sql.y: 5768
+		//line sql.y: 5772
 		Category: hDML,
-		//line sql.y: 5769
+		//line sql.y: 5773
 		Text: `
 UPDATE <tablename> [[AS] <name>]
        SET ...
@@ -1361,16 +1361,16 @@ UPDATE <tablename> [[AS] <name>]
        [LIMIT <expr>]
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 5776
+		//line sql.y: 5780
 		SeeAlso: `INSERT, UPSERT, DELETE, WEBDOCS/update.html
 `,
 	},
-	//line sql.y: 5973
+	//line sql.y: 5977
 	`<SELECTCLAUSE>`: {
 		ShortDescription: `access tabular data`,
-		//line sql.y: 5974
+		//line sql.y: 5978
 		Category: hDML,
-		//line sql.y: 5975
+		//line sql.y: 5979
 		Text: `
 Select clause:
   TABLE <tablename>
@@ -1378,12 +1378,12 @@ Select clause:
   SELECT ... [ { INTERSECT | UNION | EXCEPT } [ ALL | DISTINCT ] <selectclause> ]
 `,
 	},
-	//line sql.y: 5986
+	//line sql.y: 5990
 	`SELECT`: {
 		ShortDescription: `retrieve rows from a data source and compute a result`,
-		//line sql.y: 5987
+		//line sql.y: 5991
 		Category: hDML,
-		//line sql.y: 5988
+		//line sql.y: 5992
 		Text: `
 SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        { <expr> [[AS] <name>] | [ [<dbname>.] <tablename>. ] * } [, ...]
@@ -1397,40 +1397,40 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        [ LIMIT { <expr> | ALL } ]
        [ OFFSET <expr> [ ROW | ROWS ] ]
 `,
-		//line sql.y: 6000
+		//line sql.y: 6004
 		SeeAlso: `WEBDOCS/select-clause.html
 `,
 	},
-	//line sql.y: 6075
+	//line sql.y: 6079
 	`TABLE`: {
 		ShortDescription: `select an entire table`,
-		//line sql.y: 6076
+		//line sql.y: 6080
 		Category: hDML,
-		//line sql.y: 6077
+		//line sql.y: 6081
 		Text: `TABLE <tablename>
 `,
-		//line sql.y: 6078
+		//line sql.y: 6082
 		SeeAlso: `SELECT, VALUES, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 6386
+	//line sql.y: 6390
 	`VALUES`: {
 		ShortDescription: `select a given set of values`,
-		//line sql.y: 6387
+		//line sql.y: 6391
 		Category: hDML,
-		//line sql.y: 6388
+		//line sql.y: 6392
 		Text: `VALUES ( <exprs...> ) [, ...]
 `,
-		//line sql.y: 6389
+		//line sql.y: 6393
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 6498
+	//line sql.y: 6502
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 6499
+		//line sql.y: 6503
 		Category: hDML,
-		//line sql.y: 6500
+		//line sql.y: 6504
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexflags> } ]
@@ -1454,7 +1454,7 @@ Join types:
   { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP } ]
 
 `,
-		//line sql.y: 6522
+		//line sql.y: 6526
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},
