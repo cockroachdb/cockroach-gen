@@ -28268,15 +28268,21 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 			for outColIdx, inColIdx := range input.outCols {
 				outStartIdx := int(destStartIdx)
 				out := o.output.ColVec(outColIdx)
-				src := batch.ColVec(int(inColIdx))
+				var src coldata.Vec
+				if batch.Width() > int(inColIdx) {
+					src = batch.ColVec(int(inColIdx))
+				}
 				colType := input.sourceTypes[inColIdx]
 
 				if sel != nil {
-					if src.MaybeHasNulls() {
+					if src != nil && src.MaybeHasNulls() {
 
 						switch colType {
 						case coltypes.Bool:
-							srcCol := src.Bool()
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
 							outCol := out.Bool()
 							var val bool
 							var srcStartIdx int
@@ -28334,7 +28340,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Bytes:
-							srcCol := src.Bytes()
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
 							outCol := out.Bytes()
 							var val []byte
 							var srcStartIdx int
@@ -28392,7 +28401,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Decimal:
-							srcCol := src.Decimal()
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
 							outCol := out.Decimal()
 							var val apd.Decimal
 							var srcStartIdx int
@@ -28450,7 +28462,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int16:
-							srcCol := src.Int16()
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
 							outCol := out.Int16()
 							var val int16
 							var srcStartIdx int
@@ -28508,7 +28523,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int32:
-							srcCol := src.Int32()
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
 							outCol := out.Int32()
 							var val int32
 							var srcStartIdx int
@@ -28566,7 +28584,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int64:
-							srcCol := src.Int64()
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
 							outCol := out.Int64()
 							var val int64
 							var srcStartIdx int
@@ -28624,7 +28645,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Float64:
-							srcCol := src.Float64()
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
 							outCol := out.Float64()
 							var val float64
 							var srcStartIdx int
@@ -28682,7 +28706,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Timestamp:
-							srcCol := src.Timestamp()
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
 							outCol := out.Timestamp()
 							var val time.Time
 							var srcStartIdx int
@@ -28746,7 +28773,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 
 						switch colType {
 						case coltypes.Bool:
-							srcCol := src.Bool()
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
 							outCol := out.Bool()
 							var val bool
 							var srcStartIdx int
@@ -28801,7 +28831,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Bytes:
-							srcCol := src.Bytes()
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
 							outCol := out.Bytes()
 							var val []byte
 							var srcStartIdx int
@@ -28856,7 +28889,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Decimal:
-							srcCol := src.Decimal()
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
 							outCol := out.Decimal()
 							var val apd.Decimal
 							var srcStartIdx int
@@ -28911,7 +28947,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int16:
-							srcCol := src.Int16()
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
 							outCol := out.Int16()
 							var val int16
 							var srcStartIdx int
@@ -28966,7 +29005,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int32:
-							srcCol := src.Int32()
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
 							outCol := out.Int32()
 							var val int32
 							var srcStartIdx int
@@ -29021,7 +29063,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int64:
-							srcCol := src.Int64()
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
 							outCol := out.Int64()
 							var val int64
 							var srcStartIdx int
@@ -29076,7 +29121,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Float64:
-							srcCol := src.Float64()
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
 							outCol := out.Float64()
 							var val float64
 							var srcStartIdx int
@@ -29131,7 +29179,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Timestamp:
-							srcCol := src.Timestamp()
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
 							outCol := out.Timestamp()
 							var val time.Time
 							var srcStartIdx int
@@ -29190,11 +29241,14 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 						}
 					}
 				} else {
-					if src.MaybeHasNulls() {
+					if src != nil && src.MaybeHasNulls() {
 
 						switch colType {
 						case coltypes.Bool:
-							srcCol := src.Bool()
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
 							outCol := out.Bool()
 							var val bool
 							var srcStartIdx int
@@ -29251,7 +29305,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Bytes:
-							srcCol := src.Bytes()
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
 							outCol := out.Bytes()
 							var val []byte
 							var srcStartIdx int
@@ -29308,7 +29365,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Decimal:
-							srcCol := src.Decimal()
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
 							outCol := out.Decimal()
 							var val apd.Decimal
 							var srcStartIdx int
@@ -29365,7 +29425,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int16:
-							srcCol := src.Int16()
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
 							outCol := out.Int16()
 							var val int16
 							var srcStartIdx int
@@ -29422,7 +29485,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int32:
-							srcCol := src.Int32()
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
 							outCol := out.Int32()
 							var val int32
 							var srcStartIdx int
@@ -29479,7 +29545,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int64:
-							srcCol := src.Int64()
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
 							outCol := out.Int64()
 							var val int64
 							var srcStartIdx int
@@ -29536,7 +29605,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Float64:
-							srcCol := src.Float64()
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
 							outCol := out.Float64()
 							var val float64
 							var srcStartIdx int
@@ -29593,7 +29665,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Timestamp:
-							srcCol := src.Timestamp()
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
 							outCol := out.Timestamp()
 							var val time.Time
 							var srcStartIdx int
@@ -29656,7 +29731,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 
 						switch colType {
 						case coltypes.Bool:
-							srcCol := src.Bool()
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
 							outCol := out.Bool()
 							var val bool
 							var srcStartIdx int
@@ -29710,7 +29788,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Bytes:
-							srcCol := src.Bytes()
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
 							outCol := out.Bytes()
 							var val []byte
 							var srcStartIdx int
@@ -29764,7 +29845,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Decimal:
-							srcCol := src.Decimal()
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
 							outCol := out.Decimal()
 							var val apd.Decimal
 							var srcStartIdx int
@@ -29818,7 +29902,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int16:
-							srcCol := src.Int16()
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
 							outCol := out.Int16()
 							var val int16
 							var srcStartIdx int
@@ -29872,7 +29959,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int32:
-							srcCol := src.Int32()
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
 							outCol := out.Int32()
 							var val int32
 							var srcStartIdx int
@@ -29926,7 +30016,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Int64:
-							srcCol := src.Int64()
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
 							outCol := out.Int64()
 							var val int64
 							var srcStartIdx int
@@ -29980,7 +30073,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Float64:
-							srcCol := src.Float64()
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
 							outCol := out.Float64()
 							var val float64
 							var srcStartIdx int
@@ -30034,7 +30130,10 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						case coltypes.Timestamp:
-							srcCol := src.Timestamp()
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
 							outCol := out.Timestamp()
 							var val time.Time
 							var srcStartIdx int
@@ -30134,15 +30233,21 @@ RightColLoop:
 	for outColIdx, inColIdx := range input.outCols {
 		outStartIdx := int(destStartIdx)
 		out := o.output.ColVec(outColIdx + colOffset)
-		src := batch.ColVec(int(inColIdx))
+		var src coldata.Vec
+		if batch.Width() > int(inColIdx) {
+			src = batch.ColVec(int(inColIdx))
+		}
 		colType := input.sourceTypes[inColIdx]
 
 		if sel != nil {
-			if src.MaybeHasNulls() {
+			if src != nil && src.MaybeHasNulls() {
 
 				switch colType {
 				case coltypes.Bool:
-					srcCol := src.Bool()
+					var srcCol []bool
+					if src != nil {
+						srcCol = src.Bool()
+					}
 					outCol := out.Bool()
 
 					// Loop over every group.
@@ -30209,7 +30314,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Bytes:
-					srcCol := src.Bytes()
+					var srcCol *coldata.Bytes
+					if src != nil {
+						srcCol = src.Bytes()
+					}
 					outCol := out.Bytes()
 
 					// Loop over every group.
@@ -30281,7 +30389,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Decimal:
-					srcCol := src.Decimal()
+					var srcCol []apd.Decimal
+					if src != nil {
+						srcCol = src.Decimal()
+					}
 					outCol := out.Decimal()
 
 					// Loop over every group.
@@ -30348,7 +30459,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int16:
-					srcCol := src.Int16()
+					var srcCol []int16
+					if src != nil {
+						srcCol = src.Int16()
+					}
 					outCol := out.Int16()
 
 					// Loop over every group.
@@ -30415,7 +30529,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int32:
-					srcCol := src.Int32()
+					var srcCol []int32
+					if src != nil {
+						srcCol = src.Int32()
+					}
 					outCol := out.Int32()
 
 					// Loop over every group.
@@ -30482,7 +30599,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int64:
-					srcCol := src.Int64()
+					var srcCol []int64
+					if src != nil {
+						srcCol = src.Int64()
+					}
 					outCol := out.Int64()
 
 					// Loop over every group.
@@ -30549,7 +30669,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Float64:
-					srcCol := src.Float64()
+					var srcCol []float64
+					if src != nil {
+						srcCol = src.Float64()
+					}
 					outCol := out.Float64()
 
 					// Loop over every group.
@@ -30616,7 +30739,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
+					var srcCol []time.Time
+					if src != nil {
+						srcCol = src.Timestamp()
+					}
 					outCol := out.Timestamp()
 
 					// Loop over every group.
@@ -30689,7 +30815,10 @@ RightColLoop:
 
 				switch colType {
 				case coltypes.Bool:
-					srcCol := src.Bool()
+					var srcCol []bool
+					if src != nil {
+						srcCol = src.Bool()
+					}
 					outCol := out.Bool()
 
 					// Loop over every group.
@@ -30754,7 +30883,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Bytes:
-					srcCol := src.Bytes()
+					var srcCol *coldata.Bytes
+					if src != nil {
+						srcCol = src.Bytes()
+					}
 					outCol := out.Bytes()
 
 					// Loop over every group.
@@ -30824,7 +30956,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Decimal:
-					srcCol := src.Decimal()
+					var srcCol []apd.Decimal
+					if src != nil {
+						srcCol = src.Decimal()
+					}
 					outCol := out.Decimal()
 
 					// Loop over every group.
@@ -30889,7 +31024,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int16:
-					srcCol := src.Int16()
+					var srcCol []int16
+					if src != nil {
+						srcCol = src.Int16()
+					}
 					outCol := out.Int16()
 
 					// Loop over every group.
@@ -30954,7 +31092,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int32:
-					srcCol := src.Int32()
+					var srcCol []int32
+					if src != nil {
+						srcCol = src.Int32()
+					}
 					outCol := out.Int32()
 
 					// Loop over every group.
@@ -31019,7 +31160,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int64:
-					srcCol := src.Int64()
+					var srcCol []int64
+					if src != nil {
+						srcCol = src.Int64()
+					}
 					outCol := out.Int64()
 
 					// Loop over every group.
@@ -31084,7 +31228,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Float64:
-					srcCol := src.Float64()
+					var srcCol []float64
+					if src != nil {
+						srcCol = src.Float64()
+					}
 					outCol := out.Float64()
 
 					// Loop over every group.
@@ -31149,7 +31296,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
+					var srcCol []time.Time
+					if src != nil {
+						srcCol = src.Timestamp()
+					}
 					outCol := out.Timestamp()
 
 					// Loop over every group.
@@ -31218,11 +31368,14 @@ RightColLoop:
 				}
 			}
 		} else {
-			if src.MaybeHasNulls() {
+			if src != nil && src.MaybeHasNulls() {
 
 				switch colType {
 				case coltypes.Bool:
-					srcCol := src.Bool()
+					var srcCol []bool
+					if src != nil {
+						srcCol = src.Bool()
+					}
 					outCol := out.Bool()
 
 					// Loop over every group.
@@ -31289,7 +31442,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Bytes:
-					srcCol := src.Bytes()
+					var srcCol *coldata.Bytes
+					if src != nil {
+						srcCol = src.Bytes()
+					}
 					outCol := out.Bytes()
 
 					// Loop over every group.
@@ -31361,7 +31517,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Decimal:
-					srcCol := src.Decimal()
+					var srcCol []apd.Decimal
+					if src != nil {
+						srcCol = src.Decimal()
+					}
 					outCol := out.Decimal()
 
 					// Loop over every group.
@@ -31428,7 +31587,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int16:
-					srcCol := src.Int16()
+					var srcCol []int16
+					if src != nil {
+						srcCol = src.Int16()
+					}
 					outCol := out.Int16()
 
 					// Loop over every group.
@@ -31495,7 +31657,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int32:
-					srcCol := src.Int32()
+					var srcCol []int32
+					if src != nil {
+						srcCol = src.Int32()
+					}
 					outCol := out.Int32()
 
 					// Loop over every group.
@@ -31562,7 +31727,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int64:
-					srcCol := src.Int64()
+					var srcCol []int64
+					if src != nil {
+						srcCol = src.Int64()
+					}
 					outCol := out.Int64()
 
 					// Loop over every group.
@@ -31629,7 +31797,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Float64:
-					srcCol := src.Float64()
+					var srcCol []float64
+					if src != nil {
+						srcCol = src.Float64()
+					}
 					outCol := out.Float64()
 
 					// Loop over every group.
@@ -31696,7 +31867,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
+					var srcCol []time.Time
+					if src != nil {
+						srcCol = src.Timestamp()
+					}
 					outCol := out.Timestamp()
 
 					// Loop over every group.
@@ -31769,7 +31943,10 @@ RightColLoop:
 
 				switch colType {
 				case coltypes.Bool:
-					srcCol := src.Bool()
+					var srcCol []bool
+					if src != nil {
+						srcCol = src.Bool()
+					}
 					outCol := out.Bool()
 
 					// Loop over every group.
@@ -31834,7 +32011,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Bytes:
-					srcCol := src.Bytes()
+					var srcCol *coldata.Bytes
+					if src != nil {
+						srcCol = src.Bytes()
+					}
 					outCol := out.Bytes()
 
 					// Loop over every group.
@@ -31904,7 +32084,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Decimal:
-					srcCol := src.Decimal()
+					var srcCol []apd.Decimal
+					if src != nil {
+						srcCol = src.Decimal()
+					}
 					outCol := out.Decimal()
 
 					// Loop over every group.
@@ -31969,7 +32152,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int16:
-					srcCol := src.Int16()
+					var srcCol []int16
+					if src != nil {
+						srcCol = src.Int16()
+					}
 					outCol := out.Int16()
 
 					// Loop over every group.
@@ -32034,7 +32220,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int32:
-					srcCol := src.Int32()
+					var srcCol []int32
+					if src != nil {
+						srcCol = src.Int32()
+					}
 					outCol := out.Int32()
 
 					// Loop over every group.
@@ -32099,7 +32288,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Int64:
-					srcCol := src.Int64()
+					var srcCol []int64
+					if src != nil {
+						srcCol = src.Int64()
+					}
 					outCol := out.Int64()
 
 					// Loop over every group.
@@ -32164,7 +32356,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Float64:
-					srcCol := src.Float64()
+					var srcCol []float64
+					if src != nil {
+						srcCol = src.Float64()
+					}
 					outCol := out.Float64()
 
 					// Loop over every group.
@@ -32229,7 +32424,10 @@ RightColLoop:
 					}
 					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 				case coltypes.Timestamp:
-					srcCol := src.Timestamp()
+					var srcCol []time.Time
+					if src != nil {
+						srcCol = src.Timestamp()
+					}
 					outCol := out.Timestamp()
 
 					// Loop over every group.
