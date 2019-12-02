@@ -11980,6 +11980,38 @@ func (_f *Factory) ConstructOverlaps(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
 ) opt.ScalarExpr {
+	// [FoldNullComparisonLeft]
+	{
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
+				_expr := _f.ConstructNull(
+					_f.funcs.BoolType(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldNullComparisonRight]
+	{
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
+				_expr := _f.ConstructNull(
+					_f.funcs.BoolType(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
