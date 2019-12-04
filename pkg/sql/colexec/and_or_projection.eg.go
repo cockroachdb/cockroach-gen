@@ -61,11 +61,11 @@ func NewAndProjOp(
 	}
 }
 
-func (o *andProjOp) ChildCount() int {
+func (o *andProjOp) ChildCount(verbose bool) int {
 	return 3
 }
 
-func (o *andProjOp) Child(nth int) execinfra.OpNode {
+func (o *andProjOp) Child(nth int, verbose bool) execinfra.OpNode {
 	switch nth {
 	case 0:
 		return o.input
@@ -488,11 +488,11 @@ func NewOrProjOp(
 	}
 }
 
-func (o *orProjOp) ChildCount() int {
+func (o *orProjOp) ChildCount(verbose bool) int {
 	return 3
 }
 
-func (o *orProjOp) Child(nth int) execinfra.OpNode {
+func (o *orProjOp) Child(nth int, verbose bool) execinfra.OpNode {
 	switch nth {
 	case 0:
 		return o.input

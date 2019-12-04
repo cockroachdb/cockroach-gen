@@ -17,6 +17,9 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 )
 
+// Use execerror package to remove unused import warning.
+var _ = execerror.VectorizedInternalPanic
+
 // TODO(yuzefovich): add benchmarks.
 
 // NewRankOperator creates a new Operator that computes window function RANK or
@@ -94,13 +97,9 @@ func (r *rankNoPartitionOp) Init() {
 
 func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-
 	if r.outputColIdx == batch.Width() {
 		r.allocator.AppendColumn(batch, coltypes.Int64)
-	} else if r.outputColIdx > batch.Width() {
-		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
-
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -160,21 +159,15 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
 	if r.partitionColIdx == batch.Width() {
 		r.allocator.AppendColumn(batch, coltypes.Bool)
-	} else if r.partitionColIdx > batch.Width() {
-		execerror.VectorizedInternalPanic("unexpected: column partitionColIdx is neither present nor the next to be appended")
 	}
-	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
-
 	if r.outputColIdx == batch.Width() {
 		r.allocator.AppendColumn(batch, coltypes.Int64)
-	} else if r.outputColIdx > batch.Width() {
-		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
-
 	if batch.Length() == 0 {
 		return batch
 	}
 
+	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
@@ -240,13 +233,9 @@ func (r *denseRankNoPartitionOp) Init() {
 
 func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-
 	if r.outputColIdx == batch.Width() {
 		r.allocator.AppendColumn(batch, coltypes.Int64)
-	} else if r.outputColIdx > batch.Width() {
-		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
-
 	if batch.Length() == 0 {
 		return batch
 	}
@@ -304,21 +293,15 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
 	if r.partitionColIdx == batch.Width() {
 		r.allocator.AppendColumn(batch, coltypes.Bool)
-	} else if r.partitionColIdx > batch.Width() {
-		execerror.VectorizedInternalPanic("unexpected: column partitionColIdx is neither present nor the next to be appended")
 	}
-	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
-
 	if r.outputColIdx == batch.Width() {
 		r.allocator.AppendColumn(batch, coltypes.Int64)
-	} else if r.outputColIdx > batch.Width() {
-		execerror.VectorizedInternalPanic("unexpected: column outputColIdx is neither present nor the next to be appended")
 	}
-
 	if batch.Length() == 0 {
 		return batch
 	}
 
+	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
