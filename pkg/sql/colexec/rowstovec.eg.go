@@ -38,7 +38,36 @@ func EncDatumRowsToColVec(
 ) error {
 	var err error
 	switch columnType.Family() {
-	case types.StringFamily:
+	case types.BoolFamily:
+		allocator.performOperation(
+			[]coldata.Vec{vec},
+			func() {
+				col := vec.Bool()
+				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				for i := range rows {
+					row := rows[i]
+					if row[columnIdx].Datum == nil {
+						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							break
+						}
+					}
+					datum := row[columnIdx].Datum
+					if datum == tree.DNull {
+						vec.Nulls().SetNull(uint16(i))
+					} else {
+						v, err := datumToPhysicalFn(datum)
+						if err != nil {
+							break
+						}
+
+						castV := v.(bool)
+						col[i] = castV
+					}
+				}
+			},
+		)
+		return err
+	case types.BytesFamily:
 		allocator.performOperation(
 			[]coldata.Vec{vec},
 			func() {
@@ -96,124 +125,8 @@ func EncDatumRowsToColVec(
 			},
 		)
 		return err
-	case types.OidFamily:
-		allocator.performOperation(
-			[]coldata.Vec{vec},
-			func() {
-				col := vec.Int64()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-				for i := range rows {
-					row := rows[i]
-					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-							break
-						}
-					}
-					datum := row[columnIdx].Datum
-					if datum == tree.DNull {
-						vec.Nulls().SetNull(uint16(i))
-					} else {
-						v, err := datumToPhysicalFn(datum)
-						if err != nil {
-							break
-						}
-
-						castV := v.(int64)
-						col[i] = castV
-					}
-				}
-			},
-		)
-		return err
-	case types.BoolFamily:
-		allocator.performOperation(
-			[]coldata.Vec{vec},
-			func() {
-				col := vec.Bool()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-				for i := range rows {
-					row := rows[i]
-					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-							break
-						}
-					}
-					datum := row[columnIdx].Datum
-					if datum == tree.DNull {
-						vec.Nulls().SetNull(uint16(i))
-					} else {
-						v, err := datumToPhysicalFn(datum)
-						if err != nil {
-							break
-						}
-
-						castV := v.(bool)
-						col[i] = castV
-					}
-				}
-			},
-		)
-		return err
-	case types.DateFamily:
-		allocator.performOperation(
-			[]coldata.Vec{vec},
-			func() {
-				col := vec.Int64()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-				for i := range rows {
-					row := rows[i]
-					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-							break
-						}
-					}
-					datum := row[columnIdx].Datum
-					if datum == tree.DNull {
-						vec.Nulls().SetNull(uint16(i))
-					} else {
-						v, err := datumToPhysicalFn(datum)
-						if err != nil {
-							break
-						}
-
-						castV := v.(int64)
-						col[i] = castV
-					}
-				}
-			},
-		)
-		return err
 	case types.IntFamily:
 		switch columnType.Width() {
-		case 64:
-			allocator.performOperation(
-				[]coldata.Vec{vec},
-				func() {
-					col := vec.Int64()
-					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
-					for i := range rows {
-						row := rows[i]
-						if row[columnIdx].Datum == nil {
-							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
-								break
-							}
-						}
-						datum := row[columnIdx].Datum
-						if datum == tree.DNull {
-							vec.Nulls().SetNull(uint16(i))
-						} else {
-							v, err := datumToPhysicalFn(datum)
-							if err != nil {
-								break
-							}
-
-							castV := v.(int64)
-							col[i] = castV
-						}
-					}
-				},
-			)
-			return err
 		case 16:
 			allocator.performOperation(
 				[]coldata.Vec{vec},
@@ -237,6 +150,35 @@ func EncDatumRowsToColVec(
 							}
 
 							castV := v.(int16)
+							col[i] = castV
+						}
+					}
+				},
+			)
+			return err
+		case 64:
+			allocator.performOperation(
+				[]coldata.Vec{vec},
+				func() {
+					col := vec.Int64()
+					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+					for i := range rows {
+						row := rows[i]
+						if row[columnIdx].Datum == nil {
+							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+								break
+							}
+						}
+						datum := row[columnIdx].Datum
+						if datum == tree.DNull {
+							vec.Nulls().SetNull(uint16(i))
+						} else {
+							v, err := datumToPhysicalFn(datum)
+							if err != nil {
+								break
+							}
+
+							castV := v.(int64)
 							col[i] = castV
 						}
 					}
@@ -275,7 +217,7 @@ func EncDatumRowsToColVec(
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
 		}
-	case types.BytesFamily:
+	case types.StringFamily:
 		allocator.performOperation(
 			[]coldata.Vec{vec},
 			func() {
@@ -304,11 +246,11 @@ func EncDatumRowsToColVec(
 			},
 		)
 		return err
-	case types.TimestampFamily:
+	case types.UuidFamily:
 		allocator.performOperation(
 			[]coldata.Vec{vec},
 			func() {
-				col := vec.Timestamp()
+				col := vec.Bytes()
 				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 				for i := range rows {
 					row := rows[i]
@@ -326,8 +268,8 @@ func EncDatumRowsToColVec(
 							break
 						}
 
-						castV := v.(time.Time)
-						col[i] = castV
+						castV := v.([]byte)
+						col.Set(i, castV)
 					}
 				}
 			},
@@ -396,11 +338,11 @@ func EncDatumRowsToColVec(
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
 		}
-	case types.UuidFamily:
+	case types.TimestampFamily:
 		allocator.performOperation(
 			[]coldata.Vec{vec},
 			func() {
-				col := vec.Bytes()
+				col := vec.Timestamp()
 				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
 				for i := range rows {
 					row := rows[i]
@@ -418,8 +360,66 @@ func EncDatumRowsToColVec(
 							break
 						}
 
-						castV := v.([]byte)
-						col.Set(i, castV)
+						castV := v.(time.Time)
+						col[i] = castV
+					}
+				}
+			},
+		)
+		return err
+	case types.OidFamily:
+		allocator.performOperation(
+			[]coldata.Vec{vec},
+			func() {
+				col := vec.Int64()
+				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				for i := range rows {
+					row := rows[i]
+					if row[columnIdx].Datum == nil {
+						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							break
+						}
+					}
+					datum := row[columnIdx].Datum
+					if datum == tree.DNull {
+						vec.Nulls().SetNull(uint16(i))
+					} else {
+						v, err := datumToPhysicalFn(datum)
+						if err != nil {
+							break
+						}
+
+						castV := v.(int64)
+						col[i] = castV
+					}
+				}
+			},
+		)
+		return err
+	case types.DateFamily:
+		allocator.performOperation(
+			[]coldata.Vec{vec},
+			func() {
+				col := vec.Int64()
+				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				for i := range rows {
+					row := rows[i]
+					if row[columnIdx].Datum == nil {
+						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							break
+						}
+					}
+					datum := row[columnIdx].Datum
+					if datum == tree.DNull {
+						vec.Nulls().SetNull(uint16(i))
+					} else {
+						v, err := datumToPhysicalFn(datum)
+						if err != nil {
+							break
+						}
+
+						castV := v.(int64)
+						col[i] = castV
 					}
 				}
 			},
