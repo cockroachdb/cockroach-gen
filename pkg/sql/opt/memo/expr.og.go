@@ -2789,8 +2789,7 @@ func (g *lookupJoinGroup) bestProps() *bestProps {
 }
 
 type LookupJoinPrivate struct {
-	// JoinType is InnerJoin or LeftJoin.
-	// TODO(radu): support SemiJoin, AntiJoin.
+	// JoinType is InnerJoin, LeftJoin, SemiJoin, or AntiJoin.
 	JoinType opt.Operator
 
 	// Table identifies the table do to lookups in.
@@ -2817,6 +2816,10 @@ type LookupJoinPrivate struct {
 	// exploration transforms which currently leads to problems related to lookup
 	// join statistics.
 	Cols opt.ColSet
+
+	// LookupColsAreTableKey is true if the lookup columns form a key in the
+	// table (and thus each left row matches with at most one table row).
+	LookupColsAreTableKey bool
 
 	// lookupProps caches relational properties for the "table" side of the lookup
 	// join, treating it as if it were another relational input. This makes the
@@ -20509,6 +20512,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColList(val.KeyCols)
 	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashBool(val.LookupColsAreTableKey)
 	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
@@ -20521,6 +20525,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
