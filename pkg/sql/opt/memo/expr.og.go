@@ -1443,7 +1443,7 @@ type ValuesPrivate struct {
 	// Values expressions which appear in different places in the query. In most
 	// cases the column set is sufficient to do this, but various rules make it
 	// possible to construct Values expressions with no columns.
-	ID opt.ValuesID
+	ID opt.UniqueID
 }
 
 // SelectExpr filters rows from its input result set, based on the boolean filter
@@ -6085,7 +6085,8 @@ func (g *withScanGroup) bestProps() *bestProps {
 }
 
 type WithScanPrivate struct {
-	ID opt.WithID
+	// With identifies the CTE to scan.
+	With opt.WithID
 
 	// BindingProps stores the relational properties of the referenced expression.
 	BindingProps *props.Relational
@@ -6104,6 +6105,12 @@ type WithScanPrivate struct {
 	// the same tree, so we maintain a mapping from the columns returned from
 	// the referenced expression to the referencing expression.
 	OutCols opt.ColList
+
+	// ID is a memo-unique identifier which distinguishes between identical
+	// WithScan expressions which appear in different places in the query. In
+	// most cases the column set is sufficient to do this, but various rules make
+	// it possible to construct WithScan expressions with no columns.
+	ID opt.UniqueID
 }
 
 // RecursiveCTEExpr implements the logic of a recursive CTE:
@@ -20277,14 +20284,14 @@ func (in *interner) InternValues(val *ValuesExpr) *ValuesExpr {
 	in.hasher.HashOperator(opt.ValuesOp)
 	in.hasher.HashScalarListExpr(val.Rows)
 	in.hasher.HashColList(val.Cols)
-	in.hasher.HashValuesID(val.ID)
+	in.hasher.HashUniqueID(val.ID)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ValuesExpr); ok {
 			if in.hasher.IsScalarListExprEqual(val.Rows, existing.Rows) &&
 				in.hasher.IsColListEqual(val.Cols, existing.Cols) &&
-				in.hasher.IsValuesIDEqual(val.ID, existing.ID) {
+				in.hasher.IsUniqueIDEqual(val.ID, existing.ID) {
 				return existing
 			}
 		}
@@ -21089,20 +21096,22 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.WithScanOp)
-	in.hasher.HashWithID(val.ID)
+	in.hasher.HashWithID(val.With)
 	in.hasher.HashPointer(unsafe.Pointer(val.BindingProps))
 	in.hasher.HashString(val.Name)
 	in.hasher.HashColList(val.InCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashUniqueID(val.ID)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*WithScanExpr); ok {
-			if in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
+			if in.hasher.IsWithIDEqual(val.With, existing.With) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.BindingProps), unsafe.Pointer(existing.BindingProps)) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsColListEqual(val.InCols, existing.InCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsUniqueIDEqual(val.ID, existing.ID) {
 				return existing
 			}
 		}
