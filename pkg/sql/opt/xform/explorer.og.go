@@ -595,32 +595,6 @@ func (_e *explorer) exploreRightJoin(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
-	// [CommuteRightJoin]
-	{
-		if _rootOrd >= _rootState.start {
-			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			private := &_root.JoinPrivate
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteRightJoin) {
-				_expr := &memo.LeftJoinExpr{
-					Left:        right,
-					Right:       left,
-					On:          on,
-					JoinPrivate: *_e.funcs.CommuteJoinFlags(private),
-				}
-				_interned := _e.mem.AddLeftJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteRightJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteRightJoin, _root, _interned)
-					}
-				}
-			}
-		}
-	}
-
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {

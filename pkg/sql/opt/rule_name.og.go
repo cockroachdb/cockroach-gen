@@ -93,6 +93,7 @@ const (
 	InlineJoinConstantsRight
 	PushSelectIntoInlinableProject
 	InlineProjectInProject
+	CommuteRightJoin
 	SimplifyJoinFilters
 	DetectJoinContradiction
 	PushFilterIntoJoinLeftAndRight
@@ -123,7 +124,6 @@ const (
 	PushLimitIntoOffset
 	PushLimitIntoOrdinality
 	PushLimitIntoLeftJoin
-	PushLimitIntoRightJoin
 	EliminateMax1Row
 	FoldPlusZero
 	FoldZeroPlus
@@ -194,9 +194,7 @@ const (
 	PushSelectIntoProject
 	MergeSelectInnerJoin
 	PushSelectCondLeftIntoJoinLeftAndRight
-	PushSelectCondRightIntoJoinLeftAndRight
 	PushSelectIntoJoinLeft
-	PushSelectIntoJoinRight
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
 	InlineConstVar
@@ -222,7 +220,6 @@ const (
 	GenerateStreamingGroupBy
 	CommuteJoin
 	CommuteLeftJoin
-	CommuteRightJoin
 	CommuteSemiJoin
 	GenerateMergeJoins
 	GenerateLookupJoins

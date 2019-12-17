@@ -339,15 +339,21 @@ func (_f *Factory) ConstructSelect(
 
 	// [RejectNullsRightJoin]
 	{
-		if input.Op() == opt.RightJoinOp || input.Op() == opt.FullJoinOp {
-			left := input.Child(0).(memo.RelExpr)
-			right := input.Child(1).(memo.RelExpr)
-			on := *input.Child(2).(*memo.FiltersExpr)
-			private := input.Private().(*memo.JoinPrivate)
+		_fullJoin, _ := input.(*memo.FullJoinExpr)
+		if _fullJoin != nil {
+			left := _fullJoin.Left
+			right := _fullJoin.Right
+			on := _fullJoin.On
+			private := &_fullJoin.JoinPrivate
 			if _f.funcs.HasNullRejectingFilter(filters, _f.funcs.OutputCols(left)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsRightJoin) {
 					_expr := _f.ConstructSelect(
-						_f.funcs.ConstructNonRightJoin(input.Op(), left, right, on, private),
+						_f.ConstructLeftJoin(
+							left,
+							right,
+							on,
+							private,
+						),
 						filters,
 					)
 					if _f.appliedRule != nil {
@@ -583,7 +589,7 @@ func (_f *Factory) ConstructSelect(
 
 	// [PushSelectCondLeftIntoJoinLeftAndRight]
 	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.SemiJoinOp || input.Op() == opt.SemiJoinApplyOp || input.Op() == opt.AntiJoinOp || input.Op() == opt.AntiJoinApplyOp {
+		if input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.SemiJoinOp || input.Op() == opt.SemiJoinApplyOp || input.Op() == opt.AntiJoinOp || input.Op() == opt.AntiJoinApplyOp {
 			left := input.Child(0).(memo.RelExpr)
 			right := input.Child(1).(memo.RelExpr)
 			on := *input.Child(2).(*memo.FiltersExpr)
@@ -632,60 +638,9 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
-	// [PushSelectCondRightIntoJoinLeftAndRight]
-	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.RightJoinOp {
-			left := input.Child(0).(memo.RelExpr)
-			right := input.Child(1).(memo.RelExpr)
-			on := *input.Child(2).(*memo.FiltersExpr)
-			private := input.Private().(*memo.JoinPrivate)
-			for i := range filters {
-				item := &filters[i]
-				condition := item.Condition
-				if _f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-					leftCols := _f.funcs.OutputCols(left)
-					equivFD := _f.funcs.GetEquivFD(on, left, right)
-					if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
-							on := on
-							_expr := _f.ConstructSelect(
-								_f.DynamicConstruct(
-									input.Op(),
-									_f.ConstructSelect(
-										left,
-										memo.FiltersExpr{
-											{
-												Condition: _f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
-											},
-										},
-									),
-									_f.ConstructSelect(
-										right,
-										memo.FiltersExpr{
-											{
-												Condition: condition,
-											},
-										},
-									),
-									&on,
-									private,
-								).(memo.RelExpr),
-								_f.funcs.RemoveFiltersItem(filters, item),
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushSelectCondRightIntoJoinLeftAndRight, nil, _expr)
-							}
-							return _expr
-						}
-					}
-				}
-			}
-		}
-	}
-
 	// [PushSelectIntoJoinLeft]
 	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.SemiJoinOp || input.Op() == opt.SemiJoinApplyOp || input.Op() == opt.AntiJoinOp || input.Op() == opt.AntiJoinApplyOp {
+		if input.Op() == opt.LeftJoinOp || input.Op() == opt.LeftJoinApplyOp || input.Op() == opt.SemiJoinOp || input.Op() == opt.SemiJoinApplyOp || input.Op() == opt.AntiJoinOp || input.Op() == opt.AntiJoinApplyOp {
 			left := input.Child(0).(memo.RelExpr)
 			right := input.Child(1).(memo.RelExpr)
 			on := *input.Child(2).(*memo.FiltersExpr)
@@ -711,42 +666,6 @@ func (_f *Factory) ConstructSelect(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.PushSelectIntoJoinLeft, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [PushSelectIntoJoinRight]
-	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.InnerJoinApplyOp || input.Op() == opt.RightJoinOp {
-			left := input.Child(0).(memo.RelExpr)
-			right := input.Child(1).(memo.RelExpr)
-			on := *input.Child(2).(*memo.FiltersExpr)
-			private := input.Private().(*memo.JoinPrivate)
-			for i := range filters {
-				item := &filters[i]
-				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.IsBoundBy(item, rightCols) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoJoinRight) {
-						on := on
-						_expr := _f.ConstructSelect(
-							_f.DynamicConstruct(
-								input.Op(),
-								left,
-								_f.ConstructSelect(
-									right,
-									_f.funcs.ExtractBoundConditions(filters, rightCols),
-								),
-								&on,
-								private,
-							).(memo.RelExpr),
-							_f.funcs.ExtractUnboundConditions(filters, rightCols),
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushSelectIntoJoinRight, nil, _expr)
 						}
 						return _expr
 					}
@@ -3110,6 +3029,23 @@ func (_f *Factory) ConstructRightJoin(
 	on memo.FiltersExpr,
 	joinPrivate *memo.JoinPrivate,
 ) memo.RelExpr {
+	// [CommuteRightJoin]
+	{
+		private := joinPrivate
+		if _f.matchedRule == nil || _f.matchedRule(opt.CommuteRightJoin) {
+			_expr := _f.ConstructLeftJoin(
+				right,
+				left,
+				on,
+				_f.funcs.CommuteJoinFlags(private),
+			)
+			if _f.appliedRule != nil {
+				_f.appliedRule(opt.CommuteRightJoin, nil, _expr)
+			}
+			return _expr
+		}
+	}
+
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
@@ -3283,133 +3219,6 @@ func (_f *Factory) ConstructRightJoin(
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [MapFilterIntoJoinLeft]
-	{
-		if !_f.funcs.HasOuterCols(left) {
-			for i := range on {
-				item := &on[i]
-				_match := false
-				_eq, _ := item.Condition.(*memo.EqExpr)
-				if _eq != nil {
-					_variable, _ := _eq.Left.(*memo.VariableExpr)
-					if _variable != nil {
-						_variable2, _ := _eq.Right.(*memo.VariableExpr)
-						if _variable2 != nil {
-							_match = true
-						}
-					}
-				}
-
-				if !_match {
-					leftCols := _f.funcs.OutputCols(left)
-					if !_f.funcs.IsBoundBy(item, leftCols) {
-						equivFD := _f.funcs.GetEquivFD(on, left, right)
-						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
-							private := joinPrivate
-							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
-								_expr := _f.ConstructRightJoin(
-									left,
-									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, leftCols, equivFD)),
-									private,
-								)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.MapFilterIntoJoinLeft, nil, _expr)
-								}
-								return _expr
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [MapEqualityIntoJoinLeftAndRight]
-	{
-		if !_f.funcs.HasOuterCols(left) {
-			if !_f.funcs.HasOuterCols(right) {
-				leftCols := _f.funcs.OutputCols(left)
-				rightCols := _f.funcs.OutputCols(right)
-				if _f.funcs.CanMapJoinOpEqualities(on, leftCols, rightCols) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.MapEqualityIntoJoinLeftAndRight) {
-						_expr := _f.ConstructRightJoin(
-							left,
-							right,
-							_f.funcs.MapJoinOpEqualities(on, leftCols, rightCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.MapEqualityIntoJoinLeftAndRight, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [PushFilterIntoJoinLeft]
-	{
-		if !_f.funcs.HasOuterCols(left) {
-			for i := range on {
-				item := &on[i]
-				leftCols := _f.funcs.OutputCols(left)
-				if _f.funcs.IsBoundBy(item, leftCols) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeft) {
-						_expr := _f.ConstructRightJoin(
-							_f.ConstructSelect(
-								left,
-								_f.funcs.ExtractBoundConditions(on, leftCols),
-							),
-							right,
-							_f.funcs.ExtractUnboundConditions(on, leftCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoJoinLeft, nil, _expr)
-						}
-						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [SimplifyRightJoinWithoutFilters]
-	{
-		if !_f.funcs.CanHaveZeroRows(left) {
-			if len(on) == 0 {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
-					_expr := _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on, private).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [SimplifyRightJoinWithFilters]
-	{
-		if len(on) != 0 {
-			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_expr := _f.funcs.ConstructNonRightJoin(opt.RightJoinOp, left, right, on, private).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 					}
 					return _expr
 				}
@@ -3702,7 +3511,12 @@ func (_f *Factory) ConstructFullJoin(
 			if len(on) == 0 {
 				private := joinPrivate
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithoutFilters) {
-					_expr := _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on, private).(memo.RelExpr)
+					_expr := _f.ConstructLeftJoin(
+						left,
+						right,
+						on,
+						private,
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.SimplifyRightJoinWithoutFilters, nil, _expr)
 					}
@@ -3734,7 +3548,12 @@ func (_f *Factory) ConstructFullJoin(
 			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
 				private := joinPrivate
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_expr := _f.funcs.ConstructNonRightJoin(opt.FullJoinOp, left, right, on, private).(memo.RelExpr)
+					_expr := _f.ConstructLeftJoin(
+						left,
+						right,
+						on,
+						private,
+					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 					}
@@ -8090,49 +7909,6 @@ func (_f *Factory) ConstructLimit(
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.PushLimitIntoLeftJoin, nil, _expr)
-							}
-							return _expr
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [PushLimitIntoRightJoin]
-	{
-		_rightJoin, _ := input.(*memo.RightJoinExpr)
-		if _rightJoin != nil {
-			left := _rightJoin.Left
-			right := _rightJoin.Right
-			on := _rightJoin.On
-			private := &_rightJoin.JoinPrivate
-			_const, _ := limit.(*memo.ConstExpr)
-			if _const != nil {
-				limit := _const.Value
-				if !_f.funcs.LimitGeMaxRows(limit, right) {
-					if _f.funcs.HasColsInOrdering(right, ordering) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoRightJoin) {
-							_expr := _f.ConstructLimit(
-								_f.ConstructRightJoin(
-									left,
-									_f.ConstructLimit(
-										right,
-										_f.ConstructConst(
-											limit,
-										),
-										_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(right)),
-									),
-									on,
-									private,
-								),
-								_f.ConstructConst(
-									limit,
-								),
-								ordering,
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushLimitIntoRightJoin, nil, _expr)
 							}
 							return _expr
 						}
