@@ -592,7 +592,9 @@ func (_f *Factory) ConstructSelect(
 				item := &filters[i]
 				condition := item.Condition
 				if _f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
-					if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					equivFD := _f.funcs.GetEquivFD(on, left, right)
+					if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondLeftIntoJoinLeftAndRight) {
 							on := on
 							_expr := _f.ConstructSelect(
@@ -610,7 +612,7 @@ func (_f *Factory) ConstructSelect(
 										right,
 										memo.FiltersExpr{
 											{
-												Condition: _f.funcs.MapJoinOpFilter(on, item, right),
+												Condition: _f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
 											},
 										},
 									),
@@ -641,7 +643,9 @@ func (_f *Factory) ConstructSelect(
 				item := &filters[i]
 				condition := item.Condition
 				if _f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-					if _f.funcs.CanMapJoinOpFilter(on, item, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					equivFD := _f.funcs.GetEquivFD(on, left, right)
+					if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectCondRightIntoJoinLeftAndRight) {
 							on := on
 							_expr := _f.ConstructSelect(
@@ -651,7 +655,7 @@ func (_f *Factory) ConstructSelect(
 										left,
 										memo.FiltersExpr{
 											{
-												Condition: _f.funcs.MapJoinOpFilter(on, item, left),
+												Condition: _f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
 											},
 										},
 									),
@@ -2136,8 +2140,11 @@ func (_f *Factory) ConstructInnerJoin(
 					}
 
 					if !_match {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
-							if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+						leftCols := _f.funcs.OutputCols(left)
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
+							rightCols := _f.funcs.OutputCols(right)
+							if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 								private := joinPrivate
 								if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
 									_expr := _f.ConstructInnerJoin(
@@ -2145,7 +2152,7 @@ func (_f *Factory) ConstructInnerJoin(
 											left,
 											memo.FiltersExpr{
 												{
-													Condition: _f.funcs.MapJoinOpFilter(on, item, left),
+													Condition: _f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
 												},
 											},
 										),
@@ -2153,7 +2160,7 @@ func (_f *Factory) ConstructInnerJoin(
 											right,
 											memo.FiltersExpr{
 												{
-													Condition: _f.funcs.MapJoinOpFilter(on, item, right),
+													Condition: _f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
 												},
 											},
 										),
@@ -2191,14 +2198,16 @@ func (_f *Factory) ConstructInnerJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					if !_f.funcs.IsBoundBy(item, leftCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_expr := _f.ConstructInnerJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, left)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, leftCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -2231,14 +2240,16 @@ func (_f *Factory) ConstructInnerJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructInnerJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -2834,14 +2845,16 @@ func (_f *Factory) ConstructLeftJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructLeftJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -3295,14 +3308,16 @@ func (_f *Factory) ConstructRightJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					if !_f.funcs.IsBoundBy(item, leftCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_expr := _f.ConstructRightJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, left)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, leftCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -4096,8 +4111,11 @@ func (_f *Factory) ConstructSemiJoin(
 					}
 
 					if !_match {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
-							if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+						leftCols := _f.funcs.OutputCols(left)
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
+							rightCols := _f.funcs.OutputCols(right)
+							if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 								private := joinPrivate
 								if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoJoinLeftAndRight) {
 									_expr := _f.ConstructSemiJoin(
@@ -4105,7 +4123,7 @@ func (_f *Factory) ConstructSemiJoin(
 											left,
 											memo.FiltersExpr{
 												{
-													Condition: _f.funcs.MapJoinOpFilter(on, item, left),
+													Condition: _f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
 												},
 											},
 										),
@@ -4113,7 +4131,7 @@ func (_f *Factory) ConstructSemiJoin(
 											right,
 											memo.FiltersExpr{
 												{
-													Condition: _f.funcs.MapJoinOpFilter(on, item, right),
+													Condition: _f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
 												},
 											},
 										),
@@ -4151,14 +4169,16 @@ func (_f *Factory) ConstructSemiJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					if !_f.funcs.IsBoundBy(item, leftCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_expr := _f.ConstructSemiJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, left)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, leftCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -4191,14 +4211,16 @@ func (_f *Factory) ConstructSemiJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructSemiJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -4697,14 +4719,16 @@ func (_f *Factory) ConstructAntiJoin(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructAntiJoin(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -5491,14 +5515,16 @@ func (_f *Factory) ConstructInnerJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					if !_f.funcs.IsBoundBy(item, leftCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_expr := _f.ConstructInnerJoinApply(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, left)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, leftCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -5531,14 +5557,16 @@ func (_f *Factory) ConstructInnerJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructInnerJoinApply(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -6164,14 +6192,16 @@ func (_f *Factory) ConstructLeftJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructLeftJoinApply(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -6677,14 +6707,16 @@ func (_f *Factory) ConstructSemiJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(left)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, left) {
+					leftCols := _f.funcs.OutputCols(left)
+					if !_f.funcs.IsBoundBy(item, leftCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, leftCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinLeft) {
 								_expr := _f.ConstructSemiJoinApply(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, left)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, leftCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -6717,14 +6749,16 @@ func (_f *Factory) ConstructSemiJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructSemiJoinApply(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
@@ -7190,14 +7224,16 @@ func (_f *Factory) ConstructAntiJoinApply(
 				}
 
 				if !_match {
-					if !_f.funcs.IsBoundBy(item, _f.funcs.OutputCols(right)) {
-						if _f.funcs.CanMapJoinOpFilter(on, item, right) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.IsBoundBy(item, rightCols) {
+						equivFD := _f.funcs.GetEquivFD(on, left, right)
+						if _f.funcs.CanMapJoinOpFilter(item, rightCols, equivFD) {
 							private := joinPrivate
 							if _f.matchedRule == nil || _f.matchedRule(opt.MapFilterIntoJoinRight) {
 								_expr := _f.ConstructAntiJoinApply(
 									left,
 									right,
-									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(on, item, right)),
+									_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.MapJoinOpFilter(item, rightCols, equivFD)),
 									private,
 								)
 								if _f.appliedRule != nil {
