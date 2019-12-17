@@ -9062,7 +9062,7 @@ func (_f *Factory) ConstructNot(
 		if opt.IsComparisonOp(input) {
 			left := input.Child(0).(opt.ScalarExpr)
 			right := input.Child(1).(opt.ScalarExpr)
-			if !(input.Op() == opt.ContainsOp || input.Op() == opt.JsonExistsOp || input.Op() == opt.JsonSomeExistsOp || input.Op() == opt.JsonAllExistsOp) {
+			if !(input.Op() == opt.ContainsOp || input.Op() == opt.JsonExistsOp || input.Op() == opt.JsonSomeExistsOp || input.Op() == opt.JsonAllExistsOp || input.Op() == opt.OverlapsOp) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NegateComparison) {
 					_expr := _f.funcs.NegateComparison(input.Op(), left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
