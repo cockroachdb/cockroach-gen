@@ -180,6 +180,8 @@ const (
 	NormalizeJSONFieldAccess
 	NormalizeJSONContains
 	SimplifyCaseWhenConstValue
+	InlineAnyValuesSingleCol
+	InlineAnyValuesMultiCol
 	SimplifyEqualsAnyTuple
 	SimplifyAnyScalarArray
 	FoldCollate

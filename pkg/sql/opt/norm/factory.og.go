@@ -8533,6 +8533,61 @@ func (_f *Factory) ConstructAny(
 	scalar opt.ScalarExpr,
 	subqueryPrivate *memo.SubqueryPrivate,
 ) opt.ScalarExpr {
+	// [InlineAnyValuesSingleCol]
+	{
+		values := input
+		_values, _ := values.(*memo.ValuesExpr)
+		if _values != nil {
+			private := subqueryPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyValuesSingleCol) {
+				_expr := _f.ConstructAnyScalar(
+					scalar,
+					_f.funcs.InlineValues(values),
+					_f.funcs.SubqueryCmp(private),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.InlineAnyValuesSingleCol, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [InlineAnyValuesMultiCol]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			values := _project.Input
+			_values, _ := values.(*memo.ValuesExpr)
+			if _values != nil {
+				if len(_project.Projections) == 1 {
+					_item := &_project.Projections[0]
+					tuple := _item.Element
+					_tuple, _ := tuple.(*memo.TupleExpr)
+					if _tuple != nil {
+						if _f.funcs.IsTupleOfVars(tuple, _f.funcs.ValuesCols(values)) {
+							passthrough := _project.Passthrough
+							if _f.funcs.ColsAreEmpty(passthrough) {
+								private := subqueryPrivate
+								if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyValuesMultiCol) {
+									_expr := _f.ConstructAnyScalar(
+										scalar,
+										_f.funcs.InlineValues(values),
+										_f.funcs.SubqueryCmp(private),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.InlineAnyValuesMultiCol, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeAny(input, scalar, subqueryPrivate)
 	return _f.onConstructScalar(e)
 }
