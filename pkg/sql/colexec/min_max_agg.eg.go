@@ -394,7 +394,9 @@ func (a *minBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
 		vecLen := a.col.Len()
-		target := a.col.Slice(idx+1, vecLen)
+		target := a.col
+		_ = idx + 1
+		_ = vecLen
 		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -472,8 +474,10 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, int(inputLen))
-					for i := 0; i < col.Len(); i++ {
+					col = col
+					_ = 0
+					_ = int(inputLen)
+					for i := 0; i < int(inputLen); i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -560,8 +564,10 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, int(inputLen))
-					for i := 0; i < col.Len(); i++ {
+					col = col
+					_ = 0
+					_ = int(inputLen)
+					for i := 0; i < int(inputLen); i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2821,7 +2827,9 @@ func (a *maxBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
 		vecLen := a.col.Len()
-		target := a.col.Slice(idx+1, vecLen)
+		target := a.col
+		_ = idx + 1
+		_ = vecLen
 		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -2899,8 +2907,10 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, int(inputLen))
-					for i := 0; i < col.Len(); i++ {
+					col = col
+					_ = 0
+					_ = int(inputLen)
+					for i := 0; i < int(inputLen); i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2987,8 +2997,10 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, int(inputLen))
-					for i := 0; i < col.Len(); i++ {
+					col = col
+					_ = 0
+					_ = int(inputLen)
+					for i := 0; i < int(inputLen); i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the

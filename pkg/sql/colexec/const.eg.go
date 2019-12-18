@@ -172,8 +172,10 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 					col.Set(int(i), c.constVal)
 				}
 			} else {
-				col = col.Slice(0, int(n))
-				for i := 0; i < col.Len(); i++ {
+				col = col
+				_ = 0
+				_ = int(n)
+				for i := 0; i < int(n); i++ {
 					col.Set(i, c.constVal)
 				}
 			}

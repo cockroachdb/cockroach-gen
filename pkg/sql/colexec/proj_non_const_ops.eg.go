@@ -862,11 +862,13 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
 					// We only want to perform the projection operation if both values are not
 					// null.
@@ -898,11 +900,13 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				arg1 := col1.Get(int(i))
 				arg2 := col2.Get(int(i))
 
@@ -963,11 +967,13 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
 					// We only want to perform the projection operation if both values are not
 					// null.
@@ -999,11 +1005,13 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				arg1 := col1.Get(int(i))
 				arg2 := col2.Get(int(i))
 
@@ -1064,11 +1072,13 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
 					// We only want to perform the projection operation if both values are not
 					// null.
@@ -1100,11 +1110,13 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				arg1 := col1.Get(int(i))
 				arg2 := col2.Get(int(i))
 
@@ -1165,11 +1177,13 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
 					// We only want to perform the projection operation if both values are not
 					// null.
@@ -1201,11 +1215,13 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				arg1 := col1.Get(int(i))
 				arg2 := col2.Get(int(i))
 
@@ -1266,11 +1282,13 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
 					// We only want to perform the projection operation if both values are not
 					// null.
@@ -1302,11 +1320,13 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				arg1 := col1.Get(int(i))
 				arg2 := col2.Get(int(i))
 
@@ -1367,11 +1387,13 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
 					// We only want to perform the projection operation if both values are not
 					// null.
@@ -1403,11 +1425,13 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1.Slice(0, int(n))
+			col1 = col1
+			_ = 0
+			_ = int(n)
 			colLen := col1.Len()
 			_ = projCol[colLen-1]
 			_ = col2.Get(colLen - 1)
-			for i := 0; i < col1.Len(); i++ {
+			for i := 0; i < int(n); i++ {
 				arg1 := col1.Get(int(i))
 				arg2 := col2.Get(int(i))
 

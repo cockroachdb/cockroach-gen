@@ -318,7 +318,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
@@ -671,11 +671,13 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col.Slice(0, int(n))
+		col = col
+		_ = 0
+		_ = int(n)
 		outputCol = outputCol[:n]
-		_ = outputCol[col.Len()-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
+			for checkIdx := 0; checkIdx < int(n); checkIdx++ {
 				outputIdx := checkIdx
 				null := nulls.NullAt(uint16(checkIdx))
 				if null {
@@ -705,7 +707,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				lastValNull = null
 			}
 		} else {
-			for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
+			for checkIdx := 0; checkIdx < int(n); checkIdx++ {
 				outputIdx := checkIdx
 				v := col.Get(int(checkIdx))
 				var unique bool
@@ -745,7 +747,9 @@ func (p partitionerBytes) partitionWithOrder(
 	}
 
 	col := colVec.Bytes()
-	col = col.Slice(0, int(n))
+	col = col
+	_ = 0
+	_ = int(n)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
@@ -805,11 +809,13 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 	}
 
 	col := colVec.Bytes()
-	col = col.Slice(0, int(n))
+	col = col
+	_ = 0
+	_ = int(n)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
+		for checkIdx := 0; checkIdx < int(n); checkIdx++ {
 			outputIdx := checkIdx
 			null := nulls.NullAt(uint16(checkIdx))
 			if null {
@@ -839,7 +845,7 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 			lastValNull = null
 		}
 	} else {
-		for checkIdx := 0; checkIdx < col.Len(); checkIdx++ {
+		for checkIdx := 0; checkIdx < int(n); checkIdx++ {
 			outputIdx := checkIdx
 			v := col.Get(int(checkIdx))
 			var unique bool
@@ -980,7 +986,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
@@ -1309,7 +1315,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
@@ -1704,7 +1710,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
@@ -2099,7 +2105,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
@@ -2510,7 +2516,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
@@ -2945,7 +2951,7 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col[0:int(n)]
 		outputCol = outputCol[:n]
-		_ = outputCol[len(col)-1]
+		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx

@@ -585,8 +585,10 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, int(n))
-				for i := 0; i < col.Len(); i++ {
+				col = col
+				_ = 0
+				_ = int(n)
+				for i := 0; i < int(n); i++ {
 					v := col.Get(i)
 					if !nulls.NullAt(uint16(i)) && cmpInBytes(v, si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
@@ -607,8 +609,10 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, int(n))
-				for i := 0; i < col.Len(); i++ {
+				col = col
+				_ = 0
+				_ = int(n)
+				for i := 0; i < int(n); i++ {
 					v := col.Get(i)
 					if cmpInBytes(v, si.filterRow, si.hasNulls) == compVal {
 						sel[idx] = uint16(i)
@@ -666,8 +670,10 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col = col.Slice(0, int(n))
-			for i := 0; i < col.Len(); i++ {
+			col = col
+			_ = 0
+			_ = int(n)
+			for i := 0; i < int(n); i++ {
 				if nulls.NullAt(uint16(i)) {
 					projNulls.SetNull(uint16(i))
 				} else {
@@ -694,8 +700,10 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col = col.Slice(0, int(n))
-			for i := 0; i < col.Len(); i++ {
+			col = col
+			_ = 0
+			_ = int(n)
+			for i := 0; i < int(n); i++ {
 				v := col.Get(i)
 				cmpRes := cmpInBytes(v, pi.filterRow, pi.hasNulls)
 				if cmpRes == siNull {

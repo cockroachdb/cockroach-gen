@@ -269,7 +269,9 @@ func (a *anyNotNullBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
 		vecLen := a.vec.Len()
-		target := a.vec.Slice(idx+1, vecLen)
+		target := a.vec
+		_ = idx + 1
+		_ = vecLen
 		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
@@ -326,8 +328,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, int(inputLen))
-					for i := 0; i < col.Len(); i++ {
+					col = col
+					_ = 0
+					_ = int(inputLen)
+					for i := 0; i < int(inputLen); i++ {
 
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
@@ -384,8 +388,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, int(inputLen))
-					for i := 0; i < col.Len(); i++ {
+					col = col
+					_ = 0
+					_ = int(inputLen)
+					for i := 0; i < int(inputLen); i++ {
 
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
