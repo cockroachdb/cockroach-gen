@@ -2825,6 +2825,11 @@ type LookupJoinPrivate struct {
 	// join, treating it as if it were another relational input. This makes the
 	// lookup join appear more like other join operators.
 	lookupProps props.Relational
+
+	// ConstFilters contains the constant filters that are represented as equality
+	// conditions on the KeyCols. These filters are needed by the statistics code to
+	// correctly estimate selectivity.
+	ConstFilters FiltersExpr
 	JoinPrivate
 }
 
@@ -20520,6 +20525,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashColList(val.KeyCols)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashBool(val.LookupColsAreTableKey)
+	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
 
 	in.cache.Start(in.hasher.hash)
@@ -20533,6 +20539,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
+				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
