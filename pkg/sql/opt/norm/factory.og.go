@@ -223,6 +223,17 @@ func (_f *Factory) ConstructDelete(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructFKChecksItem constructs an expression for the FKChecksItem operator.
+// FKChecksItem is a foreign key check query, to be run after the main query.
+// An execution error will be generated if the query returns any results.
+func (_f *Factory) ConstructFKChecksItem(
+	check memo.RelExpr,
+	fKChecksItemPrivate *memo.FKChecksItemPrivate,
+) memo.FKChecksItem {
+	item := memo.FKChecksItem{Check: check, FKChecksItemPrivate: *fKChecksItemPrivate}
+	return item
+}
+
 // ConstructScan constructs an expression for the Scan operator.
 // Scan returns a result set containing every row in a table by scanning one of
 // the table's indexes according to its ordering. The ScanPrivate field
@@ -402,9 +413,9 @@ func (_f *Factory) ConstructSelect(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -438,12 +449,12 @@ func (_f *Factory) ConstructSelect(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -609,17 +620,17 @@ func (_f *Factory) ConstructSelect(
 									_f.ConstructSelect(
 										left,
 										memo.FiltersExpr{
-											{
-												Condition: condition,
-											},
+											_f.ConstructFiltersItem(
+												condition,
+											),
 										},
 									),
 									_f.ConstructSelect(
 										right,
 										memo.FiltersExpr{
-											{
-												Condition: _f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
-											},
+											_f.ConstructFiltersItem(
+												_f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
+											),
 										},
 									),
 									&on,
@@ -770,17 +781,17 @@ func (_f *Factory) ConstructSelect(
 								_f.ConstructSelect(
 									left,
 									memo.FiltersExpr{
-										{
-											Condition: _f.funcs.MapSetOpFilterLeft(item, colmap),
-										},
+										_f.ConstructFiltersItem(
+											_f.funcs.MapSetOpFilterLeft(item, colmap),
+										),
 									},
 								),
 								_f.ConstructSelect(
 									right,
 									memo.FiltersExpr{
-										{
-											Condition: _f.funcs.MapSetOpFilterRight(item, colmap),
-										},
+										_f.ConstructFiltersItem(
+											_f.funcs.MapSetOpFilterRight(item, colmap),
+										),
 									},
 								),
 								colmap,
@@ -949,14 +960,14 @@ func (_f *Factory) ConstructSelect(
 							_f.ConstructSelect(
 								innerInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.ConstructIsNot(
+									_f.ConstructFiltersItem(
+										_f.ConstructIsNot(
 											_f.funcs.NullRejectAggVar(aggregations, rejectCols),
 											_f.ConstructNull(
 												_f.funcs.AnyType(),
 											),
 										),
-									},
+									),
 								},
 							),
 							&aggregations,
@@ -1902,9 +1913,9 @@ func (_f *Factory) ConstructInnerJoin(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -1941,12 +1952,12 @@ func (_f *Factory) ConstructInnerJoin(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -2025,9 +2036,9 @@ func (_f *Factory) ConstructInnerJoin(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -2070,17 +2081,17 @@ func (_f *Factory) ConstructInnerJoin(
 										_f.ConstructSelect(
 											left,
 											memo.FiltersExpr{
-												{
-													Condition: _f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
-												},
+												_f.ConstructFiltersItem(
+													_f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
+												),
 											},
 										),
 										_f.ConstructSelect(
 											right,
 											memo.FiltersExpr{
-												{
-													Condition: _f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
-												},
+												_f.ConstructFiltersItem(
+													_f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
+												),
 											},
 										),
 										_f.funcs.RemoveFiltersItem(on, item),
@@ -2608,9 +2619,9 @@ func (_f *Factory) ConstructLeftJoin(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -2647,12 +2658,12 @@ func (_f *Factory) ConstructLeftJoin(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -2731,9 +2742,9 @@ func (_f *Factory) ConstructLeftJoin(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -3088,9 +3099,9 @@ func (_f *Factory) ConstructRightJoin(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -3127,12 +3138,12 @@ func (_f *Factory) ConstructRightJoin(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -3211,9 +3222,9 @@ func (_f *Factory) ConstructRightJoin(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -3351,9 +3362,9 @@ func (_f *Factory) ConstructFullJoin(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -3390,12 +3401,12 @@ func (_f *Factory) ConstructFullJoin(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -3474,9 +3485,9 @@ func (_f *Factory) ConstructFullJoin(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -3773,9 +3784,9 @@ func (_f *Factory) ConstructSemiJoin(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -3812,12 +3823,12 @@ func (_f *Factory) ConstructSemiJoin(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -3896,9 +3907,9 @@ func (_f *Factory) ConstructSemiJoin(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -3941,17 +3952,17 @@ func (_f *Factory) ConstructSemiJoin(
 										_f.ConstructSelect(
 											left,
 											memo.FiltersExpr{
-												{
-													Condition: _f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
-												},
+												_f.ConstructFiltersItem(
+													_f.funcs.MapJoinOpFilter(item, leftCols, equivFD),
+												),
 											},
 										),
 										_f.ConstructSelect(
 											right,
 											memo.FiltersExpr{
-												{
-													Condition: _f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
-												},
+												_f.ConstructFiltersItem(
+													_f.funcs.MapJoinOpFilter(item, rightCols, equivFD),
+												),
 											},
 										),
 										_f.funcs.RemoveFiltersItem(on, item),
@@ -4382,9 +4393,9 @@ func (_f *Factory) ConstructAntiJoin(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -4421,12 +4432,12 @@ func (_f *Factory) ConstructAntiJoin(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -4505,9 +4516,9 @@ func (_f *Factory) ConstructAntiJoin(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -5178,9 +5189,9 @@ func (_f *Factory) ConstructInnerJoinApply(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -5217,12 +5228,12 @@ func (_f *Factory) ConstructInnerJoinApply(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -5301,9 +5312,9 @@ func (_f *Factory) ConstructInnerJoinApply(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -5855,9 +5866,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -5894,12 +5905,12 @@ func (_f *Factory) ConstructLeftJoinApply(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -5978,9 +5989,9 @@ func (_f *Factory) ConstructLeftJoinApply(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -6370,9 +6381,9 @@ func (_f *Factory) ConstructSemiJoinApply(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -6409,12 +6420,12 @@ func (_f *Factory) ConstructSemiJoinApply(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -6493,9 +6504,9 @@ func (_f *Factory) ConstructSemiJoinApply(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -6887,9 +6898,9 @@ func (_f *Factory) ConstructAntiJoinApply(
 							_f.ConstructSelect(
 								anyInput,
 								memo.FiltersExpr{
-									{
-										Condition: _f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
-									},
+									_f.ConstructFiltersItem(
+										_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
+									),
 								},
 							),
 							anyPrivate,
@@ -6926,12 +6937,12 @@ func (_f *Factory) ConstructAntiJoinApply(
 									_f.ConstructSelect(
 										anyInput,
 										memo.FiltersExpr{
-											{
-												Condition: _f.ConstructIsNot(
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
 													_f.funcs.ConstructAnyCondition(anyInput, scalar, anyPrivate),
 													_f.ConstructFalse(),
 												),
-											},
+											),
 										},
 									),
 									anyPrivate,
@@ -7010,9 +7021,9 @@ func (_f *Factory) ConstructAntiJoinApply(
 						left,
 						right,
 						memo.FiltersExpr{
-							{
-								Condition: _f.ConstructFalse(),
-							},
+							_f.ConstructFiltersItem(
+								_f.ConstructFalse(),
+							),
 						},
 						private,
 					)
@@ -8555,6 +8566,84 @@ func (_f *Factory) ConstructTuple(
 ) opt.ScalarExpr {
 	e := _f.mem.MemoizeTuple(elems, typ)
 	return _f.onConstructScalar(e)
+}
+
+// ConstructProjectionsItem constructs an expression for the ProjectionsItem operator.
+// ProjectionsItem encapsulates the information needed to synthesize an output
+// column, including its ColumnID and the scalar expression that produces its
+// value. In addition, the ProjectionsItem caches a set of scalar properties that
+// are lazily calculated by traversing the Element scalar expression. This allows
+// the properties for the entire expression subtree to be calculated once and
+// then repeatedly reused.
+//
+// The Element scalar expression cannot contain a simple VariableOp with the same
+// ColumnID as the one stored in the ColPrivate field, since that would make it a
+// pass-through column. Pass-through columns are always stored on the containing
+// Project operator instead. However, the Element field can contain a VariableOp
+// when a new ColumnID is being assigned, such as in the case of an outer column
+// reference.
+func (_f *Factory) ConstructProjectionsItem(
+	element opt.ScalarExpr,
+	col opt.ColumnID,
+) memo.ProjectionsItem {
+	item := memo.ProjectionsItem{Element: element, Col: col}
+	item.PopulateProps(_f.mem)
+	return item
+}
+
+// ConstructAggregationsItem constructs an expression for the AggregationsItem operator.
+// AggregationsItem encapsulates the information for constructing an aggregate
+// output column, including its ColumnID and the aggregate expression that
+// produces its value. In addition, the AggregationsItem caches a set of scalar
+// properties that are lazily calculated by traversing the Agg scalar expression.
+// This allows the properties for the aggregate expression to be calculated once
+// and then repeatedly reused.
+//
+// The aggregate expression can only consist of aggregate functions, variable
+// references, and modifiers like AggDistinct. Examples of valid expressions:
+//
+//   (Min (Variable 1))
+//   (Count (AggDistinct (Variable 1)))
+//
+// More complex arguments must be formulated using a Project operator as input to
+// the grouping operator.
+func (_f *Factory) ConstructAggregationsItem(
+	agg opt.ScalarExpr,
+	col opt.ColumnID,
+) memo.AggregationsItem {
+	item := memo.AggregationsItem{Agg: agg, Col: col}
+	item.PopulateProps(_f.mem)
+	return item
+}
+
+// ConstructFiltersItem constructs an expression for the FiltersItem operator.
+// FiltersItem contains a filter condition that's evaluated to determine whether
+// Select or Join rows should be filtered. In addition, the FiltersItem caches a
+// set of scalar properties that are lazily calculated by traversing the
+// Condition scalar expression. This allows the properties for the entire
+// expression subtree to be calculated once and then repeatedly reused.
+func (_f *Factory) ConstructFiltersItem(
+	condition opt.ScalarExpr,
+) memo.FiltersItem {
+	item := memo.FiltersItem{Condition: condition}
+	item.PopulateProps(_f.mem)
+	return item
+}
+
+// ConstructZipItem constructs an expression for the ZipItem operator.
+// ZipItem contains a generator function or scalar expression that is contained
+// in a Zip. It also contains the list of output columns for the generator or
+// scalar expression in the ZipItem. Cols is a list since a single function may
+// output multiple columns (e.g. pg_get_keywords() outputs three columns).
+//
+// See the Zip header for more details.
+func (_f *Factory) ConstructZipItem(
+	fn opt.ScalarExpr,
+	cols opt.ColList,
+) memo.ZipItem {
+	item := memo.ZipItem{Fn: fn, Cols: cols}
+	item.PopulateProps(_f.mem)
+	return item
 }
 
 // ConstructAnd constructs an expression for the And operator.
@@ -13683,14 +13772,14 @@ func (_f *Factory) ConstructArrayFlatten(
 							_f.ConstructScalarGroupBy(
 								input,
 								memo.AggregationsExpr{
-									{
-										Agg: _f.ConstructArrayAgg(
+									_f.ConstructAggregationsItem(
+										_f.ConstructArrayAgg(
 											_f.ConstructVariable(
 												requestedCol,
 											),
 										),
-										ColPrivate: *_f.funcs.MakeArrayAggCol(_f.funcs.ArrayType(requestedCol)),
-									},
+										_f.funcs.MakeArrayAggCol(_f.funcs.ArrayType(requestedCol)),
+									),
 								},
 								_f.funcs.MakeOrderedGrouping(_f.funcs.MakeEmptyColSet(), _f.funcs.SubqueryOrdering(subquery)),
 							),
@@ -14176,6 +14265,18 @@ func (_f *Factory) ConstructWindowToOffset(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructWindowsItem constructs an expression for the WindowsItem operator.
+// WindowsItem is a single window function to be computed in the context of a
+// Window expression.
+func (_f *Factory) ConstructWindowsItem(
+	function opt.ScalarExpr,
+	windowsItemPrivate *memo.WindowsItemPrivate,
+) memo.WindowsItem {
+	item := memo.WindowsItem{Function: function, WindowsItemPrivate: *windowsItemPrivate}
+	item.PopulateProps(_f.mem)
+	return item
+}
+
 // ConstructRank constructs an expression for the Rank operator.
 // Rank computes the position of a row relative to an ordering, with same-valued
 // rows receiving the same value.
@@ -14276,6 +14377,17 @@ func (_f *Factory) ConstructNthValue(
 ) opt.ScalarExpr {
 	e := _f.mem.MemoizeNthValue(value, nth)
 	return _f.onConstructScalar(e)
+}
+
+// ConstructKVOptionsItem constructs an expression for the KVOptionsItem operator.
+// KVOptionsItem is the key and value of an option (see tree.KVOption). For keys
+// that don't have values, the value is Null.
+func (_f *Factory) ConstructKVOptionsItem(
+	value opt.ScalarExpr,
+	key string,
+) memo.KVOptionsItem {
+	item := memo.KVOptionsItem{Value: value, Key: key}
+	return item
 }
 
 // ConstructCreateTable constructs an expression for the CreateTable operator.
@@ -15743,13 +15855,7 @@ func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFun
 				newList = make([]memo.FKChecksItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Check = after
-			newList[i].OriginTable = list[i].OriginTable
-			newList[i].ReferencedTable = list[i].ReferencedTable
-			newList[i].FKOutbound = list[i].FKOutbound
-			newList[i].FKOrdinal = list[i].FKOrdinal
-			newList[i].KeyCols = list[i].KeyCols
-			newList[i].OpName = list[i].OpName
+			newList[i] = f.ConstructFKChecksItem(after, &list[i].FKChecksItemPrivate)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15770,8 +15876,7 @@ func (f *Factory) replaceProjectionsExpr(list memo.ProjectionsExpr, replace Repl
 				newList = make([]memo.ProjectionsItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Element = after
-			newList[i].Col = list[i].Col
+			newList[i] = f.ConstructProjectionsItem(after, list[i].Col)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15792,8 +15897,7 @@ func (f *Factory) replaceAggregationsExpr(list memo.AggregationsExpr, replace Re
 				newList = make([]memo.AggregationsItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Agg = after
-			newList[i].Col = list[i].Col
+			newList[i] = f.ConstructAggregationsItem(after, list[i].Col)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15814,7 +15918,7 @@ func (f *Factory) replaceFiltersExpr(list memo.FiltersExpr, replace ReplaceFunc)
 				newList = make([]memo.FiltersItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Condition = after
+			newList[i] = f.ConstructFiltersItem(after)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15828,15 +15932,14 @@ func (f *Factory) replaceFiltersExpr(list memo.FiltersExpr, replace ReplaceFunc)
 func (f *Factory) replaceZipExpr(list memo.ZipExpr, replace ReplaceFunc) (_ memo.ZipExpr, changed bool) {
 	var newList []memo.ZipItem
 	for i := range list {
-		before := list[i].Func
+		before := list[i].Fn
 		after := replace(before).(opt.ScalarExpr)
 		if before != after {
 			if newList == nil {
 				newList = make([]memo.ZipItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Func = after
-			newList[i].Cols = list[i].Cols
+			newList[i] = f.ConstructZipItem(after, list[i].Cols)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15857,9 +15960,7 @@ func (f *Factory) replaceWindowsExpr(list memo.WindowsExpr, replace ReplaceFunc)
 				newList = make([]memo.WindowsItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Function = after
-			newList[i].Frame = list[i].Frame
-			newList[i].Col = list[i].Col
+			newList[i] = f.ConstructWindowsItem(after, &list[i].WindowsItemPrivate)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -15880,8 +15981,7 @@ func (f *Factory) replaceKVOptionsExpr(list memo.KVOptionsExpr, replace ReplaceF
 				newList = make([]memo.KVOptionsItem, len(list))
 				copy(newList, list[:i])
 			}
-			newList[i].Value = after
-			newList[i].Key = list[i].Key
+			newList[i] = f.ConstructKVOptionsItem(after, list[i].Key)
 		} else if newList != nil {
 			newList[i] = list[i]
 		}
@@ -16888,6 +16988,7 @@ func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, repla
 		dst[i].FKOrdinal = src[i].FKOrdinal
 		dst[i].KeyCols = src[i].KeyCols
 		dst[i].OpName = src[i].OpName
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }
@@ -16897,6 +16998,8 @@ func (f *Factory) copyAndReplaceDefaultProjectionsExpr(src memo.ProjectionsExpr,
 	for i := range src {
 		dst[i].Element = f.invokeReplace(src[i].Element, replace).(opt.ScalarExpr)
 		dst[i].Col = src[i].Col
+		dst[i].PopulateProps(f.mem)
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }
@@ -16906,6 +17009,8 @@ func (f *Factory) copyAndReplaceDefaultAggregationsExpr(src memo.AggregationsExp
 	for i := range src {
 		dst[i].Agg = f.invokeReplace(src[i].Agg, replace).(opt.ScalarExpr)
 		dst[i].Col = src[i].Col
+		dst[i].PopulateProps(f.mem)
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }
@@ -16914,6 +17019,8 @@ func (f *Factory) copyAndReplaceDefaultFiltersExpr(src memo.FiltersExpr, replace
 	dst = make(memo.FiltersExpr, len(src))
 	for i := range src {
 		dst[i].Condition = f.invokeReplace(src[i].Condition, replace).(opt.ScalarExpr)
+		dst[i].PopulateProps(f.mem)
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }
@@ -16921,8 +17028,10 @@ func (f *Factory) copyAndReplaceDefaultFiltersExpr(src memo.FiltersExpr, replace
 func (f *Factory) copyAndReplaceDefaultZipExpr(src memo.ZipExpr, replace ReplaceFunc) (dst memo.ZipExpr) {
 	dst = make(memo.ZipExpr, len(src))
 	for i := range src {
-		dst[i].Func = f.invokeReplace(src[i].Func, replace).(opt.ScalarExpr)
+		dst[i].Fn = f.invokeReplace(src[i].Fn, replace).(opt.ScalarExpr)
 		dst[i].Cols = src[i].Cols
+		dst[i].PopulateProps(f.mem)
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }
@@ -16933,6 +17042,8 @@ func (f *Factory) copyAndReplaceDefaultWindowsExpr(src memo.WindowsExpr, replace
 		dst[i].Function = f.invokeReplace(src[i].Function, replace).(opt.ScalarExpr)
 		dst[i].Frame = src[i].Frame
 		dst[i].Col = src[i].Col
+		dst[i].PopulateProps(f.mem)
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }
@@ -16942,6 +17053,7 @@ func (f *Factory) copyAndReplaceDefaultKVOptionsExpr(src memo.KVOptionsExpr, rep
 	for i := range src {
 		dst[i].Value = f.invokeReplace(src[i].Value, replace).(opt.ScalarExpr)
 		dst[i].Key = src[i].Key
+		f.mem.CheckExpr(&dst[i])
 	}
 	return dst
 }

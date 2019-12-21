@@ -898,7 +898,7 @@ func (_e *explorer) exploreScalarGroupBy(
 					_variable, _ := variable.(*memo.VariableExpr)
 					if _variable != nil {
 						col := _variable.Col
-						aggPrivate := &_item.ColPrivate
+						aggPrivate := _item.Col
 						groupingPrivate := &_root.GroupingPrivate
 						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
 							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMinWithLimit) {
@@ -907,14 +907,14 @@ func (_e *explorer) exploreScalarGroupBy(
 										_e.f.ConstructSelect(
 											input,
 											memo.FiltersExpr{
-												{
-													Condition: _e.f.ConstructIsNot(
+												_e.f.ConstructFiltersItem(
+													_e.f.ConstructIsNot(
 														variable,
 														_e.f.ConstructNull(
 															_e.funcs.AnyType(),
 														),
 													),
-												},
+												),
 											},
 										),
 										_e.f.ConstructConst(
@@ -923,12 +923,12 @@ func (_e *explorer) exploreScalarGroupBy(
 										_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
 									),
 									Aggregations: memo.AggregationsExpr{
-										{
-											Agg: _e.f.ConstructConstAgg(
+										_e.f.ConstructAggregationsItem(
+											_e.f.ConstructConstAgg(
 												variable,
 											),
-											ColPrivate: *aggPrivate,
-										},
+											aggPrivate,
+										),
 									},
 									GroupingPrivate: *groupingPrivate,
 								}
@@ -960,7 +960,7 @@ func (_e *explorer) exploreScalarGroupBy(
 					_variable, _ := variable.(*memo.VariableExpr)
 					if _variable != nil {
 						col := _variable.Col
-						aggPrivate := &_item.ColPrivate
+						aggPrivate := _item.Col
 						groupingPrivate := &_root.GroupingPrivate
 						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
 							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
@@ -969,14 +969,14 @@ func (_e *explorer) exploreScalarGroupBy(
 										_e.f.ConstructSelect(
 											input,
 											memo.FiltersExpr{
-												{
-													Condition: _e.f.ConstructIsNot(
+												_e.f.ConstructFiltersItem(
+													_e.f.ConstructIsNot(
 														variable,
 														_e.f.ConstructNull(
 															_e.funcs.AnyType(),
 														),
 													),
-												},
+												),
 											},
 										),
 										_e.f.ConstructConst(
@@ -985,12 +985,12 @@ func (_e *explorer) exploreScalarGroupBy(
 										_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
 									),
 									Aggregations: memo.AggregationsExpr{
-										{
-											Agg: _e.f.ConstructConstAgg(
+										_e.f.ConstructAggregationsItem(
+											_e.f.ConstructConstAgg(
 												variable,
 											),
-											ColPrivate: *aggPrivate,
-										},
+											aggPrivate,
+										),
 									},
 									GroupingPrivate: *groupingPrivate,
 								}

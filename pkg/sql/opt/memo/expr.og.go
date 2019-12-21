@@ -825,13 +825,12 @@ type FKChecksItem struct {
 	FKChecksItemPrivate
 
 	Typ *types.T
-	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &FKChecksItem{}
 
 func (e *FKChecksItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *FKChecksItem) Op() opt.Operator {
@@ -7006,16 +7005,16 @@ func (e *ProjectionsExpr) DataType() *types.T {
 // reference.
 type ProjectionsItem struct {
 	Element opt.ScalarExpr
-	ColPrivate
+	Col     opt.ColumnID
 
-	Typ *types.T
-	id  opt.ScalarID
+	Typ    *types.T
+	scalar props.Scalar
 }
 
 var _ opt.ScalarExpr = &ProjectionsItem{}
 
 func (e *ProjectionsItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *ProjectionsItem) Op() opt.Operator {
@@ -7035,7 +7034,7 @@ func (e *ProjectionsItem) Child(nth int) opt.Expr {
 }
 
 func (e *ProjectionsItem) Private() interface{} {
-	return &e.ColPrivate
+	return &e.Col
 }
 
 func (e *ProjectionsItem) String() string {
@@ -7057,22 +7056,13 @@ func (e *ProjectionsItem) DataType() *types.T {
 	return e.Typ
 }
 
-func (e *ProjectionsItem) ScalarProps(mem *Memo) *props.Scalar {
-	if !e.scalar.Populated {
-		mem.logPropsBuilder.buildProjectionsItemProps(e, &e.scalar)
-	}
-	return &e.scalar
+func (e *ProjectionsItem) PopulateProps(mem *Memo) {
+	mem.logPropsBuilder.buildProjectionsItemProps(e, &e.scalar)
+	e.scalar.Populated = true
 }
 
-// ColPrivate contains the ColumnID of a synthesized projection or aggregation
-// column, as well as a set of lazily-populated scalar properties that apply to
-// the column. ColPrivate is shared by ProjectionsItem and AggregationsItem so
-// that they can be treated polymorphically.
-type ColPrivate struct {
-	Col opt.ColumnID
-
-	// Lazily populated.
-	scalar props.Scalar
+func (e *ProjectionsItem) ScalarProps() *props.Scalar {
+	return &e.scalar
 }
 
 // AggregationsExpr is a set of AggregationsItem expressions that specify the
@@ -7137,16 +7127,16 @@ func (e *AggregationsExpr) DataType() *types.T {
 // the grouping operator.
 type AggregationsItem struct {
 	Agg opt.ScalarExpr
-	ColPrivate
+	Col opt.ColumnID
 
-	Typ *types.T
-	id  opt.ScalarID
+	Typ    *types.T
+	scalar props.Scalar
 }
 
 var _ opt.ScalarExpr = &AggregationsItem{}
 
 func (e *AggregationsItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *AggregationsItem) Op() opt.Operator {
@@ -7166,7 +7156,7 @@ func (e *AggregationsItem) Child(nth int) opt.Expr {
 }
 
 func (e *AggregationsItem) Private() interface{} {
-	return &e.ColPrivate
+	return &e.Col
 }
 
 func (e *AggregationsItem) String() string {
@@ -7188,10 +7178,12 @@ func (e *AggregationsItem) DataType() *types.T {
 	return e.Typ
 }
 
-func (e *AggregationsItem) ScalarProps(mem *Memo) *props.Scalar {
-	if !e.scalar.Populated {
-		mem.logPropsBuilder.buildAggregationsItemProps(e, &e.scalar)
-	}
+func (e *AggregationsItem) PopulateProps(mem *Memo) {
+	mem.logPropsBuilder.buildAggregationsItemProps(e, &e.scalar)
+	e.scalar.Populated = true
+}
+
+func (e *AggregationsItem) ScalarProps() *props.Scalar {
 	return &e.scalar
 }
 
@@ -7247,15 +7239,14 @@ func (e *FiltersExpr) DataType() *types.T {
 // expression subtree to be calculated once and then repeatedly reused.
 type FiltersItem struct {
 	Condition opt.ScalarExpr
-	scalar    props.Scalar
 
-	id opt.ScalarID
+	scalar props.Scalar
 }
 
 var _ opt.ScalarExpr = &FiltersItem{}
 
 func (e *FiltersItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *FiltersItem) Op() opt.Operator {
@@ -7275,7 +7266,7 @@ func (e *FiltersItem) Child(nth int) opt.Expr {
 }
 
 func (e *FiltersItem) Private() interface{} {
-	return &e.scalar
+	return nil
 }
 
 func (e *FiltersItem) String() string {
@@ -7297,10 +7288,12 @@ func (e *FiltersItem) DataType() *types.T {
 	return types.Bool
 }
 
-func (e *FiltersItem) ScalarProps(mem *Memo) *props.Scalar {
-	if !e.scalar.Populated {
-		mem.logPropsBuilder.buildFiltersItemProps(e, &e.scalar)
-	}
+func (e *FiltersItem) PopulateProps(mem *Memo) {
+	mem.logPropsBuilder.buildFiltersItemProps(e, &e.scalar)
+	e.scalar.Populated = true
+}
+
+func (e *FiltersItem) ScalarProps() *props.Scalar {
 	return &e.scalar
 }
 
@@ -7368,19 +7361,23 @@ func (e *ZipExpr) DataType() *types.T {
 }
 
 // ZipItem contains a generator function or scalar expression that is contained
-// in a Zip. See the Zip header for more details.
+// in a Zip. It also contains the list of output columns for the generator or
+// scalar expression in the ZipItem. Cols is a list since a single function may
+// output multiple columns (e.g. pg_get_keywords() outputs three columns).
+//
+// See the Zip header for more details.
 type ZipItem struct {
-	Func opt.ScalarExpr
-	ZipItemPrivate
+	Fn   opt.ScalarExpr
+	Cols opt.ColList
 
-	Typ *types.T
-	id  opt.ScalarID
+	Typ    *types.T
+	scalar props.Scalar
 }
 
 var _ opt.ScalarExpr = &ZipItem{}
 
 func (e *ZipItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *ZipItem) Op() opt.Operator {
@@ -7394,13 +7391,13 @@ func (e *ZipItem) ChildCount() int {
 func (e *ZipItem) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
-		return e.Func
+		return e.Fn
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
 
 func (e *ZipItem) Private() interface{} {
-	return &e.ZipItemPrivate
+	return &e.Cols
 }
 
 func (e *ZipItem) String() string {
@@ -7412,7 +7409,7 @@ func (e *ZipItem) String() string {
 func (e *ZipItem) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
-		e.Func = child.(opt.ScalarExpr)
+		e.Fn = child.(opt.ScalarExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -7422,23 +7419,13 @@ func (e *ZipItem) DataType() *types.T {
 	return e.Typ
 }
 
-func (e *ZipItem) ScalarProps(mem *Memo) *props.Scalar {
-	if !e.scalar.Populated {
-		mem.logPropsBuilder.buildZipItemProps(e, &e.scalar)
-	}
-	return &e.scalar
+func (e *ZipItem) PopulateProps(mem *Memo) {
+	mem.logPropsBuilder.buildZipItemProps(e, &e.scalar)
+	e.scalar.Populated = true
 }
 
-// ZipItemPrivate contains the list of output columns for the generator function
-// or scalar expression in a ZipItem, as well as a set of lazily-populated
-// scalar properties that apply to the ZipItem. Cols is a list since a single
-// function may output multiple columns (e.g., pg_get_keywords() outputs three
-// columns).
-type ZipItemPrivate struct {
-	Cols opt.ColList
-
-	// Lazily populated.
-	scalar props.Scalar
+func (e *ZipItem) ScalarProps() *props.Scalar {
+	return &e.scalar
 }
 
 // AndExpr is the boolean conjunction operator that evalutes to true only if both of
@@ -12541,14 +12528,14 @@ type WindowsItem struct {
 	Function opt.ScalarExpr
 	WindowsItemPrivate
 
-	Typ *types.T
-	id  opt.ScalarID
+	Typ    *types.T
+	scalar props.Scalar
 }
 
 var _ opt.ScalarExpr = &WindowsItem{}
 
 func (e *WindowsItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *WindowsItem) Op() opt.Operator {
@@ -12590,10 +12577,12 @@ func (e *WindowsItem) DataType() *types.T {
 	return e.Typ
 }
 
-func (e *WindowsItem) ScalarProps(mem *Memo) *props.Scalar {
-	if !e.scalar.Populated {
-		mem.logPropsBuilder.buildWindowsItemProps(e, &e.scalar)
-	}
+func (e *WindowsItem) PopulateProps(mem *Memo) {
+	mem.logPropsBuilder.buildWindowsItemProps(e, &e.scalar)
+	e.scalar.Populated = true
+}
+
+func (e *WindowsItem) ScalarProps() *props.Scalar {
 	return &e.scalar
 }
 
@@ -12604,7 +12593,7 @@ type WindowsItemPrivate struct {
 	// TODO(justin): at this point we should probably just have a separate opt
 	// version of this structure.
 	Frame WindowFrame
-	ColPrivate
+	Col   opt.ColumnID
 }
 
 // RankExpr computes the position of a row relative to an ordering, with same-valued
@@ -13221,13 +13210,12 @@ type KVOptionsItem struct {
 	Key   string
 
 	Typ *types.T
-	id  opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &KVOptionsItem{}
 
 func (e *KVOptionsItem) ID() opt.ScalarID {
-	return e.id
+	return 0
 }
 
 func (e *KVOptionsItem) Op() opt.Operator {
@@ -15262,8 +15250,9 @@ func (m *Memo) MemoizeInsert(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildInsertProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15287,8 +15276,9 @@ func (m *Memo) MemoizeUpdate(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildUpdateProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15312,8 +15302,9 @@ func (m *Memo) MemoizeUpsert(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildUpsertProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15337,8 +15328,9 @@ func (m *Memo) MemoizeDelete(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildDeleteProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15358,8 +15350,9 @@ func (m *Memo) MemoizeScan(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildScanProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15379,8 +15372,9 @@ func (m *Memo) MemoizeVirtualScan(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildVirtualScanProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15400,8 +15394,9 @@ func (m *Memo) MemoizeSequenceSelect(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildSequenceSelectProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15423,8 +15418,9 @@ func (m *Memo) MemoizeValues(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildValuesProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15446,8 +15442,9 @@ func (m *Memo) MemoizeSelect(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildSelectProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15471,8 +15468,9 @@ func (m *Memo) MemoizeProject(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildProjectProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15498,8 +15496,9 @@ func (m *Memo) MemoizeInnerJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildInnerJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15525,8 +15524,9 @@ func (m *Memo) MemoizeLeftJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildLeftJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15552,8 +15552,9 @@ func (m *Memo) MemoizeRightJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildRightJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15579,8 +15580,9 @@ func (m *Memo) MemoizeFullJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildFullJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15606,8 +15608,9 @@ func (m *Memo) MemoizeSemiJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildSemiJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15633,8 +15636,9 @@ func (m *Memo) MemoizeAntiJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildAntiJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15656,8 +15660,9 @@ func (m *Memo) MemoizeIndexJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildIndexJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15681,8 +15686,9 @@ func (m *Memo) MemoizeLookupJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildLookupJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15708,8 +15714,9 @@ func (m *Memo) MemoizeMergeJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildMergeJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15731,8 +15738,9 @@ func (m *Memo) MemoizeZigzagJoin(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildZigzagJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15758,8 +15766,9 @@ func (m *Memo) MemoizeInnerJoinApply(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildInnerJoinApplyProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15785,8 +15794,9 @@ func (m *Memo) MemoizeLeftJoinApply(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildLeftJoinApplyProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15812,8 +15822,9 @@ func (m *Memo) MemoizeSemiJoinApply(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildSemiJoinApplyProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15839,8 +15850,9 @@ func (m *Memo) MemoizeAntiJoinApply(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildAntiJoinApplyProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15864,8 +15876,9 @@ func (m *Memo) MemoizeGroupBy(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildGroupByProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15889,8 +15902,9 @@ func (m *Memo) MemoizeScalarGroupBy(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildScalarGroupByProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15914,8 +15928,9 @@ func (m *Memo) MemoizeDistinctOn(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildDistinctOnProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15939,8 +15954,9 @@ func (m *Memo) MemoizeUnion(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildUnionProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15964,8 +15980,9 @@ func (m *Memo) MemoizeIntersect(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildIntersectProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -15989,8 +16006,9 @@ func (m *Memo) MemoizeExcept(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildExceptProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16014,8 +16032,9 @@ func (m *Memo) MemoizeUnionAll(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildUnionAllProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16039,8 +16058,9 @@ func (m *Memo) MemoizeIntersectAll(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildIntersectAllProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16064,8 +16084,9 @@ func (m *Memo) MemoizeExceptAll(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildExceptAllProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16089,8 +16110,9 @@ func (m *Memo) MemoizeLimit(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildLimitProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16114,8 +16136,9 @@ func (m *Memo) MemoizeOffset(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildOffsetProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16135,8 +16158,9 @@ func (m *Memo) MemoizeMax1Row(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildMax1RowProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16158,8 +16182,9 @@ func (m *Memo) MemoizeOrdinality(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildOrdinalityProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16181,8 +16206,9 @@ func (m *Memo) MemoizeProjectSet(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildProjectSetProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16206,8 +16232,9 @@ func (m *Memo) MemoizeWindow(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildWindowProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16231,8 +16258,9 @@ func (m *Memo) MemoizeWith(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildWithProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16252,8 +16280,9 @@ func (m *Memo) MemoizeWithScan(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildWithScanProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16277,8 +16306,9 @@ func (m *Memo) MemoizeRecursiveCTE(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildRecursiveCTEProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16298,8 +16328,9 @@ func (m *Memo) MemoizeFakeRel(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildFakeRelProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -16321,7 +16352,7 @@ func (m *Memo) MemoizeSubquery(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16344,7 +16375,7 @@ func (m *Memo) MemoizeAny(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16365,7 +16396,7 @@ func (m *Memo) MemoizeExists(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16385,7 +16416,7 @@ func (m *Memo) MemoizeVariable(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16405,7 +16436,7 @@ func (m *Memo) MemoizeConst(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16424,7 +16455,7 @@ func (m *Memo) MemoizeNull(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16452,7 +16483,7 @@ func (m *Memo) MemoizePlaceholder(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16473,7 +16504,7 @@ func (m *Memo) MemoizeTuple(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16494,7 +16525,7 @@ func (m *Memo) MemoizeAnd(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16515,7 +16546,7 @@ func (m *Memo) MemoizeOr(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16534,7 +16565,7 @@ func (m *Memo) MemoizeRange(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16553,7 +16584,7 @@ func (m *Memo) MemoizeNot(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16574,7 +16605,7 @@ func (m *Memo) MemoizeEq(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16595,7 +16626,7 @@ func (m *Memo) MemoizeLt(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16616,7 +16647,7 @@ func (m *Memo) MemoizeGt(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16637,7 +16668,7 @@ func (m *Memo) MemoizeLe(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16658,7 +16689,7 @@ func (m *Memo) MemoizeGe(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16679,7 +16710,7 @@ func (m *Memo) MemoizeNe(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16700,7 +16731,7 @@ func (m *Memo) MemoizeIn(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16721,7 +16752,7 @@ func (m *Memo) MemoizeNotIn(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16742,7 +16773,7 @@ func (m *Memo) MemoizeLike(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16763,7 +16794,7 @@ func (m *Memo) MemoizeNotLike(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16784,7 +16815,7 @@ func (m *Memo) MemoizeILike(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16805,7 +16836,7 @@ func (m *Memo) MemoizeNotILike(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16826,7 +16857,7 @@ func (m *Memo) MemoizeSimilarTo(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16847,7 +16878,7 @@ func (m *Memo) MemoizeNotSimilarTo(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16868,7 +16899,7 @@ func (m *Memo) MemoizeRegMatch(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16889,7 +16920,7 @@ func (m *Memo) MemoizeNotRegMatch(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16910,7 +16941,7 @@ func (m *Memo) MemoizeRegIMatch(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16931,7 +16962,7 @@ func (m *Memo) MemoizeNotRegIMatch(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16952,7 +16983,7 @@ func (m *Memo) MemoizeIs(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16973,7 +17004,7 @@ func (m *Memo) MemoizeIsNot(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -16994,7 +17025,7 @@ func (m *Memo) MemoizeContains(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17015,7 +17046,7 @@ func (m *Memo) MemoizeJsonExists(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17036,7 +17067,7 @@ func (m *Memo) MemoizeJsonAllExists(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17057,7 +17088,7 @@ func (m *Memo) MemoizeJsonSomeExists(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17078,7 +17109,7 @@ func (m *Memo) MemoizeOverlaps(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17101,7 +17132,7 @@ func (m *Memo) MemoizeAnyScalar(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17123,7 +17154,7 @@ func (m *Memo) MemoizeBitand(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17145,7 +17176,7 @@ func (m *Memo) MemoizeBitor(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17167,7 +17198,7 @@ func (m *Memo) MemoizeBitxor(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17189,7 +17220,7 @@ func (m *Memo) MemoizePlus(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17211,7 +17242,7 @@ func (m *Memo) MemoizeMinus(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17233,7 +17264,7 @@ func (m *Memo) MemoizeMult(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17255,7 +17286,7 @@ func (m *Memo) MemoizeDiv(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17277,7 +17308,7 @@ func (m *Memo) MemoizeFloorDiv(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17299,7 +17330,7 @@ func (m *Memo) MemoizeMod(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17321,7 +17352,7 @@ func (m *Memo) MemoizePow(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17343,7 +17374,7 @@ func (m *Memo) MemoizeConcat(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17365,7 +17396,7 @@ func (m *Memo) MemoizeLShift(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17387,7 +17418,7 @@ func (m *Memo) MemoizeRShift(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17409,7 +17440,7 @@ func (m *Memo) MemoizeFetchVal(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17431,7 +17462,7 @@ func (m *Memo) MemoizeFetchText(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17453,7 +17484,7 @@ func (m *Memo) MemoizeFetchValPath(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17475,7 +17506,7 @@ func (m *Memo) MemoizeFetchTextPath(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17495,7 +17526,7 @@ func (m *Memo) MemoizeUnaryMinus(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17515,7 +17546,7 @@ func (m *Memo) MemoizeUnaryComplement(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17536,7 +17567,7 @@ func (m *Memo) MemoizeCast(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17560,7 +17591,7 @@ func (m *Memo) MemoizeIfErr(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17584,7 +17615,7 @@ func (m *Memo) MemoizeCase(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17606,7 +17637,7 @@ func (m *Memo) MemoizeWhen(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17627,7 +17658,7 @@ func (m *Memo) MemoizeArray(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17649,7 +17680,7 @@ func (m *Memo) MemoizeIndirection(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17671,7 +17702,7 @@ func (m *Memo) MemoizeArrayFlatten(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17692,7 +17723,7 @@ func (m *Memo) MemoizeFunction(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17714,7 +17745,7 @@ func (m *Memo) MemoizeCollate(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17734,7 +17765,7 @@ func (m *Memo) MemoizeCoalesce(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17756,7 +17787,7 @@ func (m *Memo) MemoizeColumnAccess(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17776,7 +17807,7 @@ func (m *Memo) MemoizeUnsupportedExpr(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17796,7 +17827,7 @@ func (m *Memo) MemoizeArrayAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17816,7 +17847,7 @@ func (m *Memo) MemoizeAvg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17836,7 +17867,7 @@ func (m *Memo) MemoizeBitAndAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17856,7 +17887,7 @@ func (m *Memo) MemoizeBitOrAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17876,7 +17907,7 @@ func (m *Memo) MemoizeBoolAnd(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17896,7 +17927,7 @@ func (m *Memo) MemoizeBoolOr(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17916,7 +17947,7 @@ func (m *Memo) MemoizeConcatAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17936,7 +17967,7 @@ func (m *Memo) MemoizeCount(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17960,7 +17991,7 @@ func (m *Memo) MemoizeMax(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -17980,7 +18011,7 @@ func (m *Memo) MemoizeMin(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18000,7 +18031,7 @@ func (m *Memo) MemoizeSumInt(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18020,7 +18051,7 @@ func (m *Memo) MemoizeSum(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18040,7 +18071,7 @@ func (m *Memo) MemoizeSqrDiff(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18060,7 +18091,7 @@ func (m *Memo) MemoizeVariance(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18080,7 +18111,7 @@ func (m *Memo) MemoizeStdDev(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18100,7 +18131,7 @@ func (m *Memo) MemoizeXorAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18120,7 +18151,7 @@ func (m *Memo) MemoizeJsonAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18140,7 +18171,7 @@ func (m *Memo) MemoizeJsonbAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18162,7 +18193,7 @@ func (m *Memo) MemoizeStringAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18182,7 +18213,7 @@ func (m *Memo) MemoizeConstAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18202,7 +18233,7 @@ func (m *Memo) MemoizeConstNotNullAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18222,7 +18253,7 @@ func (m *Memo) MemoizeAnyNotNullAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18242,7 +18273,7 @@ func (m *Memo) MemoizeFirstAgg(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18262,7 +18293,7 @@ func (m *Memo) MemoizeAggDistinct(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18284,7 +18315,7 @@ func (m *Memo) MemoizeAggFilter(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18306,7 +18337,7 @@ func (m *Memo) MemoizeWindowFromOffset(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18328,7 +18359,7 @@ func (m *Memo) MemoizeWindowToOffset(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18367,7 +18398,7 @@ func (m *Memo) MemoizeNtile(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18391,7 +18422,7 @@ func (m *Memo) MemoizeLag(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18415,7 +18446,7 @@ func (m *Memo) MemoizeLead(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18435,7 +18466,7 @@ func (m *Memo) MemoizeFirstValue(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18455,7 +18486,7 @@ func (m *Memo) MemoizeLastValue(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18477,7 +18508,7 @@ func (m *Memo) MemoizeNthValue(
 			m.newGroupFn(e)
 		}
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned
 }
@@ -18499,8 +18530,9 @@ func (m *Memo) MemoizeCreateTable(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildCreateTableProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18520,8 +18552,9 @@ func (m *Memo) MemoizeCreateView(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildCreateViewProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18543,8 +18576,9 @@ func (m *Memo) MemoizeExplain(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildExplainProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18564,8 +18598,9 @@ func (m *Memo) MemoizeShowTraceForSession(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildShowTraceForSessionProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18585,8 +18620,9 @@ func (m *Memo) MemoizeOpaqueRel(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildOpaqueRelProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18606,8 +18642,9 @@ func (m *Memo) MemoizeOpaqueMutation(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildOpaqueMutationProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18627,8 +18664,9 @@ func (m *Memo) MemoizeOpaqueDDL(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildOpaqueDDLProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18652,8 +18690,9 @@ func (m *Memo) MemoizeAlterTableSplit(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildAlterTableSplitProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18675,8 +18714,9 @@ func (m *Memo) MemoizeAlterTableUnsplit(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildAlterTableUnsplitProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18696,8 +18736,9 @@ func (m *Memo) MemoizeAlterTableUnsplitAll(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildAlterTableUnsplitAllProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18719,8 +18760,9 @@ func (m *Memo) MemoizeAlterTableRelocate(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildAlterTableRelocateProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18742,8 +18784,9 @@ func (m *Memo) MemoizeControlJobs(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildControlJobsProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18765,8 +18808,9 @@ func (m *Memo) MemoizeCancelQueries(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildCancelQueriesProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18788,8 +18832,9 @@ func (m *Memo) MemoizeCancelSessions(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildCancelSessionsProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18815,8 +18860,9 @@ func (m *Memo) MemoizeExport(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildExportProps(e, &grp.rel)
+		grp.rel.Populated = true
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	}
 	return interned.FirstExpr()
 }
@@ -18827,7 +18873,7 @@ func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18841,7 +18887,7 @@ func (m *Memo) AddUpdateToGroup(e *UpdateExpr, grp RelExpr) *UpdateExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18855,7 +18901,7 @@ func (m *Memo) AddUpsertToGroup(e *UpsertExpr, grp RelExpr) *UpsertExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18869,7 +18915,7 @@ func (m *Memo) AddDeleteToGroup(e *DeleteExpr, grp RelExpr) *DeleteExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18883,7 +18929,7 @@ func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18897,7 +18943,7 @@ func (m *Memo) AddVirtualScanToGroup(e *VirtualScanExpr, grp RelExpr) *VirtualSc
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18911,7 +18957,7 @@ func (m *Memo) AddSequenceSelectToGroup(e *SequenceSelectExpr, grp RelExpr) *Seq
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18925,7 +18971,7 @@ func (m *Memo) AddValuesToGroup(e *ValuesExpr, grp RelExpr) *ValuesExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18939,7 +18985,7 @@ func (m *Memo) AddSelectToGroup(e *SelectExpr, grp RelExpr) *SelectExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18953,7 +18999,7 @@ func (m *Memo) AddProjectToGroup(e *ProjectExpr, grp RelExpr) *ProjectExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18967,7 +19013,7 @@ func (m *Memo) AddInnerJoinToGroup(e *InnerJoinExpr, grp RelExpr) *InnerJoinExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18981,7 +19027,7 @@ func (m *Memo) AddLeftJoinToGroup(e *LeftJoinExpr, grp RelExpr) *LeftJoinExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -18995,7 +19041,7 @@ func (m *Memo) AddRightJoinToGroup(e *RightJoinExpr, grp RelExpr) *RightJoinExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19009,7 +19055,7 @@ func (m *Memo) AddFullJoinToGroup(e *FullJoinExpr, grp RelExpr) *FullJoinExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19023,7 +19069,7 @@ func (m *Memo) AddSemiJoinToGroup(e *SemiJoinExpr, grp RelExpr) *SemiJoinExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19037,7 +19083,7 @@ func (m *Memo) AddAntiJoinToGroup(e *AntiJoinExpr, grp RelExpr) *AntiJoinExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19051,7 +19097,7 @@ func (m *Memo) AddIndexJoinToGroup(e *IndexJoinExpr, grp RelExpr) *IndexJoinExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19065,7 +19111,7 @@ func (m *Memo) AddLookupJoinToGroup(e *LookupJoinExpr, grp RelExpr) *LookupJoinE
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19079,7 +19125,7 @@ func (m *Memo) AddMergeJoinToGroup(e *MergeJoinExpr, grp RelExpr) *MergeJoinExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19093,7 +19139,7 @@ func (m *Memo) AddZigzagJoinToGroup(e *ZigzagJoinExpr, grp RelExpr) *ZigzagJoinE
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19107,7 +19153,7 @@ func (m *Memo) AddInnerJoinApplyToGroup(e *InnerJoinApplyExpr, grp RelExpr) *Inn
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19121,7 +19167,7 @@ func (m *Memo) AddLeftJoinApplyToGroup(e *LeftJoinApplyExpr, grp RelExpr) *LeftJ
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19135,7 +19181,7 @@ func (m *Memo) AddSemiJoinApplyToGroup(e *SemiJoinApplyExpr, grp RelExpr) *SemiJ
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19149,7 +19195,7 @@ func (m *Memo) AddAntiJoinApplyToGroup(e *AntiJoinApplyExpr, grp RelExpr) *AntiJ
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19163,7 +19209,7 @@ func (m *Memo) AddGroupByToGroup(e *GroupByExpr, grp RelExpr) *GroupByExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19177,7 +19223,7 @@ func (m *Memo) AddScalarGroupByToGroup(e *ScalarGroupByExpr, grp RelExpr) *Scala
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19191,7 +19237,7 @@ func (m *Memo) AddDistinctOnToGroup(e *DistinctOnExpr, grp RelExpr) *DistinctOnE
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19205,7 +19251,7 @@ func (m *Memo) AddUnionToGroup(e *UnionExpr, grp RelExpr) *UnionExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19219,7 +19265,7 @@ func (m *Memo) AddIntersectToGroup(e *IntersectExpr, grp RelExpr) *IntersectExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19233,7 +19279,7 @@ func (m *Memo) AddExceptToGroup(e *ExceptExpr, grp RelExpr) *ExceptExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19247,7 +19293,7 @@ func (m *Memo) AddUnionAllToGroup(e *UnionAllExpr, grp RelExpr) *UnionAllExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19261,7 +19307,7 @@ func (m *Memo) AddIntersectAllToGroup(e *IntersectAllExpr, grp RelExpr) *Interse
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19275,7 +19321,7 @@ func (m *Memo) AddExceptAllToGroup(e *ExceptAllExpr, grp RelExpr) *ExceptAllExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19289,7 +19335,7 @@ func (m *Memo) AddLimitToGroup(e *LimitExpr, grp RelExpr) *LimitExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19303,7 +19349,7 @@ func (m *Memo) AddOffsetToGroup(e *OffsetExpr, grp RelExpr) *OffsetExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19317,7 +19363,7 @@ func (m *Memo) AddMax1RowToGroup(e *Max1RowExpr, grp RelExpr) *Max1RowExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19331,7 +19377,7 @@ func (m *Memo) AddOrdinalityToGroup(e *OrdinalityExpr, grp RelExpr) *OrdinalityE
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19345,7 +19391,7 @@ func (m *Memo) AddProjectSetToGroup(e *ProjectSetExpr, grp RelExpr) *ProjectSetE
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19359,7 +19405,7 @@ func (m *Memo) AddWindowToGroup(e *WindowExpr, grp RelExpr) *WindowExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19373,7 +19419,7 @@ func (m *Memo) AddWithToGroup(e *WithExpr, grp RelExpr) *WithExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19387,7 +19433,7 @@ func (m *Memo) AddWithScanToGroup(e *WithScanExpr, grp RelExpr) *WithScanExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19401,7 +19447,7 @@ func (m *Memo) AddRecursiveCTEToGroup(e *RecursiveCTEExpr, grp RelExpr) *Recursi
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19415,7 +19461,7 @@ func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19429,7 +19475,7 @@ func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTab
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19443,7 +19489,7 @@ func (m *Memo) AddCreateViewToGroup(e *CreateViewExpr, grp RelExpr) *CreateViewE
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19457,7 +19503,7 @@ func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19471,7 +19517,7 @@ func (m *Memo) AddShowTraceForSessionToGroup(e *ShowTraceForSessionExpr, grp Rel
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19485,7 +19531,7 @@ func (m *Memo) AddOpaqueRelToGroup(e *OpaqueRelExpr, grp RelExpr) *OpaqueRelExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19499,7 +19545,7 @@ func (m *Memo) AddOpaqueMutationToGroup(e *OpaqueMutationExpr, grp RelExpr) *Opa
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19513,7 +19559,7 @@ func (m *Memo) AddOpaqueDDLToGroup(e *OpaqueDDLExpr, grp RelExpr) *OpaqueDDLExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19527,7 +19573,7 @@ func (m *Memo) AddAlterTableSplitToGroup(e *AlterTableSplitExpr, grp RelExpr) *A
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19541,7 +19587,7 @@ func (m *Memo) AddAlterTableUnsplitToGroup(e *AlterTableUnsplitExpr, grp RelExpr
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19555,7 +19601,7 @@ func (m *Memo) AddAlterTableUnsplitAllToGroup(e *AlterTableUnsplitAllExpr, grp R
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19569,7 +19615,7 @@ func (m *Memo) AddAlterTableRelocateToGroup(e *AlterTableRelocateExpr, grp RelEx
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19583,7 +19629,7 @@ func (m *Memo) AddControlJobsToGroup(e *ControlJobsExpr, grp RelExpr) *ControlJo
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19597,7 +19643,7 @@ func (m *Memo) AddCancelQueriesToGroup(e *CancelQueriesExpr, grp RelExpr) *Cance
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19611,7 +19657,7 @@ func (m *Memo) AddCancelSessionsToGroup(e *CancelSessionsExpr, grp RelExpr) *Can
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -19625,7 +19671,7 @@ func (m *Memo) AddExportToGroup(e *ExportExpr, grp RelExpr) *ExportExpr {
 	if interned == e {
 		e.setGroup(grp)
 		m.memEstimate += size
-		m.checkExpr(e)
+		m.CheckExpr(e)
 	} else if interned.group() != grp.group() {
 		// This is a group collision, do nothing.
 		return nil
@@ -21517,13 +21563,13 @@ func (in *interner) InternZip(val *ZipExpr) *ZipExpr {
 func (in *interner) InternZipItem(val *ZipItem) *ZipItem {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ZipItemOp)
-	in.hasher.HashScalarExpr(val.Func)
+	in.hasher.HashScalarExpr(val.Fn)
 	in.hasher.HashColList(val.Cols)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ZipItem); ok {
-			if in.hasher.IsScalarExprEqual(val.Func, existing.Func) &&
+			if in.hasher.IsScalarExprEqual(val.Fn, existing.Fn) &&
 				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
 				return existing
 			}
