@@ -65,8 +65,6 @@ func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullBoolAgg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroBoolColumn) {
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -80,10 +78,6 @@ func (a *anyNotNullBoolAgg) CurrentOutputIndex() int {
 func (a *anyNotNullBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroBoolColumn) {
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -254,7 +248,6 @@ func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullBytesAgg) Reset() {
-	a.vec.Zero()
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -268,11 +261,6 @@ func (a *anyNotNullBytesAgg) CurrentOutputIndex() int {
 func (a *anyNotNullBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := a.vec.Len()
-		target := a.vec
-		_ = idx + 1
-		_ = vecLen
-		target.Zero()
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -447,9 +435,6 @@ func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullDecimalAgg) Reset() {
-	for n := 0; n < len(a.vec); n++ {
-		a.vec[n].SetInt64(0)
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -463,11 +448,6 @@ func (a *anyNotNullDecimalAgg) CurrentOutputIndex() int {
 func (a *anyNotNullDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n++ {
-			target[n].SetInt64(0)
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -638,8 +618,6 @@ func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt16Agg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt16Column) {
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -653,10 +631,6 @@ func (a *anyNotNullInt16Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroInt16Column) {
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -827,8 +801,6 @@ func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt32Agg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt32Column) {
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -842,10 +814,6 @@ func (a *anyNotNullInt32Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroInt32Column) {
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1016,8 +984,6 @@ func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullInt64Agg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroInt64Column) {
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -1031,10 +997,6 @@ func (a *anyNotNullInt64Agg) CurrentOutputIndex() int {
 func (a *anyNotNullInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroInt64Column) {
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1205,8 +1167,6 @@ func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullFloat64Agg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroFloat64Column) {
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -1220,10 +1180,6 @@ func (a *anyNotNullFloat64Agg) CurrentOutputIndex() int {
 func (a *anyNotNullFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroFloat64Column) {
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -1394,8 +1350,6 @@ func (a *anyNotNullTimestampAgg) Init(groups []bool, vec coldata.Vec) {
 }
 
 func (a *anyNotNullTimestampAgg) Reset() {
-	for n := 0; n < len(a.vec); n += copy(a.vec[n:], zeroTimestampColumn) {
-	}
 	a.curIdx = -1
 	a.done = false
 	a.foundNonNullForCurrentGroup = false
@@ -1409,10 +1363,6 @@ func (a *anyNotNullTimestampAgg) CurrentOutputIndex() int {
 func (a *anyNotNullTimestampAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		vecLen := len(a.vec)
-		target := a.vec[idx+1 : vecLen]
-		for n := 0; n < len(target); n += copy(target[n:], zeroTimestampColumn) {
-		}
 		a.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }

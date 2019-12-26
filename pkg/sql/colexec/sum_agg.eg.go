@@ -64,7 +64,6 @@ func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumDecimalAgg) Reset() {
-	copy(a.scratch.vec, zeroDecimalColumn)
 	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
@@ -79,7 +78,6 @@ func (a *sumDecimalAgg) CurrentOutputIndex() int {
 func (a *sumDecimalAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroDecimalColumn)
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -95,8 +93,9 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// null.
 		if !a.scratch.foundNonNullForCurrentGroup {
 			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		}
-		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -115,15 +114,12 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroDecimalColumn[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -147,15 +143,12 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroDecimalColumn[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -181,15 +174,12 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroDecimalColumn[0]
 
 				}
 				var isNull bool
@@ -212,15 +202,12 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroDecimalColumn[0]
 
 				}
 				var isNull bool
@@ -269,7 +256,6 @@ func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt16Agg) Reset() {
-	copy(a.scratch.vec, zeroInt16Column)
 	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
@@ -284,7 +270,6 @@ func (a *sumInt16Agg) CurrentOutputIndex() int {
 func (a *sumInt16Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt16Column)
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -300,8 +285,9 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// null.
 		if !a.scratch.foundNonNullForCurrentGroup {
 			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		}
-		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -320,15 +306,12 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt16Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -358,15 +341,12 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt16Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -398,15 +378,12 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt16Column[0]
 
 				}
 				var isNull bool
@@ -435,15 +412,12 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt16Column[0]
 
 				}
 				var isNull bool
@@ -498,7 +472,6 @@ func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt32Agg) Reset() {
-	copy(a.scratch.vec, zeroInt32Column)
 	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
@@ -513,7 +486,6 @@ func (a *sumInt32Agg) CurrentOutputIndex() int {
 func (a *sumInt32Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt32Column)
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -529,8 +501,9 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// null.
 		if !a.scratch.foundNonNullForCurrentGroup {
 			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		}
-		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -549,15 +522,12 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt32Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -587,15 +557,12 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt32Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -627,15 +594,12 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt32Column[0]
 
 				}
 				var isNull bool
@@ -664,15 +628,12 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt32Column[0]
 
 				}
 				var isNull bool
@@ -727,7 +688,6 @@ func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt64Agg) Reset() {
-	copy(a.scratch.vec, zeroInt64Column)
 	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
@@ -742,7 +702,6 @@ func (a *sumInt64Agg) CurrentOutputIndex() int {
 func (a *sumInt64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroInt64Column)
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -758,8 +717,9 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// null.
 		if !a.scratch.foundNonNullForCurrentGroup {
 			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		}
-		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -778,15 +738,12 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt64Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -816,15 +773,12 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt64Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -856,15 +810,12 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt64Column[0]
 
 				}
 				var isNull bool
@@ -893,15 +844,12 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroInt64Column[0]
 
 				}
 				var isNull bool
@@ -956,7 +904,6 @@ func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumFloat64Agg) Reset() {
-	copy(a.scratch.vec, zeroFloat64Column)
 	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
@@ -971,7 +918,6 @@ func (a *sumFloat64Agg) CurrentOutputIndex() int {
 func (a *sumFloat64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		copy(a.scratch.vec[idx+1:], zeroFloat64Column)
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
 	}
 }
@@ -987,8 +933,9 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// null.
 		if !a.scratch.foundNonNullForCurrentGroup {
 			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		}
-		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 		a.scratch.curIdx++
 		a.done = true
 		return
@@ -1007,15 +954,12 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroFloat64Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -1037,15 +981,12 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroFloat64Column[0]
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -1069,15 +1010,12 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroFloat64Column[0]
 
 				}
 				var isNull bool
@@ -1098,15 +1036,12 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
 							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 						}
-						a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curAgg = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curAgg = zeroFloat64Column[0]
 
 				}
 				var isNull bool

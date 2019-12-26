@@ -62,7 +62,6 @@ func (a *avgDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *avgDecimalAgg) Reset() {
-	copy(a.scratch.vec, zeroDecimalColumn)
 	a.scratch.curIdx = -1
 	a.scratch.curSum = zeroDecimalColumn[0]
 	a.scratch.curCount = 0
@@ -79,7 +78,6 @@ func (a *avgDecimalAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
-		copy(a.scratch.vec[idx+1:], zeroDecimalColumn)
 	}
 }
 
@@ -126,14 +124,10 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalColumn[0]
+					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
-					a.scratch.curCount = 0
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
@@ -164,14 +158,10 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalColumn[0]
+					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
-					a.scratch.curCount = 0
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
@@ -204,12 +194,9 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curSum = zeroDecimalColumn[0]
 					a.scratch.curCount = 0
+
 				}
 				var isNull bool
 				isNull = false
@@ -240,12 +227,9 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curSum = zeroDecimalColumn[0]
 					a.scratch.curCount = 0
+
 				}
 				var isNull bool
 				isNull = false
@@ -298,7 +282,6 @@ func (a *avgFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *avgFloat64Agg) Reset() {
-	copy(a.scratch.vec, zeroFloat64Column)
 	a.scratch.curIdx = -1
 	a.scratch.curSum = zeroFloat64Column[0]
 	a.scratch.curCount = 0
@@ -315,7 +298,6 @@ func (a *avgFloat64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
 		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
-		copy(a.scratch.vec[idx+1:], zeroFloat64Column)
 	}
 }
 
@@ -356,14 +338,10 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
+					a.scratch.curSum = zeroFloat64Column[0]
+					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
-					a.scratch.curCount = 0
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
@@ -389,14 +367,10 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
+					a.scratch.curSum = zeroFloat64Column[0]
+					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
-					a.scratch.curCount = 0
 				}
 				var isNull bool
 				isNull = nulls.NullAt(uint16(i))
@@ -424,12 +398,9 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curSum = zeroFloat64Column[0]
 					a.scratch.curCount = 0
+
 				}
 				var isNull bool
 				isNull = false
@@ -455,12 +426,9 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-
-					// The next element of vec is guaranteed  to be initialized to the zero
-					// value. We can't use zero<no value>Column here because this is outside of
-					// the earlier template block.
-					a.scratch.curSum = a.scratch.vec[a.scratch.curIdx]
+					a.scratch.curSum = zeroFloat64Column[0]
 					a.scratch.curCount = 0
+
 				}
 				var isNull bool
 				isNull = false
