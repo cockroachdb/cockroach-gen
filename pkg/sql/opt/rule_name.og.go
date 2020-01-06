@@ -198,6 +198,7 @@ const (
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
 	InlineConstVar
+	PushSelectIntoProjectSet
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
 	PushFilterIntoSetOp

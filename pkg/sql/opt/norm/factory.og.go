@@ -764,6 +764,37 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [PushSelectIntoProjectSet]
+	{
+		_projectSet, _ := input.(*memo.ProjectSetExpr)
+		if _projectSet != nil {
+			input := _projectSet.Input
+			zip := _projectSet.Zip
+			for i := range filters {
+				item := &filters[i]
+				inputCols := _f.funcs.OutputCols(input)
+				if _f.funcs.IsBoundBy(item, inputCols) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.PushSelectIntoProjectSet) {
+						_expr := _f.ConstructSelect(
+							_f.ConstructProjectSet(
+								_f.ConstructSelect(
+									input,
+									_f.funcs.ExtractBoundConditions(filters, inputCols),
+								),
+								zip,
+							),
+							_f.funcs.ExtractUnboundConditions(filters, inputCols),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.PushSelectIntoProjectSet, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [PushFilterIntoSetOp]
 	{
 		if opt.IsSetOp(input) {
