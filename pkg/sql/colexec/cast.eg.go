@@ -376,12 +376,12 @@ func (c *castOpBoolBool) Init() {
 
 func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Bool)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -459,12 +459,12 @@ func (c *castOpBoolInt16) Init() {
 
 func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int16)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -562,12 +562,12 @@ func (c *castOpBoolInt32) Init() {
 
 func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int32)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -665,12 +665,12 @@ func (c *castOpBoolInt64) Init() {
 
 func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -768,12 +768,12 @@ func (c *castOpBoolFloat64) Init() {
 
 func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Float64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Bool()
@@ -871,12 +871,12 @@ func (c *castOpDecimalBool) Init() {
 
 func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Bool)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Decimal()
@@ -962,12 +962,12 @@ func (c *castOpDecimalDecimal) Init() {
 
 func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Decimal()
@@ -1045,12 +1045,12 @@ func (c *castOpInt16Bool) Init() {
 
 func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Bool)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1136,12 +1136,12 @@ func (c *castOpInt16Decimal) Init() {
 
 func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1227,12 +1227,12 @@ func (c *castOpInt16Int16) Init() {
 
 func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int16)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1310,12 +1310,12 @@ func (c *castOpInt16Float64) Init() {
 
 func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Float64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int16()
@@ -1401,12 +1401,12 @@ func (c *castOpInt32Bool) Init() {
 
 func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Bool)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1492,12 +1492,12 @@ func (c *castOpInt32Decimal) Init() {
 
 func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1583,12 +1583,12 @@ func (c *castOpInt32Int32) Init() {
 
 func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int32)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1666,12 +1666,12 @@ func (c *castOpInt32Float64) Init() {
 
 func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Float64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int32()
@@ -1757,12 +1757,12 @@ func (c *castOpInt64Bool) Init() {
 
 func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Bool)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -1848,12 +1848,12 @@ func (c *castOpInt64Decimal) Init() {
 
 func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -1939,12 +1939,12 @@ func (c *castOpInt64Int64) Init() {
 
 func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -2022,12 +2022,12 @@ func (c *castOpInt64Float64) Init() {
 
 func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Float64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Int64()
@@ -2113,12 +2113,12 @@ func (c *castOpFloat64Bool) Init() {
 
 func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Bool)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Bool)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2204,12 +2204,12 @@ func (c *castOpFloat64Decimal) Init() {
 
 func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Decimal)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Decimal)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2323,12 +2323,12 @@ func (c *castOpFloat64Int16) Init() {
 
 func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int16)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int16)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2426,12 +2426,12 @@ func (c *castOpFloat64Int32) Init() {
 
 func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int32)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int32)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2529,12 +2529,12 @@ func (c *castOpFloat64Int64) Init() {
 
 func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Int64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Int64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
@@ -2632,12 +2632,12 @@ func (c *castOpFloat64Float64) Init() {
 
 func (c *castOpFloat64Float64) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
+	if c.outputIdx == batch.Width() {
+		c.allocator.AppendColumn(batch, coltypes.Float64)
+	}
 	n := batch.Length()
 	if n == 0 {
 		return batch
-	}
-	if c.outputIdx == batch.Width() {
-		c.allocator.AppendColumn(batch, coltypes.Float64)
 	}
 	vec := batch.ColVec(c.colIdx)
 	col := vec.Float64()
