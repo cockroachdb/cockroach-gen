@@ -387,7 +387,7 @@ func (c *castOpBoolBool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -470,7 +470,7 @@ func (c *castOpBoolInt16) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int16()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -573,7 +573,7 @@ func (c *castOpBoolInt32) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int32()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -676,7 +676,7 @@ func (c *castOpBoolInt64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -779,7 +779,7 @@ func (c *castOpBoolFloat64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Bool()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -882,7 +882,7 @@ func (c *castOpDecimalBool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Decimal()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -973,7 +973,7 @@ func (c *castOpDecimalDecimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Decimal()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1056,7 +1056,7 @@ func (c *castOpInt16Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1147,7 +1147,7 @@ func (c *castOpInt16Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1238,7 +1238,7 @@ func (c *castOpInt16Int16) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int16()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1321,7 +1321,7 @@ func (c *castOpInt16Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int16()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1412,7 +1412,7 @@ func (c *castOpInt32Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1503,7 +1503,7 @@ func (c *castOpInt32Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1594,7 +1594,7 @@ func (c *castOpInt32Int32) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int32()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1677,7 +1677,7 @@ func (c *castOpInt32Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int32()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1768,7 +1768,7 @@ func (c *castOpInt64Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1859,7 +1859,7 @@ func (c *castOpInt64Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -1950,7 +1950,7 @@ func (c *castOpInt64Int64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2033,7 +2033,7 @@ func (c *castOpInt64Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Int64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2124,7 +2124,7 @@ func (c *castOpFloat64Bool) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2215,7 +2215,7 @@ func (c *castOpFloat64Decimal) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Decimal()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2334,7 +2334,7 @@ func (c *castOpFloat64Int16) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int16()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2437,7 +2437,7 @@ func (c *castOpFloat64Int32) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int32()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2540,7 +2540,7 @@ func (c *castOpFloat64Int64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Int64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {
@@ -2643,7 +2643,7 @@ func (c *castOpFloat64Float64) Next(ctx context.Context) coldata.Batch {
 	col := vec.Float64()
 	projVec := batch.ColVec(c.outputIdx)
 	projCol := projVec.Float64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{projVec},
 		func() {
 			if vec.MaybeHasNulls() {

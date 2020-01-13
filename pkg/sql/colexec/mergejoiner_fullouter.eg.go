@@ -34708,8 +34708,8 @@ func (o *mergeJoinFullOuterOp) buildLeftGroups(
 	sel := batch.Selection()
 	initialBuilderState := o.builderState.left
 	outputBatchSize := int(o.outputBatchSize)
-	o.allocator.performOperation(
-		o.output.ColVecs()[:len(input.outCols)],
+	o.allocator.PerformOperation(
+		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
 		func() {
 			// Loop over every column.
 		LeftColLoop:
@@ -36676,2342 +36676,2166 @@ func (o *mergeJoinFullOuterOp) buildRightGroups(
 	sel := batch.Selection()
 	outputBatchSize := int(o.outputBatchSize)
 
-	// Loop over every column.
-RightColLoop:
-	for outColIdx, inColIdx := range input.outCols {
-		outStartIdx := int(destStartIdx)
-		out := o.output.ColVec(outColIdx + colOffset)
-		var src coldata.Vec
-		if batch.Width() > int(inColIdx) {
-			src = batch.ColVec(int(inColIdx))
-		}
-		colType := input.sourceTypes[inColIdx]
-
-		if sel != nil {
-			if src != nil && src.MaybeHasNulls() {
-
-				switch colType {
-				case coltypes.Bool:
-					var srcCol []bool
-					if src != nil {
-						srcCol = src.Bool()
-					}
-					outCol := out.Bool()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					var srcCol *coldata.Bytes
-					if src != nil {
-						srcCol = src.Bytes()
-					}
-					outCol := out.Bytes()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										o.allocator.performOperation(
-											[]coldata.Vec{out},
-											func() {
-												outCol.Set(outStartIdx, v)
-											},
-										)
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					var srcCol []apd.Decimal
-					if src != nil {
-						srcCol = src.Decimal()
-					}
-					outCol := out.Decimal()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx].Set(&v)
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					var srcCol []int16
-					if src != nil {
-						srcCol = src.Int16()
-					}
-					outCol := out.Int16()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					var srcCol []int32
-					if src != nil {
-						srcCol = src.Int32()
-					}
-					outCol := out.Int32()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					var srcCol []int64
-					if src != nil {
-						srcCol = src.Int64()
-					}
-					outCol := out.Int64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					var srcCol []float64
-					if src != nil {
-						srcCol = src.Float64()
-					}
-					outCol := out.Float64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					var srcCol []time.Time
-					if src != nil {
-						srcCol = src.Timestamp()
-					}
-					outCol := out.Timestamp()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+	o.allocator.PerformOperation(
+		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		func() {
+			// Loop over every column.
+		RightColLoop:
+			for outColIdx, inColIdx := range input.outCols {
+				outStartIdx := int(destStartIdx)
+				out := o.output.ColVec(outColIdx + colOffset)
+				var src coldata.Vec
+				if batch.Width() > int(inColIdx) {
+					src = batch.ColVec(int(inColIdx))
 				}
-			} else {
+				colType := input.sourceTypes[inColIdx]
 
-				switch colType {
-				case coltypes.Bool:
-					var srcCol []bool
-					if src != nil {
-						srcCol = src.Bool()
-					}
-					outCol := out.Bool()
+				if sel != nil {
+					if src != nil && src.MaybeHasNulls() {
 
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+						switch colType {
+						case coltypes.Bool:
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
 							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
+							outCol := out.Bool()
 
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
 								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
 							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
 							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					var srcCol *coldata.Bytes
-					if src != nil {
-						srcCol = src.Bytes()
-					}
-					outCol := out.Bytes()
+							outCol := out.Bytes()
 
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
 
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										o.allocator.performOperation(
-											[]coldata.Vec{out},
-											func() {
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
 												outCol.Set(outStartIdx, v)
-											},
-										)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
 
-							outStartIdx += toAppend
+									outStartIdx += toAppend
 
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					var srcCol []apd.Decimal
-					if src != nil {
-						srcCol = src.Decimal()
-					}
-					outCol := out.Decimal()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx].Set(&v)
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
 								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
 							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
 							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					var srcCol []int16
-					if src != nil {
-						srcCol = src.Int16()
-					}
-					outCol := out.Int16()
+							outCol := out.Decimal()
 
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					var srcCol []int32
-					if src != nil {
-						srcCol = src.Int32()
-					}
-					outCol := out.Int32()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
 
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					var srcCol []int64
-					if src != nil {
-						srcCol = src.Int64()
-					}
-					outCol := out.Int64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx].Set(&v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
 
-							outStartIdx += toAppend
+									outStartIdx += toAppend
 
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					var srcCol []float64
-					if src != nil {
-						srcCol = src.Float64()
-					}
-					outCol := out.Float64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
 								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
 							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
 							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					var srcCol []time.Time
-					if src != nil {
-						srcCol = src.Timestamp()
-					}
-					outCol := out.Timestamp()
+							outCol := out.Int16()
 
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
 									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
 
-							outStartIdx += toAppend
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
 
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
 								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
 							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
+							outCol := out.Int32()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
+							outCol := out.Int64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
+							outCol := out.Float64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
+							outCol := out.Timestamp()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
 						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+					} else {
+
+						switch colType {
+						case coltypes.Bool:
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
+							outCol := out.Bool()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
+							outCol := out.Bytes()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+												outCol.Set(outStartIdx, v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
+							outCol := out.Decimal()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx].Set(&v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
+							outCol := out.Int16()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
+							outCol := out.Int32()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
+							outCol := out.Int64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
+							outCol := out.Float64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
+							outCol := out.Timestamp()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
 					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+				} else {
+					if src != nil && src.MaybeHasNulls() {
+
+						switch colType {
+						case coltypes.Bool:
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
+							outCol := out.Bool()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
+							outCol := out.Bytes()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+												outCol.Set(outStartIdx, v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
+							outCol := out.Decimal()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx].Set(&v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
+							outCol := out.Int16()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
+							outCol := out.Int32()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
+							outCol := out.Int64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
+							outCol := out.Float64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
+							outCol := out.Timestamp()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
+												out.Nulls().SetNull(uint16(outStartIdx))
+											} else {
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
+					} else {
+
+						switch colType {
+						case coltypes.Bool:
+							var srcCol []bool
+							if src != nil {
+								srcCol = src.Bool()
+							}
+							outCol := out.Bool()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Bytes:
+							var srcCol *coldata.Bytes
+							if src != nil {
+								srcCol = src.Bytes()
+							}
+							outCol := out.Bytes()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+												outCol.Set(outStartIdx, v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Decimal:
+							var srcCol []apd.Decimal
+							if src != nil {
+								srcCol = src.Decimal()
+							}
+							outCol := out.Decimal()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx].Set(&v)
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int16:
+							var srcCol []int16
+							if src != nil {
+								srcCol = src.Int16()
+							}
+							outCol := out.Int16()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int32:
+							var srcCol []int32
+							if src != nil {
+								srcCol = src.Int32()
+							}
+							outCol := out.Int32()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Int64:
+							var srcCol []int64
+							if src != nil {
+								srcCol = src.Int64()
+							}
+							outCol := out.Int64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Float64:
+							var srcCol []float64
+							if src != nil {
+								srcCol = src.Float64()
+							}
+							outCol := out.Float64()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						case coltypes.Timestamp:
+							var srcCol []time.Time
+							if src != nil {
+								srcCol = src.Timestamp()
+							}
+							outCol := out.Timestamp()
+
+							// Loop over every group.
+							for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+								rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+								// Repeat every group numRepeats times.
+								for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+									if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+									}
+									toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+									if outStartIdx+toAppend > outputBatchSize {
+										toAppend = outputBatchSize - outStartIdx
+									}
+
+									if rightGroup.nullGroup {
+										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+									} else {
+										// Optimization in the case that group length is 1, use assign
+										// instead of copy.
+										if toAppend == 1 {
+											{
+												v := srcCol[o.builderState.right.curSrcStartIdx]
+												outCol[outStartIdx] = v
+											}
+										} else {
+											out.Copy(
+												coldata.CopySliceArgs{
+													SliceArgs: coldata.SliceArgs{
+														ColType:     colType,
+														Src:         src,
+														Sel:         sel,
+														DestIdx:     uint64(outStartIdx),
+														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
+														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+													},
+												},
+											)
+										}
+									}
+
+									outStartIdx += toAppend
+
+									// If we haven't materialized all the rows from the group, then we are
+									// done with the current column.
+									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+										// If it's the last column, save state and return.
+										if outColIdx == len(input.outCols)-1 {
+											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											return
+										}
+										// Otherwise, reset to the initial state and begin the next column.
+										o.builderState.right.setBuilderColumnState(initialBuilderState)
+										continue RightColLoop
+									}
+									o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+							}
+							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
+					}
 				}
+
+				o.builderState.right.setBuilderColumnState(initialBuilderState)
 			}
-		} else {
-			if src != nil && src.MaybeHasNulls() {
-
-				switch colType {
-				case coltypes.Bool:
-					var srcCol []bool
-					if src != nil {
-						srcCol = src.Bool()
-					}
-					outCol := out.Bool()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					var srcCol *coldata.Bytes
-					if src != nil {
-						srcCol = src.Bytes()
-					}
-					outCol := out.Bytes()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										o.allocator.performOperation(
-											[]coldata.Vec{out},
-											func() {
-												outCol.Set(outStartIdx, v)
-											},
-										)
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					var srcCol []apd.Decimal
-					if src != nil {
-						srcCol = src.Decimal()
-					}
-					outCol := out.Decimal()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx].Set(&v)
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					var srcCol []int16
-					if src != nil {
-						srcCol = src.Int16()
-					}
-					outCol := out.Int16()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					var srcCol []int32
-					if src != nil {
-						srcCol = src.Int32()
-					}
-					outCol := out.Int32()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					var srcCol []int64
-					if src != nil {
-						srcCol = src.Int64()
-					}
-					outCol := out.Int64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					var srcCol []float64
-					if src != nil {
-						srcCol = src.Float64()
-					}
-					outCol := out.Float64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					var srcCol []time.Time
-					if src != nil {
-						srcCol = src.Timestamp()
-					}
-					outCol := out.Timestamp()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-										out.Nulls().SetNull(uint16(outStartIdx))
-									} else {
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
-				}
-			} else {
-
-				switch colType {
-				case coltypes.Bool:
-					var srcCol []bool
-					if src != nil {
-						srcCol = src.Bool()
-					}
-					outCol := out.Bool()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Bytes:
-					var srcCol *coldata.Bytes
-					if src != nil {
-						srcCol = src.Bytes()
-					}
-					outCol := out.Bytes()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										o.allocator.performOperation(
-											[]coldata.Vec{out},
-											func() {
-												outCol.Set(outStartIdx, v)
-											},
-										)
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Decimal:
-					var srcCol []apd.Decimal
-					if src != nil {
-						srcCol = src.Decimal()
-					}
-					outCol := out.Decimal()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx].Set(&v)
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int16:
-					var srcCol []int16
-					if src != nil {
-						srcCol = src.Int16()
-					}
-					outCol := out.Int16()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int32:
-					var srcCol []int32
-					if src != nil {
-						srcCol = src.Int32()
-					}
-					outCol := out.Int32()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Int64:
-					var srcCol []int64
-					if src != nil {
-						srcCol = src.Int64()
-					}
-					outCol := out.Int64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Float64:
-					var srcCol []float64
-					if src != nil {
-						srcCol = src.Float64()
-					}
-					outCol := out.Float64()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				case coltypes.Timestamp:
-					var srcCol []time.Time
-					if src != nil {
-						srcCol = src.Timestamp()
-					}
-					outCol := out.Timestamp()
-
-					// Loop over every group.
-					for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
-						rightGroup := &rightGroups[o.builderState.right.groupsIdx]
-						// Repeat every group numRepeats times.
-						for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
-							if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
-								o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
-							}
-							toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
-							if outStartIdx+toAppend > outputBatchSize {
-								toAppend = outputBatchSize - outStartIdx
-							}
-
-							if rightGroup.nullGroup {
-								out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
-							} else {
-								// Optimization in the case that group length is 1, use assign
-								// instead of copy.
-								if toAppend == 1 {
-									{
-										v := srcCol[o.builderState.right.curSrcStartIdx]
-										// We are in the fast path (we're setting a single element), so in
-										// order to not kill the performance, we only update the memory
-										// account in case of Bytes type (other types will not change the
-										// amount of memory accounted for).
-										outCol[outStartIdx] = v
-									}
-								} else {
-									o.allocator.Copy(
-										out,
-										coldata.CopySliceArgs{
-											SliceArgs: coldata.SliceArgs{
-												ColType:     colType,
-												Src:         src,
-												Sel:         sel,
-												DestIdx:     uint64(outStartIdx),
-												SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-												SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
-											},
-										},
-									)
-								}
-							}
-
-							outStartIdx += toAppend
-
-							// If we haven't materialized all the rows from the group, then we are
-							// done with the current column.
-							if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
-								// If it's the last column, save state and return.
-								if outColIdx == len(input.outCols)-1 {
-									o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
-									return
-								}
-								// Otherwise, reset to the initial state and begin the next column.
-								o.builderState.right.setBuilderColumnState(initialBuilderState)
-								continue RightColLoop
-							}
-							o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
-						}
-						o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
-					}
-					o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
-				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
-				}
-			}
-		}
-
-		o.builderState.right.setBuilderColumnState(initialBuilderState)
-	}
-	o.builderState.right.reset()
+			o.builderState.right.reset()
+		})
 }
 
 // probe is where we generate the groups slices that are used in the build

@@ -51,7 +51,8 @@ type anyNotNullBoolAgg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []bool
+	vec                         coldata.Vec
+	col                         []bool
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -59,7 +60,8 @@ type anyNotNullBoolAgg struct {
 
 func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Bool()
+	a.vec = vec
+	a.col = vec.Bool()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -100,8 +102,8 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -128,7 +130,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -156,7 +158,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -186,7 +188,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -214,7 +216,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -234,7 +236,8 @@ type anyNotNullBytesAgg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         *coldata.Bytes
+	vec                         coldata.Vec
+	col                         *coldata.Bytes
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -242,7 +245,8 @@ type anyNotNullBytesAgg struct {
 
 func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Bytes()
+	a.vec = vec
+	a.col = vec.Bytes()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -283,8 +287,8 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -311,7 +315,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
-							a.vec.Set(a.curIdx, v)
+							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -341,7 +345,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
-							a.vec.Set(a.curIdx, v)
+							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -371,7 +375,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
-							a.vec.Set(a.curIdx, v)
+							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -401,7 +405,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
-							a.vec.Set(a.curIdx, v)
+							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -421,7 +425,8 @@ type anyNotNullDecimalAgg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []apd.Decimal
+	vec                         coldata.Vec
+	col                         []apd.Decimal
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -429,7 +434,8 @@ type anyNotNullDecimalAgg struct {
 
 func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Decimal()
+	a.vec = vec
+	a.col = vec.Decimal()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -470,8 +476,8 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -498,7 +504,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx].Set(&v)
+							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -526,7 +532,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx].Set(&v)
+							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -556,7 +562,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx].Set(&v)
+							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -584,7 +590,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx].Set(&v)
+							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -604,7 +610,8 @@ type anyNotNullInt16Agg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []int16
+	vec                         coldata.Vec
+	col                         []int16
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -612,7 +619,8 @@ type anyNotNullInt16Agg struct {
 
 func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Int16()
+	a.vec = vec
+	a.col = vec.Int16()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -653,8 +661,8 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -681,7 +689,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -709,7 +717,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -739,7 +747,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -767,7 +775,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -787,7 +795,8 @@ type anyNotNullInt32Agg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []int32
+	vec                         coldata.Vec
+	col                         []int32
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -795,7 +804,8 @@ type anyNotNullInt32Agg struct {
 
 func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Int32()
+	a.vec = vec
+	a.col = vec.Int32()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -836,8 +846,8 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -864,7 +874,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -892,7 +902,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -922,7 +932,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -950,7 +960,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -970,7 +980,8 @@ type anyNotNullInt64Agg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []int64
+	vec                         coldata.Vec
+	col                         []int64
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -978,7 +989,8 @@ type anyNotNullInt64Agg struct {
 
 func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Int64()
+	a.vec = vec
+	a.col = vec.Int64()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -1019,8 +1031,8 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -1047,7 +1059,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1075,7 +1087,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1105,7 +1117,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1133,7 +1145,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1153,7 +1165,8 @@ type anyNotNullFloat64Agg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []float64
+	vec                         coldata.Vec
+	col                         []float64
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -1161,7 +1174,8 @@ type anyNotNullFloat64Agg struct {
 
 func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Float64()
+	a.vec = vec
+	a.col = vec.Float64()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -1202,8 +1216,8 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -1230,7 +1244,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1258,7 +1272,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1288,7 +1302,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1316,7 +1330,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1336,7 +1350,8 @@ type anyNotNullTimestampAgg struct {
 	allocator                   *Allocator
 	done                        bool
 	groups                      []bool
-	vec                         []time.Time
+	vec                         coldata.Vec
+	col                         []time.Time
 	nulls                       *coldata.Nulls
 	curIdx                      int
 	foundNonNullForCurrentGroup bool
@@ -1344,7 +1359,8 @@ type anyNotNullTimestampAgg struct {
 
 func (a *anyNotNullTimestampAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
-	a.vec = vec.Timestamp()
+	a.vec = vec
+	a.col = vec.Timestamp()
 	a.nulls = vec.Nulls()
 	a.Reset()
 }
@@ -1385,8 +1401,8 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
 
-	a.allocator.performOperation(
-		[]coldata.Vec{vec},
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
 		func() {
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
@@ -1413,7 +1429,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1441,7 +1457,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1471,7 +1487,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1499,7 +1515,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// from the rest of the template file.
 							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
-							a.vec[a.curIdx] = v
+							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
 						}
 					}

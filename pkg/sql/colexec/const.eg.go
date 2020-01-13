@@ -122,7 +122,7 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Bool()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -164,7 +164,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Bytes()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -208,7 +208,7 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Decimal()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -250,7 +250,7 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int16()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -292,7 +292,7 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int32()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -334,7 +334,7 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -376,7 +376,7 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Float64()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
@@ -418,7 +418,7 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Timestamp()
-	c.allocator.performOperation(
+	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
 			if sel := batch.Selection(); sel != nil {
