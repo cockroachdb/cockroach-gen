@@ -1588,6 +1588,14 @@ type ProjectExpr struct {
 	Projections ProjectionsExpr
 	Passthrough opt.ColSet
 
+	// notNullCols is the set of columns (input or synthesized) that are known to
+	// be not-null.
+	notNullCols opt.ColSet
+
+	// internalFuncDeps are the functional dependencies between all columns
+	// (input or synthesized).
+	internalFuncDeps props.FuncDepSet
+
 	grp  exprGroup
 	next RelExpr
 }
@@ -2665,6 +2673,11 @@ type LookupJoinExpr struct {
 	On    FiltersExpr
 	LookupJoinPrivate
 
+	// lookupProps caches relational properties for the "table" side of the lookup
+	// join, treating it as if it were another relational input. This makes the
+	// lookup join appear more like other join operators.
+	lookupProps props.Relational
+
 	grp  exprGroup
 	next RelExpr
 }
@@ -2819,11 +2832,6 @@ type LookupJoinPrivate struct {
 	// LookupColsAreTableKey is true if the lookup columns form a key in the
 	// table (and thus each left row matches with at most one table row).
 	LookupColsAreTableKey bool
-
-	// lookupProps caches relational properties for the "table" side of the lookup
-	// join, treating it as if it were another relational input. This makes the
-	// lookup join appear more like other join operators.
-	lookupProps props.Relational
 
 	// ConstFilters contains the constant filters that are represented as equality
 	// conditions on the KeyCols. These filters are needed by the statistics code to
@@ -3004,6 +3012,13 @@ type ZigzagJoinExpr struct {
 	On FiltersExpr
 	ZigzagJoinPrivate
 
+	// leftProps and rightProps cache relational properties corresponding to an
+	// unconstrained scan on the respective indexes. By putting this in the
+	// expr, zigzag joins can reuse a lot of the logical property building code
+	// for joins.
+	leftProps  props.Relational
+	rightProps props.Relational
+
 	grp  exprGroup
 	next RelExpr
 }
@@ -3155,13 +3170,6 @@ type ZigzagJoinPrivate struct {
 	// Cols is the set of columns produced by the zigzag join. This set can
 	// contain columns from either side's index.
 	Cols opt.ColSet
-
-	// leftProps and rightProps cache relational properties corresponding to an
-	// unconstrained scan on the respective indexes. By putting this in the
-	// expr, zigzag joins can reuse a lot of the logical property building code
-	// for joins.
-	leftProps  props.Relational
-	rightProps props.Relational
 }
 
 // InnerJoinApplyExpr has the same join semantics as InnerJoin. However, unlike
@@ -15467,6 +15475,7 @@ func (m *Memo) MemoizeProject(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildProjectProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -15685,6 +15694,7 @@ func (m *Memo) MemoizeLookupJoin(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildLookupJoinProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -15737,6 +15747,7 @@ func (m *Memo) MemoizeZigzagJoin(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildZigzagJoinProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -18997,6 +19008,7 @@ func (m *Memo) AddProjectToGroup(e *ProjectExpr, grp RelExpr) *ProjectExpr {
 	const size = int64(unsafe.Sizeof(ProjectExpr{}))
 	interned := m.interner.InternProject(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
@@ -19109,6 +19121,7 @@ func (m *Memo) AddLookupJoinToGroup(e *LookupJoinExpr, grp RelExpr) *LookupJoinE
 	const size = int64(unsafe.Sizeof(LookupJoinExpr{}))
 	interned := m.interner.InternLookupJoin(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
@@ -19137,6 +19150,7 @@ func (m *Memo) AddZigzagJoinToGroup(e *ZigzagJoinExpr, grp RelExpr) *ZigzagJoinE
 	const size = int64(unsafe.Sizeof(ZigzagJoinExpr{}))
 	interned := m.interner.InternZigzagJoin(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
