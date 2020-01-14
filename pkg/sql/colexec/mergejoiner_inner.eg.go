@@ -25967,8 +25967,8 @@ func (o *mergeJoinInnerOp) setBuilderSourceToBufferedGroup(
 	// We cannot yet reset the buffered groups because the builder will be taking
 	// input from them. The actual reset will take place on the next call to
 	// initProberState().
-	o.proberState.lBufferedGroup.needToReset = true
-	o.proberState.rBufferedGroup.needToReset = true
+	o.proberState.lBufferedGroupNeedToReset = true
+	o.proberState.rBufferedGroupNeedToReset = true
 }
 
 // exhaustLeftSource sets up the builder to process any remaining tuples from

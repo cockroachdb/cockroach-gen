@@ -665,7 +665,7 @@ func (ht *hashTable) rehash(
 func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel []uint16) {
 	switch t {
 	case coltypes.Bool:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Bool()
@@ -1179,7 +1179,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Bytes:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Bytes()
@@ -1613,7 +1613,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Decimal:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Decimal()
@@ -2047,7 +2047,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Int16:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Int16()
@@ -2591,7 +2591,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Int32:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Int32()
@@ -3135,7 +3135,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Int64:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Int64()
@@ -3679,7 +3679,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Float64:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Float64()
@@ -4303,7 +4303,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 			}
 		}
 	case coltypes.Timestamp:
-		buildVec := ht.vals[ht.keyCols[keyColIdx]]
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
 		probeVec := ht.keys[keyColIdx]
 
 		buildKeys := buildVec.Timestamp()
