@@ -139,6 +139,9 @@ func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -260,6 +263,9 @@ func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -381,6 +387,9 @@ func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -502,6 +511,9 @@ func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -623,6 +635,9 @@ func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -744,6 +759,9 @@ func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -837,6 +855,9 @@ func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -930,6 +951,9 @@ func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1023,6 +1047,9 @@ func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1116,6 +1143,9 @@ func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1209,6 +1239,9 @@ func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1302,6 +1335,9 @@ func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1375,6 +1411,9 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1448,6 +1487,9 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1521,6 +1563,9 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1626,6 +1671,9 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1715,6 +1763,9 @@ func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1804,6 +1855,9 @@ func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1893,6 +1947,9 @@ func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -1982,6 +2039,9 @@ func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2071,6 +2131,9 @@ func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2160,6 +2223,9 @@ func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2261,6 +2327,9 @@ func (p projPlusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2362,6 +2431,9 @@ func (p projMinusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2463,6 +2535,9 @@ func (p projMultDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2580,6 +2655,9 @@ func (p projDivDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2693,6 +2771,9 @@ func (p projEQDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2806,6 +2887,9 @@ func (p projNEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -2919,6 +3003,9 @@ func (p projLTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3032,6 +3119,9 @@ func (p projLEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3145,6 +3235,9 @@ func (p projGTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3258,6 +3351,9 @@ func (p projGEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3359,6 +3455,9 @@ func (p projPlusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3460,6 +3559,9 @@ func (p projMinusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3561,6 +3663,9 @@ func (p projMultDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3678,6 +3783,9 @@ func (p projDivDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3791,6 +3899,9 @@ func (p projEQDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -3904,6 +4015,9 @@ func (p projNEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4017,6 +4131,9 @@ func (p projLTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4130,6 +4247,9 @@ func (p projLEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4243,6 +4363,9 @@ func (p projGTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4356,6 +4479,9 @@ func (p projGEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4457,6 +4583,9 @@ func (p projPlusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4558,6 +4687,9 @@ func (p projMinusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4659,6 +4791,9 @@ func (p projMultDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4776,6 +4911,9 @@ func (p projDivDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -4889,6 +5027,9 @@ func (p projEQDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5002,6 +5143,9 @@ func (p projNEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5115,6 +5259,9 @@ func (p projLTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5228,6 +5375,9 @@ func (p projLEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5341,6 +5491,9 @@ func (p projGTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5454,6 +5607,9 @@ func (p projGEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5575,6 +5731,9 @@ func (p projEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5696,6 +5855,9 @@ func (p projNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5817,6 +5979,9 @@ func (p projLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -5938,6 +6103,9 @@ func (p projLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6059,6 +6227,9 @@ func (p projGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6180,6 +6351,9 @@ func (p projGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6289,6 +6463,9 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6398,6 +6575,9 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6507,6 +6687,9 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6628,6 +6811,9 @@ func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6741,6 +6927,9 @@ func (p projEQInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6854,6 +7043,9 @@ func (p projNEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -6967,6 +7159,9 @@ func (p projLTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7080,6 +7275,9 @@ func (p projLEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7193,6 +7391,9 @@ func (p projGTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7306,6 +7507,9 @@ func (p projGEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7403,6 +7607,9 @@ func (p projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7500,6 +7707,9 @@ func (p projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7625,6 +7835,9 @@ func (p projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7738,6 +7951,9 @@ func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -7871,6 +8087,9 @@ func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8004,6 +8223,9 @@ func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8137,6 +8359,9 @@ func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8270,6 +8495,9 @@ func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8403,6 +8631,9 @@ func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8536,6 +8767,9 @@ func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8633,6 +8867,9 @@ func (p projPlusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8730,6 +8967,9 @@ func (p projMinusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8855,6 +9095,9 @@ func (p projMultInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -8968,6 +9211,9 @@ func (p projDivInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9101,6 +9347,9 @@ func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9234,6 +9483,9 @@ func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9367,6 +9619,9 @@ func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9500,6 +9755,9 @@ func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9633,6 +9891,9 @@ func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9766,6 +10027,9 @@ func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9863,6 +10127,9 @@ func (p projPlusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -9960,6 +10227,9 @@ func (p projMinusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10085,6 +10355,9 @@ func (p projMultInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10198,6 +10471,9 @@ func (p projDivInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10331,6 +10607,9 @@ func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10464,6 +10743,9 @@ func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10597,6 +10879,9 @@ func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10730,6 +11015,9 @@ func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10863,6 +11151,9 @@ func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -10996,6 +11287,9 @@ func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -11161,6 +11455,9 @@ func (p projEQInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -11326,6 +11623,9 @@ func (p projNEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -11491,6 +11791,9 @@ func (p projLTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -11656,6 +11959,9 @@ func (p projLEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -11821,6 +12127,9 @@ func (p projGTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -11986,6 +12295,9 @@ func (p projGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12095,6 +12407,9 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12204,6 +12519,9 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12313,6 +12631,9 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12434,6 +12755,9 @@ func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12547,6 +12871,9 @@ func (p projEQInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12660,6 +12987,9 @@ func (p projNEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12773,6 +13103,9 @@ func (p projLTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12886,6 +13219,9 @@ func (p projLEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -12999,6 +13335,9 @@ func (p projGTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13112,6 +13451,9 @@ func (p projGEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13209,6 +13551,9 @@ func (p projPlusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13306,6 +13651,9 @@ func (p projMinusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13431,6 +13779,9 @@ func (p projMultInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13544,6 +13895,9 @@ func (p projDivInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13677,6 +14031,9 @@ func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13810,6 +14167,9 @@ func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -13943,6 +14303,9 @@ func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14076,6 +14439,9 @@ func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14209,6 +14575,9 @@ func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14342,6 +14711,9 @@ func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14439,6 +14811,9 @@ func (p projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14536,6 +14911,9 @@ func (p projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14661,6 +15039,9 @@ func (p projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14774,6 +15155,9 @@ func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -14907,6 +15291,9 @@ func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15040,6 +15427,9 @@ func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15173,6 +15563,9 @@ func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15306,6 +15699,9 @@ func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15439,6 +15835,9 @@ func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15572,6 +15971,9 @@ func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15669,6 +16071,9 @@ func (p projPlusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15766,6 +16171,9 @@ func (p projMinusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -15891,6 +16299,9 @@ func (p projMultInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16004,6 +16415,9 @@ func (p projDivInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16137,6 +16551,9 @@ func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16270,6 +16687,9 @@ func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16403,6 +16823,9 @@ func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16536,6 +16959,9 @@ func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16669,6 +17095,9 @@ func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16802,6 +17231,9 @@ func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -16967,6 +17399,9 @@ func (p projEQInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -17132,6 +17567,9 @@ func (p projNEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -17297,6 +17735,9 @@ func (p projLTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -17462,6 +17903,9 @@ func (p projLEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -17627,6 +18071,9 @@ func (p projGTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -17792,6 +18239,9 @@ func (p projGEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -17901,6 +18351,9 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18010,6 +18463,9 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18119,6 +18575,9 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18240,6 +18699,9 @@ func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18353,6 +18815,9 @@ func (p projEQInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18466,6 +18931,9 @@ func (p projNEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18579,6 +19047,9 @@ func (p projLTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18692,6 +19163,9 @@ func (p projLEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18805,6 +19279,9 @@ func (p projGTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -18918,6 +19395,9 @@ func (p projGEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19015,6 +19495,9 @@ func (p projPlusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19112,6 +19595,9 @@ func (p projMinusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19237,6 +19723,9 @@ func (p projMultInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19350,6 +19839,9 @@ func (p projDivInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19483,6 +19975,9 @@ func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19616,6 +20111,9 @@ func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19749,6 +20247,9 @@ func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -19882,6 +20383,9 @@ func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20015,6 +20519,9 @@ func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20148,6 +20655,9 @@ func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20245,6 +20755,9 @@ func (p projPlusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20342,6 +20855,9 @@ func (p projMinusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20467,6 +20983,9 @@ func (p projMultInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20580,6 +21099,9 @@ func (p projDivInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20713,6 +21235,9 @@ func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20846,6 +21371,9 @@ func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -20979,6 +21507,9 @@ func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21112,6 +21643,9 @@ func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21245,6 +21779,9 @@ func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21378,6 +21915,9 @@ func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21475,6 +22015,9 @@ func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21572,6 +22115,9 @@ func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21697,6 +22243,9 @@ func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21810,6 +22359,9 @@ func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -21943,6 +22495,9 @@ func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22076,6 +22631,9 @@ func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22209,6 +22767,9 @@ func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22342,6 +22903,9 @@ func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22475,6 +23039,9 @@ func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22608,6 +23175,9 @@ func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22773,6 +23343,9 @@ func (p projEQInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -22938,6 +23511,9 @@ func (p projNEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23103,6 +23679,9 @@ func (p projLTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23268,6 +23847,9 @@ func (p projLEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23433,6 +24015,9 @@ func (p projGTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23598,6 +24183,9 @@ func (p projGEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23719,6 +24307,9 @@ func (p projEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23840,6 +24431,9 @@ func (p projNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -23961,6 +24555,9 @@ func (p projLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24082,6 +24679,9 @@ func (p projLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24203,6 +24803,9 @@ func (p projGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24324,6 +24927,9 @@ func (p projGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24489,6 +25095,9 @@ func (p projEQFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24654,6 +25263,9 @@ func (p projNEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24819,6 +25431,9 @@ func (p projLTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -24984,6 +25599,9 @@ func (p projLEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -25149,6 +25767,9 @@ func (p projGTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -25314,6 +25935,9 @@ func (p projGEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -25479,6 +26103,9 @@ func (p projEQFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -25644,6 +26271,9 @@ func (p projNEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -25809,6 +26439,9 @@ func (p projLTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -25974,6 +26607,9 @@ func (p projLEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -26139,6 +26775,9 @@ func (p projGTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -26304,6 +26943,9 @@ func (p projGEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -26469,6 +27111,9 @@ func (p projEQFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -26634,6 +27279,9 @@ func (p projNEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -26799,6 +27447,9 @@ func (p projLTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -26964,6 +27615,9 @@ func (p projLEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27129,6 +27783,9 @@ func (p projGTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27294,6 +27951,9 @@ func (p projGEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27359,6 +28019,9 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27424,6 +28087,9 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27489,6 +28155,9 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27554,6 +28223,9 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27719,6 +28391,9 @@ func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -27884,6 +28559,9 @@ func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28049,6 +28727,9 @@ func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28214,6 +28895,9 @@ func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28379,6 +29063,9 @@ func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28544,6 +29231,9 @@ func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28661,6 +29351,9 @@ func (p projEQTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28778,6 +29471,9 @@ func (p projNETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -28895,6 +29591,9 @@ func (p projLTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -29012,6 +29711,9 @@ func (p projLETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -29129,6 +29831,9 @@ func (p projGTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -29246,6 +29951,9 @@ func (p projGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 

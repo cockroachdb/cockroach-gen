@@ -162,6 +162,9 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -320,6 +323,9 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -478,6 +484,9 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -636,6 +645,9 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -794,6 +806,9 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
@@ -952,6 +967,9 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			}
 		}
 	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
 	return batch
 }
 
