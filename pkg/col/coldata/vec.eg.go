@@ -26,13 +26,22 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Bool:
 		fromCol := args.Src.Bool()
 		toCol := m.Bool()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]bool, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -44,16 +53,28 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Bytes:
 		fromCol := args.Src.Bytes()
 		toCol := m.Bytes()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol.AppendSlice(fromCol, int(args.DestIdx), int(args.SrcStartIdx), int(args.SrcEndIdx))
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
 			// We need to truncate toCol before appending to it, so in case of Bytes,
 			// we append an empty slice.
 			toCol.AppendSlice(toCol, int(args.DestIdx), 0, 0)
+			// We will be getting all values below to be appended, regardless of
+			// whether the value is NULL. It is possible that Bytes' invariant of
+			// non-decreasing offsets on the source is currently not maintained, so
+			// we explicitly enforce it.
+			maxIdx := uint16(0)
+			for _, selIdx := range sel {
+				if selIdx > maxIdx {
+					maxIdx = selIdx
+				}
+			}
+			fromCol.UpdateOffsetsToBeNonDecreasing(uint64(maxIdx + 1))
 			for _, selIdx := range sel {
 				val := fromCol.Get(int(selIdx))
 				toCol.AppendVal(val)
@@ -64,6 +85,10 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Decimal:
 		fromCol := args.Src.Decimal()
 		toCol := m.Decimal()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			{
 				__desiredCap := int(args.DestIdx) + int(args.SrcEndIdx) - int(args.SrcStartIdx)
@@ -82,9 +107,14 @@ func (m *memColumn) Append(args SliceArgs) {
 			}
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]apd.Decimal, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -97,13 +127,22 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Int16:
 		fromCol := args.Src.Int16()
 		toCol := m.Int16()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]int16, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -115,13 +154,22 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Int32:
 		fromCol := args.Src.Int32()
 		toCol := m.Int32()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]int32, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -133,13 +181,22 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Int64:
 		fromCol := args.Src.Int64()
 		toCol := m.Int64()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]int64, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -151,13 +208,22 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Float64:
 		fromCol := args.Src.Float64()
 		toCol := m.Float64()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]float64, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -169,13 +235,22 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Timestamp:
 		fromCol := args.Src.Timestamp()
 		toCol := m.Timestamp()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
 		if args.Sel == nil {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// TODO(asubiotto): We could be more efficient for fixed width types by
-			// preallocating a destination slice (not so for variable length types).
-			// Improve this.
+			// Ensure that the slice has the capacity for all non-variable width
+			// types.
+			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
+			if uint64(cap(toCol)) < desiredCap {
+				newToCol := make([]time.Time, desiredCap)
+				copy(newToCol, toCol[:args.DestIdx])
+				toCol = newToCol
+			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
