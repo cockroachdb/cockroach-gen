@@ -7270,11 +7270,18 @@ func (_f *Factory) ConstructAntiJoinApply(
 // form a single group. GroupBy is used for queries with aggregate functions,
 // HAVING clauses and/or GROUP BY expressions.
 //
-// The GroupingPrivate field contains an ordering; this ordering is used to
-// determine intra-group ordering and is only useful if there is an order-
-// dependent aggregation (like ARRAY_AGG). Grouping columns are inconsequential
-// in this ordering; we currently set all grouping columns as optional in this
-// ordering (but note that this is not required by the operator).
+// The GroupingPrivate field contains an ordering; this ordering serves a
+// dual-purpose:
+//  - if we ignore any grouping columns, the remaining columns indicate an
+//    intra-group ordering; this is useful if there is an order-dependent
+//    aggregation (like ARRAY_AGG).
+//  - any prefix containing only grouping columns is used to execute the
+//    aggregation in a streaming fashion.
+//
+// Currently, the initially built GroupBy has all grouping columns as "optional"
+// in the ordering (we call this the "canonical" variant). Subsequently, the
+// GenerateStreamingGroupBy exploration rule can add more variants, based on
+// interesting orderings.
 func (_f *Factory) ConstructGroupBy(
 	input memo.RelExpr,
 	aggregations memo.AggregationsExpr,
@@ -7511,7 +7518,7 @@ func (_f *Factory) ConstructDistinctOn(
 	// [EliminateDistinct]
 	{
 		aggs := aggregations
-		if _f.funcs.GroupingColsAreKey(groupingPrivate, input) {
+		if _f.funcs.ColsAreKey(_f.funcs.GroupingCols(groupingPrivate), input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
 				_expr := _f.ConstructProject(
 					input,

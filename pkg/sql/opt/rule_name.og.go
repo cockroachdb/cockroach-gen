@@ -216,6 +216,8 @@ const (
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------
+	ReplaceScalarMinWithLimit
+	ReplaceScalarMaxWithLimit
 	ReplaceMinWithLimit
 	ReplaceMaxWithLimit
 	GenerateStreamingGroupBy

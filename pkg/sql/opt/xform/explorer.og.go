@@ -855,6 +855,92 @@ func (_e *explorer) exploreGroupBy(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [ReplaceMinWithLimit]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			aggregations := _root.Aggregations
+			for i := range aggregations {
+				item := &aggregations[i]
+				_min, _ := item.Agg.(*memo.MinExpr)
+				if _min != nil {
+					variable := _min.Input
+					_variable, _ := variable.(*memo.VariableExpr)
+					if _variable != nil {
+						col := _variable.Col
+						if _e.funcs.IsColNotNull(col, input) {
+							if _e.funcs.OtherAggsAreConst(aggregations, item) {
+								groupingPrivate := &_root.GroupingPrivate
+								if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
+									if _e.funcs.ColsAreConst(_e.funcs.GroupingCols(groupingPrivate), input) {
+										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMinWithLimit) {
+											var _last memo.RelExpr
+											if _e.o.appliedRule != nil {
+												_last = memo.LastGroupMember(_root)
+											}
+											_e.funcs.MakeProjectFromPassthroughAggs(_root, _e.f.ConstructLimit(
+												input,
+												_e.f.ConstructConst(
+													tree.NewDInt(1),
+												),
+												_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
+											), aggregations)
+											if _e.o.appliedRule != nil {
+												_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, _last.NextExpr())
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [ReplaceMaxWithLimit]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			aggregations := _root.Aggregations
+			for i := range aggregations {
+				item := &aggregations[i]
+				_max, _ := item.Agg.(*memo.MaxExpr)
+				if _max != nil {
+					variable := _max.Input
+					_variable, _ := variable.(*memo.VariableExpr)
+					if _variable != nil {
+						col := _variable.Col
+						if _e.funcs.OtherAggsAreConst(aggregations, item) {
+							groupingPrivate := &_root.GroupingPrivate
+							if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
+								if _e.funcs.ColsAreConst(_e.funcs.GroupingCols(groupingPrivate), input) {
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
+										var _last memo.RelExpr
+										if _e.o.appliedRule != nil {
+											_last = memo.LastGroupMember(_root)
+										}
+										_e.funcs.MakeProjectFromPassthroughAggs(_root, _e.f.ConstructLimit(
+											input,
+											_e.f.ConstructConst(
+												tree.NewDInt(1),
+											),
+											_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
+										), aggregations)
+										if _e.o.appliedRule != nil {
+											_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, _last.NextExpr())
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateStreamingGroupBy]
 	{
 		if _rootOrd >= _rootState.start {
@@ -886,7 +972,7 @@ func (_e *explorer) exploreScalarGroupBy(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
-	// [ReplaceMinWithLimit]
+	// [ReplaceScalarMinWithLimit]
 	{
 		if _rootOrd >= _rootState.start {
 			input := _root.Input
@@ -901,7 +987,7 @@ func (_e *explorer) exploreScalarGroupBy(
 						aggPrivate := _item.Col
 						groupingPrivate := &_root.GroupingPrivate
 						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMinWithLimit) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceScalarMinWithLimit) {
 								_expr := &memo.ScalarGroupByExpr{
 									Input: _e.f.ConstructLimit(
 										_e.f.ConstructSelect(
@@ -935,9 +1021,9 @@ func (_e *explorer) exploreScalarGroupBy(
 								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
 								if _e.o.appliedRule != nil {
 									if _interned != _expr {
-										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, nil)
+										_e.o.appliedRule(opt.ReplaceScalarMinWithLimit, _root, nil)
 									} else {
-										_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, _interned)
+										_e.o.appliedRule(opt.ReplaceScalarMinWithLimit, _root, _interned)
 									}
 								}
 							}
@@ -948,7 +1034,7 @@ func (_e *explorer) exploreScalarGroupBy(
 		}
 	}
 
-	// [ReplaceMaxWithLimit]
+	// [ReplaceScalarMaxWithLimit]
 	{
 		if _rootOrd >= _rootState.start {
 			input := _root.Input
@@ -963,7 +1049,7 @@ func (_e *explorer) exploreScalarGroupBy(
 						aggPrivate := _item.Col
 						groupingPrivate := &_root.GroupingPrivate
 						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceScalarMaxWithLimit) {
 								_expr := &memo.ScalarGroupByExpr{
 									Input: _e.f.ConstructLimit(
 										_e.f.ConstructSelect(
@@ -997,9 +1083,9 @@ func (_e *explorer) exploreScalarGroupBy(
 								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
 								if _e.o.appliedRule != nil {
 									if _interned != _expr {
-										_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, nil)
+										_e.o.appliedRule(opt.ReplaceScalarMaxWithLimit, _root, nil)
 									} else {
-										_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, _interned)
+										_e.o.appliedRule(opt.ReplaceScalarMaxWithLimit, _root, _interned)
 									}
 								}
 							}
