@@ -1042,6 +1042,14 @@ type ScanPrivate struct {
 	// Flags modify how the table is scanned, such as which index is used to scan.
 	Flags ScanFlags
 
+	// Locking represents the row-level locking mode of the Scan. Most scans
+	// leave this unset (Strength = ForNone), which indicates that no row-level
+	// locking will be performed while scanning the table. Stronger locking modes
+	// are used by SELECT .. FOR [KEY] UPDATE/SHARE statements and by the initial
+	// row retrieval of DELETE and UPDATE statements. The locking item's Targets
+	// list will always be empty when part of a ScanPrivate.
+	Locking *tree.LockingItem
+
 	// PartitionConstrainedScan records whether or not we were able to use partitions
 	// to constrain the lookup spans further. This flag is used to record telemetry
 	// about how often this optimization is getting applied.
@@ -20290,6 +20298,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
+	in.hasher.HashLockingItem(val.Locking)
 	in.hasher.HashBool(val.PartitionConstrainedScan)
 
 	in.cache.Start(in.hasher.hash)
@@ -20301,6 +20310,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
+				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
 				return existing
 			}
