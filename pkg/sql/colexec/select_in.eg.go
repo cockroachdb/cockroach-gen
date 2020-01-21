@@ -335,7 +335,7 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -404,12 +404,10 @@ func (si *selectInOpBool) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Bool()
@@ -558,7 +556,7 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -631,12 +629,10 @@ func (si *selectInOpBytes) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Bytes()
@@ -789,7 +785,7 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -858,12 +854,10 @@ func (si *selectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Decimal()
@@ -1023,7 +1017,7 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -1092,12 +1086,10 @@ func (si *selectInOpInt16) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Int16()
@@ -1257,7 +1249,7 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -1326,12 +1318,10 @@ func (si *selectInOpInt32) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Int32()
@@ -1491,7 +1481,7 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -1560,12 +1550,10 @@ func (si *selectInOpInt64) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Int64()
@@ -1733,7 +1721,7 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -1802,12 +1790,10 @@ func (si *selectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Float64()
@@ -1963,7 +1949,7 @@ func (si *selectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 	for {
 		batch := si.input.Next(ctx)
 		if batch.Length() == 0 {
-			return batch
+			return coldata.ZeroBatch
 		}
 
 		vec := batch.ColVec(si.colIdx)
@@ -2032,12 +2018,10 @@ func (si *selectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 
 func (pi *projectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 	batch := pi.input.Next(ctx)
-	if pi.outputIdx == batch.Width() {
-		pi.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Timestamp()

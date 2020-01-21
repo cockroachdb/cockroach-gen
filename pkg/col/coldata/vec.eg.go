@@ -34,14 +34,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]bool, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -95,8 +87,13 @@ func (m *memColumn) Append(args SliceArgs) {
 				if cap(toCol) >= __desiredCap {
 					toCol = toCol[:__desiredCap]
 				} else {
-					__new_slice := make([]apd.Decimal, __desiredCap)
-					copy(__new_slice, toCol)
+					__prevCap := cap(toCol)
+					__capToAllocate := __desiredCap
+					if __capToAllocate < 2*__prevCap {
+						__capToAllocate = 2 * __prevCap
+					}
+					__new_slice := make([]apd.Decimal, __desiredCap, __capToAllocate)
+					copy(__new_slice, toCol[:int(args.DestIdx)])
 					toCol = __new_slice
 				}
 				__src_slice := fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]
@@ -107,14 +104,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			}
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]apd.Decimal, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -135,14 +124,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]int16, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -162,14 +143,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]int32, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -189,14 +162,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]int64, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -216,14 +181,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]float64, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]
@@ -243,14 +200,6 @@ func (m *memColumn) Append(args SliceArgs) {
 			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
 		} else {
 			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
-			// Ensure that the slice has the capacity for all non-variable width
-			// types.
-			desiredCap := args.DestIdx + args.SrcEndIdx - args.SrcStartIdx
-			if uint64(cap(toCol)) < desiredCap {
-				newToCol := make([]time.Time, desiredCap)
-				copy(newToCol, toCol[:args.DestIdx])
-				toCol = newToCol
-			}
 			toCol = toCol[0:int(args.DestIdx)]
 			for _, selIdx := range sel {
 				val := fromCol[int(selIdx)]

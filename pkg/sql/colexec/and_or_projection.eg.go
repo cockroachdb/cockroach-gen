@@ -96,14 +96,11 @@ func (o *andProjOp) Init() {
 // populates the result of the logical operation.
 func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	batch := o.input.Next(ctx)
-	if o.outputIdx == batch.Width() {
-		o.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	origLen := batch.Length()
-	// NB: we don't short-circuit if the batch is length 0 here, because we have
-	// to make sure to run both of the projection chains. This is unfortunate.
-	// TODO(yuzefovich): add this back in once batches are right-sized by
-	// planning.
+	if origLen == 0 {
+		return coldata.ZeroBatch
+	}
+	o.allocator.MaybeAddColumn(batch, coltypes.Bool, o.outputIdx)
 	usesSel := false
 	if sel := batch.Selection(); sel != nil {
 		copy(o.origSel[:origLen], sel[:origLen])
@@ -115,13 +112,6 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	// actually run the projection.
 	o.leftFeedOp.batch = batch
 	batch = o.leftProjOpChain.Next(ctx)
-
-	if origLen == 0 {
-		// Run the right-side projection on the remaining tuples.
-		o.rightFeedOp.batch = batch
-		batch = o.rightProjOpChain.Next(ctx)
-		return batch
-	}
 
 	// Now we need to populate a selection vector on the batch in such a way that
 	// those tuples that we already know the result of logical operation for do
@@ -183,11 +173,16 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	batch.SetLength(curIdx)
 
-	// Run the right-side projection on the remaining tuples.
-	o.rightFeedOp.batch = batch
-	batch = o.rightProjOpChain.Next(ctx)
+	var ranRightSide bool
+	if curIdx > 0 {
+		// We only run the right-side projection if there are non-zero number of
+		// remaining tuples.
+		batch.SetLength(curIdx)
+		o.rightFeedOp.batch = batch
+		batch = o.rightProjOpChain.Next(ctx)
+		ranRightSide = true
+	}
 
 	// Now we need to restore the original selection vector and length.
 	if usesSel {
@@ -198,16 +193,22 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	}
 	batch.SetLength(origLen)
 
-	rightCol := batch.ColVec(o.rightIdx)
+	var (
+		rightCol     coldata.Vec
+		rightColVals []bool
+	)
+	if ranRightSide {
+		rightCol = batch.ColVec(o.rightIdx)
+		rightColVals = rightCol.Bool()
+	}
 	outputCol := batch.ColVec(o.outputIdx)
-	rightColVals := rightCol.Bool()
 	outputColVals := outputCol.Bool()
 	outputNulls := outputCol.Nulls()
 	// This is where we populate the output - do the actual evaluation of the
 	// logical operation.
 	if leftCol.MaybeHasNulls() {
 		leftNulls := leftCol.Nulls()
-		if rightCol.MaybeHasNulls() {
+		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:origLen] {
@@ -237,7 +238,9 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -295,7 +298,9 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -326,7 +331,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		if rightCol.MaybeHasNulls() {
+		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:origLen] {
@@ -356,7 +361,9 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -414,7 +421,9 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -526,14 +535,11 @@ func (o *orProjOp) Init() {
 // populates the result of the logical operation.
 func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	batch := o.input.Next(ctx)
-	if o.outputIdx == batch.Width() {
-		o.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	origLen := batch.Length()
-	// NB: we don't short-circuit if the batch is length 0 here, because we have
-	// to make sure to run both of the projection chains. This is unfortunate.
-	// TODO(yuzefovich): add this back in once batches are right-sized by
-	// planning.
+	if origLen == 0 {
+		return coldata.ZeroBatch
+	}
+	o.allocator.MaybeAddColumn(batch, coltypes.Bool, o.outputIdx)
 	usesSel := false
 	if sel := batch.Selection(); sel != nil {
 		copy(o.origSel[:origLen], sel[:origLen])
@@ -545,13 +551,6 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	// actually run the projection.
 	o.leftFeedOp.batch = batch
 	batch = o.leftProjOpChain.Next(ctx)
-
-	if origLen == 0 {
-		// Run the right-side projection on the remaining tuples.
-		o.rightFeedOp.batch = batch
-		batch = o.rightProjOpChain.Next(ctx)
-		return batch
-	}
 
 	// Now we need to populate a selection vector on the batch in such a way that
 	// those tuples that we already know the result of logical operation for do
@@ -613,11 +612,16 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	}
-	batch.SetLength(curIdx)
 
-	// Run the right-side projection on the remaining tuples.
-	o.rightFeedOp.batch = batch
-	batch = o.rightProjOpChain.Next(ctx)
+	var ranRightSide bool
+	if curIdx > 0 {
+		// We only run the right-side projection if there are non-zero number of
+		// remaining tuples.
+		batch.SetLength(curIdx)
+		o.rightFeedOp.batch = batch
+		batch = o.rightProjOpChain.Next(ctx)
+		ranRightSide = true
+	}
 
 	// Now we need to restore the original selection vector and length.
 	if usesSel {
@@ -628,16 +632,22 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	}
 	batch.SetLength(origLen)
 
-	rightCol := batch.ColVec(o.rightIdx)
+	var (
+		rightCol     coldata.Vec
+		rightColVals []bool
+	)
+	if ranRightSide {
+		rightCol = batch.ColVec(o.rightIdx)
+		rightColVals = rightCol.Bool()
+	}
 	outputCol := batch.ColVec(o.outputIdx)
-	rightColVals := rightCol.Bool()
 	outputColVals := outputCol.Bool()
 	outputNulls := outputCol.Nulls()
 	// This is where we populate the output - do the actual evaluation of the
 	// logical operation.
 	if leftCol.MaybeHasNulls() {
 		leftNulls := leftCol.Nulls()
-		if rightCol.MaybeHasNulls() {
+		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:origLen] {
@@ -667,7 +677,9 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -725,7 +737,9 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -756,7 +770,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		if rightCol.MaybeHasNulls() {
+		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:origLen] {
@@ -786,7 +800,9 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)
@@ -844,7 +860,9 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					}
 				}
 			} else {
-				_ = rightColVals[origLen-1]
+				if ranRightSide {
+					_ = rightColVals[origLen-1]
+				}
 				_ = outputColVals[origLen-1]
 				for i := range leftColVals[:origLen] {
 					idx := uint16(i)

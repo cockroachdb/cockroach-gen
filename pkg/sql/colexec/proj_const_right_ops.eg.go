@@ -33,12 +33,10 @@ type projEQBoolBoolConstOp struct {
 func (p projEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
@@ -157,12 +155,10 @@ type projNEBoolBoolConstOp struct {
 func (p projNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
@@ -281,12 +277,10 @@ type projLTBoolBoolConstOp struct {
 func (p projLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
@@ -405,12 +399,10 @@ type projLEBoolBoolConstOp struct {
 func (p projLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
@@ -529,12 +521,10 @@ type projGTBoolBoolConstOp struct {
 func (p projGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
@@ -653,12 +643,10 @@ type projGEBoolBoolConstOp struct {
 func (p projGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
@@ -777,12 +765,10 @@ type projEQBytesBytesConstOp struct {
 func (p projEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -873,12 +859,10 @@ type projNEBytesBytesConstOp struct {
 func (p projNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -969,12 +953,10 @@ type projLTBytesBytesConstOp struct {
 func (p projLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1065,12 +1047,10 @@ type projLEBytesBytesConstOp struct {
 func (p projLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1161,12 +1141,10 @@ type projGTBytesBytesConstOp struct {
 func (p projGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1257,12 +1235,10 @@ type projGEBytesBytesConstOp struct {
 func (p projGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1353,12 +1329,10 @@ type projPlusDecimalDecimalConstOp struct {
 func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1429,12 +1403,10 @@ type projMinusDecimalDecimalConstOp struct {
 func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1505,12 +1477,10 @@ type projMultDecimalDecimalConstOp struct {
 func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1581,12 +1551,10 @@ type projDivDecimalDecimalConstOp struct {
 func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1689,12 +1657,10 @@ type projEQDecimalDecimalConstOp struct {
 func (p projEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1781,12 +1747,10 @@ type projNEDecimalDecimalConstOp struct {
 func (p projNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1873,12 +1837,10 @@ type projLTDecimalDecimalConstOp struct {
 func (p projLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -1965,12 +1927,10 @@ type projLEDecimalDecimalConstOp struct {
 func (p projLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2057,12 +2017,10 @@ type projGTDecimalDecimalConstOp struct {
 func (p projGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2149,12 +2107,10 @@ type projGEDecimalDecimalConstOp struct {
 func (p projGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2241,12 +2197,10 @@ type projPlusDecimalInt16ConstOp struct {
 func (p projPlusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2345,12 +2299,10 @@ type projMinusDecimalInt16ConstOp struct {
 func (p projMinusDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2449,12 +2401,10 @@ type projMultDecimalInt16ConstOp struct {
 func (p projMultDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2553,12 +2503,10 @@ type projDivDecimalInt16ConstOp struct {
 func (p projDivDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2673,12 +2621,10 @@ type projEQDecimalInt16ConstOp struct {
 func (p projEQDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2789,12 +2735,10 @@ type projNEDecimalInt16ConstOp struct {
 func (p projNEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -2905,12 +2849,10 @@ type projLTDecimalInt16ConstOp struct {
 func (p projLTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3021,12 +2963,10 @@ type projLEDecimalInt16ConstOp struct {
 func (p projLEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3137,12 +3077,10 @@ type projGTDecimalInt16ConstOp struct {
 func (p projGTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3253,12 +3191,10 @@ type projGEDecimalInt16ConstOp struct {
 func (p projGEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3369,12 +3305,10 @@ type projPlusDecimalInt32ConstOp struct {
 func (p projPlusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3473,12 +3407,10 @@ type projMinusDecimalInt32ConstOp struct {
 func (p projMinusDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3577,12 +3509,10 @@ type projMultDecimalInt32ConstOp struct {
 func (p projMultDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3681,12 +3611,10 @@ type projDivDecimalInt32ConstOp struct {
 func (p projDivDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3801,12 +3729,10 @@ type projEQDecimalInt32ConstOp struct {
 func (p projEQDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -3917,12 +3843,10 @@ type projNEDecimalInt32ConstOp struct {
 func (p projNEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4033,12 +3957,10 @@ type projLTDecimalInt32ConstOp struct {
 func (p projLTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4149,12 +4071,10 @@ type projLEDecimalInt32ConstOp struct {
 func (p projLEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4265,12 +4185,10 @@ type projGTDecimalInt32ConstOp struct {
 func (p projGTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4381,12 +4299,10 @@ type projGEDecimalInt32ConstOp struct {
 func (p projGEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4497,12 +4413,10 @@ type projPlusDecimalInt64ConstOp struct {
 func (p projPlusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4601,12 +4515,10 @@ type projMinusDecimalInt64ConstOp struct {
 func (p projMinusDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4705,12 +4617,10 @@ type projMultDecimalInt64ConstOp struct {
 func (p projMultDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4809,12 +4719,10 @@ type projDivDecimalInt64ConstOp struct {
 func (p projDivDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -4929,12 +4837,10 @@ type projEQDecimalInt64ConstOp struct {
 func (p projEQDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5045,12 +4951,10 @@ type projNEDecimalInt64ConstOp struct {
 func (p projNEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5161,12 +5065,10 @@ type projLTDecimalInt64ConstOp struct {
 func (p projLTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5277,12 +5179,10 @@ type projLEDecimalInt64ConstOp struct {
 func (p projLEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5393,12 +5293,10 @@ type projGTDecimalInt64ConstOp struct {
 func (p projGTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5509,12 +5407,10 @@ type projGEDecimalInt64ConstOp struct {
 func (p projGEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5625,12 +5521,10 @@ type projEQDecimalFloat64ConstOp struct {
 func (p projEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5749,12 +5643,10 @@ type projNEDecimalFloat64ConstOp struct {
 func (p projNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5873,12 +5765,10 @@ type projLTDecimalFloat64ConstOp struct {
 func (p projLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -5997,12 +5887,10 @@ type projLEDecimalFloat64ConstOp struct {
 func (p projLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6121,12 +6009,10 @@ type projGTDecimalFloat64ConstOp struct {
 func (p projGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6245,12 +6131,10 @@ type projGEDecimalFloat64ConstOp struct {
 func (p projGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6369,12 +6253,10 @@ type projPlusInt16DecimalConstOp struct {
 func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6481,12 +6363,10 @@ type projMinusInt16DecimalConstOp struct {
 func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6593,12 +6473,10 @@ type projMultInt16DecimalConstOp struct {
 func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6705,12 +6583,10 @@ type projDivInt16DecimalConstOp struct {
 func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6829,12 +6705,10 @@ type projEQInt16DecimalConstOp struct {
 func (p projEQInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -6945,12 +6819,10 @@ type projNEInt16DecimalConstOp struct {
 func (p projNEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7061,12 +6933,10 @@ type projLTInt16DecimalConstOp struct {
 func (p projLTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7177,12 +7047,10 @@ type projLEInt16DecimalConstOp struct {
 func (p projLEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7293,12 +7161,10 @@ type projGTInt16DecimalConstOp struct {
 func (p projGTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7409,12 +7275,10 @@ type projGEInt16DecimalConstOp struct {
 func (p projGEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7525,12 +7389,10 @@ type projPlusInt16Int16ConstOp struct {
 func (p projPlusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int16)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int16, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7625,12 +7487,10 @@ type projMinusInt16Int16ConstOp struct {
 func (p projMinusInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int16)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int16, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7725,12 +7585,10 @@ type projMultInt16Int16ConstOp struct {
 func (p projMultInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int16)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int16, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7853,12 +7711,10 @@ type projDivInt16Int16ConstOp struct {
 func (p projDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -7969,12 +7825,10 @@ type projEQInt16Int16ConstOp struct {
 func (p projEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8105,12 +7959,10 @@ type projNEInt16Int16ConstOp struct {
 func (p projNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8241,12 +8093,10 @@ type projLTInt16Int16ConstOp struct {
 func (p projLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8377,12 +8227,10 @@ type projLEInt16Int16ConstOp struct {
 func (p projLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8513,12 +8361,10 @@ type projGTInt16Int16ConstOp struct {
 func (p projGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8649,12 +8495,10 @@ type projGEInt16Int16ConstOp struct {
 func (p projGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8785,12 +8629,10 @@ type projPlusInt16Int32ConstOp struct {
 func (p projPlusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8885,12 +8727,10 @@ type projMinusInt16Int32ConstOp struct {
 func (p projMinusInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -8985,12 +8825,10 @@ type projMultInt16Int32ConstOp struct {
 func (p projMultInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9113,12 +8951,10 @@ type projDivInt16Int32ConstOp struct {
 func (p projDivInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9229,12 +9065,10 @@ type projEQInt16Int32ConstOp struct {
 func (p projEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9365,12 +9199,10 @@ type projNEInt16Int32ConstOp struct {
 func (p projNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9501,12 +9333,10 @@ type projLTInt16Int32ConstOp struct {
 func (p projLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9637,12 +9467,10 @@ type projLEInt16Int32ConstOp struct {
 func (p projLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9773,12 +9601,10 @@ type projGTInt16Int32ConstOp struct {
 func (p projGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -9909,12 +9735,10 @@ type projGEInt16Int32ConstOp struct {
 func (p projGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10045,12 +9869,10 @@ type projPlusInt16Int64ConstOp struct {
 func (p projPlusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10145,12 +9967,10 @@ type projMinusInt16Int64ConstOp struct {
 func (p projMinusInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10245,12 +10065,10 @@ type projMultInt16Int64ConstOp struct {
 func (p projMultInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10373,12 +10191,10 @@ type projDivInt16Int64ConstOp struct {
 func (p projDivInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10489,12 +10305,10 @@ type projEQInt16Int64ConstOp struct {
 func (p projEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10625,12 +10439,10 @@ type projNEInt16Int64ConstOp struct {
 func (p projNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10761,12 +10573,10 @@ type projLTInt16Int64ConstOp struct {
 func (p projLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -10897,12 +10707,10 @@ type projLEInt16Int64ConstOp struct {
 func (p projLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11033,12 +10841,10 @@ type projGTInt16Int64ConstOp struct {
 func (p projGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11169,12 +10975,10 @@ type projGEInt16Int64ConstOp struct {
 func (p projGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11305,12 +11109,10 @@ type projEQInt16Float64ConstOp struct {
 func (p projEQInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11473,12 +11275,10 @@ type projNEInt16Float64ConstOp struct {
 func (p projNEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11641,12 +11441,10 @@ type projLTInt16Float64ConstOp struct {
 func (p projLTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11809,12 +11607,10 @@ type projLEInt16Float64ConstOp struct {
 func (p projLEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -11977,12 +11773,10 @@ type projGTInt16Float64ConstOp struct {
 func (p projGTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12145,12 +11939,10 @@ type projGEInt16Float64ConstOp struct {
 func (p projGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12313,12 +12105,10 @@ type projPlusInt32DecimalConstOp struct {
 func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12425,12 +12215,10 @@ type projMinusInt32DecimalConstOp struct {
 func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12537,12 +12325,10 @@ type projMultInt32DecimalConstOp struct {
 func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12649,12 +12435,10 @@ type projDivInt32DecimalConstOp struct {
 func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12773,12 +12557,10 @@ type projEQInt32DecimalConstOp struct {
 func (p projEQInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -12889,12 +12671,10 @@ type projNEInt32DecimalConstOp struct {
 func (p projNEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13005,12 +12785,10 @@ type projLTInt32DecimalConstOp struct {
 func (p projLTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13121,12 +12899,10 @@ type projLEInt32DecimalConstOp struct {
 func (p projLEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13237,12 +13013,10 @@ type projGTInt32DecimalConstOp struct {
 func (p projGTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13353,12 +13127,10 @@ type projGEInt32DecimalConstOp struct {
 func (p projGEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13469,12 +13241,10 @@ type projPlusInt32Int16ConstOp struct {
 func (p projPlusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13569,12 +13339,10 @@ type projMinusInt32Int16ConstOp struct {
 func (p projMinusInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13669,12 +13437,10 @@ type projMultInt32Int16ConstOp struct {
 func (p projMultInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13797,12 +13563,10 @@ type projDivInt32Int16ConstOp struct {
 func (p projDivInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -13913,12 +13677,10 @@ type projEQInt32Int16ConstOp struct {
 func (p projEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14049,12 +13811,10 @@ type projNEInt32Int16ConstOp struct {
 func (p projNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14185,12 +13945,10 @@ type projLTInt32Int16ConstOp struct {
 func (p projLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14321,12 +14079,10 @@ type projLEInt32Int16ConstOp struct {
 func (p projLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14457,12 +14213,10 @@ type projGTInt32Int16ConstOp struct {
 func (p projGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14593,12 +14347,10 @@ type projGEInt32Int16ConstOp struct {
 func (p projGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14729,12 +14481,10 @@ type projPlusInt32Int32ConstOp struct {
 func (p projPlusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int32)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int32, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14829,12 +14579,10 @@ type projMinusInt32Int32ConstOp struct {
 func (p projMinusInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int32)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int32, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -14929,12 +14677,10 @@ type projMultInt32Int32ConstOp struct {
 func (p projMultInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int32)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int32, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15057,12 +14803,10 @@ type projDivInt32Int32ConstOp struct {
 func (p projDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15173,12 +14917,10 @@ type projEQInt32Int32ConstOp struct {
 func (p projEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15309,12 +15051,10 @@ type projNEInt32Int32ConstOp struct {
 func (p projNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15445,12 +15185,10 @@ type projLTInt32Int32ConstOp struct {
 func (p projLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15581,12 +15319,10 @@ type projLEInt32Int32ConstOp struct {
 func (p projLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15717,12 +15453,10 @@ type projGTInt32Int32ConstOp struct {
 func (p projGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15853,12 +15587,10 @@ type projGEInt32Int32ConstOp struct {
 func (p projGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -15989,12 +15721,10 @@ type projPlusInt32Int64ConstOp struct {
 func (p projPlusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16089,12 +15819,10 @@ type projMinusInt32Int64ConstOp struct {
 func (p projMinusInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16189,12 +15917,10 @@ type projMultInt32Int64ConstOp struct {
 func (p projMultInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16317,12 +16043,10 @@ type projDivInt32Int64ConstOp struct {
 func (p projDivInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16433,12 +16157,10 @@ type projEQInt32Int64ConstOp struct {
 func (p projEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16569,12 +16291,10 @@ type projNEInt32Int64ConstOp struct {
 func (p projNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16705,12 +16425,10 @@ type projLTInt32Int64ConstOp struct {
 func (p projLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16841,12 +16559,10 @@ type projLEInt32Int64ConstOp struct {
 func (p projLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -16977,12 +16693,10 @@ type projGTInt32Int64ConstOp struct {
 func (p projGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -17113,12 +16827,10 @@ type projGEInt32Int64ConstOp struct {
 func (p projGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -17249,12 +16961,10 @@ type projEQInt32Float64ConstOp struct {
 func (p projEQInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -17417,12 +17127,10 @@ type projNEInt32Float64ConstOp struct {
 func (p projNEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -17585,12 +17293,10 @@ type projLTInt32Float64ConstOp struct {
 func (p projLTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -17753,12 +17459,10 @@ type projLEInt32Float64ConstOp struct {
 func (p projLEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -17921,12 +17625,10 @@ type projGTInt32Float64ConstOp struct {
 func (p projGTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18089,12 +17791,10 @@ type projGEInt32Float64ConstOp struct {
 func (p projGEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18257,12 +17957,10 @@ type projPlusInt64DecimalConstOp struct {
 func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18369,12 +18067,10 @@ type projMinusInt64DecimalConstOp struct {
 func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18481,12 +18177,10 @@ type projMultInt64DecimalConstOp struct {
 func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18593,12 +18287,10 @@ type projDivInt64DecimalConstOp struct {
 func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18717,12 +18409,10 @@ type projEQInt64DecimalConstOp struct {
 func (p projEQInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18833,12 +18523,10 @@ type projNEInt64DecimalConstOp struct {
 func (p projNEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -18949,12 +18637,10 @@ type projLTInt64DecimalConstOp struct {
 func (p projLTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19065,12 +18751,10 @@ type projLEInt64DecimalConstOp struct {
 func (p projLEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19181,12 +18865,10 @@ type projGTInt64DecimalConstOp struct {
 func (p projGTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19297,12 +18979,10 @@ type projGEInt64DecimalConstOp struct {
 func (p projGEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19413,12 +19093,10 @@ type projPlusInt64Int16ConstOp struct {
 func (p projPlusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19513,12 +19191,10 @@ type projMinusInt64Int16ConstOp struct {
 func (p projMinusInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19613,12 +19289,10 @@ type projMultInt64Int16ConstOp struct {
 func (p projMultInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19741,12 +19415,10 @@ type projDivInt64Int16ConstOp struct {
 func (p projDivInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19857,12 +19529,10 @@ type projEQInt64Int16ConstOp struct {
 func (p projEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -19993,12 +19663,10 @@ type projNEInt64Int16ConstOp struct {
 func (p projNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20129,12 +19797,10 @@ type projLTInt64Int16ConstOp struct {
 func (p projLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20265,12 +19931,10 @@ type projLEInt64Int16ConstOp struct {
 func (p projLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20401,12 +20065,10 @@ type projGTInt64Int16ConstOp struct {
 func (p projGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20537,12 +20199,10 @@ type projGEInt64Int16ConstOp struct {
 func (p projGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20673,12 +20333,10 @@ type projPlusInt64Int32ConstOp struct {
 func (p projPlusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20773,12 +20431,10 @@ type projMinusInt64Int32ConstOp struct {
 func (p projMinusInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -20873,12 +20529,10 @@ type projMultInt64Int32ConstOp struct {
 func (p projMultInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21001,12 +20655,10 @@ type projDivInt64Int32ConstOp struct {
 func (p projDivInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21117,12 +20769,10 @@ type projEQInt64Int32ConstOp struct {
 func (p projEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21253,12 +20903,10 @@ type projNEInt64Int32ConstOp struct {
 func (p projNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21389,12 +21037,10 @@ type projLTInt64Int32ConstOp struct {
 func (p projLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21525,12 +21171,10 @@ type projLEInt64Int32ConstOp struct {
 func (p projLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21661,12 +21305,10 @@ type projGTInt64Int32ConstOp struct {
 func (p projGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21797,12 +21439,10 @@ type projGEInt64Int32ConstOp struct {
 func (p projGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -21933,12 +21573,10 @@ type projPlusInt64Int64ConstOp struct {
 func (p projPlusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22033,12 +21671,10 @@ type projMinusInt64Int64ConstOp struct {
 func (p projMinusInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22133,12 +21769,10 @@ type projMultInt64Int64ConstOp struct {
 func (p projMultInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Int64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22261,12 +21895,10 @@ type projDivInt64Int64ConstOp struct {
 func (p projDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Decimal)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Decimal, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22377,12 +22009,10 @@ type projEQInt64Int64ConstOp struct {
 func (p projEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22513,12 +22143,10 @@ type projNEInt64Int64ConstOp struct {
 func (p projNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22649,12 +22277,10 @@ type projLTInt64Int64ConstOp struct {
 func (p projLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22785,12 +22411,10 @@ type projLEInt64Int64ConstOp struct {
 func (p projLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -22921,12 +22545,10 @@ type projGTInt64Int64ConstOp struct {
 func (p projGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -23057,12 +22679,10 @@ type projGEInt64Int64ConstOp struct {
 func (p projGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -23193,12 +22813,10 @@ type projEQInt64Float64ConstOp struct {
 func (p projEQInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -23361,12 +22979,10 @@ type projNEInt64Float64ConstOp struct {
 func (p projNEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -23529,12 +23145,10 @@ type projLTInt64Float64ConstOp struct {
 func (p projLTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -23697,12 +23311,10 @@ type projLEInt64Float64ConstOp struct {
 func (p projLEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -23865,12 +23477,10 @@ type projGTInt64Float64ConstOp struct {
 func (p projGTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24033,12 +23643,10 @@ type projGEInt64Float64ConstOp struct {
 func (p projGEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24201,12 +23809,10 @@ type projEQFloat64DecimalConstOp struct {
 func (p projEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24325,12 +23931,10 @@ type projNEFloat64DecimalConstOp struct {
 func (p projNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24449,12 +24053,10 @@ type projLTFloat64DecimalConstOp struct {
 func (p projLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24573,12 +24175,10 @@ type projLEFloat64DecimalConstOp struct {
 func (p projLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24697,12 +24297,10 @@ type projGTFloat64DecimalConstOp struct {
 func (p projGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24821,12 +24419,10 @@ type projGEFloat64DecimalConstOp struct {
 func (p projGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -24945,12 +24541,10 @@ type projEQFloat64Int16ConstOp struct {
 func (p projEQFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -25113,12 +24707,10 @@ type projNEFloat64Int16ConstOp struct {
 func (p projNEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -25281,12 +24873,10 @@ type projLTFloat64Int16ConstOp struct {
 func (p projLTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -25449,12 +25039,10 @@ type projLEFloat64Int16ConstOp struct {
 func (p projLEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -25617,12 +25205,10 @@ type projGTFloat64Int16ConstOp struct {
 func (p projGTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -25785,12 +25371,10 @@ type projGEFloat64Int16ConstOp struct {
 func (p projGEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -25953,12 +25537,10 @@ type projEQFloat64Int32ConstOp struct {
 func (p projEQFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -26121,12 +25703,10 @@ type projNEFloat64Int32ConstOp struct {
 func (p projNEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -26289,12 +25869,10 @@ type projLTFloat64Int32ConstOp struct {
 func (p projLTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -26457,12 +26035,10 @@ type projLEFloat64Int32ConstOp struct {
 func (p projLEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -26625,12 +26201,10 @@ type projGTFloat64Int32ConstOp struct {
 func (p projGTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -26793,12 +26367,10 @@ type projGEFloat64Int32ConstOp struct {
 func (p projGEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -26961,12 +26533,10 @@ type projEQFloat64Int64ConstOp struct {
 func (p projEQFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -27129,12 +26699,10 @@ type projNEFloat64Int64ConstOp struct {
 func (p projNEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -27297,12 +26865,10 @@ type projLTFloat64Int64ConstOp struct {
 func (p projLTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -27465,12 +27031,10 @@ type projLEFloat64Int64ConstOp struct {
 func (p projLEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -27633,12 +27197,10 @@ type projGTFloat64Int64ConstOp struct {
 func (p projGTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -27801,12 +27363,10 @@ type projGEFloat64Int64ConstOp struct {
 func (p projGEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -27969,12 +27529,10 @@ type projPlusFloat64Float64ConstOp struct {
 func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Float64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Float64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28037,12 +27595,10 @@ type projMinusFloat64Float64ConstOp struct {
 func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Float64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Float64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28105,12 +27661,10 @@ type projMultFloat64Float64ConstOp struct {
 func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Float64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Float64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28173,12 +27727,10 @@ type projDivFloat64Float64ConstOp struct {
 func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Float64)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Float64, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28241,12 +27793,10 @@ type projEQFloat64Float64ConstOp struct {
 func (p projEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28409,12 +27959,10 @@ type projNEFloat64Float64ConstOp struct {
 func (p projNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28577,12 +28125,10 @@ type projLTFloat64Float64ConstOp struct {
 func (p projLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28745,12 +28291,10 @@ type projLEFloat64Float64ConstOp struct {
 func (p projLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -28913,12 +28457,10 @@ type projGTFloat64Float64ConstOp struct {
 func (p projGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29081,12 +28623,10 @@ type projGEFloat64Float64ConstOp struct {
 func (p projGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29249,12 +28789,10 @@ type projEQTimestampTimestampConstOp struct {
 func (p projEQTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29369,12 +28907,10 @@ type projNETimestampTimestampConstOp struct {
 func (p projNETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29489,12 +29025,10 @@ type projLTTimestampTimestampConstOp struct {
 func (p projLTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29609,12 +29143,10 @@ type projLETimestampTimestampConstOp struct {
 func (p projLETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29729,12 +29261,10 @@ type projGTTimestampTimestampConstOp struct {
 func (p projGTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
@@ -29849,12 +29379,10 @@ type projGETimestampTimestampConstOp struct {
 func (p projGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)

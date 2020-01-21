@@ -114,12 +114,10 @@ func (c constBoolOp) Init() {
 func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Bool()
 	c.allocator.PerformOperation(
@@ -156,12 +154,10 @@ func (c constBytesOp) Init() {
 func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Bytes()
 	c.allocator.PerformOperation(
@@ -200,12 +196,10 @@ func (c constDecimalOp) Init() {
 func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Decimal()
 	c.allocator.PerformOperation(
@@ -242,12 +236,10 @@ func (c constInt16Op) Init() {
 func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int16()
 	c.allocator.PerformOperation(
@@ -284,12 +276,10 @@ func (c constInt32Op) Init() {
 func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int32()
 	c.allocator.PerformOperation(
@@ -326,12 +316,10 @@ func (c constInt64Op) Init() {
 func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int64()
 	c.allocator.PerformOperation(
@@ -368,12 +356,10 @@ func (c constFloat64Op) Init() {
 func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Float64()
 	c.allocator.PerformOperation(
@@ -410,12 +396,10 @@ func (c constTimestampOp) Init() {
 func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Timestamp()
 	c.allocator.PerformOperation(
@@ -463,14 +447,10 @@ func (c constNullOp) Init() {
 func (c constNullOp) Next(ctx context.Context) coldata.Batch {
 	batch := c.input.Next(ctx)
 	n := batch.Length()
-
-	if batch.Width() == c.outputIdx {
-		c.allocator.AppendColumn(batch, c.typ)
-	}
-
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 
 	col := batch.ColVec(c.outputIdx)
 	nulls := col.Nulls()

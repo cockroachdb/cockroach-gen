@@ -108,12 +108,10 @@ type projPrefixBytesBytesConstOp struct {
 func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -269,12 +267,10 @@ type projSuffixBytesBytesConstOp struct {
 func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -430,12 +426,10 @@ type projRegexpBytesBytesConstOp struct {
 func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -591,12 +585,10 @@ type projNotPrefixBytesBytesConstOp struct {
 func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -752,12 +744,10 @@ type projNotSuffixBytesBytesConstOp struct {
 func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -913,12 +903,10 @@ type projNotRegexpBytesBytesConstOp struct {
 func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	n := batch.Length()
-	if p.outputIdx == batch.Width() {
-		p.allocator.AppendColumn(batch, coltypes.Bool)
-	}
 	if n == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)

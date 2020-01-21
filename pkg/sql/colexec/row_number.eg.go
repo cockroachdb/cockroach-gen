@@ -60,12 +60,10 @@ var _ Operator = &rowNumberNoPartitionOp{}
 
 func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if r.outputColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -91,15 +89,11 @@ var _ Operator = &rowNumberWithPartitionOp{}
 
 func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if r.partitionColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Bool)
-	}
-	if r.outputColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	r.allocator.MaybeAddColumn(batch, coltypes.Bool, r.partitionColIdx)
+	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()

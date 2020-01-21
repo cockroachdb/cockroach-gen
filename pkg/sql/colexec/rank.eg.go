@@ -97,12 +97,10 @@ func (r *rankNoPartitionOp) Init() {
 
 func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if r.outputColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -157,15 +155,11 @@ func (r *rankWithPartitionOp) Init() {
 
 func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if r.partitionColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Bool)
-	}
-	if r.outputColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	r.allocator.MaybeAddColumn(batch, coltypes.Bool, r.partitionColIdx)
+	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
@@ -233,12 +227,10 @@ func (r *denseRankNoPartitionOp) Init() {
 
 func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if r.outputColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -291,15 +283,11 @@ func (r *denseRankWithPartitionOp) Init() {
 
 func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if r.partitionColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Bool)
-	}
-	if r.outputColIdx == batch.Width() {
-		r.allocator.AppendColumn(batch, coltypes.Int64)
-	}
 	if batch.Length() == 0 {
-		return batch
+		return coldata.ZeroBatch
 	}
+	r.allocator.MaybeAddColumn(batch, coltypes.Bool, r.partitionColIdx)
+	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
