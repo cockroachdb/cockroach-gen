@@ -44087,7 +44087,7 @@ func (o *mergeJoinLeftSemiOp) buildLeftGroups(
 				outStartIdx := int(destStartIdx)
 				out := o.output.ColVec(outColIdx)
 				var src coldata.Vec
-				if batch.Width() > int(inColIdx) {
+				if batch.Length() > 0 {
 					src = batch.ColVec(int(inColIdx))
 				}
 				colType := input.sourceTypes[inColIdx]
@@ -45959,7 +45959,7 @@ func (o *mergeJoinLeftSemiWithOnExprOp) buildLeftGroups(
 				outStartIdx := int(destStartIdx)
 				out := o.output.ColVec(outColIdx)
 				var src coldata.Vec
-				if batch.Width() > int(inColIdx) {
+				if batch.Length() > 0 {
 					src = batch.ColVec(int(inColIdx))
 				}
 				colType := input.sourceTypes[inColIdx]
@@ -47831,7 +47831,7 @@ func (o *mergeJoinLeftSemiOp) buildRightGroups(
 				outStartIdx := int(destStartIdx)
 				out := o.output.ColVec(outColIdx + colOffset)
 				var src coldata.Vec
-				if batch.Width() > int(inColIdx) {
+				if batch.Length() > 0 {
 					src = batch.ColVec(int(inColIdx))
 				}
 				colType := input.sourceTypes[inColIdx]
@@ -49959,7 +49959,7 @@ func (o *mergeJoinLeftSemiWithOnExprOp) buildRightGroups(
 				outStartIdx := int(destStartIdx)
 				out := o.output.ColVec(outColIdx + colOffset)
 				var src coldata.Vec
-				if batch.Width() > int(inColIdx) {
+				if batch.Length() > 0 {
 					src = batch.ColVec(int(inColIdx))
 				}
 				colType := input.sourceTypes[inColIdx]
