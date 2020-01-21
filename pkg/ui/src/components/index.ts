@@ -13,3 +13,6 @@ export * from "./globalNavigation";
 export * from "./sideNavigation";
 export * from "./tabNavigation";
 export * from "./text";
+export * from "./table";
+export * from "./tooltip";
+export * from "./select";
