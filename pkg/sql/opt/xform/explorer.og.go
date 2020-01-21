@@ -99,15 +99,17 @@ func (_e *explorer) exploreSelect(
 				if _scan != nil {
 					scan := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scan) {
-						filters := _root.Filters
-						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateZigzagJoins) {
-							var _last memo.RelExpr
-							if _e.o.appliedRule != nil {
-								_last = memo.LastGroupMember(_root)
-							}
-							_e.funcs.GenerateZigzagJoins(_root, scan, filters)
-							if _e.o.appliedRule != nil {
-								_e.o.appliedRule(opt.GenerateZigzagJoins, _root, _last.NextExpr())
+						if !_e.funcs.IsLocking(scan) {
+							filters := _root.Filters
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateZigzagJoins) {
+								var _last memo.RelExpr
+								if _e.o.appliedRule != nil {
+									_last = memo.LastGroupMember(_root)
+								}
+								_e.funcs.GenerateZigzagJoins(_root, scan, filters)
+								if _e.o.appliedRule != nil {
+									_e.o.appliedRule(opt.GenerateZigzagJoins, _root, _last.NextExpr())
+								}
 							}
 						}
 					}
@@ -135,16 +137,18 @@ func (_e *explorer) exploreSelect(
 				if _scan != nil {
 					scan := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scan) {
-						if _e.funcs.HasInvertedIndexes(scan) {
-							filters := _root.Filters
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedIndexZigzagJoins) {
-								var _last memo.RelExpr
-								if _e.o.appliedRule != nil {
-									_last = memo.LastGroupMember(_root)
-								}
-								_e.funcs.GenerateInvertedIndexZigzagJoins(_root, scan, filters)
-								if _e.o.appliedRule != nil {
-									_e.o.appliedRule(opt.GenerateInvertedIndexZigzagJoins, _root, _last.NextExpr())
+						if !_e.funcs.IsLocking(scan) {
+							if _e.funcs.HasInvertedIndexes(scan) {
+								filters := _root.Filters
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedIndexZigzagJoins) {
+									var _last memo.RelExpr
+									if _e.o.appliedRule != nil {
+										_last = memo.LastGroupMember(_root)
+									}
+									_e.funcs.GenerateInvertedIndexZigzagJoins(_root, scan, filters)
+									if _e.o.appliedRule != nil {
+										_e.o.appliedRule(opt.GenerateInvertedIndexZigzagJoins, _root, _last.NextExpr())
+									}
 								}
 							}
 						}
