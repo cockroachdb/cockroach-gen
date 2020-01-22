@@ -109,7 +109,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -126,9 +125,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -137,7 +133,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -154,9 +149,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -167,7 +159,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -184,9 +175,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -195,7 +183,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -212,9 +199,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -294,7 +278,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -311,9 +294,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
 							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
@@ -324,7 +304,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					_ = 0
 					_ = int(inputLen)
 					for i := 0; i < int(inputLen); i++ {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -341,9 +320,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
 							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
@@ -354,7 +330,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -371,9 +346,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
 							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
@@ -384,7 +356,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					_ = 0
 					_ = int(inputLen)
 					for i := 0; i < int(inputLen); i++ {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -401,9 +372,6 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col.Get(int(i))
 							a.col.Set(a.curIdx, v)
 							a.foundNonNullForCurrentGroup = true
@@ -483,7 +451,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -500,9 +467,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
@@ -511,7 +475,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -528,9 +491,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
@@ -541,7 +501,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -558,9 +517,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
@@ -569,7 +525,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -586,9 +541,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx].Set(&v)
 							a.foundNonNullForCurrentGroup = true
@@ -668,7 +620,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -685,9 +636,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -696,7 +644,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -713,9 +660,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -726,7 +670,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -743,9 +686,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -754,7 +694,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -771,9 +710,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -853,7 +789,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -870,9 +805,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -881,7 +813,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -898,9 +829,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -911,7 +839,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -928,9 +855,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -939,7 +863,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -956,9 +879,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1038,7 +958,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1055,9 +974,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1066,7 +982,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1083,9 +998,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1096,7 +1008,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1113,9 +1024,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1124,7 +1032,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1141,9 +1048,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1223,7 +1127,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1240,9 +1143,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1251,7 +1151,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1268,9 +1167,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1281,7 +1177,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1298,9 +1193,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1309,7 +1201,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1326,9 +1217,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1408,7 +1296,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1425,9 +1312,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1436,7 +1320,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1453,9 +1336,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1466,7 +1346,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1483,9 +1362,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
@@ -1494,7 +1370,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col[0:int(inputLen)]
 					for i := range col {
-
 						if a.groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group. The `a.curIdx` check is necessary because for the first
@@ -1511,9 +1386,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							// Explicit template language is used here because the type receiver differs
-							// from the rest of the template file.
-							// TODO(asubiotto): Figure out a way to alias this.
 							v := col[int(i)]
 							a.col[a.curIdx] = v
 							a.foundNonNullForCurrentGroup = true
