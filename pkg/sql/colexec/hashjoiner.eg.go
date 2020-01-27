@@ -44,7 +44,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Bool(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -66,7 +65,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -90,7 +88,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -109,7 +106,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -134,7 +130,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Bytes(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -153,7 +148,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys.Get(int(nKeys - 1))
@@ -174,7 +168,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -190,7 +183,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys.Get(int(nKeys - 1))
@@ -212,7 +204,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Decimal(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -231,7 +222,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -252,7 +242,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -268,7 +257,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -290,7 +278,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Int16(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -306,7 +293,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -324,7 +310,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -337,7 +322,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -356,7 +340,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Int32(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -372,7 +355,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -390,7 +372,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -403,7 +384,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -422,7 +402,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Int64(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -438,7 +417,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -456,7 +434,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -469,7 +446,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -488,7 +464,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Float64(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -510,7 +485,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -534,7 +508,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -553,7 +526,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -578,7 +550,6 @@ func (ht *hashTable) rehash(
 		keys, nulls := col.Timestamp(), col.Nulls()
 		if col.MaybeHasNulls() {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -597,7 +568,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -618,7 +588,6 @@ func (ht *hashTable) rehash(
 			}
 		} else {
 			if sel != nil {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
@@ -634,7 +603,6 @@ func (ht *hashTable) rehash(
 					buckets[i] = uint64(p)
 				}
 			} else {
-
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[int(nKeys-1)]
@@ -672,13 +640,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Bool()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -698,6 +664,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -723,14 +699,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -772,15 +745,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -820,16 +790,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -870,14 +837,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -916,22 +880,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -951,6 +911,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -976,14 +946,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1025,15 +992,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1073,16 +1037,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1123,14 +1084,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1169,9 +1127,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -1186,13 +1142,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Bytes()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1212,6 +1166,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -1229,14 +1193,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1270,15 +1231,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1310,16 +1268,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1352,14 +1307,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1390,22 +1342,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1425,6 +1373,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -1442,14 +1400,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1483,15 +1438,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1523,16 +1475,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1565,14 +1514,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1603,9 +1549,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -1620,13 +1564,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Decimal()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1646,6 +1588,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -1663,14 +1615,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1704,15 +1653,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1744,16 +1690,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1786,14 +1729,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1824,22 +1764,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1859,6 +1795,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -1876,14 +1822,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -1917,15 +1860,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1957,16 +1897,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -1999,14 +1936,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2037,9 +1971,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -2054,13 +1986,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Int16()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2080,6 +2010,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -2108,14 +2048,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2160,15 +2097,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2211,16 +2145,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2264,14 +2195,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2313,22 +2241,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2348,6 +2272,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -2376,14 +2310,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2428,15 +2359,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2479,16 +2407,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2532,14 +2457,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2581,9 +2503,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -2598,13 +2518,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Int32()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2624,6 +2542,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -2652,14 +2580,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2704,15 +2629,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2755,16 +2677,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2808,14 +2727,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -2857,22 +2773,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2892,6 +2804,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -2920,14 +2842,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -2972,15 +2891,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3023,16 +2939,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3076,14 +2989,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3125,9 +3035,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -3142,13 +3050,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Int64()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -3168,6 +3074,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -3196,14 +3112,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -3248,15 +3161,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3299,16 +3209,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3352,14 +3259,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3401,22 +3305,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -3436,6 +3336,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -3464,14 +3374,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -3516,15 +3423,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3567,16 +3471,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3620,14 +3521,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3669,9 +3567,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -3686,13 +3582,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Float64()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -3712,6 +3606,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -3748,14 +3652,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -3808,15 +3709,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3867,16 +3765,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3928,14 +3823,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -3985,22 +3877,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -4020,6 +3908,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -4056,14 +3954,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -4116,15 +4011,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4175,16 +4067,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4236,14 +4125,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4293,9 +4179,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -4310,13 +4194,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 		probeKeys := probeVec.Timestamp()
 
 		if sel != nil {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -4336,6 +4218,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -4360,14 +4252,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -4408,15 +4297,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4455,16 +4341,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4504,14 +4387,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4549,22 +4429,18 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			}
 		} else {
-
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
 					if ht.allowNullEquality {
 						// The allowNullEquality flag only matters if both vectors have nulls.
 						// This lets us avoid writing all 2^3 conditional branches.
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -4584,6 +4460,16 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
 
 								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
 									continue
 								}
 								if probeIsNull {
@@ -4608,14 +4494,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					} else {
-
 						probeIsNull := false
 						buildIsNull := false
 						// Early bounds check.
@@ -4656,15 +4539,12 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 										unique = cmpResult != 0
 									}
 
-									if unique {
-										ht.differs[toCheck] = true
-									}
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
 								}
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4703,16 +4583,13 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4752,14 +4629,11 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
 				} else {
-
 					probeIsNull := false
 					buildIsNull := false
 					// Early bounds check.
@@ -4797,9 +4671,7 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									unique = cmpResult != 0
 								}
 
-								if unique {
-									ht.differs[toCheck] = true
-								}
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
 							}
 						}
 					}
@@ -4819,7 +4691,6 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 
 	if prober.spec.outer {
 		if sel != nil {
-
 			// Early bounds checks.
 			_ = prober.ht.headID[batchSize-1]
 			_ = sel[batchSize-1]
@@ -4853,7 +4724,6 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 				}
 			}
 		} else {
-
 			// Early bounds checks.
 			_ = prober.ht.headID[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
@@ -4888,7 +4758,6 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 		}
 	} else {
 		if sel != nil {
-
 			// Early bounds checks.
 			_ = prober.ht.headID[batchSize-1]
 			_ = sel[batchSize-1]
@@ -4908,7 +4777,6 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 				}
 			}
 		} else {
-
 			// Early bounds checks.
 			_ = prober.ht.headID[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
@@ -4944,7 +4812,6 @@ func (prober *hashJoinProber) distinctCollect(
 		nResults = batchSize
 
 		if sel != nil {
-
 			// Early bounds checks.
 			_ = prober.ht.groupID[batchSize-1]
 			_ = prober.probeRowUnmatched[batchSize-1]
@@ -4962,7 +4829,6 @@ func (prober *hashJoinProber) distinctCollect(
 				prober.probeIdx[i] = sel[i]
 			}
 		} else {
-
 			// Early bounds checks.
 			_ = prober.ht.groupID[batchSize-1]
 			_ = prober.probeRowUnmatched[batchSize-1]
@@ -4981,7 +4847,6 @@ func (prober *hashJoinProber) distinctCollect(
 		}
 	} else {
 		if sel != nil {
-
 			// Early bounds checks.
 			_ = prober.ht.groupID[batchSize-1]
 			_ = prober.buildIdx[batchSize-1]
@@ -4996,7 +4861,6 @@ func (prober *hashJoinProber) distinctCollect(
 				}
 			}
 		} else {
-
 			// Early bounds checks.
 			_ = prober.ht.groupID[batchSize-1]
 			_ = prober.buildIdx[batchSize-1]
