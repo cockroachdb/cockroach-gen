@@ -21,6 +21,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
 // Use execgen package to remove unused import warning.
@@ -336,6 +337,34 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 				} else {
 					cmpResult = 0
 				}
+				match = cmpResult == 0
+			}
+
+			if !match {
+				return true
+			}
+		case coltypes.Interval:
+			// We perform this null check on every equality column of the last
+			// buffered tuple regardless of the join type since it is done only once
+			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+			// right side being an input) this check will always return false since
+			// nulls couldn't be buffered up though.
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+				return true
+			}
+			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Interval()
+			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			var curVal duration.Duration
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+				return true
+			}
+			col := batch.ColVec(int(colIdx)).Interval()
+			curVal = col[int(tupleToLookAtIdx)]
+			var match bool
+
+			{
+				var cmpResult int
+				cmpResult = prevVal.Compare(curVal)
 				match = cmpResult == 0
 			}
 

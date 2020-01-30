@@ -221,6 +221,21 @@ func tuplesDiffer(
 
 		*differ = *differ || unique
 		return nil
+	case coltypes.Interval:
+		aCol := aColVec.Interval()
+		bCol := bColVec.Interval()
+		var unique bool
+		arg1 := aCol[aTupleIdx]
+		arg2 := bCol[bTupleIdx]
+
+		{
+			var cmpResult int
+			cmpResult = arg1.Compare(arg2)
+			unique = cmpResult != 0
+		}
+
+		*differ = *differ || unique
+		return nil
 	default:
 		return errors.Errorf("unsupported tuplesDiffer type %s", t)
 	}

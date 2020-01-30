@@ -15,10 +15,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	// HACK: crlfmt removes the "*/}}" comment if it's the last line in the import
-	// block. This was picked because it sorts after "pkg/sql/exec/execgen" and
-	// has no deps.
-	_ "github.com/cockroachdb/cockroach/pkg/util/bufalloc"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
 func (m *memColumn) Append(args SliceArgs) {
@@ -192,6 +189,25 @@ func (m *memColumn) Append(args SliceArgs) {
 	case coltypes.Timestamp:
 		fromCol := args.Src.Timestamp()
 		toCol := m.Timestamp()
+		// NOTE: it is unfortunate that we always append whole slice without paying
+		// attention to whether the values are NULL. However, if we do start paying
+		// attention, the performance suffers dramatically, so we choose to copy
+		// over "actual" as well as "garbage" values.
+		if args.Sel == nil {
+			toCol = append(toCol[:int(args.DestIdx)], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)]...)
+		} else {
+			sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+			toCol = toCol[0:int(args.DestIdx)]
+			for _, selIdx := range sel {
+				val := fromCol[int(selIdx)]
+				toCol = append(toCol, val)
+			}
+		}
+		m.nulls.set(args)
+		m.col = toCol
+	case coltypes.Interval:
+		fromCol := args.Src.Interval()
+		toCol := m.Interval()
 		// NOTE: it is unfortunate that we always append whole slice without paying
 		// attention to whether the values are NULL. However, if we do start paying
 		// attention, the performance suffers dramatically, so we choose to copy
@@ -1006,6 +1022,103 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 		// No Sel or Sel64.
 		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
 		m.nulls.set(args.SliceArgs)
+	case coltypes.Interval:
+		fromCol := args.Src.Interval()
+		toCol := m.Interval()
+		if args.Sel64 != nil {
+			sel := args.Sel64
+			if args.SelOnDest {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
+						} else {
+							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
+							toCol[int(selIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[int(selIdx)] = v
+				}
+			} else {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+						} else {
+							v := fromCol[int(selIdx)]
+							toCol[i+int(args.DestIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[i+int(args.DestIdx)] = v
+				}
+			}
+			return
+		} else if args.Sel != nil {
+			sel := args.Sel
+			if args.SelOnDest {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							// Remove an unused warning in some cases.
+							_ = i
+							m.nulls.SetNull64(uint64(selIdx))
+						} else {
+							v := fromCol[int(selIdx)]
+							m.nulls.UnsetNull64(uint64(selIdx))
+							toCol[int(selIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[int(selIdx)] = v
+				}
+			} else {
+				if args.Src.MaybeHasNulls() {
+					nulls := args.Src.Nulls()
+					for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						if nulls.NullAt64(uint64(selIdx)) {
+							m.nulls.SetNull64(uint64(i) + args.DestIdx)
+						} else {
+							v := fromCol[int(selIdx)]
+							toCol[i+int(args.DestIdx)] = v
+						}
+					}
+					return
+				}
+				// No Nulls.
+				for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+					selIdx := sel[int(args.SrcStartIdx)+i]
+					v := fromCol[int(selIdx)]
+					toCol[i+int(args.DestIdx)] = v
+				}
+			}
+			return
+		}
+		// No Sel or Sel64.
+		copy(toCol[int(args.DestIdx):], fromCol[int(args.SrcStartIdx):int(args.SrcEndIdx)])
+		m.nulls.set(args.SliceArgs)
 	default:
 		panic(fmt.Sprintf("unhandled type %s", args.ColType))
 	}
@@ -1069,6 +1182,13 @@ func (m *memColumn) Window(colType coltypes.T, start uint64, end uint64) Vec {
 			col:   col[int(start):int(end)],
 			nulls: m.nulls.Slice(start, end),
 		}
+	case coltypes.Interval:
+		col := m.Interval()
+		return &memColumn{
+			t:     colType,
+			col:   col[int(start):int(end)],
+			nulls: m.nulls.Slice(start, end),
+		}
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
@@ -1111,6 +1231,10 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType coltypes.T) string {
 		col := m.Timestamp()
 		v := col[int(colIdx)]
 		return fmt.Sprintf("%v", v)
+	case coltypes.Interval:
+		col := m.Interval()
+		v := col[int(colIdx)]
+		return fmt.Sprintf("%v", v)
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
@@ -1150,6 +1274,10 @@ func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 	case coltypes.Timestamp:
 		target := v.Timestamp()
 		newVal := elem.(time.Time)
+		target[int(rowIdx)] = newVal
+	case coltypes.Interval:
+		target := v.Interval()
+		newVal := elem.(duration.Duration)
 		target[int(rowIdx)] = newVal
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))

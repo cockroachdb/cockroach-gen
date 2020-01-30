@@ -21,6 +21,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfra"
 	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/cockroachdb/cockroach/pkg/util/encoding"
 )
 
@@ -56,6 +57,7 @@ type OrderedSynchronizer struct {
 	outInt64Cols     [][]int64
 	outFloat64Cols   [][]float64
 	outTimestampCols [][]time.Time
+	outIntervalCols  [][]duration.Duration
 	// outColsMap contains the positions of the corresponding vectors in the
 	// slice for the same types. For example, if we have an output batch with
 	// types = [Int64, Int64, Bool, Bytes, Bool, Int64], then outColsMap will be
@@ -171,6 +173,11 @@ func (o *OrderedSynchronizer) Next(ctx context.Context) coldata.Batch {
 						outCol := o.outTimestampCols[o.outColsMap[i]]
 						v := srcCol[int(srcRowIdx)]
 						outCol[int(outputIdx)] = v
+					case coltypes.Interval:
+						srcCol := vec.Interval()
+						outCol := o.outIntervalCols[o.outColsMap[i]]
+						v := srcCol[int(srcRowIdx)]
+						outCol[int(outputIdx)] = v
 					default:
 						execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", physType))
 					}
@@ -232,6 +239,9 @@ func (o *OrderedSynchronizer) Init() {
 		case coltypes.Timestamp:
 			o.outColsMap[i] = len(o.outTimestampCols)
 			o.outTimestampCols = append(o.outTimestampCols, outVec.Timestamp())
+		case coltypes.Interval:
+			o.outColsMap[i] = len(o.outIntervalCols)
+			o.outIntervalCols = append(o.outIntervalCols, outVec.Interval())
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", o.columnTypes[i]))
 		}

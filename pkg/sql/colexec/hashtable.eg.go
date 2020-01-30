@@ -616,6 +616,88 @@ func (ht *hashTable) rehash(
 			}
 		}
 
+	case coltypes.Interval:
+		keys, nulls := col.Interval(), col.Nulls()
+		if col.MaybeHasNulls() {
+			if sel != nil {
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
+				for i := uint64(0); i < nKeys; i++ {
+					ht.cancelChecker.check(ctx)
+					selIdx := sel[i]
+					if nulls.NullAt(uint16(selIdx)) {
+						continue
+					}
+					v := keys[int(selIdx)]
+					p := uintptr(buckets[i])
+
+					months, days, nanos := v.Months, v.Days, v.Nanos()
+					p = memhash64(noescape(unsafe.Pointer(&months)), p)
+					p = memhash64(noescape(unsafe.Pointer(&days)), p)
+					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+					buckets[i] = uint64(p)
+				}
+			} else {
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
+				for i := uint64(0); i < nKeys; i++ {
+					ht.cancelChecker.check(ctx)
+					selIdx := i
+					if nulls.NullAt(uint16(selIdx)) {
+						continue
+					}
+					v := keys[int(selIdx)]
+					p := uintptr(buckets[i])
+
+					months, days, nanos := v.Months, v.Days, v.Nanos()
+					p = memhash64(noescape(unsafe.Pointer(&months)), p)
+					p = memhash64(noescape(unsafe.Pointer(&days)), p)
+					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+					buckets[i] = uint64(p)
+				}
+			}
+		} else {
+			if sel != nil {
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = sel[nKeys-1]
+				for i := uint64(0); i < nKeys; i++ {
+					ht.cancelChecker.check(ctx)
+					selIdx := sel[i]
+					v := keys[int(selIdx)]
+					p := uintptr(buckets[i])
+
+					months, days, nanos := v.Months, v.Days, v.Nanos()
+					p = memhash64(noescape(unsafe.Pointer(&months)), p)
+					p = memhash64(noescape(unsafe.Pointer(&days)), p)
+					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+					buckets[i] = uint64(p)
+				}
+			} else {
+				// Early bounds checks.
+				_ = buckets[nKeys-1]
+				_ = keys[int(nKeys-1)]
+				for i := uint64(0); i < nKeys; i++ {
+					ht.cancelChecker.check(ctx)
+					selIdx := i
+					v := keys[int(selIdx)]
+					p := uintptr(buckets[i])
+
+					months, days, nanos := v.Months, v.Days, v.Nanos()
+					p = memhash64(noescape(unsafe.Pointer(&months)), p)
+					p = memhash64(noescape(unsafe.Pointer(&days)), p)
+					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+					buckets[i] = uint64(p)
+				}
+			}
+		}
+
 	default:
 		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", t))
 	}
@@ -4664,6 +4746,428 @@ func (ht *hashTable) checkCol(t coltypes.T, keyColIdx int, nToCheck uint16, sel 
 									} else {
 										cmpResult = 0
 									}
+									unique = cmpResult != 0
+								}
+
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
+							}
+						}
+					}
+				}
+			}
+		}
+	case coltypes.Interval:
+		buildVec := ht.vals.colVecs[ht.keyCols[keyColIdx]]
+		probeVec := ht.keys[keyColIdx]
+
+		buildKeys := buildVec.Interval()
+		probeKeys := probeVec.Interval()
+
+		if sel != nil {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
+					if ht.allowNullEquality {
+						// The allowNullEquality flag only matters if both vectors have nulls.
+						// This lets us avoid writing all 2^3 conditional branches.
+						probeIsNull := false
+						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
+						for i := uint16(0); i < nToCheck; i++ {
+							// keyID of 0 is reserved to represent the end of the next chain.
+
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
+								// the build table key (calculated using keys[keyID - 1] = key) is
+								// compared to the corresponding probe table to determine if a match is
+								// found.
+
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
+
+								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
+
+								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
+									continue
+								}
+								if probeIsNull {
+									ht.groupID[toCheck] = 0
+								} else if buildIsNull {
+									ht.differs[toCheck] = true
+								} else {
+									buildVal := buildKeys[int(keyID-1)]
+									probeVal := probeKeys[int(selIdx)]
+									var unique bool
+
+									{
+										var cmpResult int
+										cmpResult = buildVal.Compare(probeVal)
+										unique = cmpResult != 0
+									}
+
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
+								}
+							}
+						}
+					} else {
+						probeIsNull := false
+						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
+						for i := uint16(0); i < nToCheck; i++ {
+							// keyID of 0 is reserved to represent the end of the next chain.
+
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
+								// the build table key (calculated using keys[keyID - 1] = key) is
+								// compared to the corresponding probe table to determine if a match is
+								// found.
+
+								selIdx := sel[toCheck]
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
+
+								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
+
+								if probeIsNull {
+									ht.groupID[toCheck] = 0
+								} else if buildIsNull {
+									ht.differs[toCheck] = true
+								} else {
+									buildVal := buildKeys[int(keyID-1)]
+									probeVal := probeKeys[int(selIdx)]
+									var unique bool
+
+									{
+										var cmpResult int
+										cmpResult = buildVal.Compare(probeVal)
+										unique = cmpResult != 0
+									}
+
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
+								}
+							}
+						}
+					}
+				} else {
+					probeIsNull := false
+					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
+					for i := uint16(0); i < nToCheck; i++ {
+						// keyID of 0 is reserved to represent the end of the next chain.
+
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
+							// the build table key (calculated using keys[keyID - 1] = key) is
+							// compared to the corresponding probe table to determine if a match is
+							// found.
+
+							selIdx := sel[toCheck]
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
+
+							if probeIsNull {
+								ht.groupID[toCheck] = 0
+							} else if buildIsNull {
+								ht.differs[toCheck] = true
+							} else {
+								buildVal := buildKeys[int(keyID-1)]
+								probeVal := probeKeys[int(selIdx)]
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = buildVal.Compare(probeVal)
+									unique = cmpResult != 0
+								}
+
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
+							}
+						}
+					}
+				}
+			} else {
+				if buildVec.MaybeHasNulls() {
+					probeIsNull := false
+					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
+					for i := uint16(0); i < nToCheck; i++ {
+						// keyID of 0 is reserved to represent the end of the next chain.
+
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
+							// the build table key (calculated using keys[keyID - 1] = key) is
+							// compared to the corresponding probe table to determine if a match is
+							// found.
+
+							selIdx := sel[toCheck]
+
+							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
+
+							if probeIsNull {
+								ht.groupID[toCheck] = 0
+							} else if buildIsNull {
+								ht.differs[toCheck] = true
+							} else {
+								buildVal := buildKeys[int(keyID-1)]
+								probeVal := probeKeys[int(selIdx)]
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = buildVal.Compare(probeVal)
+									unique = cmpResult != 0
+								}
+
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
+							}
+						}
+					}
+				} else {
+					probeIsNull := false
+					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
+					for i := uint16(0); i < nToCheck; i++ {
+						// keyID of 0 is reserved to represent the end of the next chain.
+
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
+							// the build table key (calculated using keys[keyID - 1] = key) is
+							// compared to the corresponding probe table to determine if a match is
+							// found.
+
+							selIdx := sel[toCheck]
+
+							if probeIsNull {
+								ht.groupID[toCheck] = 0
+							} else if buildIsNull {
+								ht.differs[toCheck] = true
+							} else {
+								buildVal := buildKeys[int(keyID-1)]
+								probeVal := probeKeys[int(selIdx)]
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = buildVal.Compare(probeVal)
+									unique = cmpResult != 0
+								}
+
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if probeVec.MaybeHasNulls() {
+				if buildVec.MaybeHasNulls() {
+					if ht.allowNullEquality {
+						// The allowNullEquality flag only matters if both vectors have nulls.
+						// This lets us avoid writing all 2^3 conditional branches.
+						probeIsNull := false
+						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
+						for i := uint16(0); i < nToCheck; i++ {
+							// keyID of 0 is reserved to represent the end of the next chain.
+
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
+								// the build table key (calculated using keys[keyID - 1] = key) is
+								// compared to the corresponding probe table to determine if a match is
+								// found.
+
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
+
+								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
+
+								if probeIsNull && buildIsNull {
+									// Both values are NULLs, and since we're allowing null equality, we
+									// proceed to the next value to check.
+									continue
+								} else if probeIsNull {
+									// Only probing value is NULL, so it is different from the build value
+									// (which is non-NULL). We mark it as "different" and proceed to the
+									// next value to check. This behavior is special in case of allowing
+									// null equality because we don't want to reset the groupID of the
+									// current probing tuple.
+									ht.differs[toCheck] = true
+									continue
+								}
+								if probeIsNull {
+									ht.groupID[toCheck] = 0
+								} else if buildIsNull {
+									ht.differs[toCheck] = true
+								} else {
+									buildVal := buildKeys[int(keyID-1)]
+									probeVal := probeKeys[int(selIdx)]
+									var unique bool
+
+									{
+										var cmpResult int
+										cmpResult = buildVal.Compare(probeVal)
+										unique = cmpResult != 0
+									}
+
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
+								}
+							}
+						}
+					} else {
+						probeIsNull := false
+						buildIsNull := false
+						// Early bounds check.
+						_ = ht.toCheck[nToCheck-1]
+						for i := uint16(0); i < nToCheck; i++ {
+							// keyID of 0 is reserved to represent the end of the next chain.
+
+							toCheck := ht.toCheck[i]
+							if keyID := ht.groupID[toCheck]; keyID != 0 {
+								// the build table key (calculated using keys[keyID - 1] = key) is
+								// compared to the corresponding probe table to determine if a match is
+								// found.
+
+								selIdx := toCheck
+								probeIsNull = probeVec.Nulls().NullAt(selIdx)
+
+								buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
+
+								if probeIsNull {
+									ht.groupID[toCheck] = 0
+								} else if buildIsNull {
+									ht.differs[toCheck] = true
+								} else {
+									buildVal := buildKeys[int(keyID-1)]
+									probeVal := probeKeys[int(selIdx)]
+									var unique bool
+
+									{
+										var cmpResult int
+										cmpResult = buildVal.Compare(probeVal)
+										unique = cmpResult != 0
+									}
+
+									ht.differs[toCheck] = ht.differs[toCheck] || unique
+								}
+							}
+						}
+					}
+				} else {
+					probeIsNull := false
+					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
+					for i := uint16(0); i < nToCheck; i++ {
+						// keyID of 0 is reserved to represent the end of the next chain.
+
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
+							// the build table key (calculated using keys[keyID - 1] = key) is
+							// compared to the corresponding probe table to determine if a match is
+							// found.
+
+							selIdx := toCheck
+							probeIsNull = probeVec.Nulls().NullAt(selIdx)
+
+							if probeIsNull {
+								ht.groupID[toCheck] = 0
+							} else if buildIsNull {
+								ht.differs[toCheck] = true
+							} else {
+								buildVal := buildKeys[int(keyID-1)]
+								probeVal := probeKeys[int(selIdx)]
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = buildVal.Compare(probeVal)
+									unique = cmpResult != 0
+								}
+
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
+							}
+						}
+					}
+				}
+			} else {
+				if buildVec.MaybeHasNulls() {
+					probeIsNull := false
+					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
+					for i := uint16(0); i < nToCheck; i++ {
+						// keyID of 0 is reserved to represent the end of the next chain.
+
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
+							// the build table key (calculated using keys[keyID - 1] = key) is
+							// compared to the corresponding probe table to determine if a match is
+							// found.
+
+							selIdx := toCheck
+
+							buildIsNull = buildVec.Nulls().NullAt64(keyID - 1)
+
+							if probeIsNull {
+								ht.groupID[toCheck] = 0
+							} else if buildIsNull {
+								ht.differs[toCheck] = true
+							} else {
+								buildVal := buildKeys[int(keyID-1)]
+								probeVal := probeKeys[int(selIdx)]
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = buildVal.Compare(probeVal)
+									unique = cmpResult != 0
+								}
+
+								ht.differs[toCheck] = ht.differs[toCheck] || unique
+							}
+						}
+					}
+				} else {
+					probeIsNull := false
+					buildIsNull := false
+					// Early bounds check.
+					_ = ht.toCheck[nToCheck-1]
+					for i := uint16(0); i < nToCheck; i++ {
+						// keyID of 0 is reserved to represent the end of the next chain.
+
+						toCheck := ht.toCheck[i]
+						if keyID := ht.groupID[toCheck]; keyID != 0 {
+							// the build table key (calculated using keys[keyID - 1] = key) is
+							// compared to the corresponding probe table to determine if a match is
+							// found.
+
+							selIdx := toCheck
+
+							if probeIsNull {
+								ht.groupID[toCheck] = 0
+							} else if buildIsNull {
+								ht.differs[toCheck] = true
+							} else {
+								buildVal := buildKeys[int(keyID-1)]
+								probeVal := probeKeys[int(selIdx)]
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = buildVal.Compare(probeVal)
 									unique = cmpResult != 0
 								}
 

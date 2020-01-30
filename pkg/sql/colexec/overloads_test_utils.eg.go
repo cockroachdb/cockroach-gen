@@ -10,6 +10,7 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
 func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
@@ -4888,6 +4889,78 @@ func performGETimestampTimestamp(a time.Time, b time.Time) bool {
 		} else {
 			cmpResult = 0
 		}
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performEQIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
 		r = cmpResult >= 0
 	}
 

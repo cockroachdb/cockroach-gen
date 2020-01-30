@@ -17,6 +17,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
@@ -92,6 +93,14 @@ func NewConstOp(
 			outputIdx:    outputIdx,
 			typ:          t,
 			constVal:     constVal.(time.Time),
+		}, nil
+	case coltypes.Interval:
+		return &constIntervalOp{
+			OneInputNode: NewOneInputNode(input),
+			allocator:    allocator,
+			outputIdx:    outputIdx,
+			typ:          t,
+			constVal:     constVal.(duration.Duration),
 		}, nil
 	default:
 		return nil, errors.Errorf("unsupported const type %s", t)
@@ -402,6 +411,46 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Timestamp()
+	c.allocator.PerformOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col[int(i)] = c.constVal
+				}
+			} else {
+				col = col[0:int(n)]
+				for i := range col {
+					col[i] = c.constVal
+				}
+			}
+		},
+	)
+	return batch
+}
+
+type constIntervalOp struct {
+	OneInputNode
+
+	allocator *Allocator
+	typ       coltypes.T
+	outputIdx int
+	constVal  duration.Duration
+}
+
+func (c constIntervalOp) Init() {
+	c.input.Init()
+}
+
+func (c constIntervalOp) Next(ctx context.Context) coldata.Batch {
+	batch := c.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	c.allocator.MaybeAddColumn(batch, c.typ, c.outputIdx)
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Interval()
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {

@@ -16,6 +16,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
@@ -37,6 +38,8 @@ func newAnyNotNullAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error)
 		return &anyNotNullFloat64Agg{allocator: allocator}, nil
 	case coltypes.Timestamp:
 		return &anyNotNullTimestampAgg{allocator: allocator}, nil
+	case coltypes.Interval:
+		return &anyNotNullIntervalAgg{allocator: allocator}, nil
 	default:
 		return nil, errors.Errorf("unsupported any not null agg type %s", t)
 	}
@@ -1398,5 +1401,174 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 }
 
 func (a *anyNotNullTimestampAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
+// anyNotNullIntervalAgg implements the ANY_NOT_NULL aggregate, returning the
+// first non-null value in the input column.
+type anyNotNullIntervalAgg struct {
+	allocator                   *Allocator
+	done                        bool
+	groups                      []bool
+	vec                         coldata.Vec
+	col                         []duration.Duration
+	nulls                       *coldata.Nulls
+	curIdx                      int
+	foundNonNullForCurrentGroup bool
+}
+
+func (a *anyNotNullIntervalAgg) Init(groups []bool, vec coldata.Vec) {
+	a.groups = groups
+	a.vec = vec
+	a.col = vec.Interval()
+	a.nulls = vec.Nulls()
+	a.Reset()
+}
+
+func (a *anyNotNullIntervalAgg) Reset() {
+	a.curIdx = -1
+	a.done = false
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
+}
+
+func (a *anyNotNullIntervalAgg) CurrentOutputIndex() int {
+	return a.curIdx
+}
+
+func (a *anyNotNullIntervalAgg) SetOutputIndex(idx int) {
+	if a.curIdx != -1 {
+		a.curIdx = idx
+		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+	}
+}
+
+func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	if a.done {
+		return
+	}
+	inputLen := b.Length()
+	if inputLen == 0 {
+		// If we haven't found any non-nulls for this group so far, the output for
+		// this group should be null.
+		if !a.foundNonNullForCurrentGroup {
+			a.nulls.SetNull(uint16(a.curIdx))
+		}
+		a.curIdx++
+		a.done = true
+		return
+	}
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Interval(), vec.Nulls()
+
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+						if a.groups[i] {
+							// If this is a new group, check if any non-nulls have been found for the
+							// current group. The `a.curIdx` check is necessary because for the first
+							// group in the result set there is no "current group."
+							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+								a.nulls.SetNull(uint16(a.curIdx))
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !a.foundNonNullForCurrentGroup && !isNull {
+							// If we haven't seen any non-nulls for the current group yet, and the
+							// current value is non-null, then we can pick the current value to be the
+							// output.
+							v := col[int(i)]
+							a.col[a.curIdx] = v
+							a.foundNonNullForCurrentGroup = true
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+						if a.groups[i] {
+							// If this is a new group, check if any non-nulls have been found for the
+							// current group. The `a.curIdx` check is necessary because for the first
+							// group in the result set there is no "current group."
+							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+								a.nulls.SetNull(uint16(a.curIdx))
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = nulls.NullAt(uint16(i))
+						if !a.foundNonNullForCurrentGroup && !isNull {
+							// If we haven't seen any non-nulls for the current group yet, and the
+							// current value is non-null, then we can pick the current value to be the
+							// output.
+							v := col[int(i)]
+							a.col[a.curIdx] = v
+							a.foundNonNullForCurrentGroup = true
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+						if a.groups[i] {
+							// If this is a new group, check if any non-nulls have been found for the
+							// current group. The `a.curIdx` check is necessary because for the first
+							// group in the result set there is no "current group."
+							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+								a.nulls.SetNull(uint16(a.curIdx))
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = false
+						if !a.foundNonNullForCurrentGroup && !isNull {
+							// If we haven't seen any non-nulls for the current group yet, and the
+							// current value is non-null, then we can pick the current value to be the
+							// output.
+							v := col[int(i)]
+							a.col[a.curIdx] = v
+							a.foundNonNullForCurrentGroup = true
+						}
+					}
+				} else {
+					col = col[0:int(inputLen)]
+					for i := range col {
+						if a.groups[i] {
+							// If this is a new group, check if any non-nulls have been found for the
+							// current group. The `a.curIdx` check is necessary because for the first
+							// group in the result set there is no "current group."
+							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
+								a.nulls.SetNull(uint16(a.curIdx))
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = false
+						if !a.foundNonNullForCurrentGroup && !isNull {
+							// If we haven't seen any non-nulls for the current group yet, and the
+							// current value is non-null, then we can pick the current value to be the
+							// output.
+							v := col[int(i)]
+							a.col[a.curIdx] = v
+							a.foundNonNullForCurrentGroup = true
+						}
+					}
+				}
+			}
+		},
+	)
+}
+
+func (a *anyNotNullIntervalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }

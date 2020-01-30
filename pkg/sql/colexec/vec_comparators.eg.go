@@ -20,6 +20,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
 // vecComparator is a helper for the ordered synchronizer. It stores multiple
@@ -409,6 +410,43 @@ func (c *TimestampVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx ui
 	}
 }
 
+type IntervalVecComparator struct {
+	vecs  [][]duration.Duration
+	nulls []*coldata.Nulls
+}
+
+func (c *IntervalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
+	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
+	if n1 && n2 {
+		return 0
+	} else if n1 {
+		return -1
+	} else if n2 {
+		return 1
+	}
+	left := c.vecs[vecIdx1][int(valIdx1)]
+	right := c.vecs[vecIdx2][int(valIdx2)]
+	var cmp int
+	cmp = left.Compare(right)
+	return cmp
+}
+
+func (c *IntervalVecComparator) setVec(idx int, vec coldata.Vec) {
+	c.vecs[idx] = vec.Interval()
+	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		v := c.vecs[srcVecIdx][int(srcIdx)]
+		c.vecs[dstVecIdx][int(dstIdx)] = v
+	}
+}
+
 func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 	switch t {
 	case coltypes.Bool:
@@ -449,6 +487,11 @@ func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 	case coltypes.Timestamp:
 		return &TimestampVecComparator{
 			vecs:  make([][]time.Time, numVecs),
+			nulls: make([]*coldata.Nulls, numVecs),
+		}
+	case coltypes.Interval:
+		return &IntervalVecComparator{
+			vecs:  make([][]duration.Duration, numVecs),
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
 	}

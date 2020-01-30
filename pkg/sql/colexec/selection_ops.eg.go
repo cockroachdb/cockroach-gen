@@ -22,6 +22,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
@@ -52753,6 +52754,1374 @@ func (p *selGETimestampTimestampOp) Init() {
 	p.input.Init()
 }
 
+type selEQIntervalIntervalConstOp struct {
+	selConstOpBase
+	constArg duration.Duration
+}
+
+func (p *selEQIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Interval()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selEQIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQIntervalIntervalOp struct {
+	selOpBase
+}
+
+func (p *selEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Interval()
+		col2 := vec2.Interval()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult == 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult == 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selEQIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selNEIntervalIntervalConstOp struct {
+	selConstOpBase
+	constArg duration.Duration
+}
+
+func (p *selNEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Interval()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selNEIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEIntervalIntervalOp struct {
+	selOpBase
+}
+
+func (p *selNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Interval()
+		col2 := vec2.Interval()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult != 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult != 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selNEIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selLTIntervalIntervalConstOp struct {
+	selConstOpBase
+	constArg duration.Duration
+}
+
+func (p *selLTIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Interval()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLTIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTIntervalIntervalOp struct {
+	selOpBase
+}
+
+func (p *selLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Interval()
+		col2 := vec2.Interval()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult < 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult < 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLTIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selLEIntervalIntervalConstOp struct {
+	selConstOpBase
+	constArg duration.Duration
+}
+
+func (p *selLEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Interval()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLEIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEIntervalIntervalOp struct {
+	selOpBase
+}
+
+func (p *selLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Interval()
+		col2 := vec2.Interval()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult <= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLEIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selGTIntervalIntervalConstOp struct {
+	selConstOpBase
+	constArg duration.Duration
+}
+
+func (p *selGTIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Interval()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGTIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTIntervalIntervalOp struct {
+	selOpBase
+}
+
+func (p *selGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Interval()
+		col2 := vec2.Interval()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult > 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult > 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGTIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selGEIntervalIntervalConstOp struct {
+	selConstOpBase
+	constArg duration.Duration
+}
+
+func (p *selGEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Interval()
+		var idx uint16
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col[0:int(n)]
+				for i := range col {
+					var cmp bool
+					arg := col[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg.Compare(p.constArg)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGEIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEIntervalIntervalOp struct {
+	selOpBase
+}
+
+func (p *selGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Interval()
+		col2 := vec2.Interval()
+		n := batch.Length()
+
+		var idx uint16
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := nulls.NullAt(uint16(i))
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1[int(i)]
+					arg2 := col2[int(i)]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1[0:int(n)]
+				col1Len := len(col1)
+				col2 = col2[0:col1Len]
+				for i := range col1 {
+					var cmp bool
+					arg1 := col1[i]
+					arg2 := col2[i]
+
+					{
+						var cmpResult int
+						cmpResult = arg1.Compare(arg2)
+						cmp = cmpResult >= 0
+					}
+
+					isNull := false
+					if cmp && !isNull {
+						sel[idx] = uint16(i)
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGEIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
 // GetSelectionConstOperator returns the appropriate constant selection operator
 // for the given left and right column types and comparison.
 func GetSelectionConstOperator(
@@ -53282,6 +54651,28 @@ func GetSelectionConstOperator(
 				return &selGTTimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
 			case tree.GE:
 				return &selGETimestampTimestampConstOp{selConstOpBase: selConstOpBase, constArg: c.(time.Time)}, nil
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+		default:
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
+		}
+	case coltypes.Interval:
+		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		case coltypes.Interval:
+			switch cmpOp {
+			case tree.EQ:
+				return &selEQIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+			case tree.NE:
+				return &selNEIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+			case tree.LT:
+				return &selLTIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+			case tree.LE:
+				return &selLEIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+			case tree.GT:
+				return &selGTIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+			case tree.GE:
+				return &selGEIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
@@ -53819,6 +55210,28 @@ func GetSelectionOperator(
 				return &selGTTimestampTimestampOp{selOpBase: selOpBase}, nil
 			case tree.GE:
 				return &selGETimestampTimestampOp{selOpBase: selOpBase}, nil
+			default:
+				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
+			}
+		default:
+			return nil, errors.Errorf("unhandled right type: %s", rightType)
+		}
+	case coltypes.Interval:
+		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		case coltypes.Interval:
+			switch cmpOp {
+			case tree.EQ:
+				return &selEQIntervalIntervalOp{selOpBase: selOpBase}, nil
+			case tree.NE:
+				return &selNEIntervalIntervalOp{selOpBase: selOpBase}, nil
+			case tree.LT:
+				return &selLTIntervalIntervalOp{selOpBase: selOpBase}, nil
+			case tree.LE:
+				return &selLEIntervalIntervalOp{selOpBase: selOpBase}, nil
+			case tree.GT:
+				return &selGTIntervalIntervalOp{selOpBase: selOpBase}, nil
+			case tree.GE:
+				return &selGEIntervalIntervalOp{selOpBase: selOpBase}, nil
 			default:
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
