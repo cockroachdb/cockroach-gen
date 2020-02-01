@@ -8960,6 +8960,22 @@ func (_f *Factory) ConstructNot(
 		}
 	}
 
+	// [FoldNotNull]
+	{
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNotNull) {
+				_expr := _f.ConstructNull(
+					_f.funcs.BoolType(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNotNull, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [NegateComparison]
 	{
 		if opt.IsComparisonOp(input) {

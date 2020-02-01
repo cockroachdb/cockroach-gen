@@ -22,6 +22,7 @@ const (
 	FoldNullAndOr
 	FoldNotTrue
 	FoldNotFalse
+	FoldNotNull
 	NegateComparison
 	EliminateNot
 	NegateAnd
