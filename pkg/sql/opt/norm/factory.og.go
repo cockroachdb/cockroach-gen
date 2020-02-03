@@ -7935,31 +7935,33 @@ func (_f *Factory) ConstructLimit(
 			_const, _ := limit.(*memo.ConstExpr)
 			if _const != nil {
 				limit := _const.Value
-				if !_f.funcs.LimitGeMaxRows(limit, left) {
-					if _f.funcs.HasColsInOrdering(left, ordering) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoLeftJoin) {
-							_expr := _f.ConstructLimit(
-								_f.ConstructLeftJoin(
-									_f.ConstructLimit(
-										left,
-										_f.ConstructConst(
-											limit,
+				if _f.funcs.IsPositiveLimit(limit) {
+					if !_f.funcs.LimitGeMaxRows(limit, left) {
+						if _f.funcs.HasColsInOrdering(left, ordering) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoLeftJoin) {
+								_expr := _f.ConstructLimit(
+									_f.ConstructLeftJoin(
+										_f.ConstructLimit(
+											left,
+											_f.ConstructConst(
+												limit,
+											),
+											_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(left)),
 										),
-										_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(left)),
+										right,
+										on,
+										private,
 									),
-									right,
-									on,
-									private,
-								),
-								_f.ConstructConst(
-									limit,
-								),
-								ordering,
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.PushLimitIntoLeftJoin, nil, _expr)
+									_f.ConstructConst(
+										limit,
+									),
+									ordering,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.PushLimitIntoLeftJoin, nil, _expr)
+								}
+								return _expr
 							}
-							return _expr
 						}
 					}
 				}
