@@ -30,6 +30,7 @@ type countAgg struct {
 	vec      []int64
 	nulls    *coldata.Nulls
 	curIdx   int
+	curAgg   int64
 	done     bool
 	countRow bool
 }
@@ -43,6 +44,7 @@ func (a *countAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *countAgg) Reset() {
 	a.curIdx = -1
+	a.curAgg = 0
 	a.nulls.UnsetNulls()
 	a.done = false
 }
@@ -64,6 +66,7 @@ func (a *countAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	inputLen := b.Length()
 	if inputLen == 0 {
+		a.vec[a.curIdx] = a.curAgg
 		a.curIdx++
 		a.done = true
 		return
@@ -79,50 +82,62 @@ func (a *countAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if sel != nil {
 			for _, i := range sel[:inputLen] {
 				if a.groups[i] {
+					if a.curIdx != -1 {
+						a.vec[a.curIdx] = a.curAgg
+					}
 					a.curIdx++
-					a.vec[a.curIdx] = 0
+					a.curAgg = int64(0)
 				}
 				var y int64
 				y = int64(0)
 				if !nulls.NullAt(uint16(i)) {
 					y = 1
 				}
-				a.vec[a.curIdx] += y
+				a.curAgg += y
 			}
 		} else {
 			for i := range a.groups[:inputLen] {
 				if a.groups[i] {
+					if a.curIdx != -1 {
+						a.vec[a.curIdx] = a.curAgg
+					}
 					a.curIdx++
-					a.vec[a.curIdx] = 0
+					a.curAgg = int64(0)
 				}
 				var y int64
 				y = int64(0)
 				if !nulls.NullAt(uint16(i)) {
 					y = 1
 				}
-				a.vec[a.curIdx] += y
+				a.curAgg += y
 			}
 		}
 	} else {
 		if sel != nil {
 			for _, i := range sel[:inputLen] {
 				if a.groups[i] {
+					if a.curIdx != -1 {
+						a.vec[a.curIdx] = a.curAgg
+					}
 					a.curIdx++
-					a.vec[a.curIdx] = 0
+					a.curAgg = int64(0)
 				}
 				var y int64
 				y = int64(1)
-				a.vec[a.curIdx] += y
+				a.curAgg += y
 			}
 		} else {
 			for i := range a.groups[:inputLen] {
 				if a.groups[i] {
+					if a.curIdx != -1 {
+						a.vec[a.curIdx] = a.curAgg
+					}
 					a.curIdx++
-					a.vec[a.curIdx] = 0
+					a.curAgg = int64(0)
 				}
 				var y int64
 				y = int64(1)
-				a.vec[a.curIdx] += y
+				a.curAgg += y
 			}
 		}
 	}

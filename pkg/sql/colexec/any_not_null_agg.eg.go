@@ -58,6 +58,7 @@ type anyNotNullBoolAgg struct {
 	col                         []bool
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      bool
 	foundNonNullForCurrentGroup bool
 }
 
@@ -97,6 +98,8 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -113,11 +116,16 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -128,8 +136,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -137,11 +144,16 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -152,8 +164,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -163,11 +174,16 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -178,8 +194,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -187,11 +202,16 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -202,8 +222,7 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -227,6 +246,7 @@ type anyNotNullBytesAgg struct {
 	col                         *coldata.Bytes
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      []byte
 	foundNonNullForCurrentGroup bool
 }
 
@@ -266,6 +286,8 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col.Set(a.curIdx, a.curAgg)
 		}
 		a.curIdx++
 		a.done = true
@@ -282,11 +304,16 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -297,8 +324,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col.Get(int(i))
-							a.col.Set(a.curIdx, v)
+							a.curAgg = col.Get(int(i))
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -308,11 +334,16 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					_ = int(inputLen)
 					for i := 0; i < int(inputLen); i++ {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -323,8 +354,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col.Get(int(i))
-							a.col.Set(a.curIdx, v)
+							a.curAgg = col.Get(int(i))
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -334,11 +364,16 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -349,8 +384,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col.Get(int(i))
-							a.col.Set(a.curIdx, v)
+							a.curAgg = col.Get(int(i))
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -360,11 +394,16 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					_ = int(inputLen)
 					for i := 0; i < int(inputLen); i++ {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -375,8 +414,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col.Get(int(i))
-							a.col.Set(a.curIdx, v)
+							a.curAgg = col.Get(int(i))
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -400,6 +438,7 @@ type anyNotNullDecimalAgg struct {
 	col                         []apd.Decimal
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      apd.Decimal
 	foundNonNullForCurrentGroup bool
 }
 
@@ -439,6 +478,8 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx].Set(&a.curAgg)
 		}
 		a.curIdx++
 		a.done = true
@@ -455,11 +496,16 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx].Set(&a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -470,8 +516,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx].Set(&v)
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -479,11 +524,16 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx].Set(&a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -494,8 +544,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx].Set(&v)
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -505,11 +554,16 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx].Set(&a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -520,8 +574,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx].Set(&v)
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -529,11 +582,16 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx].Set(&a.curAgg)
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -544,8 +602,7 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx].Set(&v)
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -569,6 +626,7 @@ type anyNotNullInt16Agg struct {
 	col                         []int16
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      int16
 	foundNonNullForCurrentGroup bool
 }
 
@@ -608,6 +666,8 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -624,11 +684,16 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -639,8 +704,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -648,11 +712,16 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -663,8 +732,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -674,11 +742,16 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -689,8 +762,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -698,11 +770,16 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -713,8 +790,7 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -738,6 +814,7 @@ type anyNotNullInt32Agg struct {
 	col                         []int32
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      int32
 	foundNonNullForCurrentGroup bool
 }
 
@@ -777,6 +854,8 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -793,11 +872,16 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -808,8 +892,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -817,11 +900,16 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -832,8 +920,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -843,11 +930,16 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -858,8 +950,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -867,11 +958,16 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -882,8 +978,7 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -907,6 +1002,7 @@ type anyNotNullInt64Agg struct {
 	col                         []int64
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      int64
 	foundNonNullForCurrentGroup bool
 }
 
@@ -946,6 +1042,8 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -962,11 +1060,16 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -977,8 +1080,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -986,11 +1088,16 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1001,8 +1108,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1012,11 +1118,16 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1027,8 +1138,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1036,11 +1146,16 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1051,8 +1166,7 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1076,6 +1190,7 @@ type anyNotNullFloat64Agg struct {
 	col                         []float64
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      float64
 	foundNonNullForCurrentGroup bool
 }
 
@@ -1115,6 +1230,8 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -1131,11 +1248,16 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1146,8 +1268,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1155,11 +1276,16 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1170,8 +1296,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1181,11 +1306,16 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1196,8 +1326,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1205,11 +1334,16 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1220,8 +1354,7 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1245,6 +1378,7 @@ type anyNotNullTimestampAgg struct {
 	col                         []time.Time
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      time.Time
 	foundNonNullForCurrentGroup bool
 }
 
@@ -1284,6 +1418,8 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -1300,11 +1436,16 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1315,8 +1456,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1324,11 +1464,16 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1339,8 +1484,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1350,11 +1494,16 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1365,8 +1514,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1374,11 +1522,16 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1389,8 +1542,7 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1414,6 +1566,7 @@ type anyNotNullIntervalAgg struct {
 	col                         []duration.Duration
 	nulls                       *coldata.Nulls
 	curIdx                      int
+	curAgg                      duration.Duration
 	foundNonNullForCurrentGroup bool
 }
 
@@ -1453,6 +1606,8 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// this group should be null.
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(uint16(a.curIdx))
+		} else {
+			a.col[a.curIdx] = a.curAgg
 		}
 		a.curIdx++
 		a.done = true
@@ -1469,11 +1624,16 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1484,8 +1644,7 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1493,11 +1652,16 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1508,8 +1672,7 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1519,11 +1682,16 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					sel = sel[:inputLen]
 					for _, i := range sel {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1534,8 +1702,7 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -1543,11 +1710,16 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					col = col[0:int(inputLen)]
 					for i := range col {
 						if a.groups[i] {
-							// If this is a new group, check if any non-nulls have been found for the
-							// current group. The `a.curIdx` check is necessary because for the first
+							// The `a.curIdx` check is necessary because for the first
 							// group in the result set there is no "current group."
-							if !a.foundNonNullForCurrentGroup && a.curIdx >= 0 {
-								a.nulls.SetNull(uint16(a.curIdx))
+							if a.curIdx >= 0 {
+								// If this is a new group, check if any non-nulls have been found for the
+								// current group.
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(uint16(a.curIdx))
+								} else {
+									a.col[a.curIdx] = a.curAgg
+								}
 							}
 							a.curIdx++
 							a.foundNonNullForCurrentGroup = false
@@ -1558,8 +1730,7 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							v := col[int(i)]
-							a.col[a.curIdx] = v
+							a.curAgg = col[int(i)]
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
