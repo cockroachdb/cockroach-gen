@@ -245,6 +245,17 @@ func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
+func performMultDecimalInterval(a apd.Decimal, b duration.Duration) duration.Duration {
+	var r duration.Duration
+
+	f, err := a.Float64()
+	if err != nil {
+		execerror.VectorizedInternalPanic(err)
+	}
+	r = b.MulFloat(f)
+	return r
+}
+
 func performPlusInt16Int16(a int16, b int16) int16 {
 	var r int16
 
@@ -514,6 +525,12 @@ func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		}
 	}
 
+	return r
+}
+
+func performMultInt16Interval(a int16, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	r = b.Mul(int64(a))
 	return r
 }
 
@@ -789,6 +806,12 @@ func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	return r
 }
 
+func performMultInt32Interval(a int32, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	r = b.Mul(int64(a))
+	return r
+}
+
 func performPlusInt64Int16(a int64, b int16) int64 {
 	var r int64
 
@@ -1061,6 +1084,12 @@ func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
+func performMultInt64Interval(a int64, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	r = b.Mul(int64(a))
+	return r
+}
+
 func performPlusFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	r = float64(a) + float64(b)
@@ -1082,6 +1111,126 @@ func performMultFloat64Float64(a float64, b float64) float64 {
 func performDivFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	r = float64(a) / float64(b)
+	return r
+}
+
+func performMultFloat64Interval(a float64, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	r = b.MulFloat(float64(a))
+	return r
+}
+
+func performMinusTimestampTimestamp(a time.Time, b time.Time) duration.Duration {
+	var r duration.Duration
+
+	nanos := a.Sub(b).Nanoseconds()
+	r = duration.MakeDuration(nanos, 0, 0)
+
+	return r
+}
+
+func performPlusTimestampInterval(a time.Time, b duration.Duration) time.Time {
+	var r time.Time
+	r = duration.Add(a, b)
+	return r
+}
+
+func performMinusTimestampInterval(a time.Time, b duration.Duration) time.Time {
+	var r time.Time
+	r = duration.Add(a, b.Mul(-1))
+	return r
+}
+
+func performMultIntervalInt16(a duration.Duration, b int16) duration.Duration {
+	var r duration.Duration
+	r = a.Mul(int64(b))
+	return r
+}
+
+func performDivIntervalInt16(a duration.Duration, b int16) duration.Duration {
+	var r duration.Duration
+
+	if b == 0 {
+		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+	}
+	r = a.Div(int64(b))
+	return r
+}
+
+func performMultIntervalInt32(a duration.Duration, b int32) duration.Duration {
+	var r duration.Duration
+	r = a.Mul(int64(b))
+	return r
+}
+
+func performDivIntervalInt32(a duration.Duration, b int32) duration.Duration {
+	var r duration.Duration
+
+	if b == 0 {
+		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+	}
+	r = a.Div(int64(b))
+	return r
+}
+
+func performMultIntervalInt64(a duration.Duration, b int64) duration.Duration {
+	var r duration.Duration
+	r = a.Mul(int64(b))
+	return r
+}
+
+func performDivIntervalInt64(a duration.Duration, b int64) duration.Duration {
+	var r duration.Duration
+
+	if b == 0 {
+		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+	}
+	r = a.Div(int64(b))
+	return r
+}
+
+func performMultIntervalFloat64(a duration.Duration, b float64) duration.Duration {
+	var r duration.Duration
+	r = a.MulFloat(float64(b))
+	return r
+}
+
+func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration {
+	var r duration.Duration
+
+	if b == 0.0 {
+		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+	}
+	r = a.DivFloat(float64(b))
+	return r
+}
+
+func performMultIntervalDecimal(a duration.Duration, b apd.Decimal) duration.Duration {
+	var r duration.Duration
+
+	f, err := b.Float64()
+	if err != nil {
+		execerror.VectorizedInternalPanic(err)
+	}
+	r = a.MulFloat(f)
+	return r
+}
+
+func performPlusIntervalTimestamp(a duration.Duration, b time.Time) time.Time {
+	var r time.Time
+	r = duration.Add(b, a)
+	return r
+}
+
+func performPlusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	r = a.Add(b)
+	return r
+}
+
+func performMinusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	r = a.Sub(b)
 	return r
 }
 

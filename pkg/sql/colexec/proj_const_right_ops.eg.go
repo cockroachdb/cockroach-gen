@@ -6246,6 +6246,92 @@ func (p projGEDecimalFloat64ConstOp) Init() {
 	p.input.Init()
 }
 
+type projMultDecimalIntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultDecimalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					f, err := arg.Float64()
+					if err != nil {
+						execerror.VectorizedInternalPanic(err)
+					}
+					projCol[i] = p.constArg.MulFloat(f)
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					f, err := arg.Float64()
+					if err != nil {
+						execerror.VectorizedInternalPanic(err)
+					}
+					projCol[i] = p.constArg.MulFloat(f)
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				f, err := arg.Float64()
+				if err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				projCol[i] = p.constArg.MulFloat(f)
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				f, err := arg.Float64()
+				if err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				projCol[i] = p.constArg.MulFloat(f)
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDecimalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
 type projPlusInt16DecimalConstOp struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -12095,6 +12181,72 @@ func (p projGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projGEInt16Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16IntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultInt16IntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt16IntervalConstOp) Init() {
 	p.input.Init()
 }
 
@@ -17950,6 +18102,72 @@ func (p projGEInt32Float64ConstOp) Init() {
 	p.input.Init()
 }
 
+type projMultInt32IntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultInt32IntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt32IntervalConstOp) Init() {
+	p.input.Init()
+}
+
 type projPlusInt64DecimalConstOp struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -23802,6 +24020,72 @@ func (p projGEInt64Float64ConstOp) Init() {
 	p.input.Init()
 }
 
+type projMultInt64IntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultInt64IntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt64IntervalConstOp) Init() {
+	p.input.Init()
+}
+
 type projEQFloat64DecimalConstOp struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -28782,6 +29066,150 @@ func (p projGEFloat64Float64ConstOp) Init() {
 	p.input.Init()
 }
 
+type projMultFloat64IntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultFloat64IntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.MulFloat(float64(arg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = p.constArg.MulFloat(float64(arg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.MulFloat(float64(arg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = p.constArg.MulFloat(float64(arg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultFloat64IntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusTimestampTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projMinusTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					nanos := arg.Sub(p.constArg).Nanoseconds()
+					projCol[i] = duration.MakeDuration(nanos, 0, 0)
+
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					nanos := arg.Sub(p.constArg).Nanoseconds()
+					projCol[i] = duration.MakeDuration(nanos, 0, 0)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				nanos := arg.Sub(p.constArg).Nanoseconds()
+				projCol[i] = duration.MakeDuration(nanos, 0, 0)
+
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				nanos := arg.Sub(p.constArg).Nanoseconds()
+				projCol[i] = duration.MakeDuration(nanos, 0, 0)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusTimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
 type projEQTimestampTimestampConstOp struct {
 	projConstOpBase
 	constArg time.Time
@@ -29487,6 +29915,1014 @@ func (p projGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 }
 
 func (p projGETimestampTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusTimestampIntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projPlusTimestampIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Timestamp, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Timestamp()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = duration.Add(arg, p.constArg)
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = duration.Add(arg, p.constArg)
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = duration.Add(arg, p.constArg)
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = duration.Add(arg, p.constArg)
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusTimestampIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusTimestampIntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMinusTimestampIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Timestamp, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Timestamp()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Timestamp()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = duration.Add(arg, p.constArg.Mul(-1))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = duration.Add(arg, p.constArg.Mul(-1))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = duration.Add(arg, p.constArg.Mul(-1))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = duration.Add(arg, p.constArg.Mul(-1))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusTimestampIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalDecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projMultIntervalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					f, err := p.constArg.Float64()
+					if err != nil {
+						execerror.VectorizedInternalPanic(err)
+					}
+					projCol[i] = arg.MulFloat(f)
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					f, err := p.constArg.Float64()
+					if err != nil {
+						execerror.VectorizedInternalPanic(err)
+					}
+					projCol[i] = arg.MulFloat(f)
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				f, err := p.constArg.Float64()
+				if err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				projCol[i] = arg.MulFloat(f)
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				f, err := p.constArg.Float64()
+				if err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				projCol[i] = arg.MulFloat(f)
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalInt16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projMultIntervalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivIntervalInt16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projDivIntervalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.Div(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.Div(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				if p.constArg == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.Div(int64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				if p.constArg == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.Div(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivIntervalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalInt32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projMultIntervalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivIntervalInt32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projDivIntervalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.Div(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.Div(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				if p.constArg == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.Div(int64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				if p.constArg == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.Div(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivIntervalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalInt64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projMultIntervalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivIntervalInt64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projDivIntervalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.Div(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.Div(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				if p.constArg == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.Div(int64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				if p.constArg == 0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.Div(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivIntervalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalFloat64ConstOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projMultIntervalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.MulFloat(float64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.MulFloat(float64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = arg.MulFloat(float64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = arg.MulFloat(float64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalFloat64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projDivIntervalFloat64ConstOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projDivIntervalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0.0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.DivFloat(float64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+
+					if p.constArg == 0.0 {
+						execerror.NonVectorizedPanic(tree.ErrDivByZero)
+					}
+					projCol[i] = arg.DivFloat(float64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+
+				if p.constArg == 0.0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.DivFloat(float64(p.constArg))
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+
+				if p.constArg == 0.0 {
+					execerror.NonVectorizedPanic(tree.ErrDivByZero)
+				}
+				projCol[i] = arg.DivFloat(float64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivIntervalFloat64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusIntervalTimestampConstOp struct {
+	projConstOpBase
+	constArg time.Time
+}
+
+func (p projPlusIntervalTimestampConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Timestamp, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Timestamp()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = duration.Add(p.constArg, arg)
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = duration.Add(p.constArg, arg)
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = duration.Add(p.constArg, arg)
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = duration.Add(p.constArg, arg)
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusIntervalTimestampConstOp) Init() {
+	p.input.Init()
+}
+
+type projPlusIntervalIntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projPlusIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Add(p.constArg)
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Add(p.constArg)
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = arg.Add(p.constArg)
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = arg.Add(p.constArg)
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type projMinusIntervalIntervalConstOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMinusIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	p.allocator.MaybeAddColumn(batch, coltypes.Interval, p.outputIdx)
+	vec := batch.ColVec(p.colIdx)
+	col := vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Sub(p.constArg)
+				}
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				if !colNulls.NullAt(uint16(i)) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[int(i)]
+					projCol[i] = arg.Sub(p.constArg)
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[int(i)]
+				projCol[i] = arg.Sub(p.constArg)
+			}
+		} else {
+			col = col[0:int(n)]
+			_ = projCol[int(n)-1]
+			for i := range col {
+				arg := col[int(i)]
+				projCol[i] = arg.Sub(p.constArg)
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusIntervalIntervalConstOp) Init() {
 	p.input.Init()
 }
 
@@ -30460,6 +31896,26 @@ func GetProjectionRConstOperator(
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
+		case coltypes.Interval:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultDecimalIntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -30764,6 +32220,26 @@ func GetProjectionRConstOperator(
 						projConstOpBase: projConstOpBase,
 						constArg:        c.(float64),
 					}, nil
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		case coltypes.Interval:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultInt16IntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
 				default:
 					return nil, errors.Errorf("unhandled comparison operator: %s", op)
 				}
@@ -31080,6 +32556,26 @@ func GetProjectionRConstOperator(
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
+		case coltypes.Interval:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultInt32IntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -31390,6 +32886,26 @@ func GetProjectionRConstOperator(
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
+		case coltypes.Interval:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultInt64IntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -31640,6 +33156,26 @@ func GetProjectionRConstOperator(
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
+		case coltypes.Interval:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultFloat64IntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
@@ -31649,6 +33185,11 @@ func GetProjectionRConstOperator(
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+				case tree.Minus:
+					return &projMinusTimestampTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}
@@ -31690,15 +33231,190 @@ func GetProjectionRConstOperator(
 			default:
 				return nil, errors.New("unhandled operator type")
 			}
+		case coltypes.Interval:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Plus:
+					return &projPlusTimestampIntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				case tree.Minus:
+					return &projMinusTimestampIntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
 		default:
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Interval:
 		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		case coltypes.Decimal:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultIntervalDecimalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(apd.Decimal),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		case coltypes.Int16:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultIntervalInt16ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(int16),
+					}, nil
+				case tree.Div:
+					return &projDivIntervalInt16ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(int16),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		case coltypes.Int32:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultIntervalInt32ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(int32),
+					}, nil
+				case tree.Div:
+					return &projDivIntervalInt32ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(int32),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		case coltypes.Int64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultIntervalInt64ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(int64),
+					}, nil
+				case tree.Div:
+					return &projDivIntervalInt64ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(int64),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		case coltypes.Float64:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Mult:
+					return &projMultIntervalFloat64ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(float64),
+					}, nil
+				case tree.Div:
+					return &projDivIntervalFloat64ConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(float64),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
+		case coltypes.Timestamp:
+			switch op.(type) {
+			case tree.BinaryOperator:
+				switch op {
+				case tree.Plus:
+					return &projPlusIntervalTimestampConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(time.Time),
+					}, nil
+				default:
+					return nil, errors.Errorf("unhandled binary operator: %s", op)
+				}
+			case tree.ComparisonOperator:
+				switch op {
+				default:
+					return nil, errors.Errorf("unhandled comparison operator: %s", op)
+				}
+			default:
+				return nil, errors.New("unhandled operator type")
+			}
 		case coltypes.Interval:
 			switch op.(type) {
 			case tree.BinaryOperator:
 				switch op {
+				case tree.Plus:
+					return &projPlusIntervalIntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
+				case tree.Minus:
+					return &projMinusIntervalIntervalConstOp{
+						projConstOpBase: projConstOpBase,
+						constArg:        c.(duration.Duration),
+					}, nil
 				default:
 					return nil, errors.Errorf("unhandled binary operator: %s", op)
 				}

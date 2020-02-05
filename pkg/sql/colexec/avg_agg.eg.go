@@ -63,7 +63,7 @@ func (a *avgDecimalAgg) Init(groups []bool, v coldata.Vec) {
 
 func (a *avgDecimalAgg) Reset() {
 	a.scratch.curIdx = -1
-	a.scratch.curSum = zeroDecimalColumn[0]
+	a.scratch.curSum = zeroDecimalValue
 	a.scratch.curCount = 0
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -124,7 +124,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroDecimalColumn[0]
+					a.scratch.curSum = zeroDecimalValue
 					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
@@ -158,7 +158,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroDecimalColumn[0]
+					a.scratch.curSum = zeroDecimalValue
 					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
@@ -194,7 +194,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroDecimalColumn[0]
+					a.scratch.curSum = zeroDecimalValue
 					a.scratch.curCount = 0
 
 				}
@@ -227,7 +227,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroDecimalColumn[0]
+					a.scratch.curSum = zeroDecimalValue
 					a.scratch.curCount = 0
 
 				}
@@ -283,7 +283,7 @@ func (a *avgFloat64Agg) Init(groups []bool, v coldata.Vec) {
 
 func (a *avgFloat64Agg) Reset() {
 	a.scratch.curIdx = -1
-	a.scratch.curSum = zeroFloat64Column[0]
+	a.scratch.curSum = zeroFloat64Value
 	a.scratch.curCount = 0
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -338,7 +338,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroFloat64Column[0]
+					a.scratch.curSum = zeroFloat64Value
 					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
@@ -367,7 +367,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroFloat64Column[0]
+					a.scratch.curSum = zeroFloat64Value
 					a.scratch.curCount = 0
 
 					a.scratch.foundNonNullForCurrentGroup = false
@@ -398,7 +398,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroFloat64Column[0]
+					a.scratch.curSum = zeroFloat64Value
 					a.scratch.curCount = 0
 
 				}
@@ -426,7 +426,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curSum = zeroFloat64Column[0]
+					a.scratch.curSum = zeroFloat64Value
 					a.scratch.curCount = 0
 
 				}

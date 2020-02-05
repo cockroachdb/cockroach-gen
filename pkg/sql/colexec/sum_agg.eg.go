@@ -15,6 +15,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
@@ -30,6 +31,8 @@ func newSumAgg(t coltypes.T) (aggregateFunc, error) {
 		return &sumInt64Agg{}, nil
 	case coltypes.Float64:
 		return &sumFloat64Agg{}, nil
+	case coltypes.Interval:
+		return &sumIntervalAgg{}, nil
 	default:
 		return nil, errors.Errorf("unsupported sum agg type %s", t)
 	}
@@ -64,7 +67,6 @@ func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumDecimalAgg) Reset() {
-	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -119,7 +121,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroDecimalColumn[0]
+					a.scratch.curAgg = zeroDecimalValue
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -148,7 +150,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroDecimalColumn[0]
+					a.scratch.curAgg = zeroDecimalValue
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -179,7 +181,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroDecimalColumn[0]
+					a.scratch.curAgg = zeroDecimalValue
 
 				}
 				var isNull bool
@@ -207,7 +209,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroDecimalColumn[0]
+					a.scratch.curAgg = zeroDecimalValue
 
 				}
 				var isNull bool
@@ -256,7 +258,6 @@ func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt16Agg) Reset() {
-	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -311,7 +312,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt16Column[0]
+					a.scratch.curAgg = zeroInt16Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -346,7 +347,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt16Column[0]
+					a.scratch.curAgg = zeroInt16Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -383,7 +384,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt16Column[0]
+					a.scratch.curAgg = zeroInt16Value
 
 				}
 				var isNull bool
@@ -417,7 +418,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt16Column[0]
+					a.scratch.curAgg = zeroInt16Value
 
 				}
 				var isNull bool
@@ -472,7 +473,6 @@ func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt32Agg) Reset() {
-	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -527,7 +527,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt32Column[0]
+					a.scratch.curAgg = zeroInt32Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -562,7 +562,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt32Column[0]
+					a.scratch.curAgg = zeroInt32Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -599,7 +599,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt32Column[0]
+					a.scratch.curAgg = zeroInt32Value
 
 				}
 				var isNull bool
@@ -633,7 +633,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt32Column[0]
+					a.scratch.curAgg = zeroInt32Value
 
 				}
 				var isNull bool
@@ -688,7 +688,6 @@ func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumInt64Agg) Reset() {
-	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -743,7 +742,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt64Column[0]
+					a.scratch.curAgg = zeroInt64Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -778,7 +777,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt64Column[0]
+					a.scratch.curAgg = zeroInt64Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -815,7 +814,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt64Column[0]
+					a.scratch.curAgg = zeroInt64Value
 
 				}
 				var isNull bool
@@ -849,7 +848,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroInt64Column[0]
+					a.scratch.curAgg = zeroInt64Value
 
 				}
 				var isNull bool
@@ -904,7 +903,6 @@ func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 }
 
 func (a *sumFloat64Agg) Reset() {
-	a.scratch.curAgg = a.scratch.vec[0]
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
@@ -959,7 +957,7 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroFloat64Column[0]
+					a.scratch.curAgg = zeroFloat64Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -986,7 +984,7 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroFloat64Column[0]
+					a.scratch.curAgg = zeroFloat64Value
 
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
@@ -1015,7 +1013,7 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroFloat64Column[0]
+					a.scratch.curAgg = zeroFloat64Value
 
 				}
 				var isNull bool
@@ -1041,7 +1039,7 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 					a.scratch.curIdx++
-					a.scratch.curAgg = zeroFloat64Column[0]
+					a.scratch.curAgg = zeroFloat64Value
 
 				}
 				var isNull bool
@@ -1056,5 +1054,188 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 }
 
 func (a *sumFloat64Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
+type sumIntervalAgg struct {
+	done bool
+
+	groups  []bool
+	scratch struct {
+		curIdx int
+		// curAgg holds the running total, so we can index into the slice once per
+		// group, instead of on each iteration.
+		curAgg duration.Duration
+		// vec points to the output vector we are updating.
+		vec []duration.Duration
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
+	}
+}
+
+var _ aggregateFunc = &sumIntervalAgg{}
+
+func (a *sumIntervalAgg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.scratch.vec = v.Interval()
+	a.scratch.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *sumIntervalAgg) Reset() {
+	a.scratch.curIdx = -1
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
+	a.done = false
+}
+
+func (a *sumIntervalAgg) CurrentOutputIndex() int {
+	return a.scratch.curIdx
+}
+
+func (a *sumIntervalAgg) SetOutputIndex(idx int) {
+	if a.scratch.curIdx != -1 {
+		a.scratch.curIdx = idx
+		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
+	}
+}
+
+func (a *sumIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	if a.done {
+		return
+	}
+	inputLen := b.Length()
+	if inputLen == 0 {
+		// The aggregation is finished. Flush the last value. If we haven't found
+		// any non-nulls for this group so far, the output for this group should be
+		// null.
+		if !a.scratch.foundNonNullForCurrentGroup {
+			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+		} else {
+			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+		}
+		a.scratch.curIdx++
+		a.done = true
+		return
+	}
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Interval(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curAgg = zeroIntervalValue
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg.Add(col[i])
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curAgg = zeroIntervalValue
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(uint16(i))
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg.Add(col[i])
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	} else {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curAgg = zeroIntervalValue
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg.Add(col[i])
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curAgg = zeroIntervalValue
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curAgg = a.scratch.curAgg.Add(col[i])
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	}
+}
+
+func (a *sumIntervalAgg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
