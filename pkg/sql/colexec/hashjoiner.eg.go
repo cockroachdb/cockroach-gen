@@ -17,37 +17,37 @@ import (
 // collect prepares the buildIdx and probeIdx arrays where the buildIdx and
 // probeIdx at each index are joined to make an output row. The total number of
 // resulting rows is returned.
-func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel []uint16) uint16 {
+func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint16) uint16 {
 	nResults := uint16(0)
 
-	if prober.spec.left.outer {
+	if hj.spec.left.outer {
 		if sel != nil {
 			// Early bounds checks.
-			_ = prober.ht.headID[batchSize-1]
+			_ = hj.ht.headID[batchSize-1]
 			_ = sel[batchSize-1]
-			for i := prober.prevBatchResumeIdx; i < batchSize; i++ {
-				currentID := prober.ht.headID[i]
+			for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
+				currentID := hj.ht.headID[i]
 
 				for {
-					if nResults >= prober.outputBatchSize {
-						prober.prevBatch = batch
-						prober.prevBatchResumeIdx = i
+					if nResults >= hj.outputBatchSize {
+						hj.probeState.prevBatch = batch
+						hj.probeState.prevBatchResumeIdx = i
 						return nResults
 					}
 
-					prober.probeRowUnmatched[nResults] = currentID == 0
+					hj.probeState.probeRowUnmatched[nResults] = currentID == 0
 					if currentID > 0 {
-						prober.buildIdx[nResults] = currentID - 1
+						hj.probeState.buildIdx[nResults] = currentID - 1
 					} else {
 						// If currentID == 0, then probeRowUnmatched will have been set - and
 						// we set the corresponding buildIdx to zero so that (as long as the
 						// build hash table has at least one row) we can copy the values vector
 						// without paying attention to probeRowUnmatched.
-						prober.buildIdx[nResults] = 0
+						hj.probeState.buildIdx[nResults] = 0
 					}
-					prober.probeIdx[nResults] = sel[i]
-					currentID = prober.ht.same[currentID]
-					prober.ht.headID[i] = currentID
+					hj.probeState.probeIdx[nResults] = sel[i]
+					currentID = hj.ht.same[currentID]
+					hj.ht.headID[i] = currentID
 					nResults++
 
 					if currentID == 0 {
@@ -57,30 +57,30 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 			}
 		} else {
 			// Early bounds checks.
-			_ = prober.ht.headID[batchSize-1]
-			for i := prober.prevBatchResumeIdx; i < batchSize; i++ {
-				currentID := prober.ht.headID[i]
+			_ = hj.ht.headID[batchSize-1]
+			for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
+				currentID := hj.ht.headID[i]
 
 				for {
-					if nResults >= prober.outputBatchSize {
-						prober.prevBatch = batch
-						prober.prevBatchResumeIdx = i
+					if nResults >= hj.outputBatchSize {
+						hj.probeState.prevBatch = batch
+						hj.probeState.prevBatchResumeIdx = i
 						return nResults
 					}
 
-					prober.probeRowUnmatched[nResults] = currentID == 0
+					hj.probeState.probeRowUnmatched[nResults] = currentID == 0
 					if currentID > 0 {
-						prober.buildIdx[nResults] = currentID - 1
+						hj.probeState.buildIdx[nResults] = currentID - 1
 					} else {
 						// If currentID == 0, then probeRowUnmatched will have been set - and
 						// we set the corresponding buildIdx to zero so that (as long as the
 						// build hash table has at least one row) we can copy the values vector
 						// without paying attention to probeRowUnmatched.
-						prober.buildIdx[nResults] = 0
+						hj.probeState.buildIdx[nResults] = 0
 					}
-					prober.probeIdx[nResults] = i
-					currentID = prober.ht.same[currentID]
-					prober.ht.headID[i] = currentID
+					hj.probeState.probeIdx[nResults] = i
+					currentID = hj.ht.same[currentID]
+					hj.ht.headID[i] = currentID
 					nResults++
 
 					if currentID == 0 {
@@ -91,71 +91,71 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 		}
 	} else {
 		if sel != nil {
-			switch prober.spec.joinType {
+			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = prober.ht.headID[batchSize-1]
+				_ = hj.ht.headID[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := uint16(0); i < batchSize; i++ {
-					currentID := prober.ht.headID[i]
+					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
-						prober.probeIdx[nResults] = sel[i]
+						hj.probeState.probeIdx[nResults] = sel[i]
 						nResults++
 					}
 				}
 			default:
 				// Early bounds checks.
-				_ = prober.ht.headID[batchSize-1]
+				_ = hj.ht.headID[batchSize-1]
 				_ = sel[batchSize-1]
-				for i := prober.prevBatchResumeIdx; i < batchSize; i++ {
-					currentID := prober.ht.headID[i]
+				for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
+					currentID := hj.ht.headID[i]
 					for currentID != 0 {
-						if nResults >= prober.outputBatchSize {
-							prober.prevBatch = batch
-							prober.prevBatchResumeIdx = i
+						if nResults >= hj.outputBatchSize {
+							hj.probeState.prevBatch = batch
+							hj.probeState.prevBatchResumeIdx = i
 							return nResults
 						}
 
-						prober.buildIdx[nResults] = currentID - 1
-						prober.probeIdx[nResults] = sel[i]
-						currentID = prober.ht.same[currentID]
-						prober.ht.headID[i] = currentID
+						hj.probeState.buildIdx[nResults] = currentID - 1
+						hj.probeState.probeIdx[nResults] = sel[i]
+						currentID = hj.ht.same[currentID]
+						hj.ht.headID[i] = currentID
 						nResults++
 					}
 				}
 			}
 		} else {
-			switch prober.spec.joinType {
+			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = prober.ht.headID[batchSize-1]
+				_ = hj.ht.headID[batchSize-1]
 				for i := uint16(0); i < batchSize; i++ {
-					currentID := prober.ht.headID[i]
+					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
-						prober.probeIdx[nResults] = i
+						hj.probeState.probeIdx[nResults] = i
 						nResults++
 					}
 				}
 			default:
 				// Early bounds checks.
-				_ = prober.ht.headID[batchSize-1]
-				for i := prober.prevBatchResumeIdx; i < batchSize; i++ {
-					currentID := prober.ht.headID[i]
+				_ = hj.ht.headID[batchSize-1]
+				for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
+					currentID := hj.ht.headID[i]
 					for currentID != 0 {
-						if nResults >= prober.outputBatchSize {
-							prober.prevBatch = batch
-							prober.prevBatchResumeIdx = i
+						if nResults >= hj.outputBatchSize {
+							hj.probeState.prevBatch = batch
+							hj.probeState.prevBatchResumeIdx = i
 							return nResults
 						}
 
-						prober.buildIdx[nResults] = currentID - 1
-						prober.probeIdx[nResults] = i
-						currentID = prober.ht.same[currentID]
-						prober.ht.headID[i] = currentID
+						hj.probeState.buildIdx[nResults] = currentID - 1
+						hj.probeState.probeIdx[nResults] = i
+						currentID = hj.ht.same[currentID]
+						hj.ht.headID[i] = currentID
 						nResults++
 					}
 				}
@@ -169,103 +169,101 @@ func (prober *hashJoinProber) collect(batch coldata.Batch, batchSize uint16, sel
 // distinctCollect prepares the batch with the joined output columns where the build
 // row index for each probe row is given in the groupID slice. This function
 // requires assumes a N-1 hash join.
-func (prober *hashJoinProber) distinctCollect(
-	batch coldata.Batch, batchSize uint16, sel []uint16,
-) uint16 {
+func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel []uint16) uint16 {
 	nResults := uint16(0)
 
-	if prober.spec.left.outer {
+	if hj.spec.left.outer {
 		nResults = batchSize
 
 		if sel != nil {
 			// Early bounds checks.
-			_ = prober.ht.groupID[batchSize-1]
-			_ = prober.probeRowUnmatched[batchSize-1]
-			_ = prober.buildIdx[batchSize-1]
-			_ = prober.probeIdx[batchSize-1]
+			_ = hj.ht.groupID[batchSize-1]
+			_ = hj.probeState.probeRowUnmatched[batchSize-1]
+			_ = hj.probeState.buildIdx[batchSize-1]
+			_ = hj.probeState.probeIdx[batchSize-1]
 			_ = sel[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
-				id := prober.ht.groupID[i]
+				id := hj.ht.groupID[i]
 				rowUnmatched := id == 0
-				prober.probeRowUnmatched[i] = rowUnmatched
+				hj.probeState.probeRowUnmatched[i] = rowUnmatched
 				if !rowUnmatched {
-					prober.buildIdx[i] = id - 1
+					hj.probeState.buildIdx[i] = id - 1
 				}
-				prober.probeIdx[i] = sel[i]
+				hj.probeState.probeIdx[i] = sel[i]
 			}
 		} else {
 			// Early bounds checks.
-			_ = prober.ht.groupID[batchSize-1]
-			_ = prober.probeRowUnmatched[batchSize-1]
-			_ = prober.buildIdx[batchSize-1]
-			_ = prober.probeIdx[batchSize-1]
+			_ = hj.ht.groupID[batchSize-1]
+			_ = hj.probeState.probeRowUnmatched[batchSize-1]
+			_ = hj.probeState.buildIdx[batchSize-1]
+			_ = hj.probeState.probeIdx[batchSize-1]
 			for i := uint16(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
-				id := prober.ht.groupID[i]
+				id := hj.ht.groupID[i]
 				rowUnmatched := id == 0
-				prober.probeRowUnmatched[i] = rowUnmatched
+				hj.probeState.probeRowUnmatched[i] = rowUnmatched
 				if !rowUnmatched {
-					prober.buildIdx[i] = id - 1
+					hj.probeState.buildIdx[i] = id - 1
 				}
-				prober.probeIdx[i] = i
+				hj.probeState.probeIdx[i] = i
 			}
 		}
 	} else {
 		if sel != nil {
-			switch prober.spec.joinType {
+			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = prober.ht.headID[batchSize-1]
+				_ = hj.ht.headID[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := uint16(0); i < batchSize; i++ {
-					currentID := prober.ht.headID[i]
+					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
-						prober.probeIdx[nResults] = sel[i]
+						hj.probeState.probeIdx[nResults] = sel[i]
 						nResults++
 					}
 				}
 			default:
 				// Early bounds checks.
-				_ = prober.ht.groupID[batchSize-1]
-				_ = prober.buildIdx[batchSize-1]
-				_ = prober.probeIdx[batchSize-1]
+				_ = hj.ht.groupID[batchSize-1]
+				_ = hj.probeState.buildIdx[batchSize-1]
+				_ = hj.probeState.probeIdx[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := uint16(0); i < batchSize; i++ {
-					if prober.ht.groupID[i] != 0 {
+					if hj.ht.groupID[i] != 0 {
 						// Index of keys and outputs in the hash table is calculated as ID - 1.
-						prober.buildIdx[nResults] = prober.ht.groupID[i] - 1
-						prober.probeIdx[nResults] = sel[i]
+						hj.probeState.buildIdx[nResults] = hj.ht.groupID[i] - 1
+						hj.probeState.probeIdx[nResults] = sel[i]
 						nResults++
 					}
 				}
 			}
 		} else {
-			switch prober.spec.joinType {
+			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = prober.ht.headID[batchSize-1]
+				_ = hj.ht.headID[batchSize-1]
 				for i := uint16(0); i < batchSize; i++ {
-					currentID := prober.ht.headID[i]
+					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
-						prober.probeIdx[nResults] = i
+						hj.probeState.probeIdx[nResults] = i
 						nResults++
 					}
 				}
 			default:
 				// Early bounds checks.
-				_ = prober.ht.groupID[batchSize-1]
-				_ = prober.buildIdx[batchSize-1]
-				_ = prober.probeIdx[batchSize-1]
+				_ = hj.ht.groupID[batchSize-1]
+				_ = hj.probeState.buildIdx[batchSize-1]
+				_ = hj.probeState.probeIdx[batchSize-1]
 				for i := uint16(0); i < batchSize; i++ {
-					if prober.ht.groupID[i] != 0 {
+					if hj.ht.groupID[i] != 0 {
 						// Index of keys and outputs in the hash table is calculated as ID - 1.
-						prober.buildIdx[nResults] = prober.ht.groupID[i] - 1
-						prober.probeIdx[nResults] = i
+						hj.probeState.buildIdx[nResults] = hj.ht.groupID[i] - 1
+						hj.probeState.probeIdx[nResults] = i
 						nResults++
 					}
 				}
