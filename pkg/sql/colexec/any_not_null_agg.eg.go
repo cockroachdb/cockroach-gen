@@ -324,7 +324,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							a.curAgg = col.Get(int(i))
+							// Bytes type is special - we actually need to copy the value that we're
+							// getting in an "unsafe" way because col might be reused (and the
+							// underlying memory overwritten) on the next batches.
+							a.curAgg = append(a.curAgg[:0], col.Get(int(i))...)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -354,7 +357,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							a.curAgg = col.Get(int(i))
+							// Bytes type is special - we actually need to copy the value that we're
+							// getting in an "unsafe" way because col might be reused (and the
+							// underlying memory overwritten) on the next batches.
+							a.curAgg = append(a.curAgg[:0], col.Get(int(i))...)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -384,7 +390,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							a.curAgg = col.Get(int(i))
+							// Bytes type is special - we actually need to copy the value that we're
+							// getting in an "unsafe" way because col might be reused (and the
+							// underlying memory overwritten) on the next batches.
+							a.curAgg = append(a.curAgg[:0], col.Get(int(i))...)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
@@ -414,7 +423,10 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// If we haven't seen any non-nulls for the current group yet, and the
 							// current value is non-null, then we can pick the current value to be the
 							// output.
-							a.curAgg = col.Get(int(i))
+							// Bytes type is special - we actually need to copy the value that we're
+							// getting in an "unsafe" way because col might be reused (and the
+							// underlying memory overwritten) on the next batches.
+							a.curAgg = append(a.curAgg[:0], col.Get(int(i))...)
 							a.foundNonNullForCurrentGroup = true
 						}
 					}
