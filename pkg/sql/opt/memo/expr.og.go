@@ -12255,9 +12255,8 @@ func (e *FirstAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// AggDistinctExpr is used as a modifier that wraps the input of an aggregate
-// function. It causes the respective aggregation to only process each distinct
-// value once.
+// AggDistinctExpr is used as a modifier that wraps an aggregate function. It causes
+// the respective aggregation to only process each distinct value once.
 type AggDistinctExpr struct {
 	Input opt.ScalarExpr
 
@@ -12310,10 +12309,10 @@ func (e *AggDistinctExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// AggFilterExpr is used as a modifier that wraps the input of an aggregate
-// function. It causes only rows for which the filter expression is true
-// to be processed. AggFilter should always occur on top of AggDistinct
-// if they are both present.
+// AggFilterExpr is used as a modifier that wraps an aggregate function (or an
+// AggDistinct operator that wraps an aggregate function). It causes only rows
+// for which the filter expression is true to be processed. AggFilter should
+// always occur on top of AggDistinct if they are both present.
 type AggFilterExpr struct {
 	Input  opt.ScalarExpr
 	Filter opt.ScalarExpr

@@ -7344,17 +7344,59 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [EliminateAggDistinctForKeys]
 	{
-		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, groupingPrivate, input) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
-				_expr := _f.ConstructGroupBy(
-					input,
-					_f.funcs.RemoveAggDistinctForKeys(aggregations, groupingPrivate, input),
-					groupingPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinctForKeys, nil, _expr)
+		if _f.funcs.HasStrictKey(input) {
+			for i := range aggregations {
+				item := &aggregations[i]
+				_aggDistinct, _ := item.Agg.(*memo.AggDistinctExpr)
+				if _aggDistinct != nil {
+					agg := _aggDistinct.Input
+					if _f.funcs.CanRemoveAggDistinctForKeys(input, groupingPrivate, agg) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
+							_expr := _f.ConstructGroupBy(
+								input,
+								_f.funcs.ReplaceAggregationsItem(aggregations, item, agg),
+								groupingPrivate,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateAggDistinctForKeys, nil, _expr)
+							}
+							return _expr
+						}
+					}
 				}
-				return _expr
+			}
+		}
+	}
+
+	// [EliminateAggFilteredDistinctForKeys]
+	{
+		if _f.funcs.HasStrictKey(input) {
+			for i := range aggregations {
+				item := &aggregations[i]
+				_aggFilter, _ := item.Agg.(*memo.AggFilterExpr)
+				if _aggFilter != nil {
+					_aggDistinct, _ := _aggFilter.Input.(*memo.AggDistinctExpr)
+					if _aggDistinct != nil {
+						agg := _aggDistinct.Input
+						filter := _aggFilter.Filter
+						if _f.funcs.CanRemoveAggDistinctForKeys(input, groupingPrivate, agg) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggFilteredDistinctForKeys) {
+								_expr := _f.ConstructGroupBy(
+									input,
+									_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructAggFilter(
+										agg,
+										filter,
+									)),
+									groupingPrivate,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.EliminateAggFilteredDistinctForKeys, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -7439,17 +7481,59 @@ func (_f *Factory) ConstructScalarGroupBy(
 
 	// [EliminateAggDistinctForKeys]
 	{
-		if _f.funcs.CanRemoveAggDistinctForKeys(aggregations, groupingPrivate, input) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
-				_expr := _f.ConstructScalarGroupBy(
-					input,
-					_f.funcs.RemoveAggDistinctForKeys(aggregations, groupingPrivate, input),
-					groupingPrivate,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinctForKeys, nil, _expr)
+		if _f.funcs.HasStrictKey(input) {
+			for i := range aggregations {
+				item := &aggregations[i]
+				_aggDistinct, _ := item.Agg.(*memo.AggDistinctExpr)
+				if _aggDistinct != nil {
+					agg := _aggDistinct.Input
+					if _f.funcs.CanRemoveAggDistinctForKeys(input, groupingPrivate, agg) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinctForKeys) {
+							_expr := _f.ConstructScalarGroupBy(
+								input,
+								_f.funcs.ReplaceAggregationsItem(aggregations, item, agg),
+								groupingPrivate,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateAggDistinctForKeys, nil, _expr)
+							}
+							return _expr
+						}
+					}
 				}
-				return _expr
+			}
+		}
+	}
+
+	// [EliminateAggFilteredDistinctForKeys]
+	{
+		if _f.funcs.HasStrictKey(input) {
+			for i := range aggregations {
+				item := &aggregations[i]
+				_aggFilter, _ := item.Agg.(*memo.AggFilterExpr)
+				if _aggFilter != nil {
+					_aggDistinct, _ := _aggFilter.Input.(*memo.AggDistinctExpr)
+					if _aggDistinct != nil {
+						agg := _aggDistinct.Input
+						filter := _aggFilter.Filter
+						if _f.funcs.CanRemoveAggDistinctForKeys(input, groupingPrivate, agg) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggFilteredDistinctForKeys) {
+								_expr := _f.ConstructScalarGroupBy(
+									input,
+									_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructAggFilter(
+										agg,
+										filter,
+									)),
+									groupingPrivate,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.EliminateAggFilteredDistinctForKeys, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -7518,7 +7602,7 @@ func (_f *Factory) ConstructDistinctOn(
 	// [EliminateDistinct]
 	{
 		aggs := aggregations
-		if _f.funcs.ColsAreKey(_f.funcs.GroupingCols(groupingPrivate), input) {
+		if _f.funcs.ColsAreStrictKey(_f.funcs.GroupingCols(groupingPrivate), input) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
 				_expr := _f.ConstructProject(
 					input,
@@ -14027,23 +14111,6 @@ func (_f *Factory) ConstructBitOrAgg(
 func (_f *Factory) ConstructBoolAnd(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [EliminateAggDistinct]
-	{
-		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
-		if _aggDistinct != nil {
-			in := _aggDistinct.Input
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_expr := _f.ConstructBoolAnd(
-					in,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeBoolAnd(input)
 	return _f.onConstructScalar(e)
 }
@@ -14052,23 +14119,6 @@ func (_f *Factory) ConstructBoolAnd(
 func (_f *Factory) ConstructBoolOr(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [EliminateAggDistinct]
-	{
-		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
-		if _aggDistinct != nil {
-			in := _aggDistinct.Input
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_expr := _f.ConstructBoolOr(
-					in,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeBoolOr(input)
 	return _f.onConstructScalar(e)
 }
@@ -14099,23 +14149,6 @@ func (_f *Factory) ConstructCountRows() opt.ScalarExpr {
 func (_f *Factory) ConstructMax(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [EliminateAggDistinct]
-	{
-		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
-		if _aggDistinct != nil {
-			in := _aggDistinct.Input
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_expr := _f.ConstructMax(
-					in,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeMax(input)
 	return _f.onConstructScalar(e)
 }
@@ -14124,23 +14157,6 @@ func (_f *Factory) ConstructMax(
 func (_f *Factory) ConstructMin(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
-	// [EliminateAggDistinct]
-	{
-		_aggDistinct, _ := input.(*memo.AggDistinctExpr)
-		if _aggDistinct != nil {
-			in := _aggDistinct.Input
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
-				_expr := _f.ConstructMin(
-					in,
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	e := _f.mem.MemoizeMin(input)
 	return _f.onConstructScalar(e)
 }
@@ -14274,21 +14290,33 @@ func (_f *Factory) ConstructFirstAgg(
 }
 
 // ConstructAggDistinct constructs an expression for the AggDistinct operator.
-// AggDistinct is used as a modifier that wraps the input of an aggregate
-// function. It causes the respective aggregation to only process each distinct
-// value once.
+// AggDistinct is used as a modifier that wraps an aggregate function. It causes
+// the respective aggregation to only process each distinct value once.
 func (_f *Factory) ConstructAggDistinct(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
+	// [EliminateAggDistinct]
+	{
+		if input.Op() == opt.MinOp || input.Op() == opt.MaxOp || input.Op() == opt.BoolAndOp || input.Op() == opt.BoolOrOp {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAggDistinct) {
+				_expr := input
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateAggDistinct, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeAggDistinct(input)
 	return _f.onConstructScalar(e)
 }
 
 // ConstructAggFilter constructs an expression for the AggFilter operator.
-// AggFilter is used as a modifier that wraps the input of an aggregate
-// function. It causes only rows for which the filter expression is true
-// to be processed. AggFilter should always occur on top of AggDistinct
-// if they are both present.
+// AggFilter is used as a modifier that wraps an aggregate function (or an
+// AggDistinct operator that wraps an aggregate function). It causes only rows
+// for which the filter expression is true to be processed. AggFilter should
+// always occur on top of AggDistinct if they are both present.
 func (_f *Factory) ConstructAggFilter(
 	input opt.ScalarExpr,
 	filter opt.ScalarExpr,

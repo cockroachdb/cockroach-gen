@@ -976,22 +976,22 @@ func (_e *explorer) exploreScalarGroupBy(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
-	// [ReplaceScalarMinWithLimit]
+	// [ReplaceScalarMinMaxWithLimit]
 	{
 		if _rootOrd >= _rootState.start {
 			input := _root.Input
 			if len(_root.Aggregations) == 1 {
 				_item := &_root.Aggregations[0]
-				_min, _ := _item.Agg.(*memo.MinExpr)
-				if _min != nil {
-					variable := _min.Input
+				agg := _item.Agg
+				if agg.Op() == opt.MinOp || agg.Op() == opt.MaxOp {
+					variable := agg.Child(0).(opt.ScalarExpr)
 					_variable, _ := variable.(*memo.VariableExpr)
 					if _variable != nil {
 						col := _variable.Col
 						aggPrivate := _item.Col
 						groupingPrivate := &_root.GroupingPrivate
 						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceScalarMinWithLimit) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceScalarMinMaxWithLimit) {
 								_expr := &memo.ScalarGroupByExpr{
 									Input: _e.f.ConstructLimit(
 										_e.f.ConstructSelect(
@@ -1010,7 +1010,7 @@ func (_e *explorer) exploreScalarGroupBy(
 										_e.f.ConstructConst(
 											tree.NewDInt(1),
 										),
-										_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
+										_e.funcs.MakeOrderingChoiceFromColumn(agg.Op(), col),
 									),
 									Aggregations: memo.AggregationsExpr{
 										_e.f.ConstructAggregationsItem(
@@ -1025,71 +1025,9 @@ func (_e *explorer) exploreScalarGroupBy(
 								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
 								if _e.o.appliedRule != nil {
 									if _interned != _expr {
-										_e.o.appliedRule(opt.ReplaceScalarMinWithLimit, _root, nil)
+										_e.o.appliedRule(opt.ReplaceScalarMinMaxWithLimit, _root, nil)
 									} else {
-										_e.o.appliedRule(opt.ReplaceScalarMinWithLimit, _root, _interned)
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [ReplaceScalarMaxWithLimit]
-	{
-		if _rootOrd >= _rootState.start {
-			input := _root.Input
-			if len(_root.Aggregations) == 1 {
-				_item := &_root.Aggregations[0]
-				_max, _ := _item.Agg.(*memo.MaxExpr)
-				if _max != nil {
-					variable := _max.Input
-					_variable, _ := variable.(*memo.VariableExpr)
-					if _variable != nil {
-						col := _variable.Col
-						aggPrivate := _item.Col
-						groupingPrivate := &_root.GroupingPrivate
-						if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
-							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceScalarMaxWithLimit) {
-								_expr := &memo.ScalarGroupByExpr{
-									Input: _e.f.ConstructLimit(
-										_e.f.ConstructSelect(
-											input,
-											memo.FiltersExpr{
-												_e.f.ConstructFiltersItem(
-													_e.f.ConstructIsNot(
-														variable,
-														_e.f.ConstructNull(
-															_e.funcs.AnyType(),
-														),
-													),
-												),
-											},
-										),
-										_e.f.ConstructConst(
-											tree.NewDInt(1),
-										),
-										_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
-									),
-									Aggregations: memo.AggregationsExpr{
-										_e.f.ConstructAggregationsItem(
-											_e.f.ConstructConstAgg(
-												variable,
-											),
-											aggPrivate,
-										),
-									},
-									GroupingPrivate: *groupingPrivate,
-								}
-								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
-								if _e.o.appliedRule != nil {
-									if _interned != _expr {
-										_e.o.appliedRule(opt.ReplaceScalarMaxWithLimit, _root, nil)
-									} else {
-										_e.o.appliedRule(opt.ReplaceScalarMaxWithLimit, _root, _interned)
+										_e.o.appliedRule(opt.ReplaceScalarMinMaxWithLimit, _root, _interned)
 									}
 								}
 							}

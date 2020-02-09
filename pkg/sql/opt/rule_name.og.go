@@ -87,6 +87,7 @@ const (
 	EliminateGroupByProject
 	ReduceGroupingCols
 	EliminateAggDistinctForKeys
+	EliminateAggFilteredDistinctForKeys
 	EliminateDistinctOnNoColumns
 	InlineProjectConstants
 	InlineSelectConstants
@@ -217,8 +218,7 @@ const (
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------
-	ReplaceScalarMinWithLimit
-	ReplaceScalarMaxWithLimit
+	ReplaceScalarMinMaxWithLimit
 	ReplaceMinWithLimit
 	ReplaceMaxWithLimit
 	GenerateStreamingGroupBy

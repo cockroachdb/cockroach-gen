@@ -5,15 +5,14 @@ package opt
 const (
 	UnknownOp Operator = iota
 
-	// AggDistinct is used as a modifier that wraps the input of an aggregate
-	// function. It causes the respective aggregation to only process each distinct
-	// value once.
+	// AggDistinct is used as a modifier that wraps an aggregate function. It causes
+	// the respective aggregation to only process each distinct value once.
 	AggDistinctOp
 
-	// AggFilter is used as a modifier that wraps the input of an aggregate
-	// function. It causes only rows for which the filter expression is true
-	// to be processed. AggFilter should always occur on top of AggDistinct
-	// if they are both present.
+	// AggFilter is used as a modifier that wraps an aggregate function (or an
+	// AggDistinct operator that wraps an aggregate function). It causes only rows
+	// for which the filter expression is true to be processed. AggFilter should
+	// always occur on top of AggDistinct if they are both present.
 	AggFilterOp
 
 	// Aggregations is a set of AggregationsItem expressions that specify the
