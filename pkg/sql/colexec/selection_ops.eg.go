@@ -1933,13 +1933,6 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -1981,13 +1974,6 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2173,13 +2159,6 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2221,13 +2200,6 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2413,13 +2385,6 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2461,13 +2426,6 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2653,13 +2611,6 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2701,13 +2652,6 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2893,13 +2837,6 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -2941,13 +2878,6 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -3133,13 +3063,6 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -3181,13 +3104,6 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1
-				_ = 0
-				_ = int(n)
-				col1Len := col1.Len()
-				col2 = col2
-				_ = 0
-				_ = col1Len
 				for i := 0; i < int(n); i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
