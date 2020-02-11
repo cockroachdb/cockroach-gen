@@ -32,6 +32,7 @@ var KeywordsCategories = map[string]string{
 	"bool":                      "U",
 	"boolean":                   "C",
 	"both":                      "R",
+	"bucket_count":              "U",
 	"by":                        "U",
 	"bytea":                     "U",
 	"bytes":                     "U",
@@ -441,6 +442,7 @@ var KeywordNames = []string{
 	"bool",
 	"boolean",
 	"both",
+	"bucket_count",
 	"by",
 	"bytea",
 	"bytes",
@@ -884,6 +886,8 @@ func GetKeywordID(k string) int32 {
 		return BOOLEAN
 	case "both":
 		return BOTH
+	case "bucket_count":
+		return BUCKET_COUNT
 	case "by":
 		return BY
 	case "bytea":
