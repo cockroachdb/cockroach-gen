@@ -287,7 +287,11 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash16(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -302,7 +306,11 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash16(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			}
@@ -316,7 +324,11 @@ func rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash16(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -328,7 +340,11 @@ func rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash16(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			}
@@ -349,7 +365,11 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash32(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -364,7 +384,11 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash32(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			}
@@ -378,7 +402,11 @@ func rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash32(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -390,7 +418,11 @@ func rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash32(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			}
@@ -411,7 +443,11 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash64(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -426,7 +462,11 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash64(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			}
@@ -440,7 +480,11 @@ func rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash64(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			} else {
@@ -452,7 +496,11 @@ func rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					p = memhash64(noescape(unsafe.Pointer(&v)), p)
+
+					// In order for integers with different widths but of the same value to
+					// to hash to the same value, we upcast all of them to int64.
+					asInt64 := int64(v)
+					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
 					buckets[i] = uint64(p)
 				}
 			}

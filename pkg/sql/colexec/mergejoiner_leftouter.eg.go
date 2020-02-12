@@ -42,9 +42,54 @@ func (o *mergeJoinLeftOuterOp) probeBodyLSeltrueRSeltrue(
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
 	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
-		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
-		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
-		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		leftColIdx := o.left.eqCols[eqColIdx]
+		rightColIdx := o.right.eqCols[eqColIdx]
+		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
+		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
+		leftPhysType := o.left.sourceTypes[leftColIdx]
+		rightPhysType := o.right.sourceTypes[rightColIdx]
+		colType := leftPhysType
+		// Merge joiner only supports the case when the physical types in the
+		// equality columns in both inputs are the same. If that is not the case,
+		// we need to cast one of the vectors to another's physical type putting
+		// the result of the cast into a temporary vector that is used instead of
+		// the original.
+		if leftPhysType != rightPhysType {
+			castLeftToRight := false
+			// There is a hierarchy of valid casts:
+			//   Int16 -> Int32 -> Int64 -> Float64 -> Decimal
+			// and the cast is valid if 'fromType' is mentioned before 'toType'
+			// in this chain.
+			switch leftPhysType {
+			case coltypes.Int16:
+				castLeftToRight = true
+			case coltypes.Int32:
+				castLeftToRight = rightPhysType != coltypes.Int16
+			case coltypes.Int64:
+				castLeftToRight = rightPhysType != coltypes.Int16 && rightPhysType != coltypes.Int32
+			case coltypes.Float64:
+				castLeftToRight = rightPhysType == coltypes.Decimal
+			}
+			toType := leftPhysType
+			if castLeftToRight {
+				toType = rightPhysType
+			}
+			tempVec := o.scratch.tempVecByType[toType]
+			if tempVec == nil {
+				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				o.scratch.tempVecByType[toType] = tempVec
+			} else {
+				tempVec.Nulls().UnsetNulls()
+			}
+			if castLeftToRight {
+				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				lVec = tempVec
+				colType = o.right.sourceTypes[rightColIdx]
+			} else {
+				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				rVec = tempVec
+			}
+		}
 		if lVec.MaybeHasNulls() {
 			if rVec.MaybeHasNulls() {
 
@@ -7835,9 +7880,54 @@ func (o *mergeJoinLeftOuterOp) probeBodyLSeltrueRSelfalse(
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
 	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
-		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
-		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
-		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		leftColIdx := o.left.eqCols[eqColIdx]
+		rightColIdx := o.right.eqCols[eqColIdx]
+		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
+		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
+		leftPhysType := o.left.sourceTypes[leftColIdx]
+		rightPhysType := o.right.sourceTypes[rightColIdx]
+		colType := leftPhysType
+		// Merge joiner only supports the case when the physical types in the
+		// equality columns in both inputs are the same. If that is not the case,
+		// we need to cast one of the vectors to another's physical type putting
+		// the result of the cast into a temporary vector that is used instead of
+		// the original.
+		if leftPhysType != rightPhysType {
+			castLeftToRight := false
+			// There is a hierarchy of valid casts:
+			//   Int16 -> Int32 -> Int64 -> Float64 -> Decimal
+			// and the cast is valid if 'fromType' is mentioned before 'toType'
+			// in this chain.
+			switch leftPhysType {
+			case coltypes.Int16:
+				castLeftToRight = true
+			case coltypes.Int32:
+				castLeftToRight = rightPhysType != coltypes.Int16
+			case coltypes.Int64:
+				castLeftToRight = rightPhysType != coltypes.Int16 && rightPhysType != coltypes.Int32
+			case coltypes.Float64:
+				castLeftToRight = rightPhysType == coltypes.Decimal
+			}
+			toType := leftPhysType
+			if castLeftToRight {
+				toType = rightPhysType
+			}
+			tempVec := o.scratch.tempVecByType[toType]
+			if tempVec == nil {
+				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				o.scratch.tempVecByType[toType] = tempVec
+			} else {
+				tempVec.Nulls().UnsetNulls()
+			}
+			if castLeftToRight {
+				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				lVec = tempVec
+				colType = o.right.sourceTypes[rightColIdx]
+			} else {
+				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				rVec = tempVec
+			}
+		}
 		if lVec.MaybeHasNulls() {
 			if rVec.MaybeHasNulls() {
 
@@ -15628,9 +15718,54 @@ func (o *mergeJoinLeftOuterOp) probeBodyLSelfalseRSeltrue(
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
 	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
-		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
-		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
-		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		leftColIdx := o.left.eqCols[eqColIdx]
+		rightColIdx := o.right.eqCols[eqColIdx]
+		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
+		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
+		leftPhysType := o.left.sourceTypes[leftColIdx]
+		rightPhysType := o.right.sourceTypes[rightColIdx]
+		colType := leftPhysType
+		// Merge joiner only supports the case when the physical types in the
+		// equality columns in both inputs are the same. If that is not the case,
+		// we need to cast one of the vectors to another's physical type putting
+		// the result of the cast into a temporary vector that is used instead of
+		// the original.
+		if leftPhysType != rightPhysType {
+			castLeftToRight := false
+			// There is a hierarchy of valid casts:
+			//   Int16 -> Int32 -> Int64 -> Float64 -> Decimal
+			// and the cast is valid if 'fromType' is mentioned before 'toType'
+			// in this chain.
+			switch leftPhysType {
+			case coltypes.Int16:
+				castLeftToRight = true
+			case coltypes.Int32:
+				castLeftToRight = rightPhysType != coltypes.Int16
+			case coltypes.Int64:
+				castLeftToRight = rightPhysType != coltypes.Int16 && rightPhysType != coltypes.Int32
+			case coltypes.Float64:
+				castLeftToRight = rightPhysType == coltypes.Decimal
+			}
+			toType := leftPhysType
+			if castLeftToRight {
+				toType = rightPhysType
+			}
+			tempVec := o.scratch.tempVecByType[toType]
+			if tempVec == nil {
+				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				o.scratch.tempVecByType[toType] = tempVec
+			} else {
+				tempVec.Nulls().UnsetNulls()
+			}
+			if castLeftToRight {
+				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				lVec = tempVec
+				colType = o.right.sourceTypes[rightColIdx]
+			} else {
+				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				rVec = tempVec
+			}
+		}
 		if lVec.MaybeHasNulls() {
 			if rVec.MaybeHasNulls() {
 
@@ -23421,9 +23556,54 @@ func (o *mergeJoinLeftOuterOp) probeBodyLSelfalseRSelfalse(
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
 	for eqColIdx := 0; eqColIdx < len(o.left.eqCols); eqColIdx++ {
-		lVec := o.proberState.lBatch.ColVec(int(o.left.eqCols[eqColIdx]))
-		rVec := o.proberState.rBatch.ColVec(int(o.right.eqCols[eqColIdx]))
-		colType := o.left.sourceTypes[int(o.left.eqCols[eqColIdx])]
+		leftColIdx := o.left.eqCols[eqColIdx]
+		rightColIdx := o.right.eqCols[eqColIdx]
+		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
+		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
+		leftPhysType := o.left.sourceTypes[leftColIdx]
+		rightPhysType := o.right.sourceTypes[rightColIdx]
+		colType := leftPhysType
+		// Merge joiner only supports the case when the physical types in the
+		// equality columns in both inputs are the same. If that is not the case,
+		// we need to cast one of the vectors to another's physical type putting
+		// the result of the cast into a temporary vector that is used instead of
+		// the original.
+		if leftPhysType != rightPhysType {
+			castLeftToRight := false
+			// There is a hierarchy of valid casts:
+			//   Int16 -> Int32 -> Int64 -> Float64 -> Decimal
+			// and the cast is valid if 'fromType' is mentioned before 'toType'
+			// in this chain.
+			switch leftPhysType {
+			case coltypes.Int16:
+				castLeftToRight = true
+			case coltypes.Int32:
+				castLeftToRight = rightPhysType != coltypes.Int16
+			case coltypes.Int64:
+				castLeftToRight = rightPhysType != coltypes.Int16 && rightPhysType != coltypes.Int32
+			case coltypes.Float64:
+				castLeftToRight = rightPhysType == coltypes.Decimal
+			}
+			toType := leftPhysType
+			if castLeftToRight {
+				toType = rightPhysType
+			}
+			tempVec := o.scratch.tempVecByType[toType]
+			if tempVec == nil {
+				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				o.scratch.tempVecByType[toType] = tempVec
+			} else {
+				tempVec.Nulls().UnsetNulls()
+			}
+			if castLeftToRight {
+				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				lVec = tempVec
+				colType = o.right.sourceTypes[rightColIdx]
+			} else {
+				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				rVec = tempVec
+			}
+		}
 		if lVec.MaybeHasNulls() {
 			if rVec.MaybeHasNulls() {
 
