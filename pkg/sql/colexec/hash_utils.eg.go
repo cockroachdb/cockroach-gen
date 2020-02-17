@@ -36,6 +36,7 @@ func rehash(
 	nKeys uint64,
 	sel []uint16,
 	cancelChecker CancelChecker,
+	decimalScratch decimalOverloadScratch,
 ) {
 	switch t {
 	case coltypes.Bool:
@@ -213,7 +214,12 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					b := []byte(v.String())
+
+					// In order for equal decimals to hash to the same value we need to
+					// remove the trailing zeroes if there are any.
+					tmpDec := &decimalScratch.tmpDec1
+					tmpDec.Reduce(&v)
+					b := []byte(tmpDec.String())
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
@@ -231,7 +237,12 @@ func rehash(
 					}
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					b := []byte(v.String())
+
+					// In order for equal decimals to hash to the same value we need to
+					// remove the trailing zeroes if there are any.
+					tmpDec := &decimalScratch.tmpDec1
+					tmpDec.Reduce(&v)
+					b := []byte(tmpDec.String())
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
@@ -248,7 +259,12 @@ func rehash(
 					selIdx := sel[i]
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					b := []byte(v.String())
+
+					// In order for equal decimals to hash to the same value we need to
+					// remove the trailing zeroes if there are any.
+					tmpDec := &decimalScratch.tmpDec1
+					tmpDec.Reduce(&v)
+					b := []byte(tmpDec.String())
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
@@ -263,7 +279,12 @@ func rehash(
 					selIdx := i
 					v := keys[int(selIdx)]
 					p := uintptr(buckets[i])
-					b := []byte(v.String())
+
+					// In order for equal decimals to hash to the same value we need to
+					// remove the trailing zeroes if there are any.
+					tmpDec := &decimalScratch.tmpDec1
+					tmpDec.Reduce(&v)
+					b := []byte(tmpDec.String())
 					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 

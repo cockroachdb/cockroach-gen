@@ -14,7 +14,6 @@ import (
 	"context"
 	"math"
 
-	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
@@ -30,6 +29,12 @@ type projEQBoolBoolOp struct {
 }
 
 func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -164,6 +169,12 @@ type projNEBoolBoolOp struct {
 }
 
 func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -298,6 +309,12 @@ type projLTBoolBoolOp struct {
 }
 
 func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -432,6 +449,12 @@ type projLEBoolBoolOp struct {
 }
 
 func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -566,6 +589,12 @@ type projGTBoolBoolOp struct {
 }
 
 func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -700,6 +729,12 @@ type projGEBoolBoolOp struct {
 }
 
 func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -834,6 +869,12 @@ type projEQBytesBytesOp struct {
 }
 
 func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -928,6 +969,12 @@ type projNEBytesBytesOp struct {
 }
 
 func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1022,6 +1069,12 @@ type projLTBytesBytesOp struct {
 }
 
 func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1116,6 +1169,12 @@ type projLEBytesBytesOp struct {
 }
 
 func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1210,6 +1269,12 @@ type projGTBytesBytesOp struct {
 }
 
 func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1304,6 +1369,12 @@ type projGEBytesBytesOp struct {
 }
 
 func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1398,6 +1469,12 @@ type projPlusDecimalDecimalOp struct {
 }
 
 func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1484,6 +1561,12 @@ type projMinusDecimalDecimalOp struct {
 }
 
 func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1570,6 +1653,12 @@ type projMultDecimalDecimalOp struct {
 }
 
 func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1656,6 +1745,12 @@ type projDivDecimalDecimalOp struct {
 }
 
 func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1774,6 +1869,12 @@ type projEQDecimalDecimalOp struct {
 }
 
 func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1876,6 +1977,12 @@ type projNEDecimalDecimalOp struct {
 }
 
 func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1978,6 +2085,12 @@ type projLTDecimalDecimalOp struct {
 }
 
 func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2080,6 +2193,12 @@ type projLEDecimalDecimalOp struct {
 }
 
 func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2182,6 +2301,12 @@ type projGTDecimalDecimalOp struct {
 }
 
 func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2284,6 +2409,12 @@ type projGEDecimalDecimalOp struct {
 }
 
 func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2386,6 +2517,12 @@ type projPlusDecimalInt16Op struct {
 }
 
 func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2412,7 +2549,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2435,7 +2572,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2455,7 +2592,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2474,7 +2611,7 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2500,6 +2637,12 @@ type projMinusDecimalInt16Op struct {
 }
 
 func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2526,7 +2669,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2549,7 +2692,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2569,7 +2712,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2588,7 +2731,7 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2614,6 +2757,12 @@ type projMultDecimalInt16Op struct {
 }
 
 func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2640,7 +2789,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2663,7 +2812,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2683,7 +2832,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2702,7 +2851,7 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2728,6 +2877,12 @@ type projDivDecimalInt16Op struct {
 }
 
 func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2758,7 +2913,7 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2785,7 +2940,7 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -2809,7 +2964,7 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2832,7 +2987,7 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -2858,6 +3013,12 @@ type projEQDecimalInt16Op struct {
 }
 
 func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2886,7 +3047,7 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -2912,7 +3073,7 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -2935,7 +3096,7 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -2957,7 +3118,7 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -2984,6 +3145,12 @@ type projNEDecimalInt16Op struct {
 }
 
 func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3012,7 +3179,7 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3038,7 +3205,7 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3061,7 +3228,7 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3083,7 +3250,7 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3110,6 +3277,12 @@ type projLTDecimalInt16Op struct {
 }
 
 func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3138,7 +3311,7 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3164,7 +3337,7 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3187,7 +3360,7 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3209,7 +3382,7 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3236,6 +3409,12 @@ type projLEDecimalInt16Op struct {
 }
 
 func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3264,7 +3443,7 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3290,7 +3469,7 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3313,7 +3492,7 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3335,7 +3514,7 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3362,6 +3541,12 @@ type projGTDecimalInt16Op struct {
 }
 
 func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3390,7 +3575,7 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3416,7 +3601,7 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3439,7 +3624,7 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3461,7 +3646,7 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3488,6 +3673,12 @@ type projGEDecimalInt16Op struct {
 }
 
 func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3516,7 +3707,7 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3542,7 +3733,7 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -3565,7 +3756,7 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3587,7 +3778,7 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -3614,6 +3805,12 @@ type projPlusDecimalInt32Op struct {
 }
 
 func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3640,7 +3837,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -3663,7 +3860,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -3683,7 +3880,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -3702,7 +3899,7 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -3728,6 +3925,12 @@ type projMinusDecimalInt32Op struct {
 }
 
 func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3754,7 +3957,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -3777,7 +3980,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -3797,7 +4000,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -3816,7 +4019,7 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -3842,6 +4045,12 @@ type projMultDecimalInt32Op struct {
 }
 
 func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3868,7 +4077,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -3891,7 +4100,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -3911,7 +4120,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -3930,7 +4139,7 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -3956,6 +4165,12 @@ type projDivDecimalInt32Op struct {
 }
 
 func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3986,7 +4201,7 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -4013,7 +4228,7 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -4037,7 +4252,7 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -4060,7 +4275,7 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -4086,6 +4301,12 @@ type projEQDecimalInt32Op struct {
 }
 
 func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4114,7 +4335,7 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4140,7 +4361,7 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4163,7 +4384,7 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4185,7 +4406,7 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4212,6 +4433,12 @@ type projNEDecimalInt32Op struct {
 }
 
 func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4240,7 +4467,7 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4266,7 +4493,7 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4289,7 +4516,7 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4311,7 +4538,7 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4338,6 +4565,12 @@ type projLTDecimalInt32Op struct {
 }
 
 func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4366,7 +4599,7 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4392,7 +4625,7 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4415,7 +4648,7 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4437,7 +4670,7 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4464,6 +4697,12 @@ type projLEDecimalInt32Op struct {
 }
 
 func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4492,7 +4731,7 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4518,7 +4757,7 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4541,7 +4780,7 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4563,7 +4802,7 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4590,6 +4829,12 @@ type projGTDecimalInt32Op struct {
 }
 
 func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4618,7 +4863,7 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4644,7 +4889,7 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4667,7 +4912,7 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4689,7 +4934,7 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4716,6 +4961,12 @@ type projGEDecimalInt32Op struct {
 }
 
 func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4744,7 +4995,7 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4770,7 +5021,7 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -4793,7 +5044,7 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4815,7 +5066,7 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -4842,6 +5093,12 @@ type projPlusDecimalInt64Op struct {
 }
 
 func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4868,7 +5125,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -4891,7 +5148,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -4911,7 +5168,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -4930,7 +5187,7 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -4956,6 +5213,12 @@ type projMinusDecimalInt64Op struct {
 }
 
 func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4982,7 +5245,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -5005,7 +5268,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -5025,7 +5288,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -5044,7 +5307,7 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -5070,6 +5333,12 @@ type projMultDecimalInt64Op struct {
 }
 
 func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5096,7 +5365,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -5119,7 +5388,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -5139,7 +5408,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -5158,7 +5427,7 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -5184,6 +5453,12 @@ type projDivDecimalInt64Op struct {
 }
 
 func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5214,7 +5489,7 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -5241,7 +5516,7 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
 
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 							execerror.NonVectorizedPanic(err)
@@ -5265,7 +5540,7 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -5288,7 +5563,7 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
 
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, tmpDec); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -5314,6 +5589,12 @@ type projEQDecimalInt64Op struct {
 }
 
 func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5342,7 +5623,7 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5368,7 +5649,7 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5391,7 +5672,7 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5413,7 +5694,7 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5440,6 +5721,12 @@ type projNEDecimalInt64Op struct {
 }
 
 func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5468,7 +5755,7 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5494,7 +5781,7 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5517,7 +5804,7 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5539,7 +5826,7 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5566,6 +5853,12 @@ type projLTDecimalInt64Op struct {
 }
 
 func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5594,7 +5887,7 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5620,7 +5913,7 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5643,7 +5936,7 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5665,7 +5958,7 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5692,6 +5985,12 @@ type projLEDecimalInt64Op struct {
 }
 
 func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5720,7 +6019,7 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5746,7 +6045,7 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5769,7 +6068,7 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5791,7 +6090,7 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5818,6 +6117,12 @@ type projGTDecimalInt64Op struct {
 }
 
 func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5846,7 +6151,7 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5872,7 +6177,7 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5895,7 +6200,7 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5917,7 +6222,7 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -5944,6 +6249,12 @@ type projGEDecimalInt64Op struct {
 }
 
 func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5972,7 +6283,7 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -5998,7 +6309,7 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg2), 0)
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -6021,7 +6332,7 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -6043,7 +6354,7 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg2), 0)
 						cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 					}
@@ -6070,6 +6381,12 @@ type projEQDecimalFloat64Op struct {
 }
 
 func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6098,7 +6415,7 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6126,7 +6443,7 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6151,7 +6468,7 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6175,7 +6492,7 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6204,6 +6521,12 @@ type projNEDecimalFloat64Op struct {
 }
 
 func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6232,7 +6555,7 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6260,7 +6583,7 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6285,7 +6608,7 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6309,7 +6632,7 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6338,6 +6661,12 @@ type projLTDecimalFloat64Op struct {
 }
 
 func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6366,7 +6695,7 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6394,7 +6723,7 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6419,7 +6748,7 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6443,7 +6772,7 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6472,6 +6801,12 @@ type projLEDecimalFloat64Op struct {
 }
 
 func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6500,7 +6835,7 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6528,7 +6863,7 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6553,7 +6888,7 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6577,7 +6912,7 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6606,6 +6941,12 @@ type projGTDecimalFloat64Op struct {
 }
 
 func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6634,7 +6975,7 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6662,7 +7003,7 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6687,7 +7028,7 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6711,7 +7052,7 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6740,6 +7081,12 @@ type projGEDecimalFloat64Op struct {
 }
 
 func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6768,7 +7115,7 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6796,7 +7143,7 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -6821,7 +7168,7 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6845,7 +7192,7 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -6874,6 +7221,12 @@ type projMultDecimalIntervalOp struct {
 }
 
 func (p projMultDecimalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6972,6 +7325,12 @@ type projPlusInt16DecimalOp struct {
 }
 
 func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6997,7 +7356,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -7022,7 +7381,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -7044,7 +7403,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -7065,7 +7424,7 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -7094,6 +7453,12 @@ type projMinusInt16DecimalOp struct {
 }
 
 func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7119,7 +7484,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -7144,7 +7509,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -7166,7 +7531,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -7187,7 +7552,7 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -7216,6 +7581,12 @@ type projMultInt16DecimalOp struct {
 }
 
 func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7241,7 +7612,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -7266,7 +7637,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -7288,7 +7659,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -7309,7 +7680,7 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -7338,6 +7709,12 @@ type projDivInt16DecimalOp struct {
 }
 
 func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7363,7 +7740,7 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -7391,7 +7768,7 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -7416,7 +7793,7 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -7440,7 +7817,7 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -7472,6 +7849,12 @@ type projEQInt16DecimalOp struct {
 }
 
 func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7500,7 +7883,7 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7526,7 +7909,7 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7549,7 +7932,7 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7571,7 +7954,7 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7598,6 +7981,12 @@ type projNEInt16DecimalOp struct {
 }
 
 func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7626,7 +8015,7 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7652,7 +8041,7 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7675,7 +8064,7 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7697,7 +8086,7 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7724,6 +8113,12 @@ type projLTInt16DecimalOp struct {
 }
 
 func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7752,7 +8147,7 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7778,7 +8173,7 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7801,7 +8196,7 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7823,7 +8218,7 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7850,6 +8245,12 @@ type projLEInt16DecimalOp struct {
 }
 
 func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7878,7 +8279,7 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7904,7 +8305,7 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -7927,7 +8328,7 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7949,7 +8350,7 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -7976,6 +8377,12 @@ type projGTInt16DecimalOp struct {
 }
 
 func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8004,7 +8411,7 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -8030,7 +8437,7 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -8053,7 +8460,7 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -8075,7 +8482,7 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -8102,6 +8509,12 @@ type projGEInt16DecimalOp struct {
 }
 
 func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8130,7 +8543,7 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -8156,7 +8569,7 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -8179,7 +8592,7 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -8201,7 +8614,7 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -8228,6 +8641,12 @@ type projPlusInt16Int16Op struct {
 }
 
 func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8338,6 +8757,12 @@ type projMinusInt16Int16Op struct {
 }
 
 func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8448,6 +8873,12 @@ type projMultInt16Int16Op struct {
 }
 
 func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8586,6 +9017,12 @@ type projDivInt16Int16Op struct {
 }
 
 func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8614,7 +9051,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 						if arg2 == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(arg1), 0)
 						rightTmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8640,7 +9077,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 						if arg2 == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(arg1), 0)
 						rightTmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8663,7 +9100,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(arg1), 0)
 					rightTmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8685,7 +9122,7 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(arg1), 0)
 					rightTmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8712,6 +9149,12 @@ type projEQInt16Int16Op struct {
 }
 
 func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8858,6 +9301,12 @@ type projNEInt16Int16Op struct {
 }
 
 func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9004,6 +9453,12 @@ type projLTInt16Int16Op struct {
 }
 
 func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9150,6 +9605,12 @@ type projLEInt16Int16Op struct {
 }
 
 func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9296,6 +9757,12 @@ type projGTInt16Int16Op struct {
 }
 
 func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9442,6 +9909,12 @@ type projGEInt16Int16Op struct {
 }
 
 func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9588,6 +10061,12 @@ type projPlusInt16Int32Op struct {
 }
 
 func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9698,6 +10177,12 @@ type projMinusInt16Int32Op struct {
 }
 
 func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9808,6 +10293,12 @@ type projMultInt16Int32Op struct {
 }
 
 func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9946,6 +10437,12 @@ type projDivInt16Int32Op struct {
 }
 
 func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9974,7 +10471,7 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -10000,7 +10497,7 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -10023,7 +10520,7 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -10045,7 +10542,7 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -10072,6 +10569,12 @@ type projEQInt16Int32Op struct {
 }
 
 func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10218,6 +10721,12 @@ type projNEInt16Int32Op struct {
 }
 
 func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10364,6 +10873,12 @@ type projLTInt16Int32Op struct {
 }
 
 func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10510,6 +11025,12 @@ type projLEInt16Int32Op struct {
 }
 
 func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10656,6 +11177,12 @@ type projGTInt16Int32Op struct {
 }
 
 func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10802,6 +11329,12 @@ type projGEInt16Int32Op struct {
 }
 
 func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10948,6 +11481,12 @@ type projPlusInt16Int64Op struct {
 }
 
 func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11058,6 +11597,12 @@ type projMinusInt16Int64Op struct {
 }
 
 func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11168,6 +11713,12 @@ type projMultInt16Int64Op struct {
 }
 
 func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11306,6 +11857,12 @@ type projDivInt16Int64Op struct {
 }
 
 func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11334,7 +11891,7 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -11360,7 +11917,7 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -11383,7 +11940,7 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -11405,7 +11962,7 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -11432,6 +11989,12 @@ type projEQInt16Int64Op struct {
 }
 
 func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11578,6 +12141,12 @@ type projNEInt16Int64Op struct {
 }
 
 func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11724,6 +12293,12 @@ type projLTInt16Int64Op struct {
 }
 
 func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11870,6 +12445,12 @@ type projLEInt16Int64Op struct {
 }
 
 func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12016,6 +12597,12 @@ type projGTInt16Int64Op struct {
 }
 
 func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12162,6 +12749,12 @@ type projGEInt16Int64Op struct {
 }
 
 func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12308,6 +12901,12 @@ type projEQInt16Float64Op struct {
 }
 
 func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12486,6 +13085,12 @@ type projNEInt16Float64Op struct {
 }
 
 func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12664,6 +13269,12 @@ type projLTInt16Float64Op struct {
 }
 
 func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12842,6 +13453,12 @@ type projLEInt16Float64Op struct {
 }
 
 func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13020,6 +13637,12 @@ type projGTInt16Float64Op struct {
 }
 
 func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13198,6 +13821,12 @@ type projGEInt16Float64Op struct {
 }
 
 func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13376,6 +14005,12 @@ type projMultInt16IntervalOp struct {
 }
 
 func (p projMultInt16IntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13454,6 +14089,12 @@ type projPlusInt32DecimalOp struct {
 }
 
 func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13479,7 +14120,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -13504,7 +14145,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -13526,7 +14167,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -13547,7 +14188,7 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -13576,6 +14217,12 @@ type projMinusInt32DecimalOp struct {
 }
 
 func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13601,7 +14248,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -13626,7 +14273,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -13648,7 +14295,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -13669,7 +14316,7 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -13698,6 +14345,12 @@ type projMultInt32DecimalOp struct {
 }
 
 func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13723,7 +14376,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -13748,7 +14401,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -13770,7 +14423,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -13791,7 +14444,7 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -13820,6 +14473,12 @@ type projDivInt32DecimalOp struct {
 }
 
 func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13845,7 +14504,7 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -13873,7 +14532,7 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -13898,7 +14557,7 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -13922,7 +14581,7 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -13954,6 +14613,12 @@ type projEQInt32DecimalOp struct {
 }
 
 func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13982,7 +14647,7 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14008,7 +14673,7 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14031,7 +14696,7 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14053,7 +14718,7 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14080,6 +14745,12 @@ type projNEInt32DecimalOp struct {
 }
 
 func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14108,7 +14779,7 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14134,7 +14805,7 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14157,7 +14828,7 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14179,7 +14850,7 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14206,6 +14877,12 @@ type projLTInt32DecimalOp struct {
 }
 
 func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14234,7 +14911,7 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14260,7 +14937,7 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14283,7 +14960,7 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14305,7 +14982,7 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14332,6 +15009,12 @@ type projLEInt32DecimalOp struct {
 }
 
 func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14360,7 +15043,7 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14386,7 +15069,7 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14409,7 +15092,7 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14431,7 +15114,7 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14458,6 +15141,12 @@ type projGTInt32DecimalOp struct {
 }
 
 func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14486,7 +15175,7 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14512,7 +15201,7 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14535,7 +15224,7 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14557,7 +15246,7 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14584,6 +15273,12 @@ type projGEInt32DecimalOp struct {
 }
 
 func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14612,7 +15307,7 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14638,7 +15333,7 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -14661,7 +15356,7 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14683,7 +15378,7 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -14710,6 +15405,12 @@ type projPlusInt32Int16Op struct {
 }
 
 func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14820,6 +15521,12 @@ type projMinusInt32Int16Op struct {
 }
 
 func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14930,6 +15637,12 @@ type projMultInt32Int16Op struct {
 }
 
 func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15068,6 +15781,12 @@ type projDivInt32Int16Op struct {
 }
 
 func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15096,7 +15815,7 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -15122,7 +15841,7 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -15145,7 +15864,7 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -15167,7 +15886,7 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -15194,6 +15913,12 @@ type projEQInt32Int16Op struct {
 }
 
 func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15340,6 +16065,12 @@ type projNEInt32Int16Op struct {
 }
 
 func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15486,6 +16217,12 @@ type projLTInt32Int16Op struct {
 }
 
 func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15632,6 +16369,12 @@ type projLEInt32Int16Op struct {
 }
 
 func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15778,6 +16521,12 @@ type projGTInt32Int16Op struct {
 }
 
 func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15924,6 +16673,12 @@ type projGEInt32Int16Op struct {
 }
 
 func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16070,6 +16825,12 @@ type projPlusInt32Int32Op struct {
 }
 
 func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16180,6 +16941,12 @@ type projMinusInt32Int32Op struct {
 }
 
 func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16290,6 +17057,12 @@ type projMultInt32Int32Op struct {
 }
 
 func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16428,6 +17201,12 @@ type projDivInt32Int32Op struct {
 }
 
 func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16456,7 +17235,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 						if arg2 == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(arg1), 0)
 						rightTmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -16482,7 +17261,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 						if arg2 == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(arg1), 0)
 						rightTmpDec.SetFinite(int64(arg2), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -16505,7 +17284,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(arg1), 0)
 					rightTmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -16527,7 +17306,7 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(arg1), 0)
 					rightTmpDec.SetFinite(int64(arg2), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -16554,6 +17333,12 @@ type projEQInt32Int32Op struct {
 }
 
 func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16700,6 +17485,12 @@ type projNEInt32Int32Op struct {
 }
 
 func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16846,6 +17637,12 @@ type projLTInt32Int32Op struct {
 }
 
 func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16992,6 +17789,12 @@ type projLEInt32Int32Op struct {
 }
 
 func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17138,6 +17941,12 @@ type projGTInt32Int32Op struct {
 }
 
 func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17284,6 +18093,12 @@ type projGEInt32Int32Op struct {
 }
 
 func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17430,6 +18245,12 @@ type projPlusInt32Int64Op struct {
 }
 
 func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17540,6 +18361,12 @@ type projMinusInt32Int64Op struct {
 }
 
 func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17650,6 +18477,12 @@ type projMultInt32Int64Op struct {
 }
 
 func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17788,6 +18621,12 @@ type projDivInt32Int64Op struct {
 }
 
 func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17816,7 +18655,7 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -17842,7 +18681,7 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -17865,7 +18704,7 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -17887,7 +18726,7 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -17914,6 +18753,12 @@ type projEQInt32Int64Op struct {
 }
 
 func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18060,6 +18905,12 @@ type projNEInt32Int64Op struct {
 }
 
 func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18206,6 +19057,12 @@ type projLTInt32Int64Op struct {
 }
 
 func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18352,6 +19209,12 @@ type projLEInt32Int64Op struct {
 }
 
 func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18498,6 +19361,12 @@ type projGTInt32Int64Op struct {
 }
 
 func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18644,6 +19513,12 @@ type projGEInt32Int64Op struct {
 }
 
 func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18790,6 +19665,12 @@ type projEQInt32Float64Op struct {
 }
 
 func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18968,6 +19849,12 @@ type projNEInt32Float64Op struct {
 }
 
 func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19146,6 +20033,12 @@ type projLTInt32Float64Op struct {
 }
 
 func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19324,6 +20217,12 @@ type projLEInt32Float64Op struct {
 }
 
 func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19502,6 +20401,12 @@ type projGTInt32Float64Op struct {
 }
 
 func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19680,6 +20585,12 @@ type projGEInt32Float64Op struct {
 }
 
 func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19858,6 +20769,12 @@ type projMultInt32IntervalOp struct {
 }
 
 func (p projMultInt32IntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19936,6 +20853,12 @@ type projPlusInt64DecimalOp struct {
 }
 
 func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19961,7 +20884,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -19986,7 +20909,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -20008,7 +20931,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -20029,7 +20952,7 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg2)
@@ -20058,6 +20981,12 @@ type projMinusInt64DecimalOp struct {
 }
 
 func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20083,7 +21012,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -20108,7 +21037,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -20130,7 +21059,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -20151,7 +21080,7 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg2)
@@ -20180,6 +21109,12 @@ type projMultInt64DecimalOp struct {
 }
 
 func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20205,7 +21140,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -20230,7 +21165,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -20252,7 +21187,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -20273,7 +21208,7 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg2)
@@ -20302,6 +21237,12 @@ type projDivInt64DecimalOp struct {
 }
 
 func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20327,7 +21268,7 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -20355,7 +21296,7 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg2 := col2[int(i)]
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -20380,7 +21321,7 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -20404,7 +21345,7 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg2 := col2[int(i)]
 
 				{
-					tmpDec := &apd.Decimal{}
+					tmpDec := &decimalScratch.tmpDec1
 					tmpDec.SetFinite(int64(arg1), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg2)
@@ -20436,6 +21377,12 @@ type projEQInt64DecimalOp struct {
 }
 
 func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20464,7 +21411,7 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20490,7 +21437,7 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20513,7 +21460,7 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20535,7 +21482,7 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20562,6 +21509,12 @@ type projNEInt64DecimalOp struct {
 }
 
 func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20590,7 +21543,7 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20616,7 +21569,7 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20639,7 +21592,7 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20661,7 +21614,7 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20688,6 +21641,12 @@ type projLTInt64DecimalOp struct {
 }
 
 func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20716,7 +21675,7 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20742,7 +21701,7 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20765,7 +21724,7 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20787,7 +21746,7 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20814,6 +21773,12 @@ type projLEInt64DecimalOp struct {
 }
 
 func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20842,7 +21807,7 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20868,7 +21833,7 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20891,7 +21856,7 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20913,7 +21878,7 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -20940,6 +21905,12 @@ type projGTInt64DecimalOp struct {
 }
 
 func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20968,7 +21939,7 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -20994,7 +21965,7 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -21017,7 +21988,7 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -21039,7 +22010,7 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -21066,6 +22037,12 @@ type projGEInt64DecimalOp struct {
 }
 
 func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21094,7 +22071,7 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -21120,7 +22097,7 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							tmpDec.SetFinite(int64(arg1), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -21143,7 +22120,7 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -21165,7 +22142,7 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						tmpDec.SetFinite(int64(arg1), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 					}
@@ -21192,6 +22169,12 @@ type projPlusInt64Int16Op struct {
 }
 
 func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21302,6 +22285,12 @@ type projMinusInt64Int16Op struct {
 }
 
 func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21412,6 +22401,12 @@ type projMultInt64Int16Op struct {
 }
 
 func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21550,6 +22545,12 @@ type projDivInt64Int16Op struct {
 }
 
 func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21578,7 +22579,7 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -21604,7 +22605,7 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -21627,7 +22628,7 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -21649,7 +22650,7 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -21676,6 +22677,12 @@ type projEQInt64Int16Op struct {
 }
 
 func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21822,6 +22829,12 @@ type projNEInt64Int16Op struct {
 }
 
 func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21968,6 +22981,12 @@ type projLTInt64Int16Op struct {
 }
 
 func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22114,6 +23133,12 @@ type projLEInt64Int16Op struct {
 }
 
 func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22260,6 +23285,12 @@ type projGTInt64Int16Op struct {
 }
 
 func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22406,6 +23437,12 @@ type projGEInt64Int16Op struct {
 }
 
 func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22552,6 +23589,12 @@ type projPlusInt64Int32Op struct {
 }
 
 func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22662,6 +23705,12 @@ type projMinusInt64Int32Op struct {
 }
 
 func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22772,6 +23821,12 @@ type projMultInt64Int32Op struct {
 }
 
 func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22910,6 +23965,12 @@ type projDivInt64Int32Op struct {
 }
 
 func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22938,7 +23999,7 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -22964,7 +24025,7 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -22987,7 +24048,7 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -23009,7 +24070,7 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -23036,6 +24097,12 @@ type projEQInt64Int32Op struct {
 }
 
 func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23182,6 +24249,12 @@ type projNEInt64Int32Op struct {
 }
 
 func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23328,6 +24401,12 @@ type projLTInt64Int32Op struct {
 }
 
 func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23474,6 +24553,12 @@ type projLEInt64Int32Op struct {
 }
 
 func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23620,6 +24705,12 @@ type projGTInt64Int32Op struct {
 }
 
 func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23766,6 +24857,12 @@ type projGEInt64Int32Op struct {
 }
 
 func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23912,6 +25009,12 @@ type projPlusInt64Int64Op struct {
 }
 
 func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24022,6 +25125,12 @@ type projMinusInt64Int64Op struct {
 }
 
 func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24132,6 +25241,12 @@ type projMultInt64Int64Op struct {
 }
 
 func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24270,6 +25385,12 @@ type projDivInt64Int64Op struct {
 }
 
 func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24298,7 +25419,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -24324,7 +25445,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg2) == 0 {
 							execerror.NonVectorizedPanic(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -24347,7 +25468,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -24369,7 +25490,7 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg2) == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &apd.Decimal{}, &apd.Decimal{}
+					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(arg1)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg2)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -24396,6 +25517,12 @@ type projEQInt64Int64Op struct {
 }
 
 func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24542,6 +25669,12 @@ type projNEInt64Int64Op struct {
 }
 
 func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24688,6 +25821,12 @@ type projLTInt64Int64Op struct {
 }
 
 func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24834,6 +25973,12 @@ type projLEInt64Int64Op struct {
 }
 
 func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24980,6 +26125,12 @@ type projGTInt64Int64Op struct {
 }
 
 func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25126,6 +26277,12 @@ type projGEInt64Int64Op struct {
 }
 
 func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25272,6 +26429,12 @@ type projEQInt64Float64Op struct {
 }
 
 func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25450,6 +26613,12 @@ type projNEInt64Float64Op struct {
 }
 
 func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25628,6 +26797,12 @@ type projLTInt64Float64Op struct {
 }
 
 func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25806,6 +26981,12 @@ type projLEInt64Float64Op struct {
 }
 
 func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25984,6 +27165,12 @@ type projGTInt64Float64Op struct {
 }
 
 func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26162,6 +27349,12 @@ type projGEInt64Float64Op struct {
 }
 
 func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26340,6 +27533,12 @@ type projMultInt64IntervalOp struct {
 }
 
 func (p projMultInt64IntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26418,6 +27617,12 @@ type projEQFloat64DecimalOp struct {
 }
 
 func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26446,7 +27651,7 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26474,7 +27679,7 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26499,7 +27704,7 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26523,7 +27728,7 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26552,6 +27757,12 @@ type projNEFloat64DecimalOp struct {
 }
 
 func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26580,7 +27791,7 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26608,7 +27819,7 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26633,7 +27844,7 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26657,7 +27868,7 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26686,6 +27897,12 @@ type projLTFloat64DecimalOp struct {
 }
 
 func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26714,7 +27931,7 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26742,7 +27959,7 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26767,7 +27984,7 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26791,7 +28008,7 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26820,6 +28037,12 @@ type projLEFloat64DecimalOp struct {
 }
 
 func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26848,7 +28071,7 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26876,7 +28099,7 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -26901,7 +28124,7 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26925,7 +28148,7 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -26954,6 +28177,12 @@ type projGTFloat64DecimalOp struct {
 }
 
 func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26982,7 +28211,7 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -27010,7 +28239,7 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -27035,7 +28264,7 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -27059,7 +28288,7 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -27088,6 +28317,12 @@ type projGEFloat64DecimalOp struct {
 }
 
 func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27116,7 +28351,7 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -27144,7 +28379,7 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &apd.Decimal{}
+							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 								execerror.NonVectorizedPanic(err)
 							}
@@ -27169,7 +28404,7 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -27193,7 +28428,7 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &apd.Decimal{}
+						tmpDec := &decimalScratch.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
 							execerror.NonVectorizedPanic(err)
 						}
@@ -27222,6 +28457,12 @@ type projEQFloat64Int16Op struct {
 }
 
 func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27400,6 +28641,12 @@ type projNEFloat64Int16Op struct {
 }
 
 func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27578,6 +28825,12 @@ type projLTFloat64Int16Op struct {
 }
 
 func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27756,6 +29009,12 @@ type projLEFloat64Int16Op struct {
 }
 
 func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27934,6 +29193,12 @@ type projGTFloat64Int16Op struct {
 }
 
 func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28112,6 +29377,12 @@ type projGEFloat64Int16Op struct {
 }
 
 func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28290,6 +29561,12 @@ type projEQFloat64Int32Op struct {
 }
 
 func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28468,6 +29745,12 @@ type projNEFloat64Int32Op struct {
 }
 
 func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28646,6 +29929,12 @@ type projLTFloat64Int32Op struct {
 }
 
 func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28824,6 +30113,12 @@ type projLEFloat64Int32Op struct {
 }
 
 func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29002,6 +30297,12 @@ type projGTFloat64Int32Op struct {
 }
 
 func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29180,6 +30481,12 @@ type projGEFloat64Int32Op struct {
 }
 
 func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29358,6 +30665,12 @@ type projEQFloat64Int64Op struct {
 }
 
 func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29536,6 +30849,12 @@ type projNEFloat64Int64Op struct {
 }
 
 func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29714,6 +31033,12 @@ type projLTFloat64Int64Op struct {
 }
 
 func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29892,6 +31217,12 @@ type projLEFloat64Int64Op struct {
 }
 
 func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30070,6 +31401,12 @@ type projGTFloat64Int64Op struct {
 }
 
 func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30248,6 +31585,12 @@ type projGEFloat64Int64Op struct {
 }
 
 func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30426,6 +31769,12 @@ type projPlusFloat64Float64Op struct {
 }
 
 func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30504,6 +31853,12 @@ type projMinusFloat64Float64Op struct {
 }
 
 func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30582,6 +31937,12 @@ type projMultFloat64Float64Op struct {
 }
 
 func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30660,6 +32021,12 @@ type projDivFloat64Float64Op struct {
 }
 
 func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30738,6 +32105,12 @@ type projEQFloat64Float64Op struct {
 }
 
 func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30916,6 +32289,12 @@ type projNEFloat64Float64Op struct {
 }
 
 func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31094,6 +32473,12 @@ type projLTFloat64Float64Op struct {
 }
 
 func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31272,6 +32657,12 @@ type projLEFloat64Float64Op struct {
 }
 
 func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31450,6 +32841,12 @@ type projGTFloat64Float64Op struct {
 }
 
 func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31628,6 +33025,12 @@ type projGEFloat64Float64Op struct {
 }
 
 func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31806,6 +33209,12 @@ type projMultFloat64IntervalOp struct {
 }
 
 func (p projMultFloat64IntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31884,6 +33293,12 @@ type projMinusTimestampTimestampOp struct {
 }
 
 func (p projMinusTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31974,6 +33389,12 @@ type projEQTimestampTimestampOp struct {
 }
 
 func (p projEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32104,6 +33525,12 @@ type projNETimestampTimestampOp struct {
 }
 
 func (p projNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32234,6 +33661,12 @@ type projLTTimestampTimestampOp struct {
 }
 
 func (p projLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32364,6 +33797,12 @@ type projLETimestampTimestampOp struct {
 }
 
 func (p projLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32494,6 +33933,12 @@ type projGTTimestampTimestampOp struct {
 }
 
 func (p projGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32624,6 +34069,12 @@ type projGETimestampTimestampOp struct {
 }
 
 func (p projGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32754,6 +34205,12 @@ type projPlusTimestampIntervalOp struct {
 }
 
 func (p projPlusTimestampIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32832,6 +34289,12 @@ type projMinusTimestampIntervalOp struct {
 }
 
 func (p projMinusTimestampIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32910,6 +34373,12 @@ type projMultIntervalDecimalOp struct {
 }
 
 func (p projMultIntervalDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33008,6 +34477,12 @@ type projMultIntervalInt16Op struct {
 }
 
 func (p projMultIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33086,6 +34561,12 @@ type projDivIntervalInt16Op struct {
 }
 
 func (p projDivIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33180,6 +34661,12 @@ type projMultIntervalInt32Op struct {
 }
 
 func (p projMultIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33258,6 +34745,12 @@ type projDivIntervalInt32Op struct {
 }
 
 func (p projDivIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33352,6 +34845,12 @@ type projMultIntervalInt64Op struct {
 }
 
 func (p projMultIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33430,6 +34929,12 @@ type projDivIntervalInt64Op struct {
 }
 
 func (p projDivIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33524,6 +35029,12 @@ type projMultIntervalFloat64Op struct {
 }
 
 func (p projMultIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33602,6 +35113,12 @@ type projDivIntervalFloat64Op struct {
 }
 
 func (p projDivIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33696,6 +35213,12 @@ type projPlusIntervalTimestampOp struct {
 }
 
 func (p projPlusIntervalTimestampOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33774,6 +35297,12 @@ type projPlusIntervalIntervalOp struct {
 }
 
 func (p projPlusIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33852,6 +35381,12 @@ type projMinusIntervalIntervalOp struct {
 }
 
 func (p projMinusIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33930,6 +35465,12 @@ type projEQIntervalIntervalOp struct {
 }
 
 func (p projEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34032,6 +35573,12 @@ type projNEIntervalIntervalOp struct {
 }
 
 func (p projNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34134,6 +35681,12 @@ type projLTIntervalIntervalOp struct {
 }
 
 func (p projLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34236,6 +35789,12 @@ type projLEIntervalIntervalOp struct {
 }
 
 func (p projLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34338,6 +35897,12 @@ type projGTIntervalIntervalOp struct {
 }
 
 func (p projGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34440,6 +36005,12 @@ type projGEIntervalIntervalOp struct {
 }
 
 func (p projGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {

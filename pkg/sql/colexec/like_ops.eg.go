@@ -17,6 +17,12 @@ type selPrefixBytesBytesConstOp struct {
 }
 
 func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -106,6 +112,12 @@ type projPrefixBytesBytesConstOp struct {
 }
 
 func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -176,6 +188,12 @@ type selSuffixBytesBytesConstOp struct {
 }
 
 func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -265,6 +283,12 @@ type projSuffixBytesBytesConstOp struct {
 }
 
 func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -335,6 +359,12 @@ type selRegexpBytesBytesConstOp struct {
 }
 
 func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -424,6 +454,12 @@ type projRegexpBytesBytesConstOp struct {
 }
 
 func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -494,6 +530,12 @@ type selNotPrefixBytesBytesConstOp struct {
 }
 
 func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -583,6 +625,12 @@ type projNotPrefixBytesBytesConstOp struct {
 }
 
 func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -653,6 +701,12 @@ type selNotSuffixBytesBytesConstOp struct {
 }
 
 func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -742,6 +796,12 @@ type projNotSuffixBytesBytesConstOp struct {
 }
 
 func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -812,6 +872,12 @@ type selNotRegexpBytesBytesConstOp struct {
 }
 
 func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -901,6 +967,12 @@ type projNotRegexpBytesBytesConstOp struct {
 }
 
 func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
