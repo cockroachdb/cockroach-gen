@@ -71,8 +71,8 @@ const (
 	FoldNullBinaryLeft
 	FoldNullBinaryRight
 	FoldNullInNonEmpty
-	FoldNullInEmpty
-	FoldNullNotInEmpty
+	FoldInEmpty
+	FoldNotInEmpty
 	FoldArray
 	FoldBinary
 	FoldUnary

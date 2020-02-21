@@ -10364,20 +10364,17 @@ func (_f *Factory) ConstructIn(
 		}
 	}
 
-	// [FoldNullInEmpty]
+	// [FoldInEmpty]
 	{
-		_null, _ := left.(*memo.NullExpr)
-		if _null != nil {
-			_tuple, _ := right.(*memo.TupleExpr)
-			if _tuple != nil {
-				if len(_tuple.Elems) == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullInEmpty) {
-						_expr := _f.ConstructFalse()
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullInEmpty, nil, _expr)
-						}
-						return _expr
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			if len(_tuple.Elems) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldInEmpty) {
+					_expr := _f.ConstructFalse()
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldInEmpty, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
@@ -10498,20 +10495,17 @@ func (_f *Factory) ConstructNotIn(
 		}
 	}
 
-	// [FoldNullNotInEmpty]
+	// [FoldNotInEmpty]
 	{
-		_null, _ := left.(*memo.NullExpr)
-		if _null != nil {
-			_tuple, _ := right.(*memo.TupleExpr)
-			if _tuple != nil {
-				if len(_tuple.Elems) == 0 {
-					if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullNotInEmpty) {
-						_expr := _f.ConstructTrue()
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.FoldNullNotInEmpty, nil, _expr)
-						}
-						return _expr
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			if len(_tuple.Elems) == 0 {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNotInEmpty) {
+					_expr := _f.ConstructTrue()
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNotInEmpty, nil, _expr)
 					}
+					return _expr
 				}
 			}
 		}
