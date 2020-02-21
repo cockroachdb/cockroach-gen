@@ -14125,6 +14125,15 @@ func (_f *Factory) ConstructConcatAgg(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructCorr constructs an expression for the Corr operator.
+func (_f *Factory) ConstructCorr(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeCorr(y, x)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructCount constructs an expression for the Count operator.
 func (_f *Factory) ConstructCount(
 	input opt.ScalarExpr,
@@ -15608,6 +15617,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.CorrExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructCorr(y, x)
+		}
+		return t
+
 	case *memo.CountExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -16820,6 +16837,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.CorrExpr:
+		return f.ConstructCorr(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.CountExpr:
 		return f.ConstructCount(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -17776,6 +17799,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ConcatAggOp:
 		return f.ConstructConcatAgg(
 			args[0].(opt.ScalarExpr),
+		)
+	case opt.CorrOp:
+		return f.ConstructCorr(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
 		)
 	case opt.CountOp:
 		return f.ConstructCount(

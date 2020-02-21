@@ -11351,6 +11351,64 @@ func (e *ConcatAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type CorrExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &CorrExpr{}
+
+func (e *CorrExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *CorrExpr) Op() opt.Operator {
+	return opt.CorrOp
+}
+
+func (e *CorrExpr) ChildCount() int {
+	return 2
+}
+
+func (e *CorrExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CorrExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CorrExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CorrExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CorrExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type CountExpr struct {
 	Input opt.ScalarExpr
 
@@ -17978,6 +18036,28 @@ func (m *Memo) MemoizeConcatAgg(
 	return interned
 }
 
+func (m *Memo) MemoizeCorr(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *CorrExpr {
+	const size = int64(unsafe.Sizeof(CorrExpr{}))
+	e := &CorrExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCorr(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeCount(
 	input opt.ScalarExpr,
 ) *CountExpr {
@@ -19972,6 +20052,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternBoolOr(t)
 	case *ConcatAggExpr:
 		return in.InternConcatAgg(t)
+	case *CorrExpr:
+		return in.InternCorr(t)
 	case *CountExpr:
 		return in.InternCount(t)
 	case *CountRowsExpr:
@@ -22956,6 +23038,26 @@ func (in *interner) InternConcatAgg(val *ConcatAggExpr) *ConcatAggExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ConcatAggExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCorr(val *CorrExpr) *CorrExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CorrOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CorrExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
 				return existing
 			}
 		}
