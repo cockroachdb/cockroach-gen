@@ -10,6 +10,7 @@ var expectedHelpStrings = []string{
 	"ALTER INDEX",
 	"ALTER PARTITION",
 	"ALTER RANGE",
+	"ALTER ROLE",
 	"ALTER SEQUENCE",
 	"ALTER TABLE",
 	"ALTER USER",
