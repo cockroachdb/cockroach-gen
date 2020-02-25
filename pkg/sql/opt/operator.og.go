@@ -585,9 +585,11 @@ const (
 
 	MaxOp
 
-	// Max1Row enforces that its input must return at most one row. It is used as
-	// input to the Subquery operator. See the comment above Subquery for more
-	// details.
+	// Max1Row enforces that its input must return at most one row. If the input
+	// has more than one row, Max1Row raises an error with the specified error text.
+	//
+	// Max1Row is most often used as input to the Subquery operator. See the comment
+	// above Subquery for more details.
 	Max1RowOp
 
 	// MergeJoin represents a join that is executed using merge-join.

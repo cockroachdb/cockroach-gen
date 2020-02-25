@@ -8177,11 +8177,14 @@ func (_f *Factory) ConstructOffset(
 }
 
 // ConstructMax1Row constructs an expression for the Max1Row operator.
-// Max1Row enforces that its input must return at most one row. It is used as
-// input to the Subquery operator. See the comment above Subquery for more
-// details.
+// Max1Row enforces that its input must return at most one row. If the input
+// has more than one row, Max1Row raises an error with the specified error text.
+//
+// Max1Row is most often used as input to the Subquery operator. See the comment
+// above Subquery for more details.
 func (_f *Factory) ConstructMax1Row(
 	input memo.RelExpr,
+	errorText string,
 ) memo.RelExpr {
 	// [EliminateMax1Row]
 	{
@@ -8196,7 +8199,7 @@ func (_f *Factory) ConstructMax1Row(
 		}
 	}
 
-	e := _f.mem.MemoizeMax1Row(input)
+	e := _f.mem.MemoizeMax1Row(input, errorText)
 	return _f.onConstructRelational(e)
 }
 
@@ -14974,7 +14977,7 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.Max1RowExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
-			return f.ConstructMax1Row(input)
+			return f.ConstructMax1Row(input, t.ErrorText)
 		}
 		return t
 
@@ -16357,6 +16360,7 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.Max1RowExpr:
 		return f.ConstructMax1Row(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			t.ErrorText,
 		)
 
 	case *memo.OrdinalityExpr:
@@ -17392,6 +17396,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.Max1RowOp:
 		return f.ConstructMax1Row(
 			args[0].(memo.RelExpr),
+			*args[1].(*string),
 		)
 	case opt.OrdinalityOp:
 		return f.ConstructOrdinality(

@@ -5312,11 +5312,14 @@ func (g *offsetGroup) bestProps() *bestProps {
 	return &g.best
 }
 
-// Max1RowExpr enforces that its input must return at most one row. It is used as
-// input to the Subquery operator. See the comment above Subquery for more
-// details.
+// Max1RowExpr enforces that its input must return at most one row. If the input
+// has more than one row, Max1Row raises an error with the specified error text.
+//
+// Max1Row is most often used as input to the Subquery operator. See the comment
+// above Subquery for more details.
 type Max1RowExpr struct {
-	Input RelExpr
+	Input     RelExpr
+	ErrorText string
 
 	grp  exprGroup
 	next RelExpr
@@ -5341,7 +5344,7 @@ func (e *Max1RowExpr) Child(nth int) opt.Expr {
 }
 
 func (e *Max1RowExpr) Private() interface{} {
-	return nil
+	return &e.ErrorText
 }
 
 func (e *Max1RowExpr) String() string {
@@ -16229,10 +16232,12 @@ func (m *Memo) MemoizeOffset(
 
 func (m *Memo) MemoizeMax1Row(
 	input RelExpr,
+	errorText string,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(max1RowGroup{}))
 	grp := &max1RowGroup{mem: m, first: Max1RowExpr{
-		Input: input,
+		Input:     input,
+		ErrorText: errorText,
 	}}
 	e := &grp.first
 	e.grp = grp
@@ -21153,11 +21158,13 @@ func (in *interner) InternMax1Row(val *Max1RowExpr) *Max1RowExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.Max1RowOp)
 	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashString(val.ErrorText)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*Max1RowExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Input, existing.Input) {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsStringEqual(val.ErrorText, existing.ErrorText) {
 				return existing
 			}
 		}
