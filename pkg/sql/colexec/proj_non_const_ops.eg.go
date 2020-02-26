@@ -24,6 +24,29 @@ import (
 	"github.com/pkg/errors"
 )
 
+// projConstOpBase contains all of the fields for binary projections with a
+// constant, except for the constant itself.
+// NOTE: this struct should be declared in proj_const_ops_tmpl.go, but if we do
+// so, it'll be redeclared because we execute that template twice. To go
+// around the problem we specify it here.
+type projConstOpBase struct {
+	OneInputNode
+	allocator      *Allocator
+	colIdx         int
+	outputIdx      int
+	decimalScratch decimalOverloadScratch
+}
+
+// projOpBase contains all of the fields for non-constant binary projections.
+type projOpBase struct {
+	OneInputNode
+	allocator      *Allocator
+	col1Idx        int
+	col2Idx        int
+	outputIdx      int
+	decimalScratch decimalOverloadScratch
+}
+
 type projEQBoolBoolOp struct {
 	projOpBase
 }

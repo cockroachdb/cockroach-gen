@@ -15,7 +15,6 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
@@ -44,9 +43,6 @@ func newAnyNotNullAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error)
 		return nil, errors.Errorf("unsupported any not null agg type %s", t)
 	}
 }
-
-// Use execgen package to remove unused import warning.
-var _ interface{} = execgen.UNSAFEGET
 
 // anyNotNullBoolAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.

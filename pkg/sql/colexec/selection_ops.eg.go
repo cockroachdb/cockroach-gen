@@ -26,6 +26,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+// selConstOpBase contains all of the fields for binary selections with a
+// constant, except for the constant itself.
+type selConstOpBase struct {
+	OneInputNode
+	colIdx         int
+	decimalScratch decimalOverloadScratch
+}
+
+// selOpBase contains all of the fields for non-constant binary selections.
+type selOpBase struct {
+	OneInputNode
+	col1Idx        int
+	col2Idx        int
+	decimalScratch decimalOverloadScratch
+}
+
 type selEQBoolBoolConstOp struct {
 	selConstOpBase
 	constArg bool
