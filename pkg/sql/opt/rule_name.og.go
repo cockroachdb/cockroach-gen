@@ -86,9 +86,12 @@ const (
 	EliminateDistinct
 	EliminateGroupByProject
 	ReduceGroupingCols
+	ReduceNotNullGroupingCols
 	EliminateAggDistinctForKeys
 	EliminateAggFilteredDistinctForKeys
 	EliminateDistinctOnNoColumns
+	EliminateUpsertDistinctOnNoColumns
+	EliminateDistinctOnValues
 	InlineProjectConstants
 	InlineSelectConstants
 	InlineJoinConstantsLeft

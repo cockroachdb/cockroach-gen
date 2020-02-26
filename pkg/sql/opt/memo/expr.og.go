@@ -3868,8 +3868,8 @@ func (g *groupByGroup) bestProps() *bestProps {
 }
 
 // GroupingPrivate is shared between the grouping-related operators: GroupBy
-// ScalarGroupBy, and DistinctOn. This allows the operators to be treated
-// polymorphically.
+// ScalarGroupBy, DistinctOn, and UpsertDistinctOn. This allows the operators to
+// be treated polymorphically.
 type GroupingPrivate struct {
 	// GroupingCols partitions the GroupBy input rows into aggregation groups.
 	// All rows sharing the same values for these columns are in the same group.
@@ -4187,6 +4187,148 @@ func (g *distinctOnGroup) firstExpr() RelExpr {
 }
 
 func (g *distinctOnGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// UpsertDistinctOnExpr is a variation on DistinctOn that is only used with UPSERT
+// and INSERT..ON CONFLICT statements. It differs from DistinctOn in two ways:
+//
+//   1. Null behavior: UpsertDistinctOn treats NULL values as not equal to one
+//      another for purposes of grouping. Two rows having a NULL-valued grouping
+//      column will be placed in different groups. This differs from DistinctOn
+//      behavior, where the two rows would be grouped together. This behavior
+//      difference reflects SQL semantics, in which a unique index key still
+//      allows multiple NULL values.
+//
+//   2. Duplicate behavior: UpsertDistinctOn raises an error if any distinct
+//      grouping contains more than one row. It has "input must be distinct"
+//      semantics rather than "make the input distinct" semantics. This is used
+//      to ensure that no row will be updated more than once.
+//
+type UpsertDistinctOnExpr struct {
+	Input        RelExpr
+	Aggregations AggregationsExpr
+	GroupingPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &UpsertDistinctOnExpr{}
+
+func (e *UpsertDistinctOnExpr) Op() opt.Operator {
+	return opt.UpsertDistinctOnOp
+}
+
+func (e *UpsertDistinctOnExpr) ChildCount() int {
+	return 2
+}
+
+func (e *UpsertDistinctOnExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Aggregations
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UpsertDistinctOnExpr) Private() interface{} {
+	return &e.GroupingPrivate
+}
+
+func (e *UpsertDistinctOnExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UpsertDistinctOnExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Aggregations = *child.(*AggregationsExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UpsertDistinctOnExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *UpsertDistinctOnExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *UpsertDistinctOnExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *UpsertDistinctOnExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *UpsertDistinctOnExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *UpsertDistinctOnExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *UpsertDistinctOnExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *UpsertDistinctOnExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *UpsertDistinctOnExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *UpsertDistinctOnExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *UpsertDistinctOnExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type upsertDistinctOnGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first UpsertDistinctOnExpr
+	best  bestProps
+}
+
+var _ exprGroup = &upsertDistinctOnGroup{}
+
+func (g *upsertDistinctOnGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *upsertDistinctOnGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *upsertDistinctOnGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *upsertDistinctOnGroup) bestProps() *bestProps {
 	return &g.best
 }
 
@@ -16022,6 +16164,32 @@ func (m *Memo) MemoizeDistinctOn(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeUpsertDistinctOn(
+	input RelExpr,
+	aggregations AggregationsExpr,
+	groupingPrivate *GroupingPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(upsertDistinctOnGroup{}))
+	grp := &upsertDistinctOnGroup{mem: m, first: UpsertDistinctOnExpr{
+		Input:           input,
+		Aggregations:    aggregations,
+		GroupingPrivate: *groupingPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternUpsertDistinctOn(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildUpsertDistinctOnProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeUnion(
 	left RelExpr,
 	right RelExpr,
@@ -19359,6 +19527,20 @@ func (m *Memo) AddDistinctOnToGroup(e *DistinctOnExpr, grp RelExpr) *DistinctOnE
 	return interned
 }
 
+func (m *Memo) AddUpsertDistinctOnToGroup(e *UpsertDistinctOnExpr, grp RelExpr) *UpsertDistinctOnExpr {
+	const size = int64(unsafe.Sizeof(UpsertDistinctOnExpr{}))
+	interned := m.interner.InternUpsertDistinctOn(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddUnionToGroup(e *UnionExpr, grp RelExpr) *UnionExpr {
 	const size = int64(unsafe.Sizeof(UnionExpr{}))
 	interned := m.interner.InternUnion(e)
@@ -19853,6 +20035,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternScalarGroupBy(t)
 	case *DistinctOnExpr:
 		return in.InternDistinctOn(t)
+	case *UpsertDistinctOnExpr:
+		return in.InternUpsertDistinctOn(t)
 	case *UnionExpr:
 		return in.InternUnion(t)
 	case *IntersectExpr:
@@ -20941,6 +21125,30 @@ func (in *interner) InternDistinctOn(val *DistinctOnExpr) *DistinctOnExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*DistinctOnExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
+				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUpsertDistinctOn(val *UpsertDistinctOnExpr) *UpsertDistinctOnExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UpsertDistinctOnOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashAggregationsExpr(val.Aggregations)
+	in.hasher.HashColSet(val.GroupingCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UpsertDistinctOnExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
@@ -24164,6 +24372,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildScalarGroupByProps(t, rel)
 	case *DistinctOnExpr:
 		b.buildDistinctOnProps(t, rel)
+	case *UpsertDistinctOnExpr:
+		b.buildUpsertDistinctOnProps(t, rel)
 	case *UnionExpr:
 		b.buildUnionProps(t, rel)
 	case *IntersectExpr:

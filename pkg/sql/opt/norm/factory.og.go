@@ -7327,12 +7327,13 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [ReduceGroupingCols]
 	{
-		if _f.funcs.CanReduceGroupingCols(input, groupingPrivate) {
+		redundantCols := _f.funcs.RedundantCols(input, _f.funcs.GroupingCols(groupingPrivate))
+		if !_f.funcs.ColsAreEmpty(redundantCols) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceGroupingCols) {
 				_expr := _f.ConstructGroupBy(
 					input,
-					_f.funcs.AppendReducedGroupingCols(input, aggregations, groupingPrivate),
-					_f.funcs.ReduceGroupingCols(input, groupingPrivate),
+					_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, redundantCols),
+					_f.funcs.RemoveGroupingCols(groupingPrivate, redundantCols),
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.ReduceGroupingCols, nil, _expr)
@@ -7640,12 +7641,13 @@ func (_f *Factory) ConstructDistinctOn(
 
 	// [ReduceGroupingCols]
 	{
-		if _f.funcs.CanReduceGroupingCols(input, groupingPrivate) {
+		redundantCols := _f.funcs.RedundantCols(input, _f.funcs.GroupingCols(groupingPrivate))
+		if !_f.funcs.ColsAreEmpty(redundantCols) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceGroupingCols) {
 				_expr := _f.ConstructDistinctOn(
 					input,
-					_f.funcs.AppendReducedGroupingCols(input, aggregations, groupingPrivate),
-					_f.funcs.ReduceGroupingCols(input, groupingPrivate),
+					_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, redundantCols),
+					_f.funcs.RemoveGroupingCols(groupingPrivate, redundantCols),
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.ReduceGroupingCols, nil, _expr)
@@ -7665,9 +7667,22 @@ func (_f *Factory) ConstructDistinctOn(
 						tree.NewDInt(1),
 					),
 					_f.funcs.GroupingInputOrdering(groupingPrivate),
-				), aggregations).(memo.RelExpr)
+				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.EliminateDistinctOnNoColumns, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateDistinctOnValues]
+	{
+		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(opt.DistinctOnOp)) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnValues) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(input, _f.funcs.GroupingCols(groupingPrivate), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctOnValues, nil, _expr)
 				}
 				return _expr
 			}
@@ -7710,6 +7725,99 @@ func (_f *Factory) ConstructDistinctOn(
 	}
 
 	e := _f.mem.MemoizeDistinctOn(input, aggregations, groupingPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructUpsertDistinctOn constructs an expression for the UpsertDistinctOn operator.
+// UpsertDistinctOn is a variation on DistinctOn that is only used with UPSERT
+// and INSERT..ON CONFLICT statements. It differs from DistinctOn in two ways:
+//
+//   1. Null behavior: UpsertDistinctOn treats NULL values as not equal to one
+//      another for purposes of grouping. Two rows having a NULL-valued grouping
+//      column will be placed in different groups. This differs from DistinctOn
+//      behavior, where the two rows would be grouped together. This behavior
+//      difference reflects SQL semantics, in which a unique index key still
+//      allows multiple NULL values.
+//
+//   2. Duplicate behavior: UpsertDistinctOn raises an error if any distinct
+//      grouping contains more than one row. It has "input must be distinct"
+//      semantics rather than "make the input distinct" semantics. This is used
+//      to ensure that no row will be updated more than once.
+//
+func (_f *Factory) ConstructUpsertDistinctOn(
+	input memo.RelExpr,
+	aggregations memo.AggregationsExpr,
+	groupingPrivate *memo.GroupingPrivate,
+) memo.RelExpr {
+	// [EliminateGroupByProject]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
+					_expr := _f.ConstructUpsertDistinctOn(
+						innerInput,
+						aggregations,
+						groupingPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [ReduceNotNullGroupingCols]
+	{
+		redundantCols := _f.funcs.IntersectionCols(_f.funcs.RedundantCols(input, _f.funcs.GroupingCols(groupingPrivate)), _f.funcs.NotNullCols(input))
+		if !_f.funcs.ColsAreEmpty(redundantCols) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceNotNullGroupingCols) {
+				_expr := _f.ConstructUpsertDistinctOn(
+					input,
+					_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, redundantCols),
+					_f.funcs.RemoveGroupingCols(groupingPrivate, redundantCols),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ReduceNotNullGroupingCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateUpsertDistinctOnNoColumns]
+	{
+		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUpsertDistinctOnNoColumns) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
+					input,
+					_f.funcs.DuplicateUpsertErrText(),
+				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateUpsertDistinctOnNoColumns, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateDistinctOnValues]
+	{
+		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(opt.UpsertDistinctOnOp)) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnValues) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(input, _f.funcs.GroupingCols(groupingPrivate), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctOnValues, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeUpsertDistinctOn(input, aggregations, groupingPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -8328,12 +8436,13 @@ func (_f *Factory) ConstructWindow(
 	{
 		fn := windows
 		private := windowPrivate
-		if _f.funcs.CanReduceWindowPartitionCols(input, private) {
+		redundantCols := _f.funcs.RedundantCols(input, _f.funcs.WindowPartition(private))
+		if !_f.funcs.ColsAreEmpty(redundantCols) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceWindowPartitionCols) {
 				_expr := _f.ConstructWindow(
 					input,
 					fn,
-					_f.funcs.ReduceWindowPartitionCols(input, private),
+					_f.funcs.RemoveWindowPartitionCols(private, redundantCols),
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.ReduceWindowPartitionCols, nil, _expr)
@@ -8510,12 +8619,13 @@ func (_f *Factory) ConstructAny(
 			values := _project.Input
 			_values, _ := values.(*memo.ValuesExpr)
 			if _values != nil {
+				valuesPrivate := &_values.ValuesPrivate
 				if len(_project.Projections) == 1 {
 					_item := &_project.Projections[0]
 					tuple := _item.Element
 					_tuple, _ := tuple.(*memo.TupleExpr)
 					if _tuple != nil {
-						if _f.funcs.IsTupleOfVars(tuple, _f.funcs.ValuesCols(values)) {
+						if _f.funcs.IsTupleOfVars(tuple, _f.funcs.ValuesCols(valuesPrivate)) {
 							passthrough := _project.Passthrough
 							if _f.funcs.ColsAreEmpty(passthrough) {
 								private := subqueryPrivate
@@ -14910,6 +15020,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.UpsertDistinctOnExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
+		if input != t.Input || aggregationsChanged {
+			return f.ConstructUpsertDistinctOn(input, aggregations, &t.GroupingPrivate)
+		}
+		return t
+
 	case *memo.UnionExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
@@ -16301,6 +16419,13 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.GroupingPrivate,
 		)
 
+	case *memo.UpsertDistinctOnExpr:
+		return f.ConstructUpsertDistinctOn(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultAggregationsExpr(t.Aggregations, replace),
+			&t.GroupingPrivate,
+		)
+
 	case *memo.UnionExpr:
 		return f.ConstructUnion(
 			f.invokeReplace(t.Left, replace).(memo.RelExpr),
@@ -17341,6 +17466,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.DistinctOnOp:
 		return f.ConstructDistinctOn(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.AggregationsExpr),
+			args[2].(*memo.GroupingPrivate),
+		)
+	case opt.UpsertDistinctOnOp:
+		return f.ConstructUpsertDistinctOn(
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.AggregationsExpr),
 			args[2].(*memo.GroupingPrivate),
