@@ -1240,7 +1240,8 @@ func (m *memColumn) PrettyValueAt(colIdx uint16, colType coltypes.T) string {
 	}
 }
 
-// Helper to set the value in a Vec when the type is unknown.
+// SetValueAt is an inefficient helper to set the value in a Vec when the type
+// is unknown.
 func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 	switch colType {
 	case coltypes.Bool:
@@ -1279,6 +1280,42 @@ func SetValueAt(v Vec, elem interface{}, rowIdx uint16, colType coltypes.T) {
 		target := v.Interval()
 		newVal := elem.(duration.Duration)
 		target[int(rowIdx)] = newVal
+	default:
+		panic(fmt.Sprintf("unhandled type %d", colType))
+	}
+}
+
+// GetValueAt is an inefficient helper to get the value in a Vec when the type
+// is unknown.
+func GetValueAt(v Vec, rowIdx uint16, colType coltypes.T) interface{} {
+	switch colType {
+	case coltypes.Bool:
+		target := v.Bool()
+		return target[int(rowIdx)]
+	case coltypes.Bytes:
+		target := v.Bytes()
+		return target.Get(int(rowIdx))
+	case coltypes.Decimal:
+		target := v.Decimal()
+		return target[int(rowIdx)]
+	case coltypes.Int16:
+		target := v.Int16()
+		return target[int(rowIdx)]
+	case coltypes.Int32:
+		target := v.Int32()
+		return target[int(rowIdx)]
+	case coltypes.Int64:
+		target := v.Int64()
+		return target[int(rowIdx)]
+	case coltypes.Float64:
+		target := v.Float64()
+		return target[int(rowIdx)]
+	case coltypes.Timestamp:
+		target := v.Timestamp()
+		return target[int(rowIdx)]
+	case coltypes.Interval:
+		target := v.Interval()
+		return target[int(rowIdx)]
 	default:
 		panic(fmt.Sprintf("unhandled type %d", colType))
 	}
