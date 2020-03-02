@@ -334,11 +334,11 @@ func newSingleSorter(
 type sortBoolAscOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBoolAscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBoolAscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bool()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -349,20 +349,20 @@ func (s *sortBoolAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -370,8 +370,8 @@ func (s *sortBoolAscOp) sortPartitions(ctx context.Context, partitions []uint64)
 func (s *sortBoolAscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -402,11 +402,11 @@ func (s *sortBoolAscOp) Len() int {
 type sortBoolDescOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBoolDescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBoolDescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bool()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -417,20 +417,20 @@ func (s *sortBoolDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -438,8 +438,8 @@ func (s *sortBoolDescOp) sortPartitions(ctx context.Context, partitions []uint64
 func (s *sortBoolDescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -470,11 +470,11 @@ func (s *sortBoolDescOp) Len() int {
 type sortBoolAscWithNullsOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBoolAscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBoolAscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bool()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -485,27 +485,27 @@ func (s *sortBoolAscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBoolAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBoolAscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortBoolAscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -516,8 +516,8 @@ func (s *sortBoolAscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -548,11 +548,11 @@ func (s *sortBoolAscWithNullsOp) Len() int {
 type sortBoolDescWithNullsOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBoolDescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBoolDescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bool()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -563,27 +563,27 @@ func (s *sortBoolDescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBoolDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBoolDescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortBoolDescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -594,8 +594,8 @@ func (s *sortBoolDescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -626,11 +626,11 @@ func (s *sortBoolDescWithNullsOp) Len() int {
 type sortBytesAscOp struct {
 	sortCol       *coldata.Bytes
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBytesAscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBytesAscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bytes()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -641,20 +641,20 @@ func (s *sortBytesAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -662,8 +662,8 @@ func (s *sortBytesAscOp) sortPartitions(ctx context.Context, partitions []uint64
 func (s *sortBytesAscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol.Get(int(s.order[i]))
-	arg2 := s.sortCol.Get(int(s.order[j]))
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
 
 	{
 		var cmpResult int
@@ -686,11 +686,11 @@ func (s *sortBytesAscOp) Len() int {
 type sortBytesDescOp struct {
 	sortCol       *coldata.Bytes
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBytesDescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBytesDescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bytes()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -701,20 +701,20 @@ func (s *sortBytesDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -722,8 +722,8 @@ func (s *sortBytesDescOp) sortPartitions(ctx context.Context, partitions []uint6
 func (s *sortBytesDescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol.Get(int(s.order[i]))
-	arg2 := s.sortCol.Get(int(s.order[j]))
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
 
 	{
 		var cmpResult int
@@ -746,11 +746,11 @@ func (s *sortBytesDescOp) Len() int {
 type sortBytesAscWithNullsOp struct {
 	sortCol       *coldata.Bytes
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBytesAscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBytesAscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bytes()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -761,27 +761,27 @@ func (s *sortBytesAscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBytesAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBytesAscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortBytesAscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -792,8 +792,8 @@ func (s *sortBytesAscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol.Get(int(s.order[i]))
-	arg2 := s.sortCol.Get(int(s.order[j]))
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
 
 	{
 		var cmpResult int
@@ -816,11 +816,11 @@ func (s *sortBytesAscWithNullsOp) Len() int {
 type sortBytesDescWithNullsOp struct {
 	sortCol       *coldata.Bytes
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortBytesDescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortBytesDescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Bytes()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -831,27 +831,27 @@ func (s *sortBytesDescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortBytesDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortBytesDescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortBytesDescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -862,8 +862,8 @@ func (s *sortBytesDescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol.Get(int(s.order[i]))
-	arg2 := s.sortCol.Get(int(s.order[j]))
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
 
 	{
 		var cmpResult int
@@ -886,11 +886,11 @@ func (s *sortBytesDescWithNullsOp) Len() int {
 type sortDecimalAscOp struct {
 	sortCol       []apd.Decimal
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortDecimalAscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortDecimalAscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Decimal()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -901,20 +901,20 @@ func (s *sortDecimalAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -922,8 +922,8 @@ func (s *sortDecimalAscOp) sortPartitions(ctx context.Context, partitions []uint
 func (s *sortDecimalAscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -946,11 +946,11 @@ func (s *sortDecimalAscOp) Len() int {
 type sortDecimalDescOp struct {
 	sortCol       []apd.Decimal
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortDecimalDescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortDecimalDescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Decimal()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -961,20 +961,20 @@ func (s *sortDecimalDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -982,8 +982,8 @@ func (s *sortDecimalDescOp) sortPartitions(ctx context.Context, partitions []uin
 func (s *sortDecimalDescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1006,11 +1006,11 @@ func (s *sortDecimalDescOp) Len() int {
 type sortDecimalAscWithNullsOp struct {
 	sortCol       []apd.Decimal
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortDecimalAscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortDecimalAscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Decimal()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1021,27 +1021,27 @@ func (s *sortDecimalAscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortDecimalAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortDecimalAscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortDecimalAscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1052,8 +1052,8 @@ func (s *sortDecimalAscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1076,11 +1076,11 @@ func (s *sortDecimalAscWithNullsOp) Len() int {
 type sortDecimalDescWithNullsOp struct {
 	sortCol       []apd.Decimal
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortDecimalDescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortDecimalDescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Decimal()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1091,27 +1091,27 @@ func (s *sortDecimalDescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortDecimalDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortDecimalDescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortDecimalDescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1122,8 +1122,8 @@ func (s *sortDecimalDescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1146,11 +1146,11 @@ func (s *sortDecimalDescWithNullsOp) Len() int {
 type sortInt16AscOp struct {
 	sortCol       []int16
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt16AscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt16AscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int16()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1161,20 +1161,20 @@ func (s *sortInt16AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -1182,8 +1182,8 @@ func (s *sortInt16AscOp) sortPartitions(ctx context.Context, partitions []uint64
 func (s *sortInt16AscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1217,11 +1217,11 @@ func (s *sortInt16AscOp) Len() int {
 type sortInt16DescOp struct {
 	sortCol       []int16
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt16DescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt16DescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int16()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1232,20 +1232,20 @@ func (s *sortInt16DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -1253,8 +1253,8 @@ func (s *sortInt16DescOp) sortPartitions(ctx context.Context, partitions []uint6
 func (s *sortInt16DescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1288,11 +1288,11 @@ func (s *sortInt16DescOp) Len() int {
 type sortInt16AscWithNullsOp struct {
 	sortCol       []int16
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt16AscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt16AscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int16()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1303,27 +1303,27 @@ func (s *sortInt16AscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt16AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt16AscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortInt16AscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1334,8 +1334,8 @@ func (s *sortInt16AscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1369,11 +1369,11 @@ func (s *sortInt16AscWithNullsOp) Len() int {
 type sortInt16DescWithNullsOp struct {
 	sortCol       []int16
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt16DescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt16DescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int16()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1384,27 +1384,27 @@ func (s *sortInt16DescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt16DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt16DescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortInt16DescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1415,8 +1415,8 @@ func (s *sortInt16DescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1450,11 +1450,11 @@ func (s *sortInt16DescWithNullsOp) Len() int {
 type sortInt32AscOp struct {
 	sortCol       []int32
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt32AscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt32AscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int32()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1465,20 +1465,20 @@ func (s *sortInt32AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -1486,8 +1486,8 @@ func (s *sortInt32AscOp) sortPartitions(ctx context.Context, partitions []uint64
 func (s *sortInt32AscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1521,11 +1521,11 @@ func (s *sortInt32AscOp) Len() int {
 type sortInt32DescOp struct {
 	sortCol       []int32
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt32DescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt32DescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int32()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1536,20 +1536,20 @@ func (s *sortInt32DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -1557,8 +1557,8 @@ func (s *sortInt32DescOp) sortPartitions(ctx context.Context, partitions []uint6
 func (s *sortInt32DescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1592,11 +1592,11 @@ func (s *sortInt32DescOp) Len() int {
 type sortInt32AscWithNullsOp struct {
 	sortCol       []int32
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt32AscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt32AscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int32()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1607,27 +1607,27 @@ func (s *sortInt32AscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt32AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt32AscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortInt32AscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1638,8 +1638,8 @@ func (s *sortInt32AscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1673,11 +1673,11 @@ func (s *sortInt32AscWithNullsOp) Len() int {
 type sortInt32DescWithNullsOp struct {
 	sortCol       []int32
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt32DescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt32DescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int32()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1688,27 +1688,27 @@ func (s *sortInt32DescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt32DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt32DescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortInt32DescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1719,8 +1719,8 @@ func (s *sortInt32DescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1754,11 +1754,11 @@ func (s *sortInt32DescWithNullsOp) Len() int {
 type sortInt64AscOp struct {
 	sortCol       []int64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt64AscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt64AscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1769,20 +1769,20 @@ func (s *sortInt64AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -1790,8 +1790,8 @@ func (s *sortInt64AscOp) sortPartitions(ctx context.Context, partitions []uint64
 func (s *sortInt64AscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1825,11 +1825,11 @@ func (s *sortInt64AscOp) Len() int {
 type sortInt64DescOp struct {
 	sortCol       []int64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt64DescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt64DescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1840,20 +1840,20 @@ func (s *sortInt64DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -1861,8 +1861,8 @@ func (s *sortInt64DescOp) sortPartitions(ctx context.Context, partitions []uint6
 func (s *sortInt64DescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1896,11 +1896,11 @@ func (s *sortInt64DescOp) Len() int {
 type sortInt64AscWithNullsOp struct {
 	sortCol       []int64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt64AscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt64AscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1911,27 +1911,27 @@ func (s *sortInt64AscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt64AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt64AscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortInt64AscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -1942,8 +1942,8 @@ func (s *sortInt64AscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -1977,11 +1977,11 @@ func (s *sortInt64AscWithNullsOp) Len() int {
 type sortInt64DescWithNullsOp struct {
 	sortCol       []int64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortInt64DescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortInt64DescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Int64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -1992,27 +1992,27 @@ func (s *sortInt64DescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortInt64DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortInt64DescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortInt64DescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2023,8 +2023,8 @@ func (s *sortInt64DescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2058,11 +2058,11 @@ func (s *sortInt64DescWithNullsOp) Len() int {
 type sortFloat64AscOp struct {
 	sortCol       []float64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat64AscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortFloat64AscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Float64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2073,20 +2073,20 @@ func (s *sortFloat64AscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -2094,8 +2094,8 @@ func (s *sortFloat64AscOp) sortPartitions(ctx context.Context, partitions []uint
 func (s *sortFloat64AscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2137,11 +2137,11 @@ func (s *sortFloat64AscOp) Len() int {
 type sortFloat64DescOp struct {
 	sortCol       []float64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat64DescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortFloat64DescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Float64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2152,20 +2152,20 @@ func (s *sortFloat64DescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -2173,8 +2173,8 @@ func (s *sortFloat64DescOp) sortPartitions(ctx context.Context, partitions []uin
 func (s *sortFloat64DescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2216,11 +2216,11 @@ func (s *sortFloat64DescOp) Len() int {
 type sortFloat64AscWithNullsOp struct {
 	sortCol       []float64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat64AscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortFloat64AscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Float64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2231,27 +2231,27 @@ func (s *sortFloat64AscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat64AscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortFloat64AscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortFloat64AscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2262,8 +2262,8 @@ func (s *sortFloat64AscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2305,11 +2305,11 @@ func (s *sortFloat64AscWithNullsOp) Len() int {
 type sortFloat64DescWithNullsOp struct {
 	sortCol       []float64
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortFloat64DescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortFloat64DescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Float64()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2320,27 +2320,27 @@ func (s *sortFloat64DescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortFloat64DescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortFloat64DescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortFloat64DescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2351,8 +2351,8 @@ func (s *sortFloat64DescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2394,11 +2394,11 @@ func (s *sortFloat64DescWithNullsOp) Len() int {
 type sortTimestampAscOp struct {
 	sortCol       []time.Time
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortTimestampAscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortTimestampAscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Timestamp()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2409,20 +2409,20 @@ func (s *sortTimestampAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortTimestampAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortTimestampAscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -2430,8 +2430,8 @@ func (s *sortTimestampAscOp) sortPartitions(ctx context.Context, partitions []ui
 func (s *sortTimestampAscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2461,11 +2461,11 @@ func (s *sortTimestampAscOp) Len() int {
 type sortTimestampDescOp struct {
 	sortCol       []time.Time
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortTimestampDescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortTimestampDescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Timestamp()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2476,20 +2476,20 @@ func (s *sortTimestampDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortTimestampDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortTimestampDescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -2497,8 +2497,8 @@ func (s *sortTimestampDescOp) sortPartitions(ctx context.Context, partitions []u
 func (s *sortTimestampDescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2528,11 +2528,11 @@ func (s *sortTimestampDescOp) Len() int {
 type sortTimestampAscWithNullsOp struct {
 	sortCol       []time.Time
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortTimestampAscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortTimestampAscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Timestamp()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2543,27 +2543,27 @@ func (s *sortTimestampAscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortTimestampAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortTimestampAscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortTimestampAscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2574,8 +2574,8 @@ func (s *sortTimestampAscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2605,11 +2605,11 @@ func (s *sortTimestampAscWithNullsOp) Len() int {
 type sortTimestampDescWithNullsOp struct {
 	sortCol       []time.Time
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortTimestampDescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortTimestampDescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Timestamp()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2620,27 +2620,27 @@ func (s *sortTimestampDescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortTimestampDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortTimestampDescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortTimestampDescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2651,8 +2651,8 @@ func (s *sortTimestampDescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2682,11 +2682,11 @@ func (s *sortTimestampDescWithNullsOp) Len() int {
 type sortIntervalAscOp struct {
 	sortCol       []duration.Duration
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortIntervalAscOp) init(col coldata.Vec, order []uint64) {
+func (s *sortIntervalAscOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Interval()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2697,20 +2697,20 @@ func (s *sortIntervalAscOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortIntervalAscOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortIntervalAscOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -2718,8 +2718,8 @@ func (s *sortIntervalAscOp) sortPartitions(ctx context.Context, partitions []uin
 func (s *sortIntervalAscOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2742,11 +2742,11 @@ func (s *sortIntervalAscOp) Len() int {
 type sortIntervalDescOp struct {
 	sortCol       []duration.Duration
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortIntervalDescOp) init(col coldata.Vec, order []uint64) {
+func (s *sortIntervalDescOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Interval()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2757,20 +2757,20 @@ func (s *sortIntervalDescOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortIntervalDescOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortIntervalDescOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
@@ -2778,8 +2778,8 @@ func (s *sortIntervalDescOp) sortPartitions(ctx context.Context, partitions []ui
 func (s *sortIntervalDescOp) Less(i, j int) bool {
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2802,11 +2802,11 @@ func (s *sortIntervalDescOp) Len() int {
 type sortIntervalAscWithNullsOp struct {
 	sortCol       []duration.Duration
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortIntervalAscWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortIntervalAscWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Interval()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2817,27 +2817,27 @@ func (s *sortIntervalAscWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortIntervalAscWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortIntervalAscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortIntervalAscWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If ascending, nulls always sort first, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2848,8 +2848,8 @@ func (s *sortIntervalAscWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int
@@ -2872,11 +2872,11 @@ func (s *sortIntervalAscWithNullsOp) Len() int {
 type sortIntervalDescWithNullsOp struct {
 	sortCol       []duration.Duration
 	nulls         *coldata.Nulls
-	order         []uint64
+	order         []int
 	cancelChecker CancelChecker
 }
 
-func (s *sortIntervalDescWithNullsOp) init(col coldata.Vec, order []uint64) {
+func (s *sortIntervalDescWithNullsOp) init(col coldata.Vec, order []int) {
 	s.sortCol = col.Interval()
 	s.nulls = col.Nulls()
 	s.order = order
@@ -2887,27 +2887,27 @@ func (s *sortIntervalDescWithNullsOp) sort(ctx context.Context) {
 	s.quickSort(ctx, 0, n, maxDepth(n))
 }
 
-func (s *sortIntervalDescWithNullsOp) sortPartitions(ctx context.Context, partitions []uint64) {
+func (s *sortIntervalDescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
 	if len(partitions) < 1 {
 		execerror.VectorizedInternalPanic(fmt.Sprintf("invalid partitions list %v", partitions))
 	}
 	order := s.order
 	for i, partitionStart := range partitions {
-		var partitionEnd uint64
+		var partitionEnd int
 		if i == len(partitions)-1 {
-			partitionEnd = uint64(len(order))
+			partitionEnd = len(order)
 		} else {
 			partitionEnd = partitions[i+1]
 		}
 		s.order = order[partitionStart:partitionEnd]
-		n := int(partitionEnd - partitionStart)
+		n := partitionEnd - partitionStart
 		s.quickSort(ctx, 0, n, maxDepth(n))
 	}
 }
 
 func (s *sortIntervalDescWithNullsOp) Less(i, j int) bool {
-	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[i])
-	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt64(s.order[j])
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
 	// If descending, nulls always sort last, so we encode that logic here.
 	if n1 && n2 {
 		return false
@@ -2918,8 +2918,8 @@ func (s *sortIntervalDescWithNullsOp) Less(i, j int) bool {
 	}
 	var lt bool
 	// We always indirect via the order vector.
-	arg1 := s.sortCol[int(s.order[i])]
-	arg2 := s.sortCol[int(s.order[j])]
+	arg1 := s.sortCol[s.order[i]]
+	arg2 := s.sortCol[s.order[j]]
 
 	{
 		var cmpResult int

@@ -112,7 +112,7 @@ func (s *substringInt16Int16Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -132,7 +132,7 @@ func (s *substringInt16Int16Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -155,7 +155,7 @@ func (s *substringInt16Int16Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -188,7 +188,7 @@ func (s *substringInt16Int32Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -208,7 +208,7 @@ func (s *substringInt16Int32Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -231,7 +231,7 @@ func (s *substringInt16Int32Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -264,7 +264,7 @@ func (s *substringInt16Int64Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -284,7 +284,7 @@ func (s *substringInt16Int64Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -307,7 +307,7 @@ func (s *substringInt16Int64Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -340,7 +340,7 @@ func (s *substringInt32Int16Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -360,7 +360,7 @@ func (s *substringInt32Int16Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -383,7 +383,7 @@ func (s *substringInt32Int16Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -416,7 +416,7 @@ func (s *substringInt32Int32Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -436,7 +436,7 @@ func (s *substringInt32Int32Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -459,7 +459,7 @@ func (s *substringInt32Int32Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -492,7 +492,7 @@ func (s *substringInt32Int64Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -512,7 +512,7 @@ func (s *substringInt32Int64Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -535,7 +535,7 @@ func (s *substringInt32Int64Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -568,7 +568,7 @@ func (s *substringInt64Int16Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -588,7 +588,7 @@ func (s *substringInt64Int16Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -611,7 +611,7 @@ func (s *substringInt64Int16Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -644,7 +644,7 @@ func (s *substringInt64Int32Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -664,7 +664,7 @@ func (s *substringInt64Int32Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -687,7 +687,7 @@ func (s *substringInt64Int32Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)
@@ -720,7 +720,7 @@ func (s *substringInt64Int64Operator) Next(ctx context.Context) coldata.Batch {
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
 		func() {
-			for i := uint16(0); i < n; i++ {
+			for i := 0; i < n; i++ {
 				rowIdx := i
 				if sel != nil {
 					rowIdx = sel[i]
@@ -740,7 +740,7 @@ func (s *substringInt64Int64Operator) Next(ctx context.Context) coldata.Batch {
 					continue
 				}
 
-				runes := runeVec.Get(int(rowIdx))
+				runes := runeVec.Get(rowIdx)
 				// Substring start is 1 indexed.
 				start := int(startVec[rowIdx]) - 1
 				length := int(lengthVec[rowIdx])
@@ -763,7 +763,7 @@ func (s *substringInt64Int64Operator) Next(ctx context.Context) coldata.Batch {
 				} else if start > len(runes) {
 					start = len(runes)
 				}
-				outputCol.Set(int(rowIdx), runes[start:end])
+				outputCol.Set(rowIdx, runes[start:end])
 			}
 		},
 	)

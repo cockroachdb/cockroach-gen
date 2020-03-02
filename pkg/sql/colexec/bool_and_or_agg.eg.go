@@ -56,7 +56,7 @@ func (b *boolAndAgg) CurrentOutputIndex() int {
 func (b *boolAndAgg) SetOutputIndex(idx int) {
 	if b.curIdx != -1 {
 		b.curIdx = idx
-		b.nulls.UnsetNullsAfter(uint16(idx))
+		b.nulls.UnsetNullsAfter(idx)
 	}
 }
 
@@ -67,7 +67,7 @@ func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 	inputLen := batch.Length()
 	if inputLen == 0 {
 		if !b.sawNonNull {
-			b.nulls.SetNull(uint16(b.curIdx))
+			b.nulls.SetNull(b.curIdx)
 		} else {
 			b.vec[b.curIdx] = b.curAgg
 		}
@@ -83,7 +83,7 @@ func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 			if b.groups[i] {
 				if b.curIdx >= 0 {
 					if !b.sawNonNull {
-						b.nulls.SetNull(uint16(b.curIdx))
+						b.nulls.SetNull(b.curIdx)
 					} else {
 						b.vec[b.curIdx] = b.curAgg
 					}
@@ -92,7 +92,7 @@ func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 				b.curAgg = true
 				b.sawNonNull = false
 			}
-			isNull := nulls.NullAt(uint16(i))
+			isNull := nulls.NullAt(i)
 			if !isNull {
 				b.curAgg = b.curAgg && col[i]
 				b.sawNonNull = true
@@ -105,7 +105,7 @@ func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 			if b.groups[i] {
 				if b.curIdx >= 0 {
 					if !b.sawNonNull {
-						b.nulls.SetNull(uint16(b.curIdx))
+						b.nulls.SetNull(b.curIdx)
 					} else {
 						b.vec[b.curIdx] = b.curAgg
 					}
@@ -114,7 +114,7 @@ func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 				b.curAgg = true
 				b.sawNonNull = false
 			}
-			isNull := nulls.NullAt(uint16(i))
+			isNull := nulls.NullAt(i)
 			if !isNull {
 				b.curAgg = b.curAgg && col[i]
 				b.sawNonNull = true
@@ -167,7 +167,7 @@ func (b *boolOrAgg) CurrentOutputIndex() int {
 func (b *boolOrAgg) SetOutputIndex(idx int) {
 	if b.curIdx != -1 {
 		b.curIdx = idx
-		b.nulls.UnsetNullsAfter(uint16(idx))
+		b.nulls.UnsetNullsAfter(idx)
 	}
 }
 
@@ -178,7 +178,7 @@ func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 	inputLen := batch.Length()
 	if inputLen == 0 {
 		if !b.sawNonNull {
-			b.nulls.SetNull(uint16(b.curIdx))
+			b.nulls.SetNull(b.curIdx)
 		} else {
 			b.vec[b.curIdx] = b.curAgg
 		}
@@ -194,7 +194,7 @@ func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 			if b.groups[i] {
 				if b.curIdx >= 0 {
 					if !b.sawNonNull {
-						b.nulls.SetNull(uint16(b.curIdx))
+						b.nulls.SetNull(b.curIdx)
 					} else {
 						b.vec[b.curIdx] = b.curAgg
 					}
@@ -203,7 +203,7 @@ func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 				b.curAgg = false
 				b.sawNonNull = false
 			}
-			isNull := nulls.NullAt(uint16(i))
+			isNull := nulls.NullAt(i)
 			if !isNull {
 				b.curAgg = b.curAgg || col[i]
 				b.sawNonNull = true
@@ -216,7 +216,7 @@ func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 			if b.groups[i] {
 				if b.curIdx >= 0 {
 					if !b.sawNonNull {
-						b.nulls.SetNull(uint16(b.curIdx))
+						b.nulls.SetNull(b.curIdx)
 					} else {
 						b.vec[b.curIdx] = b.curAgg
 					}
@@ -225,7 +225,7 @@ func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 				b.curAgg = false
 				b.sawNonNull = false
 			}
-			isNull := nulls.NullAt(uint16(i))
+			isNull := nulls.NullAt(i)
 			if !isNull {
 				b.curAgg = b.curAgg || col[i]
 				b.sawNonNull = true

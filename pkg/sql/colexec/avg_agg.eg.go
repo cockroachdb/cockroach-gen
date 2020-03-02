@@ -77,7 +77,7 @@ func (a *avgDecimalAgg) CurrentOutputIndex() int {
 func (a *avgDecimalAgg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.scratch.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -91,7 +91,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should be
 		// NULL.
 		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			a.scratch.nulls.SetNull(a.scratch.curIdx)
 		} else {
 			a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 			if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
@@ -115,7 +115,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
@@ -130,7 +130,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
 				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
+				isNull = nulls.NullAt(i)
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -149,7 +149,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
@@ -164,7 +164,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
 				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
+				isNull = nulls.NullAt(i)
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
 						execerror.NonVectorizedPanic(err)
@@ -185,7 +185,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
@@ -218,7 +218,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
@@ -297,7 +297,7 @@ func (a *avgFloat64Agg) CurrentOutputIndex() int {
 func (a *avgFloat64Agg) SetOutputIndex(idx int) {
 	if a.scratch.curIdx != -1 {
 		a.scratch.curIdx = idx
-		a.scratch.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.scratch.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -311,7 +311,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should be
 		// NULL.
 		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+			a.scratch.nulls.SetNull(a.scratch.curIdx)
 		} else {
 			a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
 		}
@@ -332,7 +332,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
 						}
@@ -344,7 +344,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
 				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
+				isNull = nulls.NullAt(i)
 				if !isNull {
 					a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
 					a.scratch.curCount++
@@ -361,7 +361,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
 						}
@@ -373,7 +373,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					a.scratch.foundNonNullForCurrentGroup = false
 				}
 				var isNull bool
-				isNull = nulls.NullAt(uint16(i))
+				isNull = nulls.NullAt(i)
 				if !isNull {
 					a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
 					a.scratch.curCount++
@@ -392,7 +392,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
 						}
@@ -420,7 +420,7 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					// a.scratch.curIdx is negative, it means that this is the first group.
 					if a.scratch.curIdx >= 0 {
 						if !a.scratch.foundNonNullForCurrentGroup {
-							a.scratch.nulls.SetNull(uint16(a.scratch.curIdx))
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
 						} else {
 							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum / float64(a.scratch.curCount)
 						}

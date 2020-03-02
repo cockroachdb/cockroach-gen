@@ -35,7 +35,7 @@ type andProjOp struct {
 	// origSel is a buffer used to keep track of the original selection vector of
 	// the input batch. We need to do this because we're going to modify the
 	// selection vector in order to do the short-circuiting of logical operators.
-	origSel []uint16
+	origSel []int
 }
 
 // NewAndProjOp returns a new projection operator that logical-And's
@@ -57,7 +57,7 @@ func NewAndProjOp(
 		leftIdx:          leftIdx,
 		rightIdx:         rightIdx,
 		outputIdx:        outputIdx,
-		origSel:          make([]uint16, coldata.BatchSize()),
+		origSel:          make([]int, coldata.BatchSize()),
 	}
 }
 
@@ -121,7 +121,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	knownResult := false
 	leftCol := batch.ColVec(o.leftIdx)
 	leftColVals := leftCol.Bool()
-	var curIdx uint16
+	var curIdx int
 	if usesSel {
 		sel := batch.Selection()
 		origSel := o.origSel[:origLen]
@@ -152,7 +152,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		sel := batch.Selection()
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
-			for i := uint16(0); i < origLen; i++ {
+			for i := 0; i < origLen; i++ {
 				isLeftNull := leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -162,7 +162,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := uint16(0); i < origLen; i++ {
+			for i := 0; i < origLen; i++ {
 				isLeftNull := false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -211,8 +211,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -242,8 +241,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -271,8 +269,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -302,8 +299,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -334,8 +330,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -365,8 +360,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -394,8 +388,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -425,8 +418,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -474,7 +466,7 @@ type orProjOp struct {
 	// origSel is a buffer used to keep track of the original selection vector of
 	// the input batch. We need to do this because we're going to modify the
 	// selection vector in order to do the short-circuiting of logical operators.
-	origSel []uint16
+	origSel []int
 }
 
 // NewOrProjOp returns a new projection operator that logical-Or's
@@ -496,7 +488,7 @@ func NewOrProjOp(
 		leftIdx:          leftIdx,
 		rightIdx:         rightIdx,
 		outputIdx:        outputIdx,
-		origSel:          make([]uint16, coldata.BatchSize()),
+		origSel:          make([]int, coldata.BatchSize()),
 	}
 }
 
@@ -560,7 +552,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	knownResult := true
 	leftCol := batch.ColVec(o.leftIdx)
 	leftColVals := leftCol.Bool()
-	var curIdx uint16
+	var curIdx int
 	if usesSel {
 		sel := batch.Selection()
 		origSel := o.origSel[:origLen]
@@ -591,7 +583,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		sel := batch.Selection()
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
-			for i := uint16(0); i < origLen; i++ {
+			for i := 0; i < origLen; i++ {
 				isLeftNull := leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -601,7 +593,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := uint16(0); i < origLen; i++ {
+			for i := 0; i < origLen; i++ {
 				isLeftNull := false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
@@ -650,8 +642,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -681,8 +672,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -710,8 +700,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -741,8 +730,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -773,8 +761,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		if rightCol != nil && rightCol.MaybeHasNulls() {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -804,8 +791,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -833,8 +819,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			if sel := batch.Selection(); sel != nil {
-				for _, i := range sel[:origLen] {
-					idx := i
+				for _, idx := range sel[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
@@ -864,8 +849,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 					_ = rightColVals[origLen-1]
 				}
 				_ = outputColVals[origLen-1]
-				for i := range leftColVals[:origLen] {
-					idx := uint16(i)
+				for idx := range leftColVals[:origLen] {
 					isLeftNull := false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {

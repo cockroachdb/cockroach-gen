@@ -76,11 +76,11 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -99,16 +99,16 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -132,8 +132,8 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -151,13 +151,13 @@ func (p projEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -216,11 +216,11 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -239,16 +239,16 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -272,8 +272,8 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -291,13 +291,13 @@ func (p projNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -356,11 +356,11 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -379,16 +379,16 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -412,8 +412,8 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -431,13 +431,13 @@ func (p projLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -496,11 +496,11 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -519,16 +519,16 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -552,8 +552,8 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -571,13 +571,13 @@ func (p projLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -636,11 +636,11 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -659,16 +659,16 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -692,8 +692,8 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -711,13 +711,13 @@ func (p projGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -776,11 +776,11 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -799,16 +799,16 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -832,8 +832,8 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -851,13 +851,13 @@ func (p projGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -916,11 +916,11 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -931,12 +931,12 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -952,8 +952,8 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -963,9 +963,9 @@ func (p projEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1016,11 +1016,11 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1031,12 +1031,12 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1052,8 +1052,8 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1063,9 +1063,9 @@ func (p projNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1116,11 +1116,11 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1131,12 +1131,12 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1152,8 +1152,8 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1163,9 +1163,9 @@ func (p projLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1216,11 +1216,11 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1231,12 +1231,12 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1252,8 +1252,8 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1263,9 +1263,9 @@ func (p projLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1316,11 +1316,11 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1331,12 +1331,12 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1352,8 +1352,8 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1363,9 +1363,9 @@ func (p projGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1416,11 +1416,11 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1431,12 +1431,12 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1.Get(int(i))
-					arg2 := col2.Get(int(i))
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
 
 					{
 						var cmpResult int
@@ -1452,8 +1452,8 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1463,9 +1463,9 @@ func (p projGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			for i := 0; i < int(n); i++ {
-				arg1 := col1.Get(int(i))
-				arg2 := col2.Get(int(i))
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
 
 				{
 					var cmpResult int
@@ -1516,27 +1516,27 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
@@ -1548,20 +1548,20 @@ func (p projPlusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				if _, err := tree.ExactCtx.Add(&projCol[i], &arg1, &arg2); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
@@ -1608,27 +1608,27 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
@@ -1640,20 +1640,20 @@ func (p projMinusDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg1, &arg2); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
@@ -1700,27 +1700,27 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
 						execerror.NonVectorizedPanic(err)
 					}
@@ -1732,20 +1732,20 @@ func (p projMultDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg1, &arg2); err != nil {
 					execerror.NonVectorizedPanic(err)
 				}
@@ -1792,11 +1792,11 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, &arg2)
@@ -1811,16 +1811,16 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, &arg2)
@@ -1840,8 +1840,8 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, &arg2)
@@ -1855,13 +1855,13 @@ func (p projDivDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg1, &arg2)
@@ -1916,11 +1916,11 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -1931,16 +1931,16 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -1956,8 +1956,8 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -1967,13 +1967,13 @@ func (p projEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2024,11 +2024,11 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2039,16 +2039,16 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2064,8 +2064,8 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2075,13 +2075,13 @@ func (p projNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2132,11 +2132,11 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2147,16 +2147,16 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2172,8 +2172,8 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2183,13 +2183,13 @@ func (p projLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2240,11 +2240,11 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2255,16 +2255,16 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2280,8 +2280,8 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2291,13 +2291,13 @@ func (p projLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2348,11 +2348,11 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2363,16 +2363,16 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2388,8 +2388,8 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2399,13 +2399,13 @@ func (p projGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2456,11 +2456,11 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2471,16 +2471,16 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -2496,8 +2496,8 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2507,13 +2507,13 @@ func (p projGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -2564,11 +2564,11 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2582,16 +2582,16 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2610,8 +2610,8 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2624,13 +2624,13 @@ func (p projPlusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2684,11 +2684,11 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2702,16 +2702,16 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2730,8 +2730,8 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2744,13 +2744,13 @@ func (p projMinusDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2804,11 +2804,11 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2822,16 +2822,16 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2850,8 +2850,8 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2864,13 +2864,13 @@ func (p projMultDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2924,11 +2924,11 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2946,16 +2946,16 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -2978,8 +2978,8 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -2996,13 +2996,13 @@ func (p projDivDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -3060,11 +3060,11 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3081,16 +3081,16 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3112,8 +3112,8 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3129,13 +3129,13 @@ func (p projEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3192,11 +3192,11 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3213,16 +3213,16 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3244,8 +3244,8 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3261,13 +3261,13 @@ func (p projNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3324,11 +3324,11 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3345,16 +3345,16 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3376,8 +3376,8 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3393,13 +3393,13 @@ func (p projLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3456,11 +3456,11 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3477,16 +3477,16 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3508,8 +3508,8 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3525,13 +3525,13 @@ func (p projLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3588,11 +3588,11 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3609,16 +3609,16 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3640,8 +3640,8 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3657,13 +3657,13 @@ func (p projGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3720,11 +3720,11 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3741,16 +3741,16 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -3772,8 +3772,8 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3789,13 +3789,13 @@ func (p projGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -3852,11 +3852,11 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -3870,16 +3870,16 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -3898,8 +3898,8 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -3912,13 +3912,13 @@ func (p projPlusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -3972,11 +3972,11 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -3990,16 +3990,16 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -4018,8 +4018,8 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -4032,13 +4032,13 @@ func (p projMinusDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -4092,11 +4092,11 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -4110,16 +4110,16 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -4138,8 +4138,8 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -4152,13 +4152,13 @@ func (p projMultDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -4212,11 +4212,11 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -4234,16 +4234,16 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -4266,8 +4266,8 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -4284,13 +4284,13 @@ func (p projDivDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -4348,11 +4348,11 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4369,16 +4369,16 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4400,8 +4400,8 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4417,13 +4417,13 @@ func (p projEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4480,11 +4480,11 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4501,16 +4501,16 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4532,8 +4532,8 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4549,13 +4549,13 @@ func (p projNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4612,11 +4612,11 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4633,16 +4633,16 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4664,8 +4664,8 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4681,13 +4681,13 @@ func (p projLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4744,11 +4744,11 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4765,16 +4765,16 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4796,8 +4796,8 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4813,13 +4813,13 @@ func (p projLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4876,11 +4876,11 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4897,16 +4897,16 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -4928,8 +4928,8 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -4945,13 +4945,13 @@ func (p projGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5008,11 +5008,11 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5029,16 +5029,16 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5060,8 +5060,8 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5077,13 +5077,13 @@ func (p projGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5140,11 +5140,11 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5158,16 +5158,16 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5186,8 +5186,8 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5200,13 +5200,13 @@ func (p projPlusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5260,11 +5260,11 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5278,16 +5278,16 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5306,8 +5306,8 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5320,13 +5320,13 @@ func (p projMinusDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5380,11 +5380,11 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5398,16 +5398,16 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5426,8 +5426,8 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5440,13 +5440,13 @@ func (p projMultDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5500,11 +5500,11 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5522,16 +5522,16 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 
@@ -5554,8 +5554,8 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5572,13 +5572,13 @@ func (p projDivDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 
@@ -5636,11 +5636,11 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5657,16 +5657,16 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5688,8 +5688,8 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5705,13 +5705,13 @@ func (p projEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5768,11 +5768,11 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5789,16 +5789,16 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5820,8 +5820,8 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5837,13 +5837,13 @@ func (p projNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5900,11 +5900,11 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5921,16 +5921,16 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -5952,8 +5952,8 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -5969,13 +5969,13 @@ func (p projLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6032,11 +6032,11 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6053,16 +6053,16 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6084,8 +6084,8 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6101,13 +6101,13 @@ func (p projLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6164,11 +6164,11 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6185,16 +6185,16 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6216,8 +6216,8 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6233,13 +6233,13 @@ func (p projGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6296,11 +6296,11 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6317,16 +6317,16 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6348,8 +6348,8 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6365,13 +6365,13 @@ func (p projGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6428,11 +6428,11 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6451,16 +6451,16 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6484,8 +6484,8 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6503,13 +6503,13 @@ func (p projEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6568,11 +6568,11 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6591,16 +6591,16 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6624,8 +6624,8 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6643,13 +6643,13 @@ func (p projNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6708,11 +6708,11 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6731,16 +6731,16 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6764,8 +6764,8 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6783,13 +6783,13 @@ func (p projLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6848,11 +6848,11 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6871,16 +6871,16 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -6904,8 +6904,8 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6923,13 +6923,13 @@ func (p projLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -6988,11 +6988,11 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -7011,16 +7011,16 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -7044,8 +7044,8 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -7063,13 +7063,13 @@ func (p projGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -7128,11 +7128,11 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -7151,16 +7151,16 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -7184,8 +7184,8 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -7203,13 +7203,13 @@ func (p projGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -7268,11 +7268,11 @@ func (p projMultDecimalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					f, err := arg1.Float64()
 					if err != nil {
@@ -7282,16 +7282,16 @@ func (p projMultDecimalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					f, err := arg1.Float64()
 					if err != nil {
@@ -7306,8 +7306,8 @@ func (p projMultDecimalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				f, err := arg1.Float64()
 				if err != nil {
@@ -7316,13 +7316,13 @@ func (p projMultDecimalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				projCol[i] = arg2.MulFloat(f)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				f, err := arg1.Float64()
 				if err != nil {
@@ -7372,11 +7372,11 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7392,16 +7392,16 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7422,8 +7422,8 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7438,13 +7438,13 @@ func (p projPlusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7500,11 +7500,11 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7520,16 +7520,16 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7550,8 +7550,8 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7566,13 +7566,13 @@ func (p projMinusInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7628,11 +7628,11 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7648,16 +7648,16 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7678,8 +7678,8 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7694,13 +7694,13 @@ func (p projMultInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7756,11 +7756,11 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7779,16 +7779,16 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -7812,8 +7812,8 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7831,13 +7831,13 @@ func (p projDivInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -7896,11 +7896,11 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -7917,16 +7917,16 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -7948,8 +7948,8 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -7965,13 +7965,13 @@ func (p projEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8028,11 +8028,11 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8049,16 +8049,16 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8080,8 +8080,8 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8097,13 +8097,13 @@ func (p projNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8160,11 +8160,11 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8181,16 +8181,16 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8212,8 +8212,8 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8229,13 +8229,13 @@ func (p projLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8292,11 +8292,11 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8313,16 +8313,16 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8344,8 +8344,8 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8361,13 +8361,13 @@ func (p projLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8424,11 +8424,11 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8445,16 +8445,16 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8476,8 +8476,8 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8493,13 +8493,13 @@ func (p projGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8556,11 +8556,11 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8577,16 +8577,16 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -8608,8 +8608,8 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8625,13 +8625,13 @@ func (p projGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -8688,11 +8688,11 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 + arg2
@@ -8705,16 +8705,16 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 + arg2
@@ -8732,8 +8732,8 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 + arg2
@@ -8745,13 +8745,13 @@ func (p projPlusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 + arg2
@@ -8804,11 +8804,11 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 - arg2
@@ -8821,16 +8821,16 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 - arg2
@@ -8848,8 +8848,8 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 - arg2
@@ -8861,13 +8861,13 @@ func (p projMinusInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 - arg2
@@ -8920,11 +8920,11 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 * arg2
@@ -8944,16 +8944,16 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 * arg2
@@ -8978,8 +8978,8 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 * arg2
@@ -8998,13 +8998,13 @@ func (p projMultInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 * arg2
@@ -9064,11 +9064,11 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if arg2 == 0 {
@@ -9085,16 +9085,16 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if arg2 == 0 {
@@ -9116,8 +9116,8 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if arg2 == 0 {
@@ -9133,13 +9133,13 @@ func (p projDivInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if arg2 == 0 {
@@ -9196,11 +9196,11 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9222,16 +9222,16 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9258,8 +9258,8 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9280,13 +9280,13 @@ func (p projEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9348,11 +9348,11 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9374,16 +9374,16 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9410,8 +9410,8 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9432,13 +9432,13 @@ func (p projNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9500,11 +9500,11 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9526,16 +9526,16 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9562,8 +9562,8 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9584,13 +9584,13 @@ func (p projLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9652,11 +9652,11 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9678,16 +9678,16 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9714,8 +9714,8 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9736,13 +9736,13 @@ func (p projLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9804,11 +9804,11 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9830,16 +9830,16 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9866,8 +9866,8 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9888,13 +9888,13 @@ func (p projGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -9956,11 +9956,11 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -9982,16 +9982,16 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10018,8 +10018,8 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -10040,13 +10040,13 @@ func (p projGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -10108,11 +10108,11 @@ func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -10125,16 +10125,16 @@ func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -10152,8 +10152,8 @@ func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -10165,13 +10165,13 @@ func (p projPlusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -10224,11 +10224,11 @@ func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -10241,16 +10241,16 @@ func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -10268,8 +10268,8 @@ func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -10281,13 +10281,13 @@ func (p projMinusInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -10340,11 +10340,11 @@ func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -10364,16 +10364,16 @@ func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -10398,8 +10398,8 @@ func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -10418,13 +10418,13 @@ func (p projMultInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -10484,11 +10484,11 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -10505,16 +10505,16 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -10536,8 +10536,8 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -10553,13 +10553,13 @@ func (p projDivInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -10616,11 +10616,11 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10642,16 +10642,16 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10678,8 +10678,8 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -10700,13 +10700,13 @@ func (p projEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -10768,11 +10768,11 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10794,16 +10794,16 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10830,8 +10830,8 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -10852,13 +10852,13 @@ func (p projNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -10920,11 +10920,11 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10946,16 +10946,16 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -10982,8 +10982,8 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11004,13 +11004,13 @@ func (p projLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11072,11 +11072,11 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -11098,16 +11098,16 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -11134,8 +11134,8 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11156,13 +11156,13 @@ func (p projLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11224,11 +11224,11 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -11250,16 +11250,16 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -11286,8 +11286,8 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11308,13 +11308,13 @@ func (p projGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11376,11 +11376,11 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -11402,16 +11402,16 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -11438,8 +11438,8 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11460,13 +11460,13 @@ func (p projGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -11528,11 +11528,11 @@ func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -11545,16 +11545,16 @@ func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -11572,8 +11572,8 @@ func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -11585,13 +11585,13 @@ func (p projPlusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -11644,11 +11644,11 @@ func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -11661,16 +11661,16 @@ func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -11688,8 +11688,8 @@ func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -11701,13 +11701,13 @@ func (p projMinusInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -11760,11 +11760,11 @@ func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -11784,16 +11784,16 @@ func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -11818,8 +11818,8 @@ func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -11838,13 +11838,13 @@ func (p projMultInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -11904,11 +11904,11 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -11925,16 +11925,16 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -11956,8 +11956,8 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -11973,13 +11973,13 @@ func (p projDivInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -12036,11 +12036,11 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12062,16 +12062,16 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12098,8 +12098,8 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12120,13 +12120,13 @@ func (p projEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12188,11 +12188,11 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12214,16 +12214,16 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12250,8 +12250,8 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12272,13 +12272,13 @@ func (p projNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12340,11 +12340,11 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12366,16 +12366,16 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12402,8 +12402,8 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12424,13 +12424,13 @@ func (p projLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12492,11 +12492,11 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12518,16 +12518,16 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12554,8 +12554,8 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12576,13 +12576,13 @@ func (p projLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12644,11 +12644,11 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12670,16 +12670,16 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12706,8 +12706,8 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12728,13 +12728,13 @@ func (p projGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12796,11 +12796,11 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12822,16 +12822,16 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12858,8 +12858,8 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12880,13 +12880,13 @@ func (p projGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -12948,11 +12948,11 @@ func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -12982,16 +12982,16 @@ func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13026,8 +13026,8 @@ func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13056,13 +13056,13 @@ func (p projEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13132,11 +13132,11 @@ func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13166,16 +13166,16 @@ func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13210,8 +13210,8 @@ func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13240,13 +13240,13 @@ func (p projNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13316,11 +13316,11 @@ func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13350,16 +13350,16 @@ func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13394,8 +13394,8 @@ func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13424,13 +13424,13 @@ func (p projLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13500,11 +13500,11 @@ func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13534,16 +13534,16 @@ func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13578,8 +13578,8 @@ func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13608,13 +13608,13 @@ func (p projLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13684,11 +13684,11 @@ func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13718,16 +13718,16 @@ func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13762,8 +13762,8 @@ func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13792,13 +13792,13 @@ func (p projGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13868,11 +13868,11 @@ func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13902,16 +13902,16 @@ func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -13946,8 +13946,8 @@ func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -13976,13 +13976,13 @@ func (p projGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -14052,25 +14052,25 @@ func (p projMultInt16IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.Mul(int64(arg1))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.Mul(int64(arg1))
 				}
 			}
@@ -14080,18 +14080,18 @@ func (p projMultInt16IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.Mul(int64(arg1))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.Mul(int64(arg1))
 			}
 		}
@@ -14136,11 +14136,11 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14156,16 +14156,16 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14186,8 +14186,8 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14202,13 +14202,13 @@ func (p projPlusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14264,11 +14264,11 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14284,16 +14284,16 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14314,8 +14314,8 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14330,13 +14330,13 @@ func (p projMinusInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14392,11 +14392,11 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14412,16 +14412,16 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14442,8 +14442,8 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14458,13 +14458,13 @@ func (p projMultInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14520,11 +14520,11 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14543,16 +14543,16 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -14576,8 +14576,8 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14595,13 +14595,13 @@ func (p projDivInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -14660,11 +14660,11 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -14681,16 +14681,16 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -14712,8 +14712,8 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -14729,13 +14729,13 @@ func (p projEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -14792,11 +14792,11 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -14813,16 +14813,16 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -14844,8 +14844,8 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -14861,13 +14861,13 @@ func (p projNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -14924,11 +14924,11 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -14945,16 +14945,16 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -14976,8 +14976,8 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -14993,13 +14993,13 @@ func (p projLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15056,11 +15056,11 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15077,16 +15077,16 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15108,8 +15108,8 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15125,13 +15125,13 @@ func (p projLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15188,11 +15188,11 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15209,16 +15209,16 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15240,8 +15240,8 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15257,13 +15257,13 @@ func (p projGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15320,11 +15320,11 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15341,16 +15341,16 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15372,8 +15372,8 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15389,13 +15389,13 @@ func (p projGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -15452,11 +15452,11 @@ func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -15469,16 +15469,16 @@ func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -15496,8 +15496,8 @@ func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -15509,13 +15509,13 @@ func (p projPlusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -15568,11 +15568,11 @@ func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -15585,16 +15585,16 @@ func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -15612,8 +15612,8 @@ func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -15625,13 +15625,13 @@ func (p projMinusInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -15684,11 +15684,11 @@ func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -15708,16 +15708,16 @@ func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -15742,8 +15742,8 @@ func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -15762,13 +15762,13 @@ func (p projMultInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -15828,11 +15828,11 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -15849,16 +15849,16 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -15880,8 +15880,8 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -15897,13 +15897,13 @@ func (p projDivInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -15960,11 +15960,11 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -15986,16 +15986,16 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16022,8 +16022,8 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16044,13 +16044,13 @@ func (p projEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16112,11 +16112,11 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16138,16 +16138,16 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16174,8 +16174,8 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16196,13 +16196,13 @@ func (p projNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16264,11 +16264,11 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16290,16 +16290,16 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16326,8 +16326,8 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16348,13 +16348,13 @@ func (p projLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16416,11 +16416,11 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16442,16 +16442,16 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16478,8 +16478,8 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16500,13 +16500,13 @@ func (p projLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16568,11 +16568,11 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16594,16 +16594,16 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16630,8 +16630,8 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16652,13 +16652,13 @@ func (p projGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16720,11 +16720,11 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16746,16 +16746,16 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -16782,8 +16782,8 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16804,13 +16804,13 @@ func (p projGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -16872,11 +16872,11 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 + arg2
@@ -16889,16 +16889,16 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 + arg2
@@ -16916,8 +16916,8 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 + arg2
@@ -16929,13 +16929,13 @@ func (p projPlusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 + arg2
@@ -16988,11 +16988,11 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 - arg2
@@ -17005,16 +17005,16 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 - arg2
@@ -17032,8 +17032,8 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 - arg2
@@ -17045,13 +17045,13 @@ func (p projMinusInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 - arg2
@@ -17104,11 +17104,11 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 * arg2
@@ -17128,16 +17128,16 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := arg1 * arg2
@@ -17162,8 +17162,8 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 * arg2
@@ -17182,13 +17182,13 @@ func (p projMultInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := arg1 * arg2
@@ -17248,11 +17248,11 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if arg2 == 0 {
@@ -17269,16 +17269,16 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if arg2 == 0 {
@@ -17300,8 +17300,8 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if arg2 == 0 {
@@ -17317,13 +17317,13 @@ func (p projDivInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if arg2 == 0 {
@@ -17380,11 +17380,11 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17406,16 +17406,16 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17442,8 +17442,8 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17464,13 +17464,13 @@ func (p projEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17532,11 +17532,11 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17558,16 +17558,16 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17594,8 +17594,8 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17616,13 +17616,13 @@ func (p projNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17684,11 +17684,11 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17710,16 +17710,16 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17746,8 +17746,8 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17768,13 +17768,13 @@ func (p projLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17836,11 +17836,11 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17862,16 +17862,16 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -17898,8 +17898,8 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17920,13 +17920,13 @@ func (p projLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -17988,11 +17988,11 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18014,16 +18014,16 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18050,8 +18050,8 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -18072,13 +18072,13 @@ func (p projGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -18140,11 +18140,11 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18166,16 +18166,16 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18202,8 +18202,8 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -18224,13 +18224,13 @@ func (p projGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -18292,11 +18292,11 @@ func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -18309,16 +18309,16 @@ func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -18336,8 +18336,8 @@ func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -18349,13 +18349,13 @@ func (p projPlusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -18408,11 +18408,11 @@ func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -18425,16 +18425,16 @@ func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -18452,8 +18452,8 @@ func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -18465,13 +18465,13 @@ func (p projMinusInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -18524,11 +18524,11 @@ func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -18548,16 +18548,16 @@ func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -18582,8 +18582,8 @@ func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -18602,13 +18602,13 @@ func (p projMultInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -18668,11 +18668,11 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -18689,16 +18689,16 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -18720,8 +18720,8 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -18737,13 +18737,13 @@ func (p projDivInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -18800,11 +18800,11 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18826,16 +18826,16 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18862,8 +18862,8 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -18884,13 +18884,13 @@ func (p projEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -18952,11 +18952,11 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -18978,16 +18978,16 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19014,8 +19014,8 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19036,13 +19036,13 @@ func (p projNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19104,11 +19104,11 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19130,16 +19130,16 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19166,8 +19166,8 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19188,13 +19188,13 @@ func (p projLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19256,11 +19256,11 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19282,16 +19282,16 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19318,8 +19318,8 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19340,13 +19340,13 @@ func (p projLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19408,11 +19408,11 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19434,16 +19434,16 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19470,8 +19470,8 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19492,13 +19492,13 @@ func (p projGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19560,11 +19560,11 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19586,16 +19586,16 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19622,8 +19622,8 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19644,13 +19644,13 @@ func (p projGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19712,11 +19712,11 @@ func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19746,16 +19746,16 @@ func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19790,8 +19790,8 @@ func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19820,13 +19820,13 @@ func (p projEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -19896,11 +19896,11 @@ func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19930,16 +19930,16 @@ func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -19974,8 +19974,8 @@ func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20004,13 +20004,13 @@ func (p projNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20080,11 +20080,11 @@ func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20114,16 +20114,16 @@ func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20158,8 +20158,8 @@ func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20188,13 +20188,13 @@ func (p projLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20264,11 +20264,11 @@ func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20298,16 +20298,16 @@ func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20342,8 +20342,8 @@ func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20372,13 +20372,13 @@ func (p projLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20448,11 +20448,11 @@ func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20482,16 +20482,16 @@ func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20526,8 +20526,8 @@ func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20556,13 +20556,13 @@ func (p projGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20632,11 +20632,11 @@ func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20666,16 +20666,16 @@ func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -20710,8 +20710,8 @@ func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20740,13 +20740,13 @@ func (p projGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -20816,25 +20816,25 @@ func (p projMultInt32IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.Mul(int64(arg1))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.Mul(int64(arg1))
 				}
 			}
@@ -20844,18 +20844,18 @@ func (p projMultInt32IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.Mul(int64(arg1))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.Mul(int64(arg1))
 			}
 		}
@@ -20900,11 +20900,11 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -20920,16 +20920,16 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -20950,8 +20950,8 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -20966,13 +20966,13 @@ func (p projPlusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21028,11 +21028,11 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -21048,16 +21048,16 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -21078,8 +21078,8 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21094,13 +21094,13 @@ func (p projMinusInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21156,11 +21156,11 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -21176,16 +21176,16 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -21206,8 +21206,8 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21222,13 +21222,13 @@ func (p projMultInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21284,11 +21284,11 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -21307,16 +21307,16 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						tmpDec := &decimalScratch.tmpDec1
@@ -21340,8 +21340,8 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21359,13 +21359,13 @@ func (p projDivInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					tmpDec := &decimalScratch.tmpDec1
@@ -21424,11 +21424,11 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21445,16 +21445,16 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21476,8 +21476,8 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21493,13 +21493,13 @@ func (p projEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21556,11 +21556,11 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21577,16 +21577,16 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21608,8 +21608,8 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21625,13 +21625,13 @@ func (p projNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21688,11 +21688,11 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21709,16 +21709,16 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21740,8 +21740,8 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21757,13 +21757,13 @@ func (p projLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21820,11 +21820,11 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21841,16 +21841,16 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21872,8 +21872,8 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21889,13 +21889,13 @@ func (p projLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -21952,11 +21952,11 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -21973,16 +21973,16 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22004,8 +22004,8 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22021,13 +22021,13 @@ func (p projGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22084,11 +22084,11 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22105,16 +22105,16 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22136,8 +22136,8 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22153,13 +22153,13 @@ func (p projGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22216,11 +22216,11 @@ func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -22233,16 +22233,16 @@ func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -22260,8 +22260,8 @@ func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -22273,13 +22273,13 @@ func (p projPlusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -22332,11 +22332,11 @@ func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -22349,16 +22349,16 @@ func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -22376,8 +22376,8 @@ func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -22389,13 +22389,13 @@ func (p projMinusInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -22448,11 +22448,11 @@ func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -22472,16 +22472,16 @@ func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -22506,8 +22506,8 @@ func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -22526,13 +22526,13 @@ func (p projMultInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -22592,11 +22592,11 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -22613,16 +22613,16 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -22644,8 +22644,8 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -22661,13 +22661,13 @@ func (p projDivInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -22724,11 +22724,11 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22750,16 +22750,16 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22786,8 +22786,8 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22808,13 +22808,13 @@ func (p projEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22876,11 +22876,11 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22902,16 +22902,16 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -22938,8 +22938,8 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -22960,13 +22960,13 @@ func (p projNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23028,11 +23028,11 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23054,16 +23054,16 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23090,8 +23090,8 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23112,13 +23112,13 @@ func (p projLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23180,11 +23180,11 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23206,16 +23206,16 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23242,8 +23242,8 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23264,13 +23264,13 @@ func (p projLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23332,11 +23332,11 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23358,16 +23358,16 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23394,8 +23394,8 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23416,13 +23416,13 @@ func (p projGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23484,11 +23484,11 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23510,16 +23510,16 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -23546,8 +23546,8 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23568,13 +23568,13 @@ func (p projGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -23636,11 +23636,11 @@ func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -23653,16 +23653,16 @@ func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -23680,8 +23680,8 @@ func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -23693,13 +23693,13 @@ func (p projPlusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -23752,11 +23752,11 @@ func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -23769,16 +23769,16 @@ func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -23796,8 +23796,8 @@ func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -23809,13 +23809,13 @@ func (p projMinusInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -23868,11 +23868,11 @@ func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -23892,16 +23892,16 @@ func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -23926,8 +23926,8 @@ func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -23946,13 +23946,13 @@ func (p projMultInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -24012,11 +24012,11 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -24033,16 +24033,16 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -24064,8 +24064,8 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -24081,13 +24081,13 @@ func (p projDivInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -24144,11 +24144,11 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24170,16 +24170,16 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24206,8 +24206,8 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24228,13 +24228,13 @@ func (p projEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24296,11 +24296,11 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24322,16 +24322,16 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24358,8 +24358,8 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24380,13 +24380,13 @@ func (p projNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24448,11 +24448,11 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24474,16 +24474,16 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24510,8 +24510,8 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24532,13 +24532,13 @@ func (p projLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24600,11 +24600,11 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24626,16 +24626,16 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24662,8 +24662,8 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24684,13 +24684,13 @@ func (p projLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24752,11 +24752,11 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24778,16 +24778,16 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24814,8 +24814,8 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24836,13 +24836,13 @@ func (p projGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24904,11 +24904,11 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24930,16 +24930,16 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -24966,8 +24966,8 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -24988,13 +24988,13 @@ func (p projGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -25056,11 +25056,11 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -25073,16 +25073,16 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) + int64(arg2)
@@ -25100,8 +25100,8 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -25113,13 +25113,13 @@ func (p projPlusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) + int64(arg2)
@@ -25172,11 +25172,11 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -25189,16 +25189,16 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) - int64(arg2)
@@ -25216,8 +25216,8 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -25229,13 +25229,13 @@ func (p projMinusInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) - int64(arg2)
@@ -25288,11 +25288,11 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -25312,16 +25312,16 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						result := int64(arg1) * int64(arg2)
@@ -25346,8 +25346,8 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -25366,13 +25366,13 @@ func (p projMultInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					result := int64(arg1) * int64(arg2)
@@ -25432,11 +25432,11 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -25453,16 +25453,16 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						if int64(arg2) == 0 {
@@ -25484,8 +25484,8 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -25501,13 +25501,13 @@ func (p projDivInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					if int64(arg2) == 0 {
@@ -25564,11 +25564,11 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -25590,16 +25590,16 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -25626,8 +25626,8 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -25648,13 +25648,13 @@ func (p projEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -25716,11 +25716,11 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -25742,16 +25742,16 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -25778,8 +25778,8 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -25800,13 +25800,13 @@ func (p projNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -25868,11 +25868,11 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -25894,16 +25894,16 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -25930,8 +25930,8 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -25952,13 +25952,13 @@ func (p projLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26020,11 +26020,11 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26046,16 +26046,16 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26082,8 +26082,8 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26104,13 +26104,13 @@ func (p projLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26172,11 +26172,11 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26198,16 +26198,16 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26234,8 +26234,8 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26256,13 +26256,13 @@ func (p projGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26324,11 +26324,11 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26350,16 +26350,16 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26386,8 +26386,8 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26408,13 +26408,13 @@ func (p projGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26476,11 +26476,11 @@ func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26510,16 +26510,16 @@ func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26554,8 +26554,8 @@ func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26584,13 +26584,13 @@ func (p projEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26660,11 +26660,11 @@ func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26694,16 +26694,16 @@ func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26738,8 +26738,8 @@ func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26768,13 +26768,13 @@ func (p projNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26844,11 +26844,11 @@ func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26878,16 +26878,16 @@ func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -26922,8 +26922,8 @@ func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -26952,13 +26952,13 @@ func (p projLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27028,11 +27028,11 @@ func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27062,16 +27062,16 @@ func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27106,8 +27106,8 @@ func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27136,13 +27136,13 @@ func (p projLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27212,11 +27212,11 @@ func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27246,16 +27246,16 @@ func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27290,8 +27290,8 @@ func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27320,13 +27320,13 @@ func (p projGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27396,11 +27396,11 @@ func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27430,16 +27430,16 @@ func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27474,8 +27474,8 @@ func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27504,13 +27504,13 @@ func (p projGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27580,25 +27580,25 @@ func (p projMultInt64IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.Mul(int64(arg1))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.Mul(int64(arg1))
 				}
 			}
@@ -27608,18 +27608,18 @@ func (p projMultInt64IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.Mul(int64(arg1))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.Mul(int64(arg1))
 			}
 		}
@@ -27664,11 +27664,11 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27687,16 +27687,16 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27720,8 +27720,8 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27739,13 +27739,13 @@ func (p projEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27804,11 +27804,11 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27827,16 +27827,16 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27860,8 +27860,8 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27879,13 +27879,13 @@ func (p projNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -27944,11 +27944,11 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -27967,16 +27967,16 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28000,8 +28000,8 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28019,13 +28019,13 @@ func (p projLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28084,11 +28084,11 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28107,16 +28107,16 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28140,8 +28140,8 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28159,13 +28159,13 @@ func (p projLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28224,11 +28224,11 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28247,16 +28247,16 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28280,8 +28280,8 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28299,13 +28299,13 @@ func (p projGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28364,11 +28364,11 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28387,16 +28387,16 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28420,8 +28420,8 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28439,13 +28439,13 @@ func (p projGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28504,11 +28504,11 @@ func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28538,16 +28538,16 @@ func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28582,8 +28582,8 @@ func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28612,13 +28612,13 @@ func (p projEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28688,11 +28688,11 @@ func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28722,16 +28722,16 @@ func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28766,8 +28766,8 @@ func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28796,13 +28796,13 @@ func (p projNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28872,11 +28872,11 @@ func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28906,16 +28906,16 @@ func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -28950,8 +28950,8 @@ func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -28980,13 +28980,13 @@ func (p projLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29056,11 +29056,11 @@ func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29090,16 +29090,16 @@ func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29134,8 +29134,8 @@ func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29164,13 +29164,13 @@ func (p projLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29240,11 +29240,11 @@ func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29274,16 +29274,16 @@ func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29318,8 +29318,8 @@ func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29348,13 +29348,13 @@ func (p projGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29424,11 +29424,11 @@ func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29458,16 +29458,16 @@ func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29502,8 +29502,8 @@ func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29532,13 +29532,13 @@ func (p projGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29608,11 +29608,11 @@ func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29642,16 +29642,16 @@ func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29686,8 +29686,8 @@ func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29716,13 +29716,13 @@ func (p projEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29792,11 +29792,11 @@ func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29826,16 +29826,16 @@ func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -29870,8 +29870,8 @@ func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29900,13 +29900,13 @@ func (p projNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -29976,11 +29976,11 @@ func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30010,16 +30010,16 @@ func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30054,8 +30054,8 @@ func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30084,13 +30084,13 @@ func (p projLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30160,11 +30160,11 @@ func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30194,16 +30194,16 @@ func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30238,8 +30238,8 @@ func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30268,13 +30268,13 @@ func (p projLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30344,11 +30344,11 @@ func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30378,16 +30378,16 @@ func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30422,8 +30422,8 @@ func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30452,13 +30452,13 @@ func (p projGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30528,11 +30528,11 @@ func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30562,16 +30562,16 @@ func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30606,8 +30606,8 @@ func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30636,13 +30636,13 @@ func (p projGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30712,11 +30712,11 @@ func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30746,16 +30746,16 @@ func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30790,8 +30790,8 @@ func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30820,13 +30820,13 @@ func (p projEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -30896,11 +30896,11 @@ func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30930,16 +30930,16 @@ func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -30974,8 +30974,8 @@ func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31004,13 +31004,13 @@ func (p projNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31080,11 +31080,11 @@ func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31114,16 +31114,16 @@ func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31158,8 +31158,8 @@ func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31188,13 +31188,13 @@ func (p projLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31264,11 +31264,11 @@ func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31298,16 +31298,16 @@ func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31342,8 +31342,8 @@ func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31372,13 +31372,13 @@ func (p projLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31448,11 +31448,11 @@ func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31482,16 +31482,16 @@ func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31526,8 +31526,8 @@ func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31556,13 +31556,13 @@ func (p projGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31632,11 +31632,11 @@ func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31666,16 +31666,16 @@ func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -31710,8 +31710,8 @@ func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31740,13 +31740,13 @@ func (p projGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -31816,25 +31816,25 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) + float64(arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) + float64(arg2)
 				}
 			}
@@ -31844,18 +31844,18 @@ func (p projPlusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) + float64(arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) + float64(arg2)
 			}
 		}
@@ -31900,25 +31900,25 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) - float64(arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) - float64(arg2)
 				}
 			}
@@ -31928,18 +31928,18 @@ func (p projMinusFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) - float64(arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) - float64(arg2)
 			}
 		}
@@ -31984,25 +31984,25 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) * float64(arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) * float64(arg2)
 				}
 			}
@@ -32012,18 +32012,18 @@ func (p projMultFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) * float64(arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) * float64(arg2)
 			}
 		}
@@ -32068,25 +32068,25 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) / float64(arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = float64(arg1) / float64(arg2)
 				}
 			}
@@ -32096,18 +32096,18 @@ func (p projDivFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) / float64(arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = float64(arg1) / float64(arg2)
 			}
 		}
@@ -32152,11 +32152,11 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32186,16 +32186,16 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32230,8 +32230,8 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32260,13 +32260,13 @@ func (p projEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32336,11 +32336,11 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32370,16 +32370,16 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32414,8 +32414,8 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32444,13 +32444,13 @@ func (p projNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32520,11 +32520,11 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32554,16 +32554,16 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32598,8 +32598,8 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32628,13 +32628,13 @@ func (p projLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32704,11 +32704,11 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32738,16 +32738,16 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32782,8 +32782,8 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32812,13 +32812,13 @@ func (p projLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32888,11 +32888,11 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32922,16 +32922,16 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -32966,8 +32966,8 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -32996,13 +32996,13 @@ func (p projGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33072,11 +33072,11 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33106,16 +33106,16 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33150,8 +33150,8 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33180,13 +33180,13 @@ func (p projGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33256,25 +33256,25 @@ func (p projMultFloat64IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.MulFloat(float64(arg1))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg2.MulFloat(float64(arg1))
 				}
 			}
@@ -33284,18 +33284,18 @@ func (p projMultFloat64IntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.MulFloat(float64(arg1))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg2.MulFloat(float64(arg1))
 			}
 		}
@@ -33340,11 +33340,11 @@ func (p projMinusTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					nanos := arg1.Sub(arg2).Nanoseconds()
 					projCol[i] = duration.MakeDuration(nanos, 0, 0)
@@ -33352,16 +33352,16 @@ func (p projMinusTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					nanos := arg1.Sub(arg2).Nanoseconds()
 					projCol[i] = duration.MakeDuration(nanos, 0, 0)
@@ -33374,21 +33374,21 @@ func (p projMinusTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				nanos := arg1.Sub(arg2).Nanoseconds()
 				projCol[i] = duration.MakeDuration(nanos, 0, 0)
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				nanos := arg1.Sub(arg2).Nanoseconds()
 				projCol[i] = duration.MakeDuration(nanos, 0, 0)
@@ -33436,11 +33436,11 @@ func (p projEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33458,16 +33458,16 @@ func (p projEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33490,8 +33490,8 @@ func (p projEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33508,13 +33508,13 @@ func (p projEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33572,11 +33572,11 @@ func (p projNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33594,16 +33594,16 @@ func (p projNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33626,8 +33626,8 @@ func (p projNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33644,13 +33644,13 @@ func (p projNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33708,11 +33708,11 @@ func (p projLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33730,16 +33730,16 @@ func (p projLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33762,8 +33762,8 @@ func (p projLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33780,13 +33780,13 @@ func (p projLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33844,11 +33844,11 @@ func (p projLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33866,16 +33866,16 @@ func (p projLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -33898,8 +33898,8 @@ func (p projLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33916,13 +33916,13 @@ func (p projLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -33980,11 +33980,11 @@ func (p projGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -34002,16 +34002,16 @@ func (p projGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -34034,8 +34034,8 @@ func (p projGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -34052,13 +34052,13 @@ func (p projGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -34116,11 +34116,11 @@ func (p projGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -34138,16 +34138,16 @@ func (p projGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -34170,8 +34170,8 @@ func (p projGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -34188,13 +34188,13 @@ func (p projGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -34252,25 +34252,25 @@ func (p projPlusTimestampIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = duration.Add(arg1, arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = duration.Add(arg1, arg2)
 				}
 			}
@@ -34280,18 +34280,18 @@ func (p projPlusTimestampIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = duration.Add(arg1, arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = duration.Add(arg1, arg2)
 			}
 		}
@@ -34336,25 +34336,25 @@ func (p projMinusTimestampIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = duration.Add(arg1, arg2.Mul(-1))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = duration.Add(arg1, arg2.Mul(-1))
 				}
 			}
@@ -34364,18 +34364,18 @@ func (p projMinusTimestampIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = duration.Add(arg1, arg2.Mul(-1))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = duration.Add(arg1, arg2.Mul(-1))
 			}
 		}
@@ -34420,11 +34420,11 @@ func (p projMultIntervalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					f, err := arg2.Float64()
 					if err != nil {
@@ -34434,16 +34434,16 @@ func (p projMultIntervalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					f, err := arg2.Float64()
 					if err != nil {
@@ -34458,8 +34458,8 @@ func (p projMultIntervalDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				f, err := arg2.Float64()
 				if err != nil {
@@ -34468,13 +34468,13 @@ func (p projMultIntervalDecimalOp) Next(ctx context.Context) coldata.Batch {
 				projCol[i] = arg1.MulFloat(f)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				f, err := arg2.Float64()
 				if err != nil {
@@ -34524,25 +34524,25 @@ func (p projMultIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Mul(int64(arg2))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Mul(int64(arg2))
 				}
 			}
@@ -34552,18 +34552,18 @@ func (p projMultIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Mul(int64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Mul(int64(arg2))
 			}
 		}
@@ -34608,11 +34608,11 @@ func (p projDivIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34621,16 +34621,16 @@ func (p projDivIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34644,8 +34644,8 @@ func (p projDivIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34653,13 +34653,13 @@ func (p projDivIntervalInt16Op) Next(ctx context.Context) coldata.Batch {
 				projCol[i] = arg1.Div(int64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34708,25 +34708,25 @@ func (p projMultIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Mul(int64(arg2))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Mul(int64(arg2))
 				}
 			}
@@ -34736,18 +34736,18 @@ func (p projMultIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Mul(int64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Mul(int64(arg2))
 			}
 		}
@@ -34792,11 +34792,11 @@ func (p projDivIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34805,16 +34805,16 @@ func (p projDivIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34828,8 +34828,8 @@ func (p projDivIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34837,13 +34837,13 @@ func (p projDivIntervalInt32Op) Next(ctx context.Context) coldata.Batch {
 				projCol[i] = arg1.Div(int64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34892,25 +34892,25 @@ func (p projMultIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Mul(int64(arg2))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Mul(int64(arg2))
 				}
 			}
@@ -34920,18 +34920,18 @@ func (p projMultIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Mul(int64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Mul(int64(arg2))
 			}
 		}
@@ -34976,11 +34976,11 @@ func (p projDivIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -34989,16 +34989,16 @@ func (p projDivIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35012,8 +35012,8 @@ func (p projDivIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35021,13 +35021,13 @@ func (p projDivIntervalInt64Op) Next(ctx context.Context) coldata.Batch {
 				projCol[i] = arg1.Div(int64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35076,25 +35076,25 @@ func (p projMultIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.MulFloat(float64(arg2))
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.MulFloat(float64(arg2))
 				}
 			}
@@ -35104,18 +35104,18 @@ func (p projMultIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.MulFloat(float64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.MulFloat(float64(arg2))
 			}
 		}
@@ -35160,11 +35160,11 @@ func (p projDivIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0.0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35173,16 +35173,16 @@ func (p projDivIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					if arg2 == 0.0 {
 						execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35196,8 +35196,8 @@ func (p projDivIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0.0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35205,13 +35205,13 @@ func (p projDivIntervalFloat64Op) Next(ctx context.Context) coldata.Batch {
 				projCol[i] = arg1.DivFloat(float64(arg2))
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				if arg2 == 0.0 {
 					execerror.NonVectorizedPanic(tree.ErrDivByZero)
@@ -35260,25 +35260,25 @@ func (p projPlusIntervalTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = duration.Add(arg2, arg1)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = duration.Add(arg2, arg1)
 				}
 			}
@@ -35288,18 +35288,18 @@ func (p projPlusIntervalTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = duration.Add(arg2, arg1)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = duration.Add(arg2, arg1)
 			}
 		}
@@ -35344,25 +35344,25 @@ func (p projPlusIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Add(arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Add(arg2)
 				}
 			}
@@ -35372,18 +35372,18 @@ func (p projPlusIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Add(arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Add(arg2)
 			}
 		}
@@ -35428,25 +35428,25 @@ func (p projMinusIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Sub(arg2)
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 					projCol[i] = arg1.Sub(arg2)
 				}
 			}
@@ -35456,18 +35456,18 @@ func (p projMinusIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Sub(arg2)
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 				projCol[i] = arg1.Sub(arg2)
 			}
 		}
@@ -35512,11 +35512,11 @@ func (p projEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35527,16 +35527,16 @@ func (p projEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35552,8 +35552,8 @@ func (p projEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35563,13 +35563,13 @@ func (p projEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35620,11 +35620,11 @@ func (p projNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35635,16 +35635,16 @@ func (p projNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35660,8 +35660,8 @@ func (p projNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35671,13 +35671,13 @@ func (p projNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35728,11 +35728,11 @@ func (p projLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35743,16 +35743,16 @@ func (p projLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35768,8 +35768,8 @@ func (p projLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35779,13 +35779,13 @@ func (p projLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35836,11 +35836,11 @@ func (p projLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35851,16 +35851,16 @@ func (p projLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35876,8 +35876,8 @@ func (p projLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35887,13 +35887,13 @@ func (p projLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35944,11 +35944,11 @@ func (p projGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35959,16 +35959,16 @@ func (p projGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -35984,8 +35984,8 @@ func (p projGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -35995,13 +35995,13 @@ func (p projGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -36052,11 +36052,11 @@ func (p projGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -36067,16 +36067,16 @@ func (p projGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 				}
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				if !col1Nulls.NullAt(uint16(i)) && !col2Nulls.NullAt(uint16(i)) {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
 					// We only want to perform the projection operation if both values are not
 					// null.
-					arg1 := col1[int(i)]
-					arg2 := col2[int(i)]
+					arg1 := col1[i]
+					arg2 := col2[i]
 
 					{
 						var cmpResult int
@@ -36092,8 +36092,8 @@ func (p projGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int
@@ -36103,13 +36103,13 @@ func (p projGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 			}
 		} else {
-			col1 = col1[0:int(n)]
+			col1 = col1[0:n]
 			colLen := len(col1)
 			_ = projCol[colLen-1]
 			_ = col2[colLen-1]
 			for i := range col1 {
-				arg1 := col1[int(i)]
-				arg2 := col2[int(i)]
+				arg1 := col1[i]
+				arg2 := col2[i]
 
 				{
 					var cmpResult int

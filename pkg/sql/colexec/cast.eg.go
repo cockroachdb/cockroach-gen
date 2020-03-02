@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16, sel []uint16) {
+func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, sel []int) {
 	switch fromType {
 	case coltypes.Bool:
 		switch toType {
@@ -40,22 +40,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -63,18 +63,18 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -90,7 +90,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int16
 
 							r = 0
@@ -98,16 +98,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int16
 
 							r = 0
@@ -115,7 +115,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -123,7 +123,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int16
 
 						r = 0
@@ -131,12 +131,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int16
 
 						r = 0
@@ -144,7 +144,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -160,7 +160,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 
 							r = 0
@@ -168,16 +168,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 
 							r = 0
@@ -185,7 +185,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -193,7 +193,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 
 						r = 0
@@ -201,12 +201,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 
 						r = 0
@@ -214,7 +214,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -230,7 +230,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							r = 0
@@ -238,16 +238,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							r = 0
@@ -255,7 +255,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -263,7 +263,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						r = 0
@@ -271,12 +271,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						r = 0
@@ -284,7 +284,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -300,7 +300,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = 0
@@ -308,16 +308,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = 0
@@ -325,7 +325,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = 1
 							}
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -333,7 +333,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = 0
@@ -341,12 +341,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = 0
@@ -354,7 +354,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = 1
 						}
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -380,26 +380,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v.Sign() != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v.Sign() != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -407,22 +407,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v.Sign() != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v.Sign() != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -438,22 +438,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 							r = v
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 							r = v
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				}
@@ -461,18 +461,18 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 						r = v
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 						r = v
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				}
 			}
@@ -493,26 +493,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -520,22 +520,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -551,26 +551,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							r = *apd.New(int64(v), 0)
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							r = *apd.New(int64(v), 0)
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				}
@@ -578,22 +578,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						r = *apd.New(int64(v), 0)
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						r = *apd.New(int64(v), 0)
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				}
 			}
@@ -609,22 +609,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int16
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int16
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -632,18 +632,18 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int16
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int16
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -659,26 +659,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 
 							r = int32(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 
 							r = int32(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -686,22 +686,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 
 						r = int32(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 
 						r = int32(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -717,26 +717,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							r = int64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							r = int64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -744,22 +744,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						r = int64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						r = int64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -775,26 +775,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = float64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = float64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -802,22 +802,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = float64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = float64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -838,26 +838,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -865,22 +865,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -896,26 +896,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							r = *apd.New(int64(v), 0)
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							r = *apd.New(int64(v), 0)
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				}
@@ -923,22 +923,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						r = *apd.New(int64(v), 0)
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						r = *apd.New(int64(v), 0)
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				}
 			}
@@ -954,22 +954,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -977,18 +977,18 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1004,26 +1004,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							r = int64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							r = int64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1031,22 +1031,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						r = int64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						r = int64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1062,26 +1062,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = float64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = float64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1089,22 +1089,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = float64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = float64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1125,26 +1125,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1152,22 +1152,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1183,26 +1183,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							r = *apd.New(int64(v), 0)
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							r = *apd.New(int64(v), 0)
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				}
@@ -1210,22 +1210,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						r = *apd.New(int64(v), 0)
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						r = *apd.New(int64(v), 0)
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				}
 			}
@@ -1241,22 +1241,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1264,18 +1264,18 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1291,26 +1291,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = float64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 
 							r = float64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1318,22 +1318,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = float64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 
 						r = float64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1354,26 +1354,26 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r bool
 
 							r = v != 0
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1381,22 +1381,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r bool
 
 						r = v != 0
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1412,7 +1412,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							{
@@ -1424,16 +1424,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = tmpDec
 							}
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r apd.Decimal
 
 							{
@@ -1445,7 +1445,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 								r = tmpDec
 							}
 
-							outputCol[int(i)].Set(&r)
+							outputCol[i].Set(&r)
 						}
 					}
 				}
@@ -1453,7 +1453,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						{
@@ -1465,12 +1465,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = tmpDec
 						}
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r apd.Decimal
 
 						{
@@ -1482,7 +1482,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							r = tmpDec
 						}
 
-						outputCol[int(i)].Set(&r)
+						outputCol[i].Set(&r)
 					}
 				}
 			}
@@ -1498,7 +1498,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int16
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
@@ -1506,16 +1506,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							}
 							r = int16(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int16
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
@@ -1523,7 +1523,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							}
 							r = int16(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1531,7 +1531,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int16
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
@@ -1539,12 +1539,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						}
 						r = int16(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int16
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
@@ -1552,7 +1552,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						}
 						r = int16(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1568,7 +1568,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
@@ -1576,16 +1576,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							}
 							r = int32(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int32
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
@@ -1593,7 +1593,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							}
 							r = int32(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1601,7 +1601,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
@@ -1609,12 +1609,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						}
 						r = int32(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int32
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
@@ -1622,7 +1622,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						}
 						r = int32(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1638,7 +1638,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
@@ -1646,16 +1646,16 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							}
 							r = int64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r int64
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
@@ -1663,7 +1663,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 							}
 							r = int64(v)
 
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1671,7 +1671,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
@@ -1679,12 +1679,12 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						}
 						r = int64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r int64
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
@@ -1692,7 +1692,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						}
 						r = int64(v)
 
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -1708,22 +1708,22 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 						if inputNulls.NullAt(i) {
 							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						if inputNulls.NullAt(uint16(i)) {
-							outputNulls.SetNull(uint16(i))
+						if inputNulls.NullAt(i) {
+							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[int(i)]
+							v := inputCol[i]
 							var r float64
 							r = v
-							outputCol[int(i)] = r
+							outputCol[i] = r
 						}
 					}
 				}
@@ -1731,18 +1731,18 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n uint16
 				if sel != nil {
 					sel = sel[:n]
 					for _, i := range sel {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				} else {
-					inputCol = inputCol[0:int(n)]
+					inputCol = inputCol[0:n]
 					for i := range inputCol {
-						v := inputCol[int(i)]
+						v := inputCol[i]
 						var r float64
 						r = v
-						outputCol[int(i)] = r
+						outputCol[i] = r
 					}
 				}
 			}
@@ -2099,9 +2099,9 @@ func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		for i := uint16(0); i < n; i++ {
-			if vecNulls.NullAt(uint16(i)) {
-				projNulls.SetNull(uint16(i))
+		for i := 0; i < n; i++ {
+			if vecNulls.NullAt(i) {
+				projNulls.SetNull(i)
 			} else {
 				execerror.VectorizedInternalPanic(fmt.Errorf("unexpected non-null at index %d", i))
 			}

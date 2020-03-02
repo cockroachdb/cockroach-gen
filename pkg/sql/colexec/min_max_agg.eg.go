@@ -91,7 +91,7 @@ func (a *minBoolAgg) CurrentOutputIndex() int {
 func (a *minBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -105,7 +105,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -134,7 +134,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -143,14 +143,14 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -173,7 +173,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -182,7 +182,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -191,14 +191,14 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -232,7 +232,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -244,11 +244,11 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -271,7 +271,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -280,7 +280,7 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -292,11 +292,11 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -372,7 +372,7 @@ func (a *minBytesAgg) CurrentOutputIndex() int {
 func (a *minBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -386,7 +386,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -415,7 +415,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -424,14 +424,14 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -448,8 +448,8 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col
 					_ = 0
-					_ = int(inputLen)
-					for i := 0; i < int(inputLen); i++ {
+					_ = inputLen
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -457,7 +457,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -466,14 +466,14 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -499,7 +499,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -511,11 +511,11 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -532,8 +532,8 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col
 					_ = 0
-					_ = int(inputLen)
-					for i := 0; i < int(inputLen); i++ {
+					_ = inputLen
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -541,7 +541,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -553,11 +553,11 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -625,7 +625,7 @@ func (a *minDecimalAgg) CurrentOutputIndex() int {
 func (a *minDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -639,7 +639,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -668,7 +668,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -677,14 +677,14 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -699,7 +699,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -708,7 +708,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -717,14 +717,14 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -750,7 +750,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -762,11 +762,11 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -781,7 +781,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -790,7 +790,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -802,11 +802,11 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -874,7 +874,7 @@ func (a *minInt16Agg) CurrentOutputIndex() int {
 func (a *minInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -888,7 +888,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -917,7 +917,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -926,14 +926,14 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -959,7 +959,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -968,7 +968,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -977,14 +977,14 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1021,7 +1021,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1033,11 +1033,11 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1063,7 +1063,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1072,7 +1072,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1084,11 +1084,11 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1167,7 +1167,7 @@ func (a *minInt32Agg) CurrentOutputIndex() int {
 func (a *minInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -1181,7 +1181,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -1210,7 +1210,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1219,14 +1219,14 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1252,7 +1252,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1261,7 +1261,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1270,14 +1270,14 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1314,7 +1314,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1326,11 +1326,11 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1356,7 +1356,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1365,7 +1365,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1377,11 +1377,11 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1460,7 +1460,7 @@ func (a *minInt64Agg) CurrentOutputIndex() int {
 func (a *minInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -1474,7 +1474,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -1503,7 +1503,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1512,14 +1512,14 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1545,7 +1545,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1554,7 +1554,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1563,14 +1563,14 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1607,7 +1607,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1619,11 +1619,11 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1649,7 +1649,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1658,7 +1658,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1670,11 +1670,11 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1753,7 +1753,7 @@ func (a *minFloat64Agg) CurrentOutputIndex() int {
 func (a *minFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -1767,7 +1767,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -1796,7 +1796,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1805,14 +1805,14 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1846,7 +1846,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1855,7 +1855,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1864,14 +1864,14 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1916,7 +1916,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1928,11 +1928,11 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -1966,7 +1966,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -1975,7 +1975,7 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -1987,11 +1987,11 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2078,7 +2078,7 @@ func (a *minTimestampAgg) CurrentOutputIndex() int {
 func (a *minTimestampAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -2092,7 +2092,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -2121,7 +2121,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2130,14 +2130,14 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2159,7 +2159,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -2168,7 +2168,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2177,14 +2177,14 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2217,7 +2217,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2229,11 +2229,11 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2255,7 +2255,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -2264,7 +2264,7 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2276,11 +2276,11 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2355,7 +2355,7 @@ func (a *minIntervalAgg) CurrentOutputIndex() int {
 func (a *minIntervalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -2369,7 +2369,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -2398,7 +2398,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2407,14 +2407,14 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2429,7 +2429,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -2438,7 +2438,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2447,14 +2447,14 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2480,7 +2480,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2492,11 +2492,11 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2511,7 +2511,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -2520,7 +2520,7 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2532,11 +2532,11 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2629,7 +2629,7 @@ func (a *maxBoolAgg) CurrentOutputIndex() int {
 func (a *maxBoolAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -2643,7 +2643,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -2672,7 +2672,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2681,14 +2681,14 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2711,7 +2711,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -2720,7 +2720,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2729,14 +2729,14 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2770,7 +2770,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2782,11 +2782,11 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2809,7 +2809,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -2818,7 +2818,7 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -2830,11 +2830,11 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -2910,7 +2910,7 @@ func (a *maxBytesAgg) CurrentOutputIndex() int {
 func (a *maxBytesAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -2924,7 +2924,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -2953,7 +2953,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -2962,14 +2962,14 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -2986,8 +2986,8 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col
 					_ = 0
-					_ = int(inputLen)
-					for i := 0; i < int(inputLen); i++ {
+					_ = inputLen
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2995,7 +2995,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -3004,14 +3004,14 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -3037,7 +3037,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -3049,11 +3049,11 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -3070,8 +3070,8 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				} else {
 					col = col
 					_ = 0
-					_ = int(inputLen)
-					for i := 0; i < int(inputLen); i++ {
+					_ = inputLen
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -3079,7 +3079,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col.Set(a.curIdx, a.curAgg)
 								}
@@ -3091,11 +3091,11 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(int(i))
+								a.curAgg = col.Get(i)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col.Get(int(i))
+								candidate := col.Get(i)
 
 								{
 									var cmpResult int
@@ -3163,7 +3163,7 @@ func (a *maxDecimalAgg) CurrentOutputIndex() int {
 func (a *maxDecimalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -3177,7 +3177,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -3206,7 +3206,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -3215,14 +3215,14 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3237,7 +3237,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -3246,7 +3246,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -3255,14 +3255,14 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3288,7 +3288,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -3300,11 +3300,11 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3319,7 +3319,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -3328,7 +3328,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx].Set(&a.curAgg)
 								}
@@ -3340,11 +3340,11 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3412,7 +3412,7 @@ func (a *maxInt16Agg) CurrentOutputIndex() int {
 func (a *maxInt16Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -3426,7 +3426,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -3455,7 +3455,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3464,14 +3464,14 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3497,7 +3497,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -3506,7 +3506,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3515,14 +3515,14 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3559,7 +3559,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3571,11 +3571,11 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3601,7 +3601,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -3610,7 +3610,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3622,11 +3622,11 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3705,7 +3705,7 @@ func (a *maxInt32Agg) CurrentOutputIndex() int {
 func (a *maxInt32Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -3719,7 +3719,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -3748,7 +3748,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3757,14 +3757,14 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3790,7 +3790,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -3799,7 +3799,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3808,14 +3808,14 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3852,7 +3852,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3864,11 +3864,11 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3894,7 +3894,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -3903,7 +3903,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -3915,11 +3915,11 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -3998,7 +3998,7 @@ func (a *maxInt64Agg) CurrentOutputIndex() int {
 func (a *maxInt64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -4012,7 +4012,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -4041,7 +4041,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4050,14 +4050,14 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4083,7 +4083,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4092,7 +4092,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4101,14 +4101,14 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4145,7 +4145,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4157,11 +4157,11 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4187,7 +4187,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4196,7 +4196,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4208,11 +4208,11 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4291,7 +4291,7 @@ func (a *maxFloat64Agg) CurrentOutputIndex() int {
 func (a *maxFloat64Agg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -4305,7 +4305,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -4334,7 +4334,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4343,14 +4343,14 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4384,7 +4384,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4393,7 +4393,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4402,14 +4402,14 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4454,7 +4454,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4466,11 +4466,11 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4504,7 +4504,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4513,7 +4513,7 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4525,11 +4525,11 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4616,7 +4616,7 @@ func (a *maxTimestampAgg) CurrentOutputIndex() int {
 func (a *maxTimestampAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -4630,7 +4630,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -4659,7 +4659,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4668,14 +4668,14 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4697,7 +4697,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4706,7 +4706,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4715,14 +4715,14 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4755,7 +4755,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4767,11 +4767,11 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4793,7 +4793,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4802,7 +4802,7 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4814,11 +4814,11 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4893,7 +4893,7 @@ func (a *maxIntervalAgg) CurrentOutputIndex() int {
 func (a *maxIntervalAgg) SetOutputIndex(idx int) {
 	if a.curIdx != -1 {
 		a.curIdx = idx
-		a.nulls.UnsetNullsAfter(uint16(idx + 1))
+		a.nulls.UnsetNullsAfter(idx + 1)
 	}
 }
 
@@ -4907,7 +4907,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		// any non-nulls for this group so far, the output for this group should
 		// be null.
 		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(uint16(a.curIdx))
+			a.nulls.SetNull(a.curIdx)
 		} else {
 			a.allocator.PerformOperation(
 				[]coldata.Vec{a.vec},
@@ -4936,7 +4936,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4945,14 +4945,14 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -4967,7 +4967,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -4976,7 +4976,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -4985,14 +4985,14 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							a.foundNonNullForCurrentGroup = false
 						}
 						var isNull bool
-						isNull = nulls.NullAt(uint16(i))
+						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -5018,7 +5018,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -5030,11 +5030,11 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int
@@ -5049,7 +5049,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:int(inputLen)]
+					col = col[0:inputLen]
 					for i := range col {
 
 						if a.groups[i] {
@@ -5058,7 +5058,7 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 							// negative, it means that this is the first group.
 							if a.curIdx >= 0 {
 								if !a.foundNonNullForCurrentGroup {
-									a.nulls.SetNull(uint16(a.curIdx))
+									a.nulls.SetNull(a.curIdx)
 								} else {
 									a.col[a.curIdx] = a.curAgg
 								}
@@ -5070,11 +5070,11 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[int(i)]
+								a.curAgg = col[i]
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
-								candidate := col[int(i)]
+								candidate := col[i]
 
 								{
 									var cmpResult int

@@ -145,7 +145,7 @@ func newSingleOrderedDistinct(
 type partitioner interface {
 	// partition partitions the input colVec of size n, writing true to the
 	// outputCol for every value that differs from the previous one.
-	partition(colVec coldata.Vec, outputCol []bool, n uint64)
+	partition(colVec coldata.Vec, outputCol []bool, n int)
 
 	// partitionWithOrder is like partition, except it performs the partitioning
 	// on the input Vec as if it were ordered via the input order vector, which is
@@ -154,7 +154,7 @@ type partitioner interface {
 	// implies a reordered input vector [b,b,a], the resultant outputCol would be
 	// [true, false, true], indicating a distinct value at the 0th and 2nd
 	// elements.
-	partitionWithOrder(colVec coldata.Vec, order []uint64, outputCol []bool, n uint64)
+	partitionWithOrder(colVec coldata.Vec, order []int, outputCol []bool, n int)
 }
 
 // newPartitioner returns a new partitioner on type t.
@@ -239,7 +239,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -260,14 +260,14 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -298,7 +298,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -321,20 +321,20 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -365,7 +365,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -401,7 +401,7 @@ func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
 type partitionerBool struct{}
 
 func (p partitionerBool) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal bool
 	var lastValNull bool
@@ -411,19 +411,19 @@ func (p partitionerBool) partitionWithOrder(
 	}
 
 	col := colVec.Bool()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -453,7 +453,7 @@ func (p partitionerBool) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -476,7 +476,7 @@ func (p partitionerBool) partitionWithOrder(
 	}
 }
 
-func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     bool
 		lastValNull bool
@@ -487,20 +487,20 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint6
 	}
 
 	col := colVec.Bool()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -531,7 +531,7 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n uint6
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -610,7 +610,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -631,14 +631,14 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col.Get(int(checkIdx))
+					v := col.Get(checkIdx)
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -661,7 +661,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col.Get(int(checkIdx))
+				v := col.Get(checkIdx)
 				var unique bool
 
 				{
@@ -678,20 +678,20 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		col = col
 		_ = 0
-		_ = int(n)
+		_ = n
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := 0; checkIdx < int(n); checkIdx++ {
+			for checkIdx := 0; checkIdx < n; checkIdx++ {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col.Get(int(checkIdx))
+					v := col.Get(checkIdx)
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -712,9 +712,9 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 				lastValNull = null
 			}
 		} else {
-			for checkIdx := 0; checkIdx < int(n); checkIdx++ {
+			for checkIdx := 0; checkIdx < n; checkIdx++ {
 				outputIdx := checkIdx
-				v := col.Get(int(checkIdx))
+				v := col.Get(checkIdx)
 				var unique bool
 
 				{
@@ -742,7 +742,7 @@ func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
 type partitionerBytes struct{}
 
 func (p partitionerBytes) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal []byte
 	var lastValNull bool
@@ -754,19 +754,19 @@ func (p partitionerBytes) partitionWithOrder(
 	col := colVec.Bytes()
 	col = col
 	_ = 0
-	_ = int(n)
+	_ = n
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col.Get(int(checkIdx))
+				v := col.Get(checkIdx)
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -788,7 +788,7 @@ func (p partitionerBytes) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col.Get(int(checkIdx))
+			v := col.Get(checkIdx)
 			var unique bool
 
 			{
@@ -803,7 +803,7 @@ func (p partitionerBytes) partitionWithOrder(
 	}
 }
 
-func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     []byte
 		lastValNull bool
@@ -816,20 +816,20 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 	col := colVec.Bytes()
 	col = col
 	_ = 0
-	_ = int(n)
+	_ = n
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := 0; checkIdx < int(n); checkIdx++ {
+		for checkIdx := 0; checkIdx < n; checkIdx++ {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col.Get(int(checkIdx))
+				v := col.Get(checkIdx)
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -850,9 +850,9 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n uint
 			lastValNull = null
 		}
 	} else {
-		for checkIdx := 0; checkIdx < int(n); checkIdx++ {
+		for checkIdx := 0; checkIdx < n; checkIdx++ {
 			outputIdx := checkIdx
-			v := col.Get(int(checkIdx))
+			v := col.Get(checkIdx)
 			var unique bool
 
 			{
@@ -923,7 +923,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -944,14 +944,14 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -974,7 +974,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -989,20 +989,20 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -1025,7 +1025,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -1053,7 +1053,7 @@ func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 type partitionerDecimal struct{}
 
 func (p partitionerDecimal) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal apd.Decimal
 	var lastValNull bool
@@ -1063,19 +1063,19 @@ func (p partitionerDecimal) partitionWithOrder(
 	}
 
 	col := colVec.Decimal()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -1097,7 +1097,7 @@ func (p partitionerDecimal) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -1112,7 +1112,7 @@ func (p partitionerDecimal) partitionWithOrder(
 	}
 }
 
-func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     apd.Decimal
 		lastValNull bool
@@ -1123,20 +1123,20 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 	}
 
 	col := colVec.Decimal()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -1159,7 +1159,7 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n ui
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -1230,7 +1230,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -1251,14 +1251,14 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -1292,7 +1292,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -1318,20 +1318,20 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -1365,7 +1365,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -1404,7 +1404,7 @@ func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt16 struct{}
 
 func (p partitionerInt16) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal int16
 	var lastValNull bool
@@ -1414,19 +1414,19 @@ func (p partitionerInt16) partitionWithOrder(
 	}
 
 	col := colVec.Int16()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -1459,7 +1459,7 @@ func (p partitionerInt16) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -1485,7 +1485,7 @@ func (p partitionerInt16) partitionWithOrder(
 	}
 }
 
-func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     int16
 		lastValNull bool
@@ -1496,20 +1496,20 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 	}
 
 	col := colVec.Int16()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -1543,7 +1543,7 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n uint
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -1625,7 +1625,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -1646,14 +1646,14 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -1687,7 +1687,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -1713,20 +1713,20 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -1760,7 +1760,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -1799,7 +1799,7 @@ func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt32 struct{}
 
 func (p partitionerInt32) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal int32
 	var lastValNull bool
@@ -1809,19 +1809,19 @@ func (p partitionerInt32) partitionWithOrder(
 	}
 
 	col := colVec.Int32()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -1854,7 +1854,7 @@ func (p partitionerInt32) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -1880,7 +1880,7 @@ func (p partitionerInt32) partitionWithOrder(
 	}
 }
 
-func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     int32
 		lastValNull bool
@@ -1891,20 +1891,20 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 	}
 
 	col := colVec.Int32()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -1938,7 +1938,7 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n uint
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -2020,7 +2020,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -2041,14 +2041,14 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -2082,7 +2082,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -2108,20 +2108,20 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -2155,7 +2155,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -2194,7 +2194,7 @@ func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
 type partitionerInt64 struct{}
 
 func (p partitionerInt64) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal int64
 	var lastValNull bool
@@ -2204,19 +2204,19 @@ func (p partitionerInt64) partitionWithOrder(
 	}
 
 	col := colVec.Int64()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -2249,7 +2249,7 @@ func (p partitionerInt64) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -2275,7 +2275,7 @@ func (p partitionerInt64) partitionWithOrder(
 	}
 }
 
-func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     int64
 		lastValNull bool
@@ -2286,20 +2286,20 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 	}
 
 	col := colVec.Int64()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -2333,7 +2333,7 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n uint
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -2415,7 +2415,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -2436,14 +2436,14 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -2485,7 +2485,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -2519,20 +2519,20 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -2574,7 +2574,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -2621,7 +2621,7 @@ func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 type partitionerFloat64 struct{}
 
 func (p partitionerFloat64) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal float64
 	var lastValNull bool
@@ -2631,19 +2631,19 @@ func (p partitionerFloat64) partitionWithOrder(
 	}
 
 	col := colVec.Float64()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -2684,7 +2684,7 @@ func (p partitionerFloat64) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -2718,7 +2718,7 @@ func (p partitionerFloat64) partitionWithOrder(
 	}
 }
 
-func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     float64
 		lastValNull bool
@@ -2729,20 +2729,20 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n ui
 	}
 
 	col := colVec.Float64()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -2784,7 +2784,7 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n ui
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -2874,7 +2874,7 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -2895,14 +2895,14 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -2932,7 +2932,7 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -2954,20 +2954,20 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -2997,7 +2997,7 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -3032,7 +3032,7 @@ func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 type partitionerTimestamp struct{}
 
 func (p partitionerTimestamp) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal time.Time
 	var lastValNull bool
@@ -3042,19 +3042,19 @@ func (p partitionerTimestamp) partitionWithOrder(
 	}
 
 	col := colVec.Timestamp()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -3083,7 +3083,7 @@ func (p partitionerTimestamp) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -3105,7 +3105,7 @@ func (p partitionerTimestamp) partitionWithOrder(
 	}
 }
 
-func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     time.Time
 		lastValNull bool
@@ -3116,20 +3116,20 @@ func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n 
 	}
 
 	col := colVec.Timestamp()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -3159,7 +3159,7 @@ func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n 
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -3237,7 +3237,7 @@ func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 	lastVal := p.lastVal
 	lastValNull := p.lastValNull
 	sel := batch.Selection()
-	firstIdx := uint16(0)
+	firstIdx := 0
 	if sel != nil {
 		firstIdx = sel[0]
 	}
@@ -3258,14 +3258,14 @@ func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 		if nulls != nil {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -3288,7 +3288,7 @@ func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for _, checkIdx := range sel {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -3303,20 +3303,20 @@ func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 		}
 	} else {
 		// Bounds check elimination.
-		col = col[0:int(n)]
+		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				null := nulls.NullAt(uint16(checkIdx))
+				null := nulls.NullAt(checkIdx)
 				if null {
 					if !lastValNull {
 						// The current value is null while the previous was not.
 						outputCol[outputIdx] = true
 					}
 				} else {
-					v := col[int(checkIdx)]
+					v := col[checkIdx]
 					if lastValNull {
 						// The previous value was null while the current is not.
 						outputCol[outputIdx] = true
@@ -3339,7 +3339,7 @@ func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			for checkIdx := range col {
 				outputIdx := checkIdx
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				var unique bool
 
 				{
@@ -3367,7 +3367,7 @@ func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 type partitionerInterval struct{}
 
 func (p partitionerInterval) partitionWithOrder(
-	colVec coldata.Vec, order []uint64, outputCol []bool, n uint64,
+	colVec coldata.Vec, order []int, outputCol []bool, n int,
 ) {
 	var lastVal duration.Duration
 	var lastValNull bool
@@ -3377,19 +3377,19 @@ func (p partitionerInterval) partitionWithOrder(
 	}
 
 	col := colVec.Interval()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -3411,7 +3411,7 @@ func (p partitionerInterval) partitionWithOrder(
 		}
 	} else {
 		for outputIdx, checkIdx := range order {
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{
@@ -3426,7 +3426,7 @@ func (p partitionerInterval) partitionWithOrder(
 	}
 }
 
-func (p partitionerInterval) partition(colVec coldata.Vec, outputCol []bool, n uint64) {
+func (p partitionerInterval) partition(colVec coldata.Vec, outputCol []bool, n int) {
 	var (
 		lastVal     duration.Duration
 		lastValNull bool
@@ -3437,20 +3437,20 @@ func (p partitionerInterval) partition(colVec coldata.Vec, outputCol []bool, n u
 	}
 
 	col := colVec.Interval()
-	col = col[0:int(n)]
+	col = col[0:n]
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			null := nulls.NullAt(uint16(checkIdx))
+			null := nulls.NullAt(checkIdx)
 			if null {
 				if !lastValNull {
 					// The current value is null while the previous was not.
 					outputCol[outputIdx] = true
 				}
 			} else {
-				v := col[int(checkIdx)]
+				v := col[checkIdx]
 				if lastValNull {
 					// The previous value was null while the current is not.
 					outputCol[outputIdx] = true
@@ -3473,7 +3473,7 @@ func (p partitionerInterval) partition(colVec coldata.Vec, outputCol []bool, n u
 	} else {
 		for checkIdx := range col {
 			outputIdx := checkIdx
-			v := col[int(checkIdx)]
+			v := col[checkIdx]
 			var unique bool
 
 			{

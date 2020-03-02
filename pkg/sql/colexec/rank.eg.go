@@ -106,7 +106,7 @@ func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if r.distinctCol[sel[i]] {
 				r.rank += r.rankIncrement
 				r.rankIncrement = 1
@@ -117,7 +117,7 @@ func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if r.distinctCol[i] {
 				r.rank += r.rankIncrement
 				r.rankIncrement = 1
@@ -166,7 +166,7 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if partitionCol[sel[i]] {
 				r.rank = 1
 				r.rankIncrement = 1
@@ -183,7 +183,7 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if partitionCol[i] {
 				r.rank = 1
 				r.rankIncrement = 1
@@ -236,7 +236,7 @@ func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if r.distinctCol[sel[i]] {
 				r.rank++
 				rankCol[sel[i]] = r.rank
@@ -246,7 +246,7 @@ func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if r.distinctCol[i] {
 				r.rank++
 				rankCol[i] = r.rank
@@ -294,7 +294,7 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if partitionCol[sel[i]] {
 				r.rank = 1
 				r.rankIncrement = 1
@@ -310,7 +310,7 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 		}
 	} else {
-		for i := uint16(0); i < batch.Length(); i++ {
+		for i := 0; i < batch.Length(); i++ {
 			if partitionCol[i] {
 				r.rank = 1
 				r.rankIncrement = 1

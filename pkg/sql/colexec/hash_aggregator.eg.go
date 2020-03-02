@@ -32,13 +32,13 @@ import (
 // NOTE: the return vector will reuse the memory allocated for the selection
 //       vector.
 func (v hashAggFuncs) match(
-	sel []uint16,
+	sel []int,
 	b coldata.Batch,
 	keyCols []uint32,
 	keyTypes []coltypes.T,
 	keyMapping coldata.Batch,
 	diff []bool,
-) (bool, []uint16) {
+) (bool, []int) {
 	// We want to directly write to the selection vector to avoid extra
 	// allocation.
 	b.SetSelection(true)
@@ -50,7 +50,7 @@ func (v hashAggFuncs) match(
 	for keyIdx, colIdx := range keyCols {
 		lhs := keyMapping.ColVec(keyIdx)
 		lhsHasNull := lhs.MaybeHasNulls()
-		lhsNull := lhs.Nulls().NullAt64(v.keyIdx)
+		lhsNull := lhs.Nulls().NullAt(v.keyIdx)
 
 		rhs := b.ColVec(int(colIdx))
 		rhsHasNull := rhs.MaybeHasNulls()
@@ -62,7 +62,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Bool()
 			rhsCol := rhs.Bool()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -71,7 +71,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -93,7 +93,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -101,7 +101,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -123,11 +123,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -149,11 +149,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -179,7 +179,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Bytes()
 			rhsCol := rhs.Bytes()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol.Get(int(aggKeyIdx))
+				lhsVal := lhsCol.Get(aggKeyIdx)
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -188,7 +188,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol.Get(int(rowIdx))
+					rhsVal := rhsCol.Get(rowIdx)
 
 					var cmp bool
 
@@ -202,7 +202,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol.Get(int(aggKeyIdx))
+				lhsVal := lhsCol.Get(aggKeyIdx)
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -210,7 +210,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol.Get(int(rowIdx))
+					rhsVal := rhsCol.Get(rowIdx)
 
 					var cmp bool
 
@@ -224,11 +224,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol.Get(int(aggKeyIdx))
+				lhsVal := lhsCol.Get(aggKeyIdx)
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol.Get(int(rowIdx))
+					rhsVal := rhsCol.Get(rowIdx)
 
 					var cmp bool
 
@@ -242,11 +242,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol.Get(int(aggKeyIdx))
+				lhsVal := lhsCol.Get(aggKeyIdx)
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol.Get(int(rowIdx))
+					rhsVal := rhsCol.Get(rowIdx)
 
 					var cmp bool
 
@@ -264,7 +264,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Decimal()
 			rhsCol := rhs.Decimal()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -273,7 +273,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -287,7 +287,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -295,7 +295,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -309,11 +309,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -327,11 +327,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -349,7 +349,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Int16()
 			rhsCol := rhs.Int16()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -358,7 +358,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -383,7 +383,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -391,7 +391,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -416,11 +416,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -445,11 +445,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -478,7 +478,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Int32()
 			rhsCol := rhs.Int32()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -487,7 +487,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -512,7 +512,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -520,7 +520,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -545,11 +545,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -574,11 +574,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -607,7 +607,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Int64()
 			rhsCol := rhs.Int64()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -616,7 +616,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -641,7 +641,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -649,7 +649,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -674,11 +674,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -703,11 +703,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -736,7 +736,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Float64()
 			rhsCol := rhs.Float64()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -745,7 +745,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -778,7 +778,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -786,7 +786,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -819,11 +819,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -856,11 +856,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -897,7 +897,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Timestamp()
 			rhsCol := rhs.Timestamp()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -906,7 +906,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -927,7 +927,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -935,7 +935,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -956,11 +956,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -981,11 +981,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -1010,7 +1010,7 @@ func (v hashAggFuncs) match(
 			lhsCol := lhs.Interval()
 			rhsCol := rhs.Interval()
 			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
@@ -1019,7 +1019,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -1033,7 +1033,7 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 					if lhsNull {
@@ -1041,7 +1041,7 @@ func (v hashAggFuncs) match(
 						continue
 					}
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -1055,11 +1055,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -1073,11 +1073,11 @@ func (v hashAggFuncs) match(
 				}
 
 			} else {
-				lhsVal := lhsCol[int(aggKeyIdx)]
+				lhsVal := lhsCol[aggKeyIdx]
 
 				for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[int(rowIdx)]
+					rhsVal := rhsCol[rowIdx]
 
 					var cmp bool
 
@@ -1108,12 +1108,12 @@ func (v hashAggFuncs) match(
 	}
 
 	if len(matched) > 0 {
-		b.SetLength(uint16(len(matched)))
+		b.SetLength(len(matched))
 		anyMatched = true
 	}
 
 	// Reset diff slice back to all false.
-	for n := uint16(0); n < uint16(len(diff)); n += uint16(copy(diff, zeroBoolColumn)) {
+	for n := 0; n < len(diff); n += copy(diff, zeroBoolColumn) {
 	}
 
 	return anyMatched, remaining

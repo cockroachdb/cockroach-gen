@@ -130,10 +130,10 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}
@@ -170,13 +170,13 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col.Set(int(i), c.constVal)
+					col.Set(i, c.constVal)
 				}
 			} else {
 				col = col
 				_ = 0
-				_ = int(n)
-				for i := 0; i < int(n); i++ {
+				_ = n
+				for i := 0; i < n; i++ {
 					col.Set(i, c.constVal)
 				}
 			}
@@ -212,10 +212,10 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)].Set(&c.constVal)
+					col[i].Set(&c.constVal)
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i].Set(&c.constVal)
 				}
@@ -252,10 +252,10 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}
@@ -292,10 +292,10 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}
@@ -332,10 +332,10 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}
@@ -372,10 +372,10 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}
@@ -412,10 +412,10 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}
@@ -452,10 +452,10 @@ func (c constIntervalOp) Next(ctx context.Context) coldata.Batch {
 		func() {
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
-					col[int(i)] = c.constVal
+					col[i] = c.constVal
 				}
 			} else {
-				col = col[0:int(n)]
+				col = col[0:n]
 				for i := range col {
 					col[i] = c.constVal
 				}

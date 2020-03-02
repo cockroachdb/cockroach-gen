@@ -37,7 +37,7 @@ type OrderedSynchronizer struct {
 	// inputBatches stores the current batch for each input.
 	inputBatches []coldata.Batch
 	// inputIndices stores the current index into each input batch.
-	inputIndices []uint16
+	inputIndices []int
 	// heap is a min heap which stores indices into inputBatches. The "current
 	// value" of ith input batch is the tuple at inputIndices[i] position of
 	// inputBatches[i] batch. If an input is fully exhausted, it will be removed
@@ -112,7 +112,7 @@ func (o *OrderedSynchronizer) Next(ctx context.Context) coldata.Batch {
 		heap.Init(o)
 	}
 	o.output.ResetInternalBatch()
-	outputIdx := uint16(0)
+	outputIdx := 0
 	o.allocator.PerformOperation(o.output.ColVecs(), func() {
 		for outputIdx < coldata.BatchSize() {
 			if o.Len() == 0 {
@@ -136,48 +136,48 @@ func (o *OrderedSynchronizer) Next(ctx context.Context) coldata.Batch {
 					case coltypes.Bool:
 						srcCol := vec.Bool()
 						outCol := o.outBoolCols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					case coltypes.Bytes:
 						srcCol := vec.Bytes()
 						outCol := o.outBytesCols[o.outColsMap[i]]
-						v := srcCol.Get(int(srcRowIdx))
-						outCol.Set(int(outputIdx), v)
+						v := srcCol.Get(srcRowIdx)
+						outCol.Set(outputIdx, v)
 					case coltypes.Decimal:
 						srcCol := vec.Decimal()
 						outCol := o.outDecimalCols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)].Set(&v)
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx].Set(&v)
 					case coltypes.Int16:
 						srcCol := vec.Int16()
 						outCol := o.outInt16Cols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					case coltypes.Int32:
 						srcCol := vec.Int32()
 						outCol := o.outInt32Cols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					case coltypes.Int64:
 						srcCol := vec.Int64()
 						outCol := o.outInt64Cols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					case coltypes.Float64:
 						srcCol := vec.Float64()
 						outCol := o.outFloat64Cols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					case coltypes.Timestamp:
 						srcCol := vec.Timestamp()
 						outCol := o.outTimestampCols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					case coltypes.Interval:
 						srcCol := vec.Interval()
 						outCol := o.outIntervalCols[o.outColsMap[i]]
-						v := srcCol[int(srcRowIdx)]
-						outCol[int(outputIdx)] = v
+						v := srcCol[srcRowIdx]
+						outCol[outputIdx] = v
 					default:
 						execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", physType))
 					}
@@ -208,7 +208,7 @@ func (o *OrderedSynchronizer) Next(ctx context.Context) coldata.Batch {
 
 // Init is part of the Operator interface.
 func (o *OrderedSynchronizer) Init() {
-	o.inputIndices = make([]uint16, len(o.inputs))
+	o.inputIndices = make([]int, len(o.inputs))
 	o.output = o.allocator.NewMemBatch(o.columnTypes)
 	o.outNulls = make([]*coldata.Nulls, len(o.columnTypes))
 	o.outColsMap = make([]int, len(o.columnTypes))

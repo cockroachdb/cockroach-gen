@@ -35,11 +35,11 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 	if input == &o.right {
 		bufferedGroup = o.proberState.rBufferedGroup
 	}
-	lastBufferedTupleIdx := bufferedGroup.length - 1
-	tupleToLookAtIdx := uint64(rowIdx)
+	lastBufferedTupleIdx := bufferedGroup.Length() - 1
+	tupleToLookAtIdx := rowIdx
 	sel := batch.Selection()
 	if sel != nil {
-		tupleToLookAtIdx = uint64(sel[rowIdx])
+		tupleToLookAtIdx = sel[rowIdx]
 	}
 
 	// Check all equality columns in the first row of batch to make sure we're in
@@ -54,17 +54,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Bool()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal bool
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Bool()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -90,17 +90,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Bytes()
-			prevVal := bufferedCol.Get(int(lastBufferedTupleIdx))
+			prevVal := bufferedCol.Get(lastBufferedTupleIdx)
 			var curVal []byte
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Bytes()
-			curVal = col.Get(int(tupleToLookAtIdx))
+			curVal = col.Get(tupleToLookAtIdx)
 			var match bool
 
 			{
@@ -118,17 +118,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Decimal()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal apd.Decimal
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Decimal()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -146,17 +146,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Int16()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal int16
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Int16()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -185,17 +185,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Int32()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal int32
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Int32()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -224,17 +224,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Int64()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal int64
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Int64()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -263,17 +263,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Float64()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal float64
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Float64()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -310,17 +310,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Timestamp()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal time.Time
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Timestamp()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{
@@ -345,17 +345,17 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
 			// right side being an input) this check will always return false since
 			// nulls couldn't be buffered up though.
-			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt64(uint64(lastBufferedTupleIdx)) {
+			if bufferedGroup.ColVec(int(colIdx)).Nulls().NullAt(lastBufferedTupleIdx) {
 				return true
 			}
 			bufferedCol := bufferedGroup.ColVec(int(colIdx)).Interval()
-			prevVal := bufferedCol[int(lastBufferedTupleIdx)]
+			prevVal := bufferedCol[lastBufferedTupleIdx]
 			var curVal duration.Duration
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt64(tupleToLookAtIdx) {
+			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
 				return true
 			}
 			col := batch.ColVec(int(colIdx)).Interval()
-			curVal = col[int(tupleToLookAtIdx)]
+			curVal = col[tupleToLookAtIdx]
 			var match bool
 
 			{

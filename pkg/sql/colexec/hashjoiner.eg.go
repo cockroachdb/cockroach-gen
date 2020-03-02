@@ -17,8 +17,8 @@ import (
 // collect prepares the buildIdx and probeIdx arrays where the buildIdx and
 // probeIdx at each index are joined to make an output row. The total number of
 // resulting rows is returned.
-func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint16) uint16 {
-	nResults := uint16(0)
+func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int {
+	nResults := int(0)
 
 	if hj.spec.left.outer {
 		if sel != nil {
@@ -37,7 +37,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 
 					hj.probeState.probeRowUnmatched[nResults] = currentID == 0
 					if currentID > 0 {
-						hj.probeState.buildIdx[nResults] = currentID - 1
+						hj.probeState.buildIdx[nResults] = int(currentID - 1)
 					} else {
 						// If currentID == 0, then probeRowUnmatched will have been set - and
 						// we set the corresponding buildIdx to zero so that (as long as the
@@ -70,7 +70,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 
 					hj.probeState.probeRowUnmatched[nResults] = currentID == 0
 					if currentID > 0 {
-						hj.probeState.buildIdx[nResults] = currentID - 1
+						hj.probeState.buildIdx[nResults] = int(currentID - 1)
 					} else {
 						// If currentID == 0, then probeRowUnmatched will have been set - and
 						// we set the corresponding buildIdx to zero so that (as long as the
@@ -96,7 +96,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 				// Early bounds checks.
 				_ = hj.ht.headID[batchSize-1]
 				_ = sel[batchSize-1]
-				for i := uint16(0); i < batchSize; i++ {
+				for i := int(0); i < batchSize; i++ {
 					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
@@ -118,7 +118,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 							return nResults
 						}
 
-						hj.probeState.buildIdx[nResults] = currentID - 1
+						hj.probeState.buildIdx[nResults] = int(currentID - 1)
 						hj.probeState.probeIdx[nResults] = sel[i]
 						currentID = hj.ht.same[currentID]
 						hj.ht.headID[i] = currentID
@@ -131,7 +131,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
 				_ = hj.ht.headID[batchSize-1]
-				for i := uint16(0); i < batchSize; i++ {
+				for i := int(0); i < batchSize; i++ {
 					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
@@ -152,7 +152,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 							return nResults
 						}
 
-						hj.probeState.buildIdx[nResults] = currentID - 1
+						hj.probeState.buildIdx[nResults] = int(currentID - 1)
 						hj.probeState.probeIdx[nResults] = i
 						currentID = hj.ht.same[currentID]
 						hj.ht.headID[i] = currentID
@@ -169,8 +169,8 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize uint16, sel []uint1
 // distinctCollect prepares the batch with the joined output columns where the build
 // row index for each probe row is given in the groupID slice. This function
 // requires assumes a N-1 hash join.
-func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel []uint16) uint16 {
-	nResults := uint16(0)
+func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []int) int {
+	nResults := int(0)
 
 	if hj.spec.left.outer {
 		nResults = batchSize
@@ -182,13 +182,13 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel
 			_ = hj.probeState.buildIdx[batchSize-1]
 			_ = hj.probeState.probeIdx[batchSize-1]
 			_ = sel[batchSize-1]
-			for i := uint16(0); i < batchSize; i++ {
+			for i := int(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
 				id := hj.ht.groupID[i]
 				rowUnmatched := id == 0
 				hj.probeState.probeRowUnmatched[i] = rowUnmatched
 				if !rowUnmatched {
-					hj.probeState.buildIdx[i] = id - 1
+					hj.probeState.buildIdx[i] = int(id - 1)
 				}
 				hj.probeState.probeIdx[i] = sel[i]
 			}
@@ -198,13 +198,13 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel
 			_ = hj.probeState.probeRowUnmatched[batchSize-1]
 			_ = hj.probeState.buildIdx[batchSize-1]
 			_ = hj.probeState.probeIdx[batchSize-1]
-			for i := uint16(0); i < batchSize; i++ {
+			for i := int(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
 				id := hj.ht.groupID[i]
 				rowUnmatched := id == 0
 				hj.probeState.probeRowUnmatched[i] = rowUnmatched
 				if !rowUnmatched {
-					hj.probeState.buildIdx[i] = id - 1
+					hj.probeState.buildIdx[i] = int(id - 1)
 				}
 				hj.probeState.probeIdx[i] = i
 			}
@@ -216,7 +216,7 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel
 				// Early bounds checks.
 				_ = hj.ht.headID[batchSize-1]
 				_ = sel[batchSize-1]
-				for i := uint16(0); i < batchSize; i++ {
+				for i := int(0); i < batchSize; i++ {
 					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
@@ -231,10 +231,10 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel
 				_ = hj.probeState.buildIdx[batchSize-1]
 				_ = hj.probeState.probeIdx[batchSize-1]
 				_ = sel[batchSize-1]
-				for i := uint16(0); i < batchSize; i++ {
+				for i := int(0); i < batchSize; i++ {
 					if hj.ht.groupID[i] != 0 {
 						// Index of keys and outputs in the hash table is calculated as ID - 1.
-						hj.probeState.buildIdx[nResults] = hj.ht.groupID[i] - 1
+						hj.probeState.buildIdx[nResults] = int(hj.ht.groupID[i] - 1)
 						hj.probeState.probeIdx[nResults] = sel[i]
 						nResults++
 					}
@@ -245,7 +245,7 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
 				_ = hj.ht.headID[batchSize-1]
-				for i := uint16(0); i < batchSize; i++ {
+				for i := int(0); i < batchSize; i++ {
 					currentID := hj.ht.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
@@ -259,10 +259,10 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize uint16, sel
 				_ = hj.ht.groupID[batchSize-1]
 				_ = hj.probeState.buildIdx[batchSize-1]
 				_ = hj.probeState.probeIdx[batchSize-1]
-				for i := uint16(0); i < batchSize; i++ {
+				for i := int(0); i < batchSize; i++ {
 					if hj.ht.groupID[i] != 0 {
 						// Index of keys and outputs in the hash table is calculated as ID - 1.
-						hj.probeState.buildIdx[nResults] = hj.ht.groupID[i] - 1
+						hj.probeState.buildIdx[nResults] = int(hj.ht.groupID[i] - 1)
 						hj.probeState.probeIdx[nResults] = i
 						nResults++
 					}

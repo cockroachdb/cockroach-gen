@@ -30,13 +30,13 @@ type vecComparator interface {
 	// compare compares values from two vectors. vecIdx is the index of the vector
 	// and valIdx is the index of the value in that vector to compare. Returns -1,
 	// 0, or 1.
-	compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int
+	compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int
 
 	// set sets the value of the vector at dstVecIdx at index dstValIdx to the value
 	// at the vector at srcVecIdx at index srcValIdx.
 	// NOTE: whenever set is used, the caller is responsible for updating the
 	// memory accounts.
-	set(srcVecIdx, dstVecIdx int, srcValIdx, dstValIdx uint16)
+	set(srcVecIdx, dstVecIdx int, srcValIdx, dstValIdx int)
 
 	// setVec updates the vector at idx.
 	setVec(idx int, vec coldata.Vec)
@@ -47,7 +47,7 @@ type BoolVecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *BoolVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *BoolVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -57,8 +57,8 @@ func (c *BoolVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint1
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 
 	if !left && right {
@@ -77,13 +77,13 @@ func (c *BoolVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *BoolVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *BoolVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 
@@ -92,7 +92,7 @@ type BytesVecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *BytesVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *BytesVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -102,8 +102,8 @@ func (c *BytesVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1].Get(int(valIdx1))
-	right := c.vecs[vecIdx2].Get(int(valIdx2))
+	left := c.vecs[vecIdx1].Get(valIdx1)
+	right := c.vecs[vecIdx2].Get(valIdx2)
 	var cmp int
 	cmp = bytes.Compare(left, right)
 	return cmp
@@ -114,7 +114,7 @@ func (c *BytesVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *BytesVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *BytesVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
@@ -125,7 +125,7 @@ func (c *BytesVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16
 		// variable number of bytes in `dstVecIdx`, so we will have to either shift
 		// the bytes after that element left or right, depending on how long the
 		// source bytes slice is. Refer to the CopySlice comment for an example.
-		c.vecs[dstVecIdx].CopySlice(c.vecs[srcVecIdx], int(dstIdx), int(srcIdx), int(srcIdx+1))
+		c.vecs[dstVecIdx].CopySlice(c.vecs[srcVecIdx], dstIdx, srcIdx, srcIdx+1)
 	}
 }
 
@@ -134,7 +134,7 @@ type DecimalVecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *DecimalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *DecimalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -144,8 +144,8 @@ func (c *DecimalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 	cmp = tree.CompareDecimals(&left, &right)
 	return cmp
@@ -156,13 +156,13 @@ func (c *DecimalVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *DecimalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *DecimalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)].Set(&v)
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx].Set(&v)
 	}
 }
 
@@ -171,7 +171,7 @@ type Int16VecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -181,8 +181,8 @@ func (c *Int16VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 
 	{
@@ -204,13 +204,13 @@ func (c *Int16VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *Int16VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *Int16VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 
@@ -219,7 +219,7 @@ type Int32VecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *Int32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *Int32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -229,8 +229,8 @@ func (c *Int32VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 
 	{
@@ -252,13 +252,13 @@ func (c *Int32VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *Int32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *Int32VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 
@@ -267,7 +267,7 @@ type Int64VecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -277,8 +277,8 @@ func (c *Int64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 
 	{
@@ -300,13 +300,13 @@ func (c *Int64VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *Int64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *Int64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 
@@ -315,7 +315,7 @@ type Float64VecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -325,8 +325,8 @@ func (c *Float64VecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 ui
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 
 	{
@@ -356,13 +356,13 @@ func (c *Float64VecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *Float64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *Float64VecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 
@@ -371,7 +371,7 @@ type TimestampVecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *TimestampVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *TimestampVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -381,8 +381,8 @@ func (c *TimestampVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 
 	if left.Before(right) {
@@ -400,13 +400,13 @@ func (c *TimestampVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *TimestampVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *TimestampVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 
@@ -415,7 +415,7 @@ type IntervalVecComparator struct {
 	nulls []*coldata.Nulls
 }
 
-func (c *IntervalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 uint16) int {
+func (c *IntervalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
 	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
 	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
 	if n1 && n2 {
@@ -425,8 +425,8 @@ func (c *IntervalVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 u
 	} else if n2 {
 		return 1
 	}
-	left := c.vecs[vecIdx1][int(valIdx1)]
-	right := c.vecs[vecIdx2][int(valIdx2)]
+	left := c.vecs[vecIdx1][valIdx1]
+	right := c.vecs[vecIdx2][valIdx2]
 	var cmp int
 	cmp = left.Compare(right)
 	return cmp
@@ -437,13 +437,13 @@ func (c *IntervalVecComparator) setVec(idx int, vec coldata.Vec) {
 	c.nulls[idx] = vec.Nulls()
 }
 
-func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx uint16) {
+func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
 	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
 		c.nulls[dstVecIdx].SetNull(dstIdx)
 	} else {
 		c.nulls[dstVecIdx].UnsetNull(dstIdx)
-		v := c.vecs[srcVecIdx][int(srcIdx)]
-		c.vecs[dstVecIdx][int(dstIdx)] = v
+		v := c.vecs[srcVecIdx][srcIdx]
+		c.vecs[dstVecIdx][dstIdx] = v
 	}
 }
 

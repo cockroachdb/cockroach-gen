@@ -72,7 +72,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -113,12 +113,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -126,9 +126,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -158,12 +158,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -194,12 +194,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -272,11 +272,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -341,12 +341,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -354,9 +354,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -378,12 +378,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -406,12 +406,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -468,11 +468,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -529,12 +529,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -542,9 +542,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -566,12 +566,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -594,12 +594,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -656,11 +656,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -717,12 +717,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -730,9 +730,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -765,12 +765,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -804,12 +804,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -888,11 +888,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -960,12 +960,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -973,9 +973,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -1008,12 +1008,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -1047,12 +1047,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1131,11 +1131,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1203,12 +1203,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -1216,9 +1216,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -1251,12 +1251,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -1290,12 +1290,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1374,11 +1374,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1446,12 +1446,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -1459,9 +1459,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -1502,12 +1502,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -1549,12 +1549,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1649,11 +1649,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1729,12 +1729,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -1742,9 +1742,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -1773,12 +1773,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -1808,12 +1808,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1884,11 +1884,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -1952,12 +1952,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -1965,9 +1965,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -1989,12 +1989,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -2017,12 +2017,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2079,11 +2079,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2146,16 +2146,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -2185,12 +2185,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -2222,7 +2222,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2296,7 +2296,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2361,16 +2361,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -2392,12 +2392,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -2421,7 +2421,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -2479,7 +2479,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -2536,16 +2536,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -2567,12 +2567,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -2596,7 +2596,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2654,7 +2654,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2711,16 +2711,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -2753,12 +2753,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -2793,7 +2793,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2873,7 +2873,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -2941,16 +2941,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -2983,12 +2983,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -3023,7 +3023,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3103,7 +3103,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3171,16 +3171,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -3213,12 +3213,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -3253,7 +3253,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3333,7 +3333,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3401,16 +3401,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -3451,12 +3451,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -3499,7 +3499,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3595,7 +3595,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3671,16 +3671,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -3709,12 +3709,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -3745,7 +3745,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3817,7 +3817,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3881,16 +3881,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -3912,12 +3912,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -3941,7 +3941,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -3999,7 +3999,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4064,7 +4064,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -4072,9 +4072,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -4105,7 +4105,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -4136,12 +4136,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4214,11 +4214,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4283,7 +4283,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -4291,9 +4291,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -4316,7 +4316,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -4339,12 +4339,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -4401,11 +4401,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -4462,7 +4462,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -4470,9 +4470,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -4495,7 +4495,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -4518,12 +4518,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4580,11 +4580,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4641,7 +4641,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -4649,9 +4649,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -4685,7 +4685,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -4719,12 +4719,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4803,11 +4803,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -4875,7 +4875,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -4883,9 +4883,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -4919,7 +4919,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -4953,12 +4953,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5037,11 +5037,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5109,7 +5109,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -5117,9 +5117,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -5153,7 +5153,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -5187,12 +5187,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5271,11 +5271,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5343,7 +5343,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -5351,9 +5351,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -5395,7 +5395,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -5437,12 +5437,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5537,11 +5537,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5617,7 +5617,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -5625,9 +5625,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -5657,7 +5657,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -5687,12 +5687,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5763,11 +5763,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5831,7 +5831,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -5839,9 +5839,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -5864,7 +5864,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -5887,12 +5887,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -5949,11 +5949,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6018,9 +6018,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -6051,7 +6051,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -6083,7 +6083,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6157,7 +6157,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6224,9 +6224,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -6249,7 +6249,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -6273,7 +6273,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -6331,7 +6331,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -6390,9 +6390,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -6415,7 +6415,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -6439,7 +6439,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6497,7 +6497,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6556,9 +6556,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -6592,7 +6592,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -6627,7 +6627,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6707,7 +6707,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6777,9 +6777,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -6813,7 +6813,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -6848,7 +6848,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6928,7 +6928,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -6998,9 +6998,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -7034,7 +7034,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -7069,7 +7069,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7149,7 +7149,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7219,9 +7219,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -7263,7 +7263,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -7306,7 +7306,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7402,7 +7402,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7480,9 +7480,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -7512,7 +7512,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -7543,7 +7543,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7615,7 +7615,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7681,9 +7681,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -7706,7 +7706,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -7730,7 +7730,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7788,7 +7788,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -7874,7 +7874,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -7915,12 +7915,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -7928,9 +7928,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -7960,12 +7960,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -7996,12 +7996,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8074,11 +8074,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8143,12 +8143,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -8156,9 +8156,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -8180,12 +8180,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -8208,12 +8208,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -8270,11 +8270,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -8331,12 +8331,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -8344,9 +8344,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -8368,12 +8368,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -8396,12 +8396,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8458,11 +8458,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8519,12 +8519,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -8532,9 +8532,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -8567,12 +8567,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -8606,12 +8606,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8690,11 +8690,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8762,12 +8762,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -8775,9 +8775,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -8810,12 +8810,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -8849,12 +8849,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -8933,11 +8933,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9005,12 +9005,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -9018,9 +9018,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -9053,12 +9053,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -9092,12 +9092,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9176,11 +9176,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9248,12 +9248,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -9261,9 +9261,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -9304,12 +9304,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -9351,12 +9351,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9451,11 +9451,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9531,12 +9531,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -9544,9 +9544,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -9575,12 +9575,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -9610,12 +9610,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9686,11 +9686,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9754,12 +9754,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -9767,9 +9767,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -9791,12 +9791,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -9819,12 +9819,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9881,11 +9881,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -9948,16 +9948,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -9987,12 +9987,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -10024,7 +10024,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10098,7 +10098,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10163,16 +10163,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -10194,12 +10194,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -10223,7 +10223,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -10281,7 +10281,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -10338,16 +10338,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -10369,12 +10369,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -10398,7 +10398,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10456,7 +10456,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10513,16 +10513,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -10555,12 +10555,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -10595,7 +10595,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10675,7 +10675,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10743,16 +10743,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -10785,12 +10785,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -10825,7 +10825,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10905,7 +10905,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -10973,16 +10973,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -11015,12 +11015,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -11055,7 +11055,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11135,7 +11135,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11203,16 +11203,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -11253,12 +11253,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -11301,7 +11301,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11397,7 +11397,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11473,16 +11473,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -11511,12 +11511,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -11547,7 +11547,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11619,7 +11619,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11683,16 +11683,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+							if lVec.Nulls().NullAt(lSel[curLIdx]) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -11714,12 +11714,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(lSel[curLIdx])) {
+										if lVec.Nulls().NullAt(lSel[curLIdx]) {
 											lComplete = true
 											break
 										}
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -11743,7 +11743,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11801,7 +11801,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -11866,7 +11866,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -11874,9 +11874,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -11907,7 +11907,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -11938,12 +11938,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12016,11 +12016,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12085,7 +12085,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -12093,9 +12093,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -12118,7 +12118,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -12141,12 +12141,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -12203,11 +12203,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -12264,7 +12264,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -12272,9 +12272,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -12297,7 +12297,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -12320,12 +12320,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12382,11 +12382,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12443,7 +12443,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -12451,9 +12451,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -12487,7 +12487,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -12521,12 +12521,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12605,11 +12605,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12677,7 +12677,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -12685,9 +12685,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -12721,7 +12721,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -12755,12 +12755,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12839,11 +12839,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -12911,7 +12911,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -12919,9 +12919,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -12955,7 +12955,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -12989,12 +12989,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13073,11 +13073,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13145,7 +13145,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -13153,9 +13153,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -13197,7 +13197,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -13239,12 +13239,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13339,11 +13339,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13419,7 +13419,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -13427,9 +13427,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -13459,7 +13459,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -13489,12 +13489,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13565,11 +13565,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13633,7 +13633,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -13641,9 +13641,9 @@ EqLoop:
 							}
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -13666,7 +13666,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -13689,12 +13689,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13751,11 +13751,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13820,9 +13820,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -13853,7 +13853,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -13885,7 +13885,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -13959,7 +13959,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14026,9 +14026,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -14051,7 +14051,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -14075,7 +14075,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -14133,7 +14133,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -14192,9 +14192,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -14217,7 +14217,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -14241,7 +14241,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14299,7 +14299,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14358,9 +14358,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -14394,7 +14394,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -14429,7 +14429,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14509,7 +14509,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14579,9 +14579,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -14615,7 +14615,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -14650,7 +14650,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14730,7 +14730,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14800,9 +14800,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -14836,7 +14836,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -14871,7 +14871,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -14951,7 +14951,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15021,9 +15021,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -15065,7 +15065,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -15108,7 +15108,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15204,7 +15204,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15282,9 +15282,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -15314,7 +15314,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -15345,7 +15345,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15417,7 +15417,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15483,9 +15483,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := lSel[curLIdx]
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -15508,7 +15508,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := lSel[curLIdx]
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -15532,7 +15532,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15590,7 +15590,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15676,7 +15676,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -15717,12 +15717,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -15730,9 +15730,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -15762,12 +15762,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -15798,12 +15798,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15876,11 +15876,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -15945,12 +15945,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -15958,9 +15958,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -15982,12 +15982,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -16010,12 +16010,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -16072,11 +16072,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -16133,12 +16133,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -16146,9 +16146,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -16170,12 +16170,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -16198,12 +16198,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16260,11 +16260,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16321,12 +16321,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -16334,9 +16334,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -16369,12 +16369,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -16408,12 +16408,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16492,11 +16492,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16564,12 +16564,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -16577,9 +16577,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -16612,12 +16612,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -16651,12 +16651,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16735,11 +16735,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16807,12 +16807,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -16820,9 +16820,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -16855,12 +16855,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -16894,12 +16894,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -16978,11 +16978,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17050,12 +17050,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -17063,9 +17063,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -17106,12 +17106,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -17153,12 +17153,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17253,11 +17253,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17333,12 +17333,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -17346,9 +17346,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -17377,12 +17377,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -17412,12 +17412,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17488,11 +17488,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17556,12 +17556,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -17569,9 +17569,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -17593,12 +17593,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -17621,12 +17621,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17683,11 +17683,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17750,16 +17750,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -17789,12 +17789,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -17826,7 +17826,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17900,7 +17900,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -17965,16 +17965,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -17996,12 +17996,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -18025,7 +18025,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -18083,7 +18083,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -18140,16 +18140,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -18171,12 +18171,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -18200,7 +18200,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18258,7 +18258,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18315,16 +18315,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -18357,12 +18357,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -18397,7 +18397,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18477,7 +18477,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18545,16 +18545,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -18587,12 +18587,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -18627,7 +18627,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18707,7 +18707,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18775,16 +18775,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -18817,12 +18817,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -18857,7 +18857,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -18937,7 +18937,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19005,16 +19005,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -19055,12 +19055,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -19103,7 +19103,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19199,7 +19199,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19275,16 +19275,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -19313,12 +19313,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -19349,7 +19349,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19421,7 +19421,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19485,16 +19485,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -19516,12 +19516,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -19545,7 +19545,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19603,7 +19603,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19668,7 +19668,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -19676,9 +19676,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -19709,7 +19709,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -19740,12 +19740,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19818,11 +19818,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -19887,7 +19887,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -19895,9 +19895,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -19920,7 +19920,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -19943,12 +19943,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -20005,11 +20005,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -20066,7 +20066,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -20074,9 +20074,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -20099,7 +20099,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -20122,12 +20122,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20184,11 +20184,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20245,7 +20245,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -20253,9 +20253,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -20289,7 +20289,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -20323,12 +20323,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20407,11 +20407,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20479,7 +20479,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -20487,9 +20487,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -20523,7 +20523,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -20557,12 +20557,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20641,11 +20641,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20713,7 +20713,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -20721,9 +20721,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -20757,7 +20757,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -20791,12 +20791,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20875,11 +20875,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -20947,7 +20947,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -20955,9 +20955,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -20999,7 +20999,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -21041,12 +21041,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21141,11 +21141,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21221,7 +21221,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -21229,9 +21229,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -21261,7 +21261,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -21291,12 +21291,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21367,11 +21367,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21435,7 +21435,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+							if rVec.Nulls().NullAt(rSel[curRIdx]) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -21443,9 +21443,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -21468,7 +21468,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -21491,12 +21491,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											rComplete = true
 											break
 										}
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21553,11 +21553,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(rSel[curRIdx])) {
+										if rVec.Nulls().NullAt(rSel[curRIdx]) {
 											break
 										}
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21622,9 +21622,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -21655,7 +21655,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -21687,7 +21687,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21761,7 +21761,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -21828,9 +21828,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -21853,7 +21853,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -21877,7 +21877,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -21935,7 +21935,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -21994,9 +21994,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -22019,7 +22019,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -22043,7 +22043,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22101,7 +22101,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22160,9 +22160,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -22196,7 +22196,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -22231,7 +22231,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22311,7 +22311,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22381,9 +22381,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -22417,7 +22417,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -22452,7 +22452,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22532,7 +22532,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22602,9 +22602,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -22638,7 +22638,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -22673,7 +22673,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22753,7 +22753,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -22823,9 +22823,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -22867,7 +22867,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -22910,7 +22910,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23006,7 +23006,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23084,9 +23084,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -23116,7 +23116,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -23147,7 +23147,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23219,7 +23219,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23285,9 +23285,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := rSel[curRIdx]
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -23310,7 +23310,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -23334,7 +23334,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23392,7 +23392,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = rSel[curRIdx]
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23478,7 +23478,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, int(coldata.BatchSize()))
+				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -23519,12 +23519,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -23532,9 +23532,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -23564,12 +23564,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -23600,12 +23600,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23678,11 +23678,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -23747,12 +23747,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -23760,9 +23760,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -23784,12 +23784,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -23812,12 +23812,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -23874,11 +23874,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -23935,12 +23935,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -23948,9 +23948,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -23972,12 +23972,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -24000,12 +24000,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24062,11 +24062,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24123,12 +24123,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -24136,9 +24136,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -24171,12 +24171,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -24210,12 +24210,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24294,11 +24294,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24366,12 +24366,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -24379,9 +24379,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -24414,12 +24414,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -24453,12 +24453,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24537,11 +24537,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24609,12 +24609,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -24622,9 +24622,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -24657,12 +24657,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -24696,12 +24696,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24780,11 +24780,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -24852,12 +24852,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -24865,9 +24865,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -24908,12 +24908,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -24955,12 +24955,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25055,11 +25055,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25135,12 +25135,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -25148,9 +25148,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -25179,12 +25179,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -25214,12 +25214,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25290,11 +25290,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25358,12 +25358,12 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -25371,9 +25371,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -25395,12 +25395,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -25423,12 +25423,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25485,11 +25485,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25552,16 +25552,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -25591,12 +25591,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -25628,7 +25628,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25702,7 +25702,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -25767,16 +25767,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -25798,12 +25798,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -25827,7 +25827,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -25885,7 +25885,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -25942,16 +25942,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -25973,12 +25973,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -26002,7 +26002,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26060,7 +26060,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26117,16 +26117,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -26159,12 +26159,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -26199,7 +26199,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26279,7 +26279,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26347,16 +26347,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -26389,12 +26389,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -26429,7 +26429,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26509,7 +26509,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26577,16 +26577,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -26619,12 +26619,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -26659,7 +26659,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26739,7 +26739,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -26807,16 +26807,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -26857,12 +26857,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -26905,7 +26905,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27001,7 +27001,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27077,16 +27077,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -27115,12 +27115,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -27151,7 +27151,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27223,7 +27223,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27287,16 +27287,16 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+							if lVec.Nulls().NullAt(curLIdx) {
 
 								curLIdx++
 								continue
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -27318,12 +27318,12 @@ EqLoop:
 								} else {
 									curLIdx++
 									for curLIdx < curLLength {
-										if lVec.Nulls().NullAt64(uint64(curLIdx)) {
+										if lVec.Nulls().NullAt(curLIdx) {
 											lComplete = true
 											break
 										}
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -27347,7 +27347,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27405,7 +27405,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27470,7 +27470,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -27478,9 +27478,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -27511,7 +27511,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -27542,12 +27542,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27620,11 +27620,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27689,7 +27689,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -27697,9 +27697,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -27722,7 +27722,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -27745,12 +27745,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -27807,11 +27807,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -27868,7 +27868,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -27876,9 +27876,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -27901,7 +27901,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -27924,12 +27924,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -27986,11 +27986,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28047,7 +28047,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -28055,9 +28055,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -28091,7 +28091,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -28125,12 +28125,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28209,11 +28209,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28281,7 +28281,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -28289,9 +28289,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -28325,7 +28325,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -28359,12 +28359,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28443,11 +28443,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28515,7 +28515,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -28523,9 +28523,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -28559,7 +28559,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -28593,12 +28593,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28677,11 +28677,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28749,7 +28749,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -28757,9 +28757,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -28801,7 +28801,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -28843,12 +28843,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -28943,11 +28943,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29023,7 +29023,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -29031,9 +29031,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -29063,7 +29063,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -29093,12 +29093,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29169,11 +29169,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29237,7 +29237,7 @@ EqLoop:
 						}
 						// Expand or filter each group based on the current equality column.
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-							if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+							if rVec.Nulls().NullAt(curRIdx) {
 
 								o.groups.addRightOuterGroup(curLIdx, curRIdx)
 								curRIdx++
@@ -29245,9 +29245,9 @@ EqLoop:
 							}
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -29270,7 +29270,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -29293,12 +29293,12 @@ EqLoop:
 								} else {
 									curRIdx++
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											rComplete = true
 											break
 										}
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29355,11 +29355,11 @@ EqLoop:
 									// the left, so we're adding each of them as a right outer group.
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
-										if rVec.Nulls().NullAt64(uint64(curRIdx)) {
+										if rVec.Nulls().NullAt(curRIdx) {
 											break
 										}
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29424,9 +29424,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -29457,7 +29457,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -29489,7 +29489,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29563,7 +29563,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29630,9 +29630,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys.Get(int(lSelIdx))
+							lVal := lKeys.Get(lSelIdx)
 							rSelIdx := curRIdx
-							rVal := rKeys.Get(int(rSelIdx))
+							rVal := rKeys.Get(rSelIdx)
 
 							var match bool
 
@@ -29655,7 +29655,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys.Get(int(lSelIdx))
+										newLVal := lKeys.Get(lSelIdx)
 
 										{
 											var cmpResult int
@@ -29679,7 +29679,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -29737,7 +29737,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys.Get(int(rSelIdx))
+										newRVal := rKeys.Get(rSelIdx)
 
 										{
 											var cmpResult int
@@ -29796,9 +29796,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -29821,7 +29821,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -29845,7 +29845,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29903,7 +29903,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -29962,9 +29962,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -29998,7 +29998,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -30033,7 +30033,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30113,7 +30113,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30183,9 +30183,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -30219,7 +30219,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -30254,7 +30254,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30334,7 +30334,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30404,9 +30404,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -30440,7 +30440,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -30475,7 +30475,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30555,7 +30555,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30625,9 +30625,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -30669,7 +30669,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -30712,7 +30712,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30808,7 +30808,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -30886,9 +30886,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -30918,7 +30918,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -30949,7 +30949,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -31021,7 +31021,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -31087,9 +31087,9 @@ EqLoop:
 						for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
 
 							lSelIdx := curLIdx
-							lVal := lKeys[int(lSelIdx)]
+							lVal := lKeys[lSelIdx]
 							rSelIdx := curRIdx
-							rVal := rKeys[int(rSelIdx)]
+							rVal := rKeys[rSelIdx]
 
 							var match bool
 
@@ -31112,7 +31112,7 @@ EqLoop:
 									curLIdx++
 									for curLIdx < curLLength {
 										lSelIdx := curLIdx
-										newLVal := lKeys[int(lSelIdx)]
+										newLVal := lKeys[lSelIdx]
 
 										{
 											var cmpResult int
@@ -31136,7 +31136,7 @@ EqLoop:
 									curRIdx++
 									for curRIdx < curRLength {
 										rSelIdx := curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -31194,7 +31194,7 @@ EqLoop:
 									o.groups.addRightOuterGroup(curLIdx, curRIdx-1)
 									for curRIdx < curRLength {
 										rSelIdx = curRIdx
-										newRVal := rKeys[int(rSelIdx)]
+										newRVal := rKeys[rSelIdx]
 
 										{
 											var cmpResult int
@@ -31260,22 +31260,18 @@ EqLoop:
 // repeated numRepeats times, instead of a simple copy of the group as a whole.
 // SIDE EFFECTS: writes into o.output.
 func (o *mergeJoinRightOuterOp) buildLeftGroups(
-	leftGroups []group,
-	colOffset int,
-	input *mergeJoinInput,
-	batch coldata.Batch,
-	destStartIdx uint16,
+	leftGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	sel := batch.Selection()
 	initialBuilderState := o.builderState.left
-	outputBatchSize := int(o.outputBatchSize)
+	outputBatchSize := o.outputBatchSize
 	o.allocator.PerformOperation(
 		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
 		func() {
 			// Loop over every column.
 		LeftColLoop:
 			for outColIdx, inColIdx := range input.outCols {
-				outStartIdx := int(destStartIdx)
+				outStartIdx := destStartIdx
 				out := o.output.ColVec(outColIdx)
 				var src coldata.Vec
 				if batch.Length() > 0 {
@@ -31308,7 +31304,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31317,11 +31313,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31369,7 +31365,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31378,11 +31374,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol.Get(srcStartIdx)
@@ -31430,7 +31426,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31439,11 +31435,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31491,7 +31487,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31500,11 +31496,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31552,7 +31548,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31561,11 +31557,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31613,7 +31609,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31622,11 +31618,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31674,7 +31670,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31683,11 +31679,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31735,7 +31731,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31744,11 +31740,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31796,7 +31792,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31805,11 +31801,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -31863,7 +31859,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31872,7 +31868,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -31921,7 +31917,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31930,7 +31926,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -31979,7 +31975,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -31988,7 +31984,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32037,7 +32033,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -32046,7 +32042,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32095,7 +32091,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -32104,7 +32100,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32153,7 +32149,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -32162,7 +32158,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32211,7 +32207,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -32220,7 +32216,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32269,7 +32265,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -32278,7 +32274,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32327,7 +32323,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 								for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
 									// Repeat each row numRepeats times.
 									srcStartIdx = o.builderState.left.curSrcStartIdx
-									srcStartIdx = int(sel[srcStartIdx])
+									srcStartIdx = sel[srcStartIdx]
 
 									repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
 									toAppend := repeatsLeft
@@ -32336,7 +32332,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -32401,11 +32397,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32461,11 +32457,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol.Get(srcStartIdx)
@@ -32521,11 +32517,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32581,11 +32577,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32641,11 +32637,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32701,11 +32697,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32761,11 +32757,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32821,11 +32817,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32881,11 +32877,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
-										if src.Nulls().NullAt64(uint64(srcStartIdx)) {
-											out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										if src.Nulls().NullAt(srcStartIdx) {
+											out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 											outStartIdx += toAppend
 										} else {
 											val = srcCol[srcStartIdx]
@@ -32947,7 +32943,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33004,7 +33000,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33061,7 +33057,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33118,7 +33114,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33175,7 +33171,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33232,7 +33228,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33289,7 +33285,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33346,7 +33342,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33403,7 +33399,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 									}
 
 									if leftGroup.nullGroup {
-										out.Nulls().SetNullRange(uint64(outStartIdx), uint64(outStartIdx+toAppend))
+										out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
 										outStartIdx += toAppend
 									} else {
 										{
@@ -33463,15 +33459,11 @@ func (o *mergeJoinRightOuterOp) buildLeftGroups(
 // expanded but directly copied numRepeats times.
 // SIDE EFFECTS: writes into o.output.
 func (o *mergeJoinRightOuterOp) buildRightGroups(
-	rightGroups []group,
-	colOffset int,
-	input *mergeJoinInput,
-	batch coldata.Batch,
-	destStartIdx uint16,
+	rightGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	initialBuilderState := o.builderState.right
 	sel := batch.Selection()
-	outputBatchSize := int(o.outputBatchSize)
+	outputBatchSize := o.outputBatchSize
 
 	o.allocator.PerformOperation(
 		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
@@ -33479,7 +33471,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 			// Loop over every column.
 		RightColLoop:
 			for outColIdx, inColIdx := range input.outCols {
-				outStartIdx := int(destStartIdx)
+				outStartIdx := destStartIdx
 				out := o.output.ColVec(outColIdx + colOffset)
 				var src coldata.Vec
 				if batch.Length() > 0 {
@@ -33516,9 +33508,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -33528,9 +33520,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33581,9 +33573,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+												v := srcCol.Get(sel[o.builderState.right.curSrcStartIdx])
 												outCol.Set(outStartIdx, v)
 											}
 										} else {
@@ -33593,9 +33585,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33646,9 +33638,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx].Set(&v)
 											}
 										} else {
@@ -33658,9 +33650,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33711,9 +33703,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -33723,9 +33715,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33776,9 +33768,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -33788,9 +33780,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33841,9 +33833,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -33853,9 +33845,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33906,9 +33898,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -33918,9 +33910,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -33971,9 +33963,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -33983,9 +33975,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34036,9 +34028,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+												out.Nulls().SetNull(outStartIdx)
 											} else {
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34048,9 +34040,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34107,7 +34099,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34117,9 +34109,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34170,7 +34162,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol.Get(int(sel[o.builderState.right.curSrcStartIdx]))
+												v := srcCol.Get(sel[o.builderState.right.curSrcStartIdx])
 												outCol.Set(outStartIdx, v)
 											}
 										} else {
@@ -34180,9 +34172,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34233,7 +34225,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx].Set(&v)
 											}
 										} else {
@@ -34243,9 +34235,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34296,7 +34288,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34306,9 +34298,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34359,7 +34351,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34369,9 +34361,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34422,7 +34414,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34432,9 +34424,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34485,7 +34477,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34495,9 +34487,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34548,7 +34540,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34558,9 +34550,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34611,7 +34603,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// instead of copy.
 										if toAppend == 1 {
 											{
-												v := srcCol[int(sel[o.builderState.right.curSrcStartIdx])]
+												v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 												outCol[outStartIdx] = v
 											}
 										} else {
@@ -34621,9 +34613,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34681,8 +34673,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -34694,9 +34686,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34746,8 +34738,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol.Get(o.builderState.right.curSrcStartIdx)
 												outCol.Set(outStartIdx, v)
@@ -34759,9 +34751,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34811,8 +34803,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx].Set(&v)
@@ -34824,9 +34816,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34876,8 +34868,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -34889,9 +34881,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -34941,8 +34933,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -34954,9 +34946,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35006,8 +34998,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -35019,9 +35011,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35071,8 +35063,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -35084,9 +35076,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35136,8 +35128,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -35149,9 +35141,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35201,8 +35193,8 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 										// Optimization in the case that group length is 1, use assign
 										// instead of copy.
 										if toAppend == 1 {
-											if src.Nulls().NullAt64(uint64(o.builderState.right.curSrcStartIdx)) {
-												out.Nulls().SetNull(uint16(outStartIdx))
+											if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+												out.Nulls().SetNull(outStartIdx)
 											} else {
 												v := srcCol[o.builderState.right.curSrcStartIdx]
 												outCol[outStartIdx] = v
@@ -35214,9 +35206,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35283,9 +35275,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35346,9 +35338,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35409,9 +35401,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35472,9 +35464,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35535,9 +35527,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35598,9 +35590,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35661,9 +35653,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35724,9 +35716,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35787,9 +35779,9 @@ func (o *mergeJoinRightOuterOp) buildRightGroups(
 														ColType:     colType,
 														Src:         src,
 														Sel:         sel,
-														DestIdx:     uint64(outStartIdx),
-														SrcStartIdx: uint64(o.builderState.right.curSrcStartIdx),
-														SrcEndIdx:   uint64(o.builderState.right.curSrcStartIdx + toAppend),
+														DestIdx:     outStartIdx,
+														SrcStartIdx: o.builderState.right.curSrcStartIdx,
+														SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
 													},
 												},
 											)
@@ -35859,12 +35851,12 @@ func (o *mergeJoinRightOuterOp) probe(ctx context.Context) {
 func (o *mergeJoinRightOuterOp) setBuilderSourceToBufferedGroup(
 	ctx context.Context,
 ) {
-	lGroupEndIdx := int(o.proberState.lBufferedGroup.length)
+	lGroupEndIdx := o.proberState.lBufferedGroup.Length()
 	// The capacity of builder state lGroups and rGroups is always at least 1
 	// given the init.
 	o.builderState.lGroups = o.builderState.lGroups[:1]
 	o.builderState.rGroups = o.builderState.rGroups[:1]
-	rGroupEndIdx := int(o.proberState.rBufferedGroup.length)
+	rGroupEndIdx := o.proberState.rBufferedGroup.Length()
 	o.builderState.lGroups[0] = group{
 		rowStartIdx: 0,
 		rowEndIdx:   lGroupEndIdx,
@@ -35934,22 +35926,20 @@ func (o *mergeJoinRightOuterOp) build() {
 // batch size to determine the output count. Note that as soon as a group is
 // materialized partially or fully to output, its toBuild field is updated
 // accordingly.
-func (o *mergeJoinRightOuterOp) calculateOutputCount(
-	groups []group,
-) uint16 {
-	count := int(o.builderState.outCount)
+func (o *mergeJoinRightOuterOp) calculateOutputCount(groups []group) int {
+	count := o.builderState.outCount
 
 	for i := 0; i < len(groups); i++ {
 		count += groups[i].toBuild
 		groups[i].toBuild = 0
-		if count > int(o.outputBatchSize) {
-			groups[i].toBuild = count - int(o.outputBatchSize)
-			count = int(o.outputBatchSize)
-			return uint16(count)
+		if count > o.outputBatchSize {
+			groups[i].toBuild = count - o.outputBatchSize
+			count = o.outputBatchSize
+			return count
 		}
 	}
 	o.builderState.outFinished = true
-	return uint16(count)
+	return count
 }
 
 func (o *mergeJoinRightOuterOp) Next(ctx context.Context) coldata.Batch {
@@ -36016,7 +36006,7 @@ func (o *mergeJoinRightOuterOp) Next(ctx context.Context) coldata.Batch {
 			if o.outputReady || o.builderState.outCount == o.outputBatchSize {
 				o.output.SetLength(o.builderState.outCount)
 				// Reset builder out count.
-				o.builderState.outCount = uint16(0)
+				o.builderState.outCount = 0
 				o.outputReady = false
 				return o.output
 			}
