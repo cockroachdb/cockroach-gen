@@ -14,63 +14,58 @@ import (
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
+	"github.com/cockroachdb/errors"
 )
-
-// Use execerror package to remove unused import warning.
-var _ = execerror.VectorizedInternalPanic
 
 // TODO(yuzefovich): add benchmarks.
 
-// NewRankOperator creates a new Operator that computes window function RANK or
-// DENSE_RANK. dense distinguishes between the two functions. input *must*
-// already be ordered on orderingCols (which should not be empty). outputColIdx
-// specifies in which coldata.Vec the operator should put its output (if there
-// is no such column, a new column is appended).
+// NewRankOperator creates a new Operator that computes window functions RANK
+// or DENSE_RANK (depending on the passed in windowFn).
+// outputColIdx specifies in which coldata.Vec the operator should put its
+// output (if there is no such column, a new column is appended).
 func NewRankOperator(
 	allocator *Allocator,
 	input Operator,
-	inputTyps []coltypes.T,
-	dense bool,
-	orderingCols []uint32,
+	windowFn execinfrapb.WindowerSpec_WindowFunc,
+	orderingCols []execinfrapb.Ordering_Column,
 	outputColIdx int,
 	partitionColIdx int,
+	peersColIdx int,
 ) (Operator, error) {
 	if len(orderingCols) == 0 {
 		return NewConstOp(allocator, input, coltypes.Int64, int64(1), outputColIdx)
 	}
-	op, outputCol, err := OrderedDistinctColsToOperators(input, orderingCols, inputTyps)
-	if err != nil {
-		return nil, err
-	}
 	initFields := rankInitFields{
-		OneInputNode:    NewOneInputNode(op),
+		OneInputNode:    NewOneInputNode(input),
 		allocator:       allocator,
-		distinctCol:     outputCol,
 		outputColIdx:    outputColIdx,
 		partitionColIdx: partitionColIdx,
+		peersColIdx:     peersColIdx,
 	}
-	if dense {
-		if partitionColIdx != -1 {
+	switch windowFn {
+	case execinfrapb.WindowerSpec_RANK:
+		if partitionColIdx != columnOmitted {
+			return &rankWithPartitionOp{rankInitFields: initFields}, nil
+		}
+		return &rankNoPartitionOp{rankInitFields: initFields}, nil
+	case execinfrapb.WindowerSpec_DENSE_RANK:
+		if partitionColIdx != columnOmitted {
 			return &denseRankWithPartitionOp{rankInitFields: initFields}, nil
 		}
 		return &denseRankNoPartitionOp{rankInitFields: initFields}, nil
+	default:
+		return nil, errors.Errorf("unsupported rank type %s", windowFn)
 	}
-	if partitionColIdx != -1 {
-		return &rankWithPartitionOp{rankInitFields: initFields}, nil
-	}
-	return &rankNoPartitionOp{rankInitFields: initFields}, nil
 }
 
 type rankInitFields struct {
 	OneInputNode
-	allocator *Allocator
-	// distinctCol is the output column of the chain of ordered distinct
-	// operators in which true will indicate that a new rank needs to be assigned
-	// to the corresponding tuple.
-	distinctCol     []bool
+
+	allocator       *Allocator
 	outputColIdx    int
 	partitionColIdx int
+	peersColIdx     int
 }
 
 type rankNoPartitionOp struct {
@@ -79,8 +74,7 @@ type rankNoPartitionOp struct {
 	// rank indicates which rank should be assigned to the next tuple.
 	rank int64
 	// rankIncrement indicates by how much rank should be incremented when a
-	// tuple distinct from the previous one on the ordering columns is seen. It
-	// is used only in case of a regular rank function (i.e. not dense).
+	// tuple distinct from the previous one on the ordering columns is seen.
 	rankIncrement int64
 }
 
@@ -88,7 +82,7 @@ var _ Operator = &rankNoPartitionOp{}
 
 func (r *rankNoPartitionOp) Init() {
 	r.Input().Init()
-	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
+	// All rank functions start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
 	// rankIncrement to 1 will update r.rank to 1 on the very first tuple (as
 	// desired).
@@ -97,28 +91,29 @@ func (r *rankNoPartitionOp) Init() {
 
 func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
+	n := batch.Length()
+	if n == 0 {
 		return coldata.ZeroBatch
 	}
 	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
-
+	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := 0; i < batch.Length(); i++ {
-			if r.distinctCol[sel[i]] {
+		for _, i := range sel[:n] {
+			if peersCol[i] {
 				r.rank += r.rankIncrement
 				r.rankIncrement = 1
-				rankCol[sel[i]] = r.rank
+				rankCol[i] = r.rank
 			} else {
-				rankCol[sel[i]] = r.rank
+				rankCol[i] = r.rank
 				r.rankIncrement++
 			}
 		}
 	} else {
-		for i := 0; i < batch.Length(); i++ {
-			if r.distinctCol[i] {
+		for i := range rankCol[:n] {
+			if peersCol[i] {
 				r.rank += r.rankIncrement
 				r.rankIncrement = 1
 				rankCol[i] = r.rank
@@ -137,8 +132,7 @@ type rankWithPartitionOp struct {
 	// rank indicates which rank should be assigned to the next tuple.
 	rank int64
 	// rankIncrement indicates by how much rank should be incremented when a
-	// tuple distinct from the previous one on the ordering columns is seen. It
-	// is used only in case of a regular rank function (i.e. not dense).
+	// tuple distinct from the previous one on the ordering columns is seen.
 	rankIncrement int64
 }
 
@@ -146,7 +140,7 @@ var _ Operator = &rankWithPartitionOp{}
 
 func (r *rankWithPartitionOp) Init() {
 	r.Input().Init()
-	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
+	// All rank functions start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
 	// rankIncrement to 1 will update r.rank to 1 on the very first tuple (as
 	// desired).
@@ -155,42 +149,42 @@ func (r *rankWithPartitionOp) Init() {
 
 func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
+	n := batch.Length()
+	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Bool, r.partitionColIdx)
 	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
-
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
+	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := 0; i < batch.Length(); i++ {
-			if partitionCol[sel[i]] {
-				r.rank = 1
-				r.rankIncrement = 1
-				rankCol[sel[i]] = 1
-				continue
-			}
-			if r.distinctCol[sel[i]] {
-				r.rank += r.rankIncrement
-				r.rankIncrement = 1
-				rankCol[sel[i]] = r.rank
-			} else {
-				rankCol[sel[i]] = r.rank
-				r.rankIncrement++
-			}
-		}
-	} else {
-		for i := 0; i < batch.Length(); i++ {
+		for _, i := range sel[:n] {
 			if partitionCol[i] {
 				r.rank = 1
 				r.rankIncrement = 1
 				rankCol[i] = 1
 				continue
 			}
-			if r.distinctCol[i] {
+			if peersCol[i] {
+				r.rank += r.rankIncrement
+				r.rankIncrement = 1
+				rankCol[i] = r.rank
+			} else {
+				rankCol[i] = r.rank
+				r.rankIncrement++
+			}
+		}
+	} else {
+		for i := range rankCol[:n] {
+			if partitionCol[i] {
+				r.rank = 1
+				r.rankIncrement = 1
+				rankCol[i] = 1
+				continue
+			}
+			if peersCol[i] {
 				r.rank += r.rankIncrement
 				r.rankIncrement = 1
 				rankCol[i] = r.rank
@@ -209,8 +203,7 @@ type denseRankNoPartitionOp struct {
 	// rank indicates which rank should be assigned to the next tuple.
 	rank int64
 	// rankIncrement indicates by how much rank should be incremented when a
-	// tuple distinct from the previous one on the ordering columns is seen. It
-	// is used only in case of a regular rank function (i.e. not dense).
+	// tuple distinct from the previous one on the ordering columns is seen.
 	rankIncrement int64
 }
 
@@ -218,7 +211,7 @@ var _ Operator = &denseRankNoPartitionOp{}
 
 func (r *denseRankNoPartitionOp) Init() {
 	r.Input().Init()
-	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
+	// All rank functions start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
 	// rankIncrement to 1 will update r.rank to 1 on the very first tuple (as
 	// desired).
@@ -227,27 +220,28 @@ func (r *denseRankNoPartitionOp) Init() {
 
 func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
+	n := batch.Length()
+	if n == 0 {
 		return coldata.ZeroBatch
 	}
 	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
-
+	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := 0; i < batch.Length(); i++ {
-			if r.distinctCol[sel[i]] {
+		for _, i := range sel[:n] {
+			if peersCol[i] {
 				r.rank++
-				rankCol[sel[i]] = r.rank
+				rankCol[i] = r.rank
 			} else {
-				rankCol[sel[i]] = r.rank
+				rankCol[i] = r.rank
 
 			}
 		}
 	} else {
-		for i := 0; i < batch.Length(); i++ {
-			if r.distinctCol[i] {
+		for i := range rankCol[:n] {
+			if peersCol[i] {
 				r.rank++
 				rankCol[i] = r.rank
 			} else {
@@ -265,8 +259,7 @@ type denseRankWithPartitionOp struct {
 	// rank indicates which rank should be assigned to the next tuple.
 	rank int64
 	// rankIncrement indicates by how much rank should be incremented when a
-	// tuple distinct from the previous one on the ordering columns is seen. It
-	// is used only in case of a regular rank function (i.e. not dense).
+	// tuple distinct from the previous one on the ordering columns is seen.
 	rankIncrement int64
 }
 
@@ -274,7 +267,7 @@ var _ Operator = &denseRankWithPartitionOp{}
 
 func (r *denseRankWithPartitionOp) Init() {
 	r.Input().Init()
-	// RANK and DENSE_RANK start counting from 1. Before we assign the rank to a
+	// All rank functions start counting from 1. Before we assign the rank to a
 	// tuple in the batch, we first increment r.rank, so setting this
 	// rankIncrement to 1 will update r.rank to 1 on the very first tuple (as
 	// desired).
@@ -283,41 +276,41 @@ func (r *denseRankWithPartitionOp) Init() {
 
 func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
+	n := batch.Length()
+	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Bool, r.partitionColIdx)
 	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
-
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
+	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
-		for i := 0; i < batch.Length(); i++ {
-			if partitionCol[sel[i]] {
-				r.rank = 1
-				r.rankIncrement = 1
-				rankCol[sel[i]] = 1
-				continue
-			}
-			if r.distinctCol[sel[i]] {
-				r.rank++
-				rankCol[sel[i]] = r.rank
-			} else {
-				rankCol[sel[i]] = r.rank
-
-			}
-		}
-	} else {
-		for i := 0; i < batch.Length(); i++ {
+		for _, i := range sel[:n] {
 			if partitionCol[i] {
 				r.rank = 1
 				r.rankIncrement = 1
 				rankCol[i] = 1
 				continue
 			}
-			if r.distinctCol[i] {
+			if peersCol[i] {
+				r.rank++
+				rankCol[i] = r.rank
+			} else {
+				rankCol[i] = r.rank
+
+			}
+		}
+	} else {
+		for i := range rankCol[:n] {
+			if partitionCol[i] {
+				r.rank = 1
+				r.rankIncrement = 1
+				rankCol[i] = 1
+				continue
+			}
+			if peersCol[i] {
 				r.rank++
 				rankCol[i] = r.rank
 			} else {
