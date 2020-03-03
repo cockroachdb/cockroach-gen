@@ -35,7 +35,7 @@ func (_f *Factory) ConstructInsert(
 ) memo.RelExpr {
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructInsert(
@@ -90,7 +90,7 @@ func (_f *Factory) ConstructUpdate(
 
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructUpdate(
@@ -152,7 +152,7 @@ func (_f *Factory) ConstructUpsert(
 
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructUpsert(
@@ -203,7 +203,7 @@ func (_f *Factory) ConstructDelete(
 
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate)
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructDelete(
