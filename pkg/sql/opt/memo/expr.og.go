@@ -3888,6 +3888,10 @@ type GroupingPrivate struct {
 	// columns. Exploration rules can create versions of the operator with
 	// orderings that contain grouping columns.
 	Ordering physical.OrderingChoice
+
+	// ErrorOnDup, if true, triggers an error if any aggregation group contains
+	// more than one row. This can only be true for the UpsertDistinctOn operator.
+	ErrorOnDup bool
 }
 
 // ScalarGroupByExpr computes aggregate functions over the complete set of input
@@ -21073,6 +21077,7 @@ func (in *interner) InternGroupBy(val *GroupByExpr) *GroupByExpr {
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -21080,7 +21085,8 @@ func (in *interner) InternGroupBy(val *GroupByExpr) *GroupByExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
 		}
@@ -21097,6 +21103,7 @@ func (in *interner) InternScalarGroupBy(val *ScalarGroupByExpr) *ScalarGroupByEx
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -21104,7 +21111,8 @@ func (in *interner) InternScalarGroupBy(val *ScalarGroupByExpr) *ScalarGroupByEx
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
 		}
@@ -21121,6 +21129,7 @@ func (in *interner) InternDistinctOn(val *DistinctOnExpr) *DistinctOnExpr {
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -21128,7 +21137,8 @@ func (in *interner) InternDistinctOn(val *DistinctOnExpr) *DistinctOnExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
 		}
@@ -21145,6 +21155,7 @@ func (in *interner) InternUpsertDistinctOn(val *UpsertDistinctOnExpr) *UpsertDis
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -21152,7 +21163,8 @@ func (in *interner) InternUpsertDistinctOn(val *UpsertDistinctOnExpr) *UpsertDis
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
 		}
