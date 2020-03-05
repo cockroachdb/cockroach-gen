@@ -31,9 +31,7 @@ type mergeJoinRightOuterOp struct {
 
 var _ InternalMemoryOperator = &mergeJoinRightOuterOp{}
 
-func (o *mergeJoinRightOuterOp) probeBodyLSeltrueRSeltrue(
-	ctx context.Context,
-) {
+func (o *mergeJoinRightOuterOp) probeBodyLSeltrueRSeltrue(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -7833,9 +7831,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinRightOuterOp) probeBodyLSeltrueRSelfalse(
-	ctx context.Context,
-) {
+func (o *mergeJoinRightOuterOp) probeBodyLSeltrueRSelfalse(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -15635,9 +15631,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinRightOuterOp) probeBodyLSelfalseRSeltrue(
-	ctx context.Context,
-) {
+func (o *mergeJoinRightOuterOp) probeBodyLSelfalseRSeltrue(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -23437,9 +23431,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinRightOuterOp) probeBodyLSelfalseRSelfalse(
-	ctx context.Context,
-) {
+func (o *mergeJoinRightOuterOp) probeBodyLSelfalseRSelfalse(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -35848,9 +35840,7 @@ func (o *mergeJoinRightOuterOp) probe(ctx context.Context) {
 
 // setBuilderSourceToBufferedGroup sets up the builder state to use the
 // buffered group.
-func (o *mergeJoinRightOuterOp) setBuilderSourceToBufferedGroup(
-	ctx context.Context,
-) {
+func (o *mergeJoinRightOuterOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
 	lGroupEndIdx := o.proberState.lBufferedGroup.Length()
 	// The capacity of builder state lGroups and rGroups is always at least 1
 	// given the init.
