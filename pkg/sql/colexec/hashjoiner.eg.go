@@ -23,10 +23,10 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 	if hj.spec.left.outer {
 		if sel != nil {
 			// Early bounds checks.
-			_ = hj.ht.headID[batchSize-1]
+			_ = hj.ht.probeScratch.headID[batchSize-1]
 			_ = sel[batchSize-1]
 			for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
-				currentID := hj.ht.headID[i]
+				currentID := hj.ht.probeScratch.headID[i]
 
 				for {
 					if nResults >= hj.outputBatchSize {
@@ -47,7 +47,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 					}
 					hj.probeState.probeIdx[nResults] = sel[i]
 					currentID = hj.ht.same[currentID]
-					hj.ht.headID[i] = currentID
+					hj.ht.probeScratch.headID[i] = currentID
 					nResults++
 
 					if currentID == 0 {
@@ -57,9 +57,9 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 			}
 		} else {
 			// Early bounds checks.
-			_ = hj.ht.headID[batchSize-1]
+			_ = hj.ht.probeScratch.headID[batchSize-1]
 			for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
-				currentID := hj.ht.headID[i]
+				currentID := hj.ht.probeScratch.headID[i]
 
 				for {
 					if nResults >= hj.outputBatchSize {
@@ -80,7 +80,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 					}
 					hj.probeState.probeIdx[nResults] = i
 					currentID = hj.ht.same[currentID]
-					hj.ht.headID[i] = currentID
+					hj.ht.probeScratch.headID[i] = currentID
 					nResults++
 
 					if currentID == 0 {
@@ -94,10 +94,10 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = hj.ht.headID[batchSize-1]
+				_ = hj.ht.probeScratch.headID[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
-					currentID := hj.ht.headID[i]
+					currentID := hj.ht.probeScratch.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
@@ -107,10 +107,10 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 				}
 			default:
 				// Early bounds checks.
-				_ = hj.ht.headID[batchSize-1]
+				_ = hj.ht.probeScratch.headID[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
-					currentID := hj.ht.headID[i]
+					currentID := hj.ht.probeScratch.headID[i]
 					for currentID != 0 {
 						if nResults >= hj.outputBatchSize {
 							hj.probeState.prevBatch = batch
@@ -121,7 +121,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 						hj.probeState.buildIdx[nResults] = int(currentID - 1)
 						hj.probeState.probeIdx[nResults] = sel[i]
 						currentID = hj.ht.same[currentID]
-						hj.ht.headID[i] = currentID
+						hj.ht.probeScratch.headID[i] = currentID
 						nResults++
 					}
 				}
@@ -130,9 +130,9 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = hj.ht.headID[batchSize-1]
+				_ = hj.ht.probeScratch.headID[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
-					currentID := hj.ht.headID[i]
+					currentID := hj.ht.probeScratch.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
@@ -142,9 +142,9 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 				}
 			default:
 				// Early bounds checks.
-				_ = hj.ht.headID[batchSize-1]
+				_ = hj.ht.probeScratch.headID[batchSize-1]
 				for i := hj.probeState.prevBatchResumeIdx; i < batchSize; i++ {
-					currentID := hj.ht.headID[i]
+					currentID := hj.ht.probeScratch.headID[i]
 					for currentID != 0 {
 						if nResults >= hj.outputBatchSize {
 							hj.probeState.prevBatch = batch
@@ -155,7 +155,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 						hj.probeState.buildIdx[nResults] = int(currentID - 1)
 						hj.probeState.probeIdx[nResults] = i
 						currentID = hj.ht.same[currentID]
-						hj.ht.headID[i] = currentID
+						hj.ht.probeScratch.headID[i] = currentID
 						nResults++
 					}
 				}
@@ -177,14 +177,14 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 
 		if sel != nil {
 			// Early bounds checks.
-			_ = hj.ht.groupID[batchSize-1]
+			_ = hj.ht.probeScratch.groupID[batchSize-1]
 			_ = hj.probeState.probeRowUnmatched[batchSize-1]
 			_ = hj.probeState.buildIdx[batchSize-1]
 			_ = hj.probeState.probeIdx[batchSize-1]
 			_ = sel[batchSize-1]
 			for i := int(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
-				id := hj.ht.groupID[i]
+				id := hj.ht.probeScratch.groupID[i]
 				rowUnmatched := id == 0
 				hj.probeState.probeRowUnmatched[i] = rowUnmatched
 				if !rowUnmatched {
@@ -194,13 +194,13 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 			}
 		} else {
 			// Early bounds checks.
-			_ = hj.ht.groupID[batchSize-1]
+			_ = hj.ht.probeScratch.groupID[batchSize-1]
 			_ = hj.probeState.probeRowUnmatched[batchSize-1]
 			_ = hj.probeState.buildIdx[batchSize-1]
 			_ = hj.probeState.probeIdx[batchSize-1]
 			for i := int(0); i < batchSize; i++ {
 				// Index of keys and outputs in the hash table is calculated as ID - 1.
-				id := hj.ht.groupID[i]
+				id := hj.ht.probeScratch.groupID[i]
 				rowUnmatched := id == 0
 				hj.probeState.probeRowUnmatched[i] = rowUnmatched
 				if !rowUnmatched {
@@ -214,10 +214,10 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = hj.ht.headID[batchSize-1]
+				_ = hj.ht.probeScratch.headID[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
-					currentID := hj.ht.headID[i]
+					currentID := hj.ht.probeScratch.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
@@ -227,14 +227,14 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 				}
 			default:
 				// Early bounds checks.
-				_ = hj.ht.groupID[batchSize-1]
+				_ = hj.ht.probeScratch.groupID[batchSize-1]
 				_ = hj.probeState.buildIdx[batchSize-1]
 				_ = hj.probeState.probeIdx[batchSize-1]
 				_ = sel[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
-					if hj.ht.groupID[i] != 0 {
+					if hj.ht.probeScratch.groupID[i] != 0 {
 						// Index of keys and outputs in the hash table is calculated as ID - 1.
-						hj.probeState.buildIdx[nResults] = int(hj.ht.groupID[i] - 1)
+						hj.probeState.buildIdx[nResults] = int(hj.ht.probeScratch.groupID[i] - 1)
 						hj.probeState.probeIdx[nResults] = sel[i]
 						nResults++
 					}
@@ -244,9 +244,9 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 			switch hj.spec.joinType {
 			case sqlbase.JoinType_LEFT_ANTI:
 				// Early bounds checks.
-				_ = hj.ht.headID[batchSize-1]
+				_ = hj.ht.probeScratch.headID[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
-					currentID := hj.ht.headID[i]
+					currentID := hj.ht.probeScratch.headID[i]
 					if currentID == 0 {
 						// currentID of 0 indicates that ith probing row didn't have a match, so
 						// we include it into the output.
@@ -256,13 +256,13 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 				}
 			default:
 				// Early bounds checks.
-				_ = hj.ht.groupID[batchSize-1]
+				_ = hj.ht.probeScratch.groupID[batchSize-1]
 				_ = hj.probeState.buildIdx[batchSize-1]
 				_ = hj.probeState.probeIdx[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
-					if hj.ht.groupID[i] != 0 {
+					if hj.ht.probeScratch.groupID[i] != 0 {
 						// Index of keys and outputs in the hash table is calculated as ID - 1.
-						hj.probeState.buildIdx[nResults] = int(hj.ht.groupID[i] - 1)
+						hj.probeState.buildIdx[nResults] = int(hj.ht.probeScratch.groupID[i] - 1)
 						hj.probeState.probeIdx[nResults] = i
 						nResults++
 					}
