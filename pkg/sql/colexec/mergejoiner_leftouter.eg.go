@@ -70,7 +70,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
+				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -226,9 +226,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -431,9 +431,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -620,9 +620,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -842,9 +842,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -1086,9 +1086,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -1330,9 +1330,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -1598,9 +1598,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -1846,9 +1846,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -2049,9 +2049,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -2259,9 +2259,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -2455,9 +2455,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -2635,9 +2635,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -2848,9 +2848,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -3083,9 +3083,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -3318,9 +3318,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -3577,9 +3577,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -3816,9 +3816,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -4010,9 +4010,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -4221,9 +4221,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -4413,9 +4413,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -4589,9 +4589,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -4798,9 +4798,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -5029,9 +5029,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -5260,9 +5260,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -5515,9 +5515,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -5750,9 +5750,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -5940,9 +5940,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -6137,9 +6137,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -6320,9 +6320,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -6487,9 +6487,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -6687,9 +6687,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -6909,9 +6909,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -7131,9 +7131,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -7377,9 +7377,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -7603,9 +7603,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -7784,9 +7784,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -7906,7 +7906,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
+				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -8062,9 +8062,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -8267,9 +8267,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -8456,9 +8456,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -8678,9 +8678,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -8922,9 +8922,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -9166,9 +9166,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -9434,9 +9434,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -9682,9 +9682,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -9885,9 +9885,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -10095,9 +10095,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -10291,9 +10291,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -10471,9 +10471,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -10684,9 +10684,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -10919,9 +10919,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -11154,9 +11154,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -11413,9 +11413,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -11652,9 +11652,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -11846,9 +11846,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -12057,9 +12057,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -12249,9 +12249,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -12425,9 +12425,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -12634,9 +12634,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -12865,9 +12865,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -13096,9 +13096,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -13351,9 +13351,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -13586,9 +13586,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -13776,9 +13776,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -13973,9 +13973,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -14156,9 +14156,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -14323,9 +14323,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -14523,9 +14523,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -14745,9 +14745,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -14967,9 +14967,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -15213,9 +15213,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -15439,9 +15439,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -15620,9 +15620,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -15742,7 +15742,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
+				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -15898,9 +15898,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -16103,9 +16103,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -16292,9 +16292,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -16514,9 +16514,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -16758,9 +16758,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -17002,9 +17002,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -17270,9 +17270,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -17518,9 +17518,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -17721,9 +17721,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -17931,9 +17931,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -18127,9 +18127,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -18307,9 +18307,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -18520,9 +18520,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -18755,9 +18755,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -18990,9 +18990,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -19249,9 +19249,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -19488,9 +19488,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -19682,9 +19682,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -19893,9 +19893,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -20085,9 +20085,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -20261,9 +20261,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -20470,9 +20470,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -20701,9 +20701,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -20932,9 +20932,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -21187,9 +21187,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -21422,9 +21422,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -21612,9 +21612,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -21809,9 +21809,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -21992,9 +21992,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -22159,9 +22159,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -22359,9 +22359,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -22581,9 +22581,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -22803,9 +22803,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -23049,9 +23049,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -23275,9 +23275,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -23456,9 +23456,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -23578,7 +23578,7 @@ EqLoop:
 			}
 			tempVec := o.scratch.tempVecByType[toType]
 			if tempVec == nil {
-				tempVec = o.allocator.NewMemColumn(toType, coldata.BatchSize())
+				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
 				o.scratch.tempVecByType[toType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
@@ -23734,9 +23734,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -23939,9 +23939,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -24128,9 +24128,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -24350,9 +24350,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -24594,9 +24594,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -24838,9 +24838,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -25106,9 +25106,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -25354,9 +25354,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -25557,9 +25557,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -25767,9 +25767,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -25963,9 +25963,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -26143,9 +26143,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -26356,9 +26356,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -26591,9 +26591,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -26826,9 +26826,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -27085,9 +27085,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -27324,9 +27324,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -27518,9 +27518,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -27729,9 +27729,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -27921,9 +27921,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -28097,9 +28097,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -28306,9 +28306,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -28537,9 +28537,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -28768,9 +28768,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -29023,9 +29023,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -29258,9 +29258,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -29448,9 +29448,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -29645,9 +29645,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -29828,9 +29828,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -29995,9 +29995,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -30195,9 +30195,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -30417,9 +30417,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -30639,9 +30639,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -30885,9 +30885,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -31111,9 +31111,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -31292,9 +31292,9 @@ EqLoop:
 								// Last equality column and either group is incomplete. Save state
 								// and have it handled in the next iteration.
 								if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
-									o.appendToBufferedGroup(&o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+									o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
 									o.proberState.lIdx = lGroupLength + beginLIdx
-									o.appendToBufferedGroup(&o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+									o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
 									o.proberState.rIdx = rGroupLength + beginRIdx
 
 									o.groups.finishedCol()
@@ -31375,15 +31375,15 @@ EqLoop:
 	}
 }
 
-// buildLeftGroups takes a []group and expands each group into the output by
-// repeating each row in the group numRepeats times. For example, given an
-// input table:
+// buildLeftGroupsFromBatch takes a []group and expands each group into the
+// output by repeating each row in the group numRepeats times. For example,
+// given an input table:
 //  L1 |  L2
 //  --------
 //  1  |  a
 //  1  |  b
 // and leftGroups = [{startIdx: 0, endIdx: 2, numRepeats: 3}]
-// then buildLeftGroups expands this to
+// then buildLeftGroupsFromBatch expands this to
 //  L1 |  L2
 //  --------
 //  1  |  a
@@ -31392,16 +31392,17 @@ EqLoop:
 //  1  |  b
 //  1  |  b
 //  1  |  b
-// Note: this is different from buildRightGroups in that each row of group is
-// repeated numRepeats times, instead of a simple copy of the group as a whole.
+// Note: this is different from buildRightGroupsFromBatch in that each row of
+// group is repeated numRepeats times, instead of a simple copy of the group as
+// a whole.
 // SIDE EFFECTS: writes into o.output.
-func (o *mergeJoinLeftOuterOp) buildLeftGroups(
+func (o *mergeJoinLeftOuterOp) buildLeftGroupsFromBatch(
 	leftGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	sel := batch.Selection()
 	initialBuilderState := o.builderState.left
 	outputBatchSize := o.outputBatchSize
-	o.allocator.PerformOperation(
+	o.unlimitedAllocator.PerformOperation(
 		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
 		func() {
 			// Loop over every column.
@@ -33467,8 +33468,457 @@ func (o *mergeJoinLeftOuterOp) buildLeftGroups(
 	)
 }
 
-// buildRightGroups takes a []group and repeats each group numRepeats times.
-// For example, given an input table:
+// buildLeftBufferedGroup is similar to buildLeftGroupsFromBatch, but it
+// builds the output columns corresponding to the left input based on the
+// buffered group. The goal is to repeat each row from the left buffered group
+// leftGroup.numRepeats times.
+// Note that all other fields of leftGroup are ignored because, by definition,
+// all rows in the buffered group are part of leftGroup (i.e. we don't need to
+// look at rowStartIdx and rowEndIdx). Also, all rows in the buffered group do
+// have a match, so the group can neither be "nullGroup" nor "unmatched".
+func (o *mergeJoinLeftOuterOp) buildLeftBufferedGroup(
+	leftGroup group,
+	colOffset int,
+	input *mergeJoinInput,
+	bufferedGroup mjBufferedGroup,
+	destStartIdx int,
+) {
+	var err error
+	currentBatch := o.builderState.lBufferedGroupBatch
+	if currentBatch == nil {
+		currentBatch, err = bufferedGroup.dequeue()
+		if err != nil {
+			execerror.VectorizedInternalPanic(err)
+		}
+		o.builderState.lBufferedGroupBatch = currentBatch
+		o.builderState.left.curSrcStartIdx = 0
+	}
+	initialBuilderState := o.builderState.left
+	o.unlimitedAllocator.PerformOperation(
+		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		func() {
+			batchLength := currentBatch.Length()
+			for batchLength > 0 {
+				var updatedDestStartIdx int
+				// Loop over every column.
+			LeftColLoop:
+				for outColIdx, inColIdx := range input.outCols {
+					outStartIdx := destStartIdx
+					src := currentBatch.ColVec(int(inColIdx))
+					out := o.output.ColVec(outColIdx)
+					colType := input.sourceTypes[inColIdx]
+					switch colType {
+					case coltypes.Bool:
+						srcCol := src.Bool()
+						outCol := out.Bool()
+						var val bool
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Bytes:
+						srcCol := src.Bytes()
+						outCol := out.Bytes()
+						var val []byte
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol.Get(srcStartIdx)
+								for i := 0; i < toAppend; i++ {
+									outCol.Set(outStartIdx, val)
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Decimal:
+						srcCol := src.Decimal()
+						outCol := out.Decimal()
+						var val apd.Decimal
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx].Set(&val)
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Int16:
+						srcCol := src.Int16()
+						outCol := out.Int16()
+						var val int16
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Int32:
+						srcCol := src.Int32()
+						outCol := out.Int32()
+						var val int32
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Int64:
+						srcCol := src.Int64()
+						outCol := out.Int64()
+						var val int64
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Float64:
+						srcCol := src.Float64()
+						outCol := out.Float64()
+						var val float64
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Timestamp:
+						srcCol := src.Timestamp()
+						outCol := out.Timestamp()
+						var val time.Time
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					case coltypes.Interval:
+						srcCol := src.Interval()
+						outCol := out.Interval()
+						var val duration.Duration
+						// Loop over every row in the group.
+						for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+							// Repeat each row numRepeats times.
+							srcStartIdx := o.builderState.left.curSrcStartIdx
+							repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+							toAppend := repeatsLeft
+							if outStartIdx+toAppend > o.outputBatchSize {
+								toAppend = o.outputBatchSize - outStartIdx
+							}
+
+							if src.Nulls().NullAt(srcStartIdx) {
+								out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+								outStartIdx += toAppend
+							} else {
+								val = srcCol[srcStartIdx]
+								for i := 0; i < toAppend; i++ {
+									outCol[outStartIdx] = val
+									outStartIdx++
+								}
+							}
+
+							if toAppend < repeatsLeft {
+								// We didn't materialize all the rows in the current batch, so
+								// we move to the next column.
+								if outColIdx == len(input.outCols)-1 {
+									// This is the last column, so we update the builder state
+									// and exit.
+									o.builderState.left.numRepeatsIdx += toAppend
+									return
+								}
+								o.builderState.left.setBuilderColumnState(initialBuilderState)
+								continue LeftColLoop
+							}
+							// We fully processed the current row, and before moving on to the
+							// next one, we need to reset numRepeatsIdx (so that the next row
+							// would be repeated leftGroup.numRepeats times).
+							o.builderState.left.numRepeatsIdx = 0
+						}
+					default:
+						execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					}
+					updatedDestStartIdx = outStartIdx
+					o.builderState.left.setBuilderColumnState(initialBuilderState)
+				}
+				// We have appended some tuples into the output batch from the current
+				// batch (the latter is now fully processed), so we need to adjust
+				// destStartIdx accordingly for the next batch.
+				destStartIdx = updatedDestStartIdx
+				// We have processed all tuples in the current batch from the
+				// buffered group, so we need to dequeue the next one.
+				o.unlimitedAllocator.ReleaseBatch(currentBatch)
+				currentBatch, err = bufferedGroup.dequeue()
+				if err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				o.builderState.lBufferedGroupBatch = currentBatch
+				batchLength = currentBatch.Length()
+				// Note that here we're not resetting the builder state to
+				// initialBuilderState because we have transitioned to building from a
+				// new batch.
+				o.builderState.left.curSrcStartIdx = 0
+				o.builderState.left.numRepeatsIdx = 0
+			}
+			o.builderState.lBufferedGroupBatch = nil
+			o.builderState.left.reset()
+		},
+	)
+}
+
+// buildRightGroupsFromBatch takes a []group and repeats each group numRepeats
+// times. For example, given an input table:
 //  R1 |  R2
 //  --------
 //  1  |  a
@@ -33483,17 +33933,17 @@ func (o *mergeJoinLeftOuterOp) buildLeftGroups(
 //  1  |  b
 //  1  |  a
 //  1  |  b
-// Note: this is different from buildLeftGroups in that each group is not
-// expanded but directly copied numRepeats times.
+// Note: this is different from buildLeftGroupsFromBatch in that each group is
+// not expanded but directly copied numRepeats times.
 // SIDE EFFECTS: writes into o.output.
-func (o *mergeJoinLeftOuterOp) buildRightGroups(
+func (o *mergeJoinLeftOuterOp) buildRightGroupsFromBatch(
 	rightGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	initialBuilderState := o.builderState.right
 	sel := batch.Selection()
 	outputBatchSize := o.outputBatchSize
 
-	o.allocator.PerformOperation(
+	o.unlimitedAllocator.PerformOperation(
 		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
 		func() {
 			// Loop over every column.
@@ -33566,7 +34016,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -33633,7 +34083,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -33700,7 +34150,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -33767,7 +34217,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -33834,7 +34284,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -33901,7 +34351,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -33968,7 +34418,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34035,7 +34485,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34102,7 +34552,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34173,7 +34623,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34238,7 +34688,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34303,7 +34753,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34368,7 +34818,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34433,7 +34883,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34498,7 +34948,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34563,7 +35013,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34628,7 +35078,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34693,7 +35143,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34768,7 +35218,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34835,7 +35285,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34902,7 +35352,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -34969,7 +35419,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35036,7 +35486,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35103,7 +35553,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35170,7 +35620,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35237,7 +35687,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35304,7 +35754,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35375,7 +35825,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35440,7 +35890,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35505,7 +35955,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35570,7 +36020,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35635,7 +36085,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35700,7 +36150,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35765,7 +36215,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35830,7 +36280,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35895,7 +36345,7 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
 										if outColIdx == len(input.outCols)-1 {
-											o.builderState.right.curSrcStartIdx = o.builderState.right.curSrcStartIdx + toAppend
+											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
 										// Otherwise, reset to the initial state and begin the next column.
@@ -35914,6 +36364,318 @@ func (o *mergeJoinLeftOuterOp) buildRightGroups(
 				}
 
 				o.builderState.right.setBuilderColumnState(initialBuilderState)
+			}
+			o.builderState.right.reset()
+		})
+}
+
+// buildRightBufferedGroup is similar to buildRightGroupsFromBatch, but it
+// builds the output columns corresponding to the right input based on the
+// buffered group. The goal is to repeat the whole buffered group
+// rightGroup.numRepeats times.
+// Note that all other fields of rightGroup are ignored because, by definition,
+// all rows in the buffered group are part of rightGroup (i.e. we don't need to
+// look at rowStartIdx and rowEndIdx). Also, all rows in the buffered group do
+// have a match, so the group can neither be "nullGroup" nor "unmatched".
+func (o *mergeJoinLeftOuterOp) buildRightBufferedGroup(
+	rightGroup group,
+	colOffset int,
+	input *mergeJoinInput,
+	bufferedGroup mjBufferedGroup,
+	destStartIdx int,
+) {
+	var err error
+	o.unlimitedAllocator.PerformOperation(
+		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		func() {
+			outStartIdx := destStartIdx
+			// Repeat the buffered group numRepeats times.
+			for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+				currentBatch := o.builderState.rBufferedGroupBatch
+				if currentBatch == nil {
+					currentBatch, err = bufferedGroup.dequeue()
+					if err != nil {
+						execerror.VectorizedInternalPanic(err)
+					}
+					o.builderState.rBufferedGroupBatch = currentBatch
+					o.builderState.right.curSrcStartIdx = 0
+				}
+				batchLength := currentBatch.Length()
+				for batchLength > 0 {
+					toAppend := batchLength - o.builderState.right.curSrcStartIdx
+					if outStartIdx+toAppend > o.outputBatchSize {
+						toAppend = o.outputBatchSize - outStartIdx
+					}
+
+					// Loop over every column.
+					for outColIdx, inColIdx := range input.outCols {
+						out := o.output.ColVec(outColIdx + colOffset)
+						src := currentBatch.ColVec(int(inColIdx))
+						colType := input.sourceTypes[inColIdx]
+						switch colType {
+						case coltypes.Bool:
+							srcCol := src.Bool()
+							outCol := out.Bool()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Bytes:
+							srcCol := src.Bytes()
+							outCol := out.Bytes()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+									outCol.Set(outStartIdx, v)
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Decimal:
+							srcCol := src.Decimal()
+							outCol := out.Decimal()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx].Set(&v)
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Int16:
+							srcCol := src.Int16()
+							outCol := out.Int16()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Int32:
+							srcCol := src.Int32()
+							outCol := out.Int32()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Int64:
+							srcCol := src.Int64()
+							outCol := out.Int64()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Float64:
+							srcCol := src.Float64()
+							outCol := out.Float64()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Timestamp:
+							srcCol := src.Timestamp()
+							outCol := out.Timestamp()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						case coltypes.Interval:
+							srcCol := src.Interval()
+							outCol := out.Interval()
+
+							// Optimization in the case that group length is 1, use assign
+							// instead of copy.
+							if toAppend == 1 {
+								if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+									out.Nulls().SetNull(outStartIdx)
+								} else {
+									v := srcCol[o.builderState.right.curSrcStartIdx]
+									outCol[outStartIdx] = v
+								}
+							} else {
+								out.Copy(
+									coldata.CopySliceArgs{
+										SliceArgs: coldata.SliceArgs{
+											ColType:     colType,
+											Src:         src,
+											DestIdx:     outStartIdx,
+											SrcStartIdx: o.builderState.right.curSrcStartIdx,
+											SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+										},
+									},
+								)
+							}
+						default:
+							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						}
+					}
+					outStartIdx += toAppend
+
+					if toAppend < batchLength-o.builderState.right.curSrcStartIdx {
+						// If we haven't materialized all the rows from the batch, then we
+						// are ready to emit the output batch.
+						o.builderState.right.curSrcStartIdx += toAppend
+						return
+					}
+					// We have fully processed the current batch, so we need to get the
+					// next one.
+					o.unlimitedAllocator.ReleaseBatch(currentBatch)
+					currentBatch, err = bufferedGroup.dequeue()
+					if err != nil {
+						execerror.VectorizedInternalPanic(err)
+					}
+					o.builderState.rBufferedGroupBatch = currentBatch
+					batchLength = currentBatch.Length()
+					o.builderState.right.curSrcStartIdx = 0
+				}
+				// We have fully processed all the batches from the buffered group, so
+				// we need to rewind it.
+				if err := bufferedGroup.rewind(); err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				o.builderState.rBufferedGroupBatch = nil
 			}
 			o.builderState.right.reset()
 		})
@@ -35949,12 +36711,12 @@ func (o *mergeJoinLeftOuterOp) probe(ctx context.Context) {
 // setBuilderSourceToBufferedGroup sets up the builder state to use the
 // buffered group.
 func (o *mergeJoinLeftOuterOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
-	lGroupEndIdx := o.proberState.lBufferedGroup.Length()
+	lGroupEndIdx := o.proberState.lBufferedGroup.numTuples
 	// The capacity of builder state lGroups and rGroups is always at least 1
 	// given the init.
 	o.builderState.lGroups = o.builderState.lGroups[:1]
 	o.builderState.rGroups = o.builderState.rGroups[:1]
-	rGroupEndIdx := o.proberState.rBufferedGroup.Length()
+	rGroupEndIdx := o.proberState.rBufferedGroup.numTuples
 	o.builderState.lGroups[0] = group{
 		rowStartIdx: 0,
 		rowEndIdx:   lGroupEndIdx,
@@ -35968,14 +36730,13 @@ func (o *mergeJoinLeftOuterOp) setBuilderSourceToBufferedGroup(ctx context.Conte
 		toBuild:     rGroupEndIdx * lGroupEndIdx,
 	}
 
-	o.builderState.lBatch = o.proberState.lBufferedGroup
-	o.builderState.rBatch = o.proberState.rBufferedGroup
+	o.builderState.buildFrom = mjBuildFromBufferedGroup
 
 	// We cannot yet reset the buffered groups because the builder will be taking
 	// input from them. The actual reset will take place on the next call to
 	// initProberState().
-	o.proberState.lBufferedGroupNeedToReset = true
-	o.proberState.rBufferedGroupNeedToReset = true
+	o.proberState.lBufferedGroup.needToReset = true
+	o.proberState.rBufferedGroup.needToReset = true
 }
 
 // exhaustLeftSource sets up the builder to process any remaining tuples from
@@ -36010,16 +36771,6 @@ func (o *mergeJoinLeftOuterOp) exhaustLeftSource(ctx context.Context) {
 func (o *mergeJoinLeftOuterOp) exhaustRightSource() {
 }
 
-// build creates the cross product, and writes it to the output member.
-func (o *mergeJoinLeftOuterOp) build() {
-	if o.output.Width() != 0 {
-		outStartIdx := o.builderState.outCount
-		o.buildLeftGroups(o.builderState.lGroups, 0 /* colOffset */, &o.left, o.builderState.lBatch, outStartIdx)
-		o.buildRightGroups(o.builderState.rGroups, len(o.left.outCols), &o.right, o.builderState.rBatch, outStartIdx)
-	}
-	o.builderState.outCount = o.calculateOutputCount(o.builderState.lGroups)
-}
-
 // calculateOutputCount uses the toBuild field of each group and the output
 // batch size to determine the output count. Note that as soon as a group is
 // materialized partially or fully to output, its toBuild field is updated
@@ -36038,6 +36789,29 @@ func (o *mergeJoinLeftOuterOp) calculateOutputCount(groups []group) int {
 	}
 	o.builderState.outFinished = true
 	return count
+}
+
+// build creates the cross product, and writes it to the output member.
+func (o *mergeJoinLeftOuterOp) build() {
+	outStartIdx := o.builderState.outCount
+	o.builderState.outCount = o.calculateOutputCount(o.builderState.lGroups)
+	if o.output.Width() != 0 && o.builderState.outCount > outStartIdx {
+		// We will be actually building the output if we have columns in the output
+		// batch (meaning that we're not doing query like 'SELECT count(*) ...')
+		// and when builderState.outCount has increased (meaning that we have
+		// something to build).
+		switch o.builderState.buildFrom {
+		case mjBuildFromBatch:
+			o.buildLeftGroupsFromBatch(o.builderState.lGroups, 0 /* colOffset */, &o.left, o.proberState.lBatch, outStartIdx)
+			o.buildRightGroupsFromBatch(o.builderState.rGroups, len(o.left.outCols), &o.right, o.proberState.rBatch, outStartIdx)
+		case mjBuildFromBufferedGroup:
+			o.buildLeftBufferedGroup(o.builderState.lGroups[0], 0 /* colOffset */, &o.left, o.proberState.lBufferedGroup, outStartIdx)
+			o.buildRightBufferedGroup(o.builderState.rGroups[0], len(o.left.outCols), &o.right, o.proberState.rBufferedGroup, outStartIdx)
+
+		default:
+			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
+		}
+	}
 }
 
 func (o *mergeJoinLeftOuterOp) Next(ctx context.Context) coldata.Batch {
@@ -36061,12 +36835,7 @@ func (o *mergeJoinLeftOuterOp) Next(ctx context.Context) coldata.Batch {
 		case mjSourceFinished:
 
 			o.outputReady = true
-			// First we make sure that batches of the builder state are always set. This
-			// is needed because the batches are accessed outside of _LEFT_SWITCH and
-			// _RIGHT_SWITCH (before the merge joiner figures out whether there are any
-			// groups to be built).
-			o.builderState.lBatch = o.proberState.lBatch
-			o.builderState.rBatch = o.proberState.rBatch
+			o.builderState.buildFrom = mjBuildFromBatch
 			// Next, we need to make sure that builder state is set up for a case when
 			// neither exhaustLeftSource nor exhaustRightSource is called below. In such
 			// scenario the merge joiner is done, so it'll be outputting zero-length
@@ -36102,12 +36871,32 @@ func (o *mergeJoinLeftOuterOp) Next(ctx context.Context) coldata.Batch {
 			}
 
 			if o.outputReady || o.builderState.outCount == o.outputBatchSize {
+				if o.builderState.outCount == 0 {
+					// We have already fully emitted the result of the join, so we
+					// transition to "finished" state.
+					o.state = mjDone
+					continue
+				}
 				o.output.SetLength(o.builderState.outCount)
 				// Reset builder out count.
 				o.builderState.outCount = 0
 				o.outputReady = false
 				return o.output
 			}
+		case mjDone:
+			if o.proberState.lBufferedGroup.spillingQueue != nil {
+				if err := o.proberState.lBufferedGroup.close(); err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				o.proberState.lBufferedGroup.spillingQueue = nil
+			}
+			if o.proberState.rBufferedGroup.spillingQueue != nil {
+				if err := o.proberState.rBufferedGroup.close(); err != nil {
+					execerror.VectorizedInternalPanic(err)
+				}
+				o.proberState.rBufferedGroup.spillingQueue = nil
+			}
+			return coldata.ZeroBatch
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unexpected merge joiner state in Next: %v", o.state))
 		}
