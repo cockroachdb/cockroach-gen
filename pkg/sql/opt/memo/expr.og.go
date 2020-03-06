@@ -6004,6 +6004,14 @@ type WindowPrivate struct {
 	// Ordering is the ordering that the window function is computed relative to
 	// within each partition.
 	Ordering physical.OrderingChoice
+
+	// RangeOffsetColumn is the column ID of a single column from ORDER BY
+	// clause (when there is only one column). We store it separately because
+	// Ordering might be simplified (when that single column is in Partition),
+	// but the execution still needs to know the original ordering with RANGE
+	// mode of framing when at least one of the bounds has "offset". This column
+	// ID is used to reconstruct the Ordering during exec build phase.
+	RangeOffsetColumn opt.ColumnID
 }
 
 // WithExpr executes Binding, making its results available to Main. Within Main, the
@@ -21443,6 +21451,7 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 	in.hasher.HashWindowsExpr(val.Windows)
 	in.hasher.HashColSet(val.Partition)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashColumnID(val.RangeOffsetColumn)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -21450,7 +21459,8 @@ func (in *interner) InternWindow(val *WindowExpr) *WindowExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsWindowsExprEqual(val.Windows, existing.Windows) &&
 				in.hasher.IsColSetEqual(val.Partition, existing.Partition) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsColumnIDEqual(val.RangeOffsetColumn, existing.RangeOffsetColumn) {
 				return existing
 			}
 		}
