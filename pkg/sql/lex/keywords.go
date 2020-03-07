@@ -206,6 +206,7 @@ var KeywordsCategories = map[string]string{
 	"localtime":                 "R",
 	"localtimestamp":            "R",
 	"locked":                    "U",
+	"login":                     "U",
 	"lookup":                    "U",
 	"low":                       "U",
 	"match":                     "U",
@@ -222,6 +223,7 @@ var KeywordsCategories = map[string]string{
 	"next":                      "U",
 	"no":                        "U",
 	"nocreaterole":              "U",
+	"nologin":                   "U",
 	"none":                      "T",
 	"normal":                    "U",
 	"not":                       "R",
@@ -384,6 +386,7 @@ var KeywordsCategories = map[string]string{
 	"unknown":                   "U",
 	"unlogged":                  "U",
 	"unsplit":                   "U",
+	"until":                     "U",
 	"update":                    "U",
 	"upsert":                    "U",
 	"use":                       "U",
@@ -619,6 +622,7 @@ var KeywordNames = []string{
 	"localtime",
 	"localtimestamp",
 	"locked",
+	"login",
 	"lookup",
 	"low",
 	"match",
@@ -635,6 +639,7 @@ var KeywordNames = []string{
 	"next",
 	"no",
 	"nocreaterole",
+	"nologin",
 	"none",
 	"normal",
 	"not",
@@ -797,6 +802,7 @@ var KeywordNames = []string{
 	"unknown",
 	"unlogged",
 	"unsplit",
+	"until",
 	"update",
 	"upsert",
 	"use",
@@ -1240,6 +1246,8 @@ func GetKeywordID(k string) int32 {
 		return LOCALTIMESTAMP
 	case "locked":
 		return LOCKED
+	case "login":
+		return LOGIN
 	case "lookup":
 		return LOOKUP
 	case "low":
@@ -1272,6 +1280,8 @@ func GetKeywordID(k string) int32 {
 		return NO
 	case "nocreaterole":
 		return NOCREATEROLE
+	case "nologin":
+		return NOLOGIN
 	case "none":
 		return NONE
 	case "normal":
@@ -1596,6 +1606,8 @@ func GetKeywordID(k string) int32 {
 		return UNLOGGED
 	case "unsplit":
 		return UNSPLIT
+	case "until":
+		return UNTIL
 	case "update":
 		return UPDATE
 	case "upsert":
