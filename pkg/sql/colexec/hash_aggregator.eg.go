@@ -50,7 +50,6 @@ func (v hashAggFuncs) match(
 	for keyIdx, colIdx := range keyCols {
 		lhs := keyMapping.ColVec(keyIdx)
 		lhsHasNull := lhs.MaybeHasNulls()
-		lhsNull := lhs.Nulls().NullAt(v.keyIdx)
 
 		rhs := b.ColVec(int(colIdx))
 		rhsHasNull := rhs.MaybeHasNulls()
@@ -61,1035 +60,1107 @@ func (v hashAggFuncs) match(
 		case coltypes.Bool:
 			lhsCol := lhs.Bool()
 			rhsCol := rhs.Bool()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						if !lhsVal && rhsVal {
-							cmpResult = -1
-						} else if lhsVal && !rhsVal {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
 						}
 
-						cmp = cmpResult != 0
-					}
+						rhsVal := rhsCol[rowIdx]
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+						var cmp bool
 
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+						{
+							var cmpResult int
 
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
+							if !lhsVal && rhsVal {
+								cmpResult = -1
+							} else if lhsVal && !rhsVal {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
 
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						if !lhsVal && rhsVal {
-							cmpResult = -1
-						} else if lhsVal && !rhsVal {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						if !lhsVal && rhsVal {
-							cmpResult = -1
-						} else if lhsVal && !rhsVal {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
 						}
 
-						cmp = cmpResult != 0
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							if !lhsVal && rhsVal {
+								cmpResult = -1
+							} else if lhsVal && !rhsVal {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
+						var cmp bool
 
-					{
-						var cmpResult int
+						{
+							var cmpResult int
 
-						if !lhsVal && rhsVal {
-							cmpResult = -1
-						} else if lhsVal && !rhsVal {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+							if !lhsVal && rhsVal {
+								cmpResult = -1
+							} else if lhsVal && !rhsVal {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							if !lhsVal && rhsVal {
+								cmpResult = -1
+							} else if lhsVal && !rhsVal {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Bytes:
 			lhsCol := lhs.Bytes()
 			rhsCol := rhs.Bytes()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol.Get(aggKeyIdx)
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol.Get(aggKeyIdx)
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
+						}
+
+						rhsVal := rhsCol.Get(rowIdx)
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(lhsVal, rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					rhsVal := rhsCol.Get(rowIdx)
+				} else {
+					lhsVal := lhsCol.Get(aggKeyIdx)
 
-					var cmp bool
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-					{
-						var cmpResult int
-						cmpResult = bytes.Compare(lhsVal, rhsVal)
-						cmp = cmpResult != 0
+						rhsVal := rhsCol.Get(rowIdx)
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(lhsVal, rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol.Get(aggKeyIdx)
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol.Get(rowIdx)
-
-					var cmp bool
-
-					{
-						var cmpResult int
-						cmpResult = bytes.Compare(lhsVal, rhsVal)
-						cmp = cmpResult != 0
-					}
-
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol.Get(aggKeyIdx)
-
-				for selIdx, rowIdx := range sel {
-
-					rhsVal := rhsCol.Get(rowIdx)
-
-					var cmp bool
-
-					{
-						var cmpResult int
-						cmpResult = bytes.Compare(lhsVal, rhsVal)
-						cmp = cmpResult != 0
-					}
-
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
 			} else {
-				lhsVal := lhsCol.Get(aggKeyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol.Get(aggKeyIdx)
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol.Get(rowIdx)
+						rhsVal := rhsCol.Get(rowIdx)
 
-					var cmp bool
+						var cmp bool
 
-					{
-						var cmpResult int
-						cmpResult = bytes.Compare(lhsVal, rhsVal)
-						cmp = cmpResult != 0
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(lhsVal, rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol.Get(aggKeyIdx)
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol.Get(rowIdx)
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = bytes.Compare(lhsVal, rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Decimal:
 			lhsCol := lhs.Decimal()
 			rhsCol := rhs.Decimal()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
+						}
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					rhsVal := rhsCol[rowIdx]
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-					var cmp bool
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-					{
-						var cmpResult int
-						cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
-						cmp = cmpResult != 0
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-						cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
-						cmp = cmpResult != 0
-					}
-
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-						cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
-						cmp = cmpResult != 0
-					}
-
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
+						var cmp bool
 
-					{
-						var cmpResult int
-						cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
-						cmp = cmpResult != 0
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = tree.CompareDecimals(&lhsVal, &rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Int16:
 			lhsCol := lhs.Int16()
 			rhsCol := rhs.Int16()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
 						}
 
-						cmp = cmpResult != 0
-					}
+						rhsVal := rhsCol[rowIdx]
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-				for selIdx, rowIdx := range sel {
+						rhsVal := rhsCol[rowIdx]
 
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Int32:
 			lhsCol := lhs.Int32()
 			rhsCol := rhs.Int32()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
 						}
 
-						cmp = cmpResult != 0
-					}
+						rhsVal := rhsCol[rowIdx]
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-				for selIdx, rowIdx := range sel {
+						rhsVal := rhsCol[rowIdx]
 
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Int64:
 			lhsCol := lhs.Int64()
 			rhsCol := rhs.Int64()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
-							}
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
 						}
 
-						cmp = cmpResult != 0
-					}
+						rhsVal := rhsCol[rowIdx]
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-				for selIdx, rowIdx := range sel {
+						rhsVal := rhsCol[rowIdx]
 
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := int64(lhsVal), int64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else {
-								cmpResult = 0
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							{
+								a, b := int64(lhsVal), int64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+							}
+
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Float64:
 			lhsCol := lhs.Float64()
 			rhsCol := rhs.Float64()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						{
-							a, b := float64(lhsVal), float64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else if a == b {
-								cmpResult = 0
-							} else if math.IsNaN(a) {
-								if math.IsNaN(b) {
-									cmpResult = 0
-								} else {
-									cmpResult = -1
-								}
-							} else {
-								cmpResult = 1
-							}
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
 						}
 
-						cmp = cmpResult != 0
-					}
+						rhsVal := rhsCol[rowIdx]
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := float64(lhsVal), float64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else if a == b {
-								cmpResult = 0
-							} else if math.IsNaN(a) {
-								if math.IsNaN(b) {
-									cmpResult = 0
-								} else {
+							var cmpResult int
+
+							{
+								a, b := float64(lhsVal), float64(rhsVal)
+								if a < b {
 									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
 								}
-							} else {
-								cmpResult = 1
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-				for selIdx, rowIdx := range sel {
+						rhsVal := rhsCol[rowIdx]
 
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := float64(lhsVal), float64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else if a == b {
-								cmpResult = 0
-							} else if math.IsNaN(a) {
-								if math.IsNaN(b) {
-									cmpResult = 0
-								} else {
+							var cmpResult int
+
+							{
+								a, b := float64(lhsVal), float64(rhsVal)
+								if a < b {
 									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
 								}
-							} else {
-								cmpResult = 1
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
-
-					{
-						var cmpResult int
+						var cmp bool
 
 						{
-							a, b := float64(lhsVal), float64(rhsVal)
-							if a < b {
-								cmpResult = -1
-							} else if a > b {
-								cmpResult = 1
-							} else if a == b {
-								cmpResult = 0
-							} else if math.IsNaN(a) {
-								if math.IsNaN(b) {
-									cmpResult = 0
-								} else {
+							var cmpResult int
+
+							{
+								a, b := float64(lhsVal), float64(rhsVal)
+								if a < b {
 									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
 								}
-							} else {
-								cmpResult = 1
 							}
+
+							cmp = cmpResult != 0
 						}
 
-						cmp = cmpResult != 0
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							{
+								a, b := float64(lhsVal), float64(rhsVal)
+								if a < b {
+									cmpResult = -1
+								} else if a > b {
+									cmpResult = 1
+								} else if a == b {
+									cmpResult = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmpResult = 0
+									} else {
+										cmpResult = -1
+									}
+								} else {
+									cmpResult = 1
+								}
+							}
+
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Timestamp:
 			lhsCol := lhs.Timestamp()
 			rhsCol := rhs.Timestamp()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						if lhsVal.Before(rhsVal) {
-							cmpResult = -1
-						} else if rhsVal.Before(lhsVal) {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
 						}
-						cmp = cmpResult != 0
-					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+						rhsVal := rhsCol[rowIdx]
 
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+						var cmp bool
 
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
+						{
+							var cmpResult int
 
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						if lhsVal.Before(rhsVal) {
-							cmpResult = -1
-						} else if rhsVal.Before(lhsVal) {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+							if lhsVal.Before(rhsVal) {
+								cmpResult = -1
+							} else if rhsVal.Before(lhsVal) {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+							cmp = cmpResult != 0
 						}
-						cmp = cmpResult != 0
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-
-						if lhsVal.Before(rhsVal) {
-							cmpResult = -1
-						} else if rhsVal.Before(lhsVal) {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
 						}
-						cmp = cmpResult != 0
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							if lhsVal.Before(rhsVal) {
+								cmpResult = -1
+							} else if rhsVal.Before(lhsVal) {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
+						var cmp bool
 
-					{
-						var cmpResult int
+						{
+							var cmpResult int
 
-						if lhsVal.Before(rhsVal) {
-							cmpResult = -1
-						} else if rhsVal.Before(lhsVal) {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+							if lhsVal.Before(rhsVal) {
+								cmpResult = -1
+							} else if rhsVal.Before(lhsVal) {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+							cmp = cmpResult != 0
 						}
-						cmp = cmpResult != 0
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+
+							if lhsVal.Before(rhsVal) {
+								cmpResult = -1
+							} else if rhsVal.Before(lhsVal) {
+								cmpResult = 1
+							} else {
+								cmpResult = 0
+							}
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		case coltypes.Interval:
 			lhsCol := lhs.Interval()
 			rhsCol := rhs.Interval()
-			if lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
+			if lhsHasNull {
+				lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
-					diffNull := (lhsNull != rhs.Nulls().NullAt(rowIdx))
-					if diffNull {
-						diff[selIdx] = true
-						continue
+					for selIdx, rowIdx := range sel {
+						rhsNull := rhs.Nulls().NullAt(rowIdx)
+						if lhsNull && rhsNull {
+							// Both values are NULLs, and we do not consider them different.
+							continue
+						} else if lhsNull || rhsNull {
+							diff[selIdx] = true
+							continue
+						}
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = lhsVal.Compare(rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					rhsVal := rhsCol[rowIdx]
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
-					var cmp bool
+					for selIdx, rowIdx := range sel {
+						if lhsNull {
+							diff[selIdx] = true
+							continue
+						}
 
-					{
-						var cmpResult int
-						cmpResult = lhsVal.Compare(rhsVal)
-						cmp = cmpResult != 0
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = lhsVal.Compare(rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
 				}
-
-			} else if lhsHasNull && !rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-					if lhsNull {
-						diff[selIdx] = true
-						continue
-					}
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-						cmpResult = lhsVal.Compare(rhsVal)
-						cmp = cmpResult != 0
-					}
-
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
-			} else if !lhsHasNull && rhsHasNull {
-				lhsVal := lhsCol[aggKeyIdx]
-
-				for selIdx, rowIdx := range sel {
-
-					rhsVal := rhsCol[rowIdx]
-
-					var cmp bool
-
-					{
-						var cmpResult int
-						cmpResult = lhsVal.Compare(rhsVal)
-						cmp = cmpResult != 0
-					}
-
-					diff[selIdx] = diff[selIdx] || cmp
-				}
-
 			} else {
-				lhsVal := lhsCol[aggKeyIdx]
+				if rhsHasNull {
+					lhsVal := lhsCol[aggKeyIdx]
 
-				for selIdx, rowIdx := range sel {
+					for selIdx, rowIdx := range sel {
 
-					rhsVal := rhsCol[rowIdx]
+						rhsVal := rhsCol[rowIdx]
 
-					var cmp bool
+						var cmp bool
 
-					{
-						var cmpResult int
-						cmpResult = lhsVal.Compare(rhsVal)
-						cmp = cmpResult != 0
+						{
+							var cmpResult int
+							cmpResult = lhsVal.Compare(rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
 					}
 
-					diff[selIdx] = diff[selIdx] || cmp
-				}
+				} else {
+					lhsVal := lhsCol[aggKeyIdx]
 
+					for selIdx, rowIdx := range sel {
+
+						rhsVal := rhsCol[rowIdx]
+
+						var cmp bool
+
+						{
+							var cmpResult int
+							cmpResult = lhsVal.Compare(rhsVal)
+							cmp = cmpResult != 0
+						}
+
+						diff[selIdx] = diff[selIdx] || cmp
+					}
+
+				}
 			}
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", keyTyp))
