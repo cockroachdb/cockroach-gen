@@ -43819,8 +43819,8 @@ func (o *mergeJoinFullOuterOp) setBuilderSourceToBufferedGroup(ctx context.Conte
 	// We cannot yet reset the buffered groups because the builder will be taking
 	// input from them. The actual reset will take place on the next call to
 	// initProberState().
-	o.proberState.lBufferedGroup.needToReset = true
-	o.proberState.rBufferedGroup.needToReset = true
+	o.proberState.lBufferedGroupNeedToReset = true
+	o.proberState.rBufferedGroupNeedToReset = true
 }
 
 // exhaustLeftSource sets up the builder to process any remaining tuples from
@@ -43999,17 +43999,11 @@ func (o *mergeJoinFullOuterOp) Next(ctx context.Context) coldata.Batch {
 				return o.output
 			}
 		case mjDone:
-			if o.proberState.lBufferedGroup.spillingQueue != nil {
-				if err := o.proberState.lBufferedGroup.close(); err != nil {
-					execerror.VectorizedInternalPanic(err)
-				}
-				o.proberState.lBufferedGroup.spillingQueue = nil
+			if err := o.proberState.lBufferedGroup.close(); err != nil {
+				execerror.VectorizedInternalPanic(err)
 			}
-			if o.proberState.rBufferedGroup.spillingQueue != nil {
-				if err := o.proberState.rBufferedGroup.close(); err != nil {
-					execerror.VectorizedInternalPanic(err)
-				}
-				o.proberState.rBufferedGroup.spillingQueue = nil
+			if err := o.proberState.rBufferedGroup.close(); err != nil {
+				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
 		default:
