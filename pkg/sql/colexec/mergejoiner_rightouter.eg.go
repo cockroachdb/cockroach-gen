@@ -31253,24 +31253,23 @@ EqLoop:
 // a whole.
 // SIDE EFFECTS: writes into o.output.
 func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
-	leftGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
+	leftGroups []group, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	sel := batch.Selection()
 	initialBuilderState := o.builderState.left
 	outputBatchSize := o.outputBatchSize
 	o.unlimitedAllocator.PerformOperation(
-		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		o.output.ColVecs()[:len(input.sourceTypes)],
 		func() {
 			// Loop over every column.
 		LeftColLoop:
-			for outColIdx, inColIdx := range input.outCols {
+			for colIdx, colType := range input.sourceTypes {
 				outStartIdx := destStartIdx
-				out := o.output.ColVec(outColIdx)
+				out := o.output.ColVec(colIdx)
 				var src coldata.Vec
 				if batch.Length() > 0 {
-					src = batch.ColVec(int(inColIdx))
+					src = batch.ColVec(colIdx)
 				}
-				colType := input.sourceTypes[inColIdx]
 
 				if sel != nil {
 					if src != nil && src.MaybeHasNulls() {
@@ -31325,7 +31324,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31386,7 +31385,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31447,7 +31446,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31508,7 +31507,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31569,7 +31568,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31630,7 +31629,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31691,7 +31690,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31752,7 +31751,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31813,7 +31812,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31877,7 +31876,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31935,7 +31934,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -31993,7 +31992,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32051,7 +32050,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32109,7 +32108,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32167,7 +32166,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32225,7 +32224,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32283,7 +32282,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32341,7 +32340,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32409,7 +32408,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32469,7 +32468,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32529,7 +32528,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32589,7 +32588,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32649,7 +32648,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32709,7 +32708,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32769,7 +32768,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32829,7 +32828,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32889,7 +32888,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -32952,7 +32951,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33009,7 +33008,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33066,7 +33065,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33123,7 +33122,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33180,7 +33179,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33237,7 +33236,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33294,7 +33293,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33351,7 +33350,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33408,7 +33407,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 										// We didn't materialize all the rows in the group so save state and
 										// move to the next column.
 										o.builderState.left.numRepeatsIdx += toAppend
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											return
 										}
 										o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33441,11 +33440,7 @@ func (o *mergeJoinRightOuterOp) buildLeftGroupsFromBatch(
 // look at rowStartIdx and rowEndIdx). Also, all rows in the buffered group do
 // have a match, so the group can neither be "nullGroup" nor "unmatched".
 func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
-	leftGroup group,
-	colOffset int,
-	input *mergeJoinInput,
-	bufferedGroup mjBufferedGroup,
-	destStartIdx int,
+	leftGroup group, input *mergeJoinInput, bufferedGroup mjBufferedGroup, destStartIdx int,
 ) {
 	var err error
 	currentBatch := o.builderState.lBufferedGroupBatch
@@ -33459,18 +33454,17 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 	}
 	initialBuilderState := o.builderState.left
 	o.unlimitedAllocator.PerformOperation(
-		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		o.output.ColVecs()[:len(input.sourceTypes)],
 		func() {
 			batchLength := currentBatch.Length()
 			for batchLength > 0 {
 				var updatedDestStartIdx int
 				// Loop over every column.
 			LeftColLoop:
-				for outColIdx, inColIdx := range input.outCols {
+				for colIdx, colType := range input.sourceTypes {
 					outStartIdx := destStartIdx
-					src := currentBatch.ColVec(int(inColIdx))
-					out := o.output.ColVec(outColIdx)
-					colType := input.sourceTypes[inColIdx]
+					src := currentBatch.ColVec(colIdx)
+					out := o.output.ColVec(colIdx)
 					switch colType {
 					case coltypes.Bool:
 						srcCol := src.Bool()
@@ -33500,7 +33494,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33542,7 +33536,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33584,7 +33578,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33626,7 +33620,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33668,7 +33662,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33710,7 +33704,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33752,7 +33746,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33794,7 +33788,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33836,7 +33830,7 @@ func (o *mergeJoinRightOuterOp) buildLeftBufferedGroup(
 							if toAppend < repeatsLeft {
 								// We didn't materialize all the rows in the current batch, so
 								// we move to the next column.
-								if outColIdx == len(input.outCols)-1 {
+								if colIdx == len(input.sourceTypes)-1 {
 									// This is the last column, so we update the builder state
 									// and exit.
 									o.builderState.left.numRepeatsIdx += toAppend
@@ -33908,18 +33902,17 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 	outputBatchSize := o.outputBatchSize
 
 	o.unlimitedAllocator.PerformOperation(
-		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		o.output.ColVecs()[colOffset:colOffset+len(input.sourceTypes)],
 		func() {
 			// Loop over every column.
 		RightColLoop:
-			for outColIdx, inColIdx := range input.outCols {
+			for colIdx, colType := range input.sourceTypes {
 				outStartIdx := destStartIdx
-				out := o.output.ColVec(outColIdx + colOffset)
+				out := o.output.ColVec(colIdx + colOffset)
 				var src coldata.Vec
 				if batch.Length() > 0 {
-					src = batch.ColVec(int(inColIdx))
+					src = batch.ColVec(colIdx)
 				}
-				colType := input.sourceTypes[inColIdx]
 
 				if sel != nil {
 					if src != nil && src.MaybeHasNulls() {
@@ -33977,7 +33970,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34042,7 +34035,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34107,7 +34100,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34172,7 +34165,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34237,7 +34230,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34302,7 +34295,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34367,7 +34360,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34432,7 +34425,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34497,7 +34490,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34566,7 +34559,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34629,7 +34622,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34692,7 +34685,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34755,7 +34748,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34818,7 +34811,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34881,7 +34874,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -34944,7 +34937,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35007,7 +35000,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35070,7 +35063,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35143,7 +35136,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35208,7 +35201,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35273,7 +35266,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35338,7 +35331,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35403,7 +35396,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35468,7 +35461,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35533,7 +35526,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35598,7 +35591,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35663,7 +35656,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35732,7 +35725,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35795,7 +35788,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35858,7 +35851,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35921,7 +35914,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -35984,7 +35977,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -36047,7 +36040,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -36110,7 +36103,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -36173,7 +36166,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -36236,7 +36229,7 @@ func (o *mergeJoinRightOuterOp) buildRightGroupsFromBatch(
 									// done with the current column.
 									if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
 										// If it's the last column, save state and return.
-										if outColIdx == len(input.outCols)-1 {
+										if colIdx == len(input.sourceTypes)-1 {
 											o.builderState.right.curSrcStartIdx += toAppend
 											return
 										}
@@ -36278,7 +36271,7 @@ func (o *mergeJoinRightOuterOp) buildRightBufferedGroup(
 ) {
 	var err error
 	o.unlimitedAllocator.PerformOperation(
-		o.output.ColVecs()[colOffset:colOffset+len(input.outCols)],
+		o.output.ColVecs()[colOffset:colOffset+len(input.sourceTypes)],
 		func() {
 			outStartIdx := destStartIdx
 			// Repeat the buffered group numRepeats times.
@@ -36300,10 +36293,9 @@ func (o *mergeJoinRightOuterOp) buildRightBufferedGroup(
 					}
 
 					// Loop over every column.
-					for outColIdx, inColIdx := range input.outCols {
-						out := o.output.ColVec(outColIdx + colOffset)
-						src := currentBatch.ColVec(int(inColIdx))
-						colType := input.sourceTypes[inColIdx]
+					for colIdx, colType := range input.sourceTypes {
+						out := o.output.ColVec(colIdx + colOffset)
+						src := currentBatch.ColVec(colIdx)
 						switch colType {
 						case coltypes.Bool:
 							srcCol := src.Bool()
@@ -36694,11 +36686,11 @@ func (o *mergeJoinRightOuterOp) build() {
 		// something to build).
 		switch o.builderState.buildFrom {
 		case mjBuildFromBatch:
-			o.buildLeftGroupsFromBatch(o.builderState.lGroups, 0 /* colOffset */, &o.left, o.proberState.lBatch, outStartIdx)
-			o.buildRightGroupsFromBatch(o.builderState.rGroups, len(o.left.outCols), &o.right, o.proberState.rBatch, outStartIdx)
+			o.buildLeftGroupsFromBatch(o.builderState.lGroups, &o.left, o.proberState.lBatch, outStartIdx)
+			o.buildRightGroupsFromBatch(o.builderState.rGroups, len(o.left.sourceTypes), &o.right, o.proberState.rBatch, outStartIdx)
 		case mjBuildFromBufferedGroup:
-			o.buildLeftBufferedGroup(o.builderState.lGroups[0], 0 /* colOffset */, &o.left, o.proberState.lBufferedGroup, outStartIdx)
-			o.buildRightBufferedGroup(o.builderState.rGroups[0], len(o.left.outCols), &o.right, o.proberState.rBufferedGroup, outStartIdx)
+			o.buildLeftBufferedGroup(o.builderState.lGroups[0], &o.left, o.proberState.lBufferedGroup, outStartIdx)
+			o.buildRightBufferedGroup(o.builderState.rGroups[0], len(o.left.sourceTypes), &o.right, o.proberState.rBufferedGroup, outStartIdx)
 
 		default:
 			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
