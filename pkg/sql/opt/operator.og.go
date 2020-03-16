@@ -1152,6 +1152,39 @@ func IsEnforcerOp(e Expr) bool {
 	return false
 }
 
+var TelemetryOperators = [...]Operator{
+	AntiJoinOp,
+	AntiJoinApplyOp,
+	DistinctOnOp,
+	FullJoinOp,
+	GroupByOp,
+	InnerJoinOp,
+	InnerJoinApplyOp,
+	LeftJoinOp,
+	LeftJoinApplyOp,
+	LookupJoinOp,
+	MergeJoinOp,
+	ProjectSetOp,
+	RightJoinOp,
+	ScalarGroupByOp,
+	SemiJoinOp,
+	SemiJoinApplyOp,
+	SortOp,
+	UpsertDistinctOnOp,
+	ZigzagJoinOp,
+}
+
+func IsTelemetryOp(e Expr) bool {
+	switch e.Op() {
+	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, FullJoinOp,
+		GroupByOp, InnerJoinOp, InnerJoinApplyOp, LeftJoinOp, LeftJoinApplyOp,
+		LookupJoinOp, MergeJoinOp, ProjectSetOp, RightJoinOp, ScalarGroupByOp,
+		SemiJoinOp, SemiJoinApplyOp, SortOp, UpsertDistinctOnOp, ZigzagJoinOp:
+		return true
+	}
+	return false
+}
+
 var RelationalOperators = [...]Operator{
 	AlterTableRelocateOp,
 	AlterTableSplitOp,
@@ -1544,38 +1577,6 @@ func IsJoinNonApplyOp(e Expr) bool {
 	switch e.Op() {
 	case AntiJoinOp, FullJoinOp, InnerJoinOp, LeftJoinOp,
 		RightJoinOp, SemiJoinOp:
-		return true
-	}
-	return false
-}
-
-var TelemetryOperators = [...]Operator{
-	AntiJoinOp,
-	AntiJoinApplyOp,
-	DistinctOnOp,
-	FullJoinOp,
-	GroupByOp,
-	InnerJoinOp,
-	InnerJoinApplyOp,
-	LeftJoinOp,
-	LeftJoinApplyOp,
-	LookupJoinOp,
-	MergeJoinOp,
-	ProjectSetOp,
-	RightJoinOp,
-	ScalarGroupByOp,
-	SemiJoinOp,
-	SemiJoinApplyOp,
-	UpsertDistinctOnOp,
-	ZigzagJoinOp,
-}
-
-func IsTelemetryOp(e Expr) bool {
-	switch e.Op() {
-	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, FullJoinOp,
-		GroupByOp, InnerJoinOp, InnerJoinApplyOp, LeftJoinOp, LeftJoinApplyOp,
-		LookupJoinOp, MergeJoinOp, ProjectSetOp, RightJoinOp, ScalarGroupByOp,
-		SemiJoinOp, SemiJoinApplyOp, UpsertDistinctOnOp, ZigzagJoinOp:
 		return true
 	}
 	return false
