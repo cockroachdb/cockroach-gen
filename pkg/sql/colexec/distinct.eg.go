@@ -214,11 +214,11 @@ func (p *sortedDistinctBoolOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctBoolOp) reset() {
+func (p *sortedDistinctBoolOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -585,11 +585,11 @@ func (p *sortedDistinctBytesOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctBytesOp) reset() {
+func (p *sortedDistinctBytesOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -898,11 +898,11 @@ func (p *sortedDistinctDecimalOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctDecimalOp) reset() {
+func (p *sortedDistinctDecimalOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -1205,11 +1205,11 @@ func (p *sortedDistinctInt16Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt16Op) reset() {
+func (p *sortedDistinctInt16Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -1600,11 +1600,11 @@ func (p *sortedDistinctInt32Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt32Op) reset() {
+func (p *sortedDistinctInt32Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -1995,11 +1995,11 @@ func (p *sortedDistinctInt64Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt64Op) reset() {
+func (p *sortedDistinctInt64Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -2390,11 +2390,11 @@ func (p *sortedDistinctFloat64Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctFloat64Op) reset() {
+func (p *sortedDistinctFloat64Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -2849,11 +2849,11 @@ func (p *sortedDistinctTimestampOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctTimestampOp) reset() {
+func (p *sortedDistinctTimestampOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 
@@ -3212,11 +3212,11 @@ func (p *sortedDistinctIntervalOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctIntervalOp) reset() {
+func (p *sortedDistinctIntervalOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
-		resetter.reset()
+		resetter.reset(ctx)
 	}
 }
 

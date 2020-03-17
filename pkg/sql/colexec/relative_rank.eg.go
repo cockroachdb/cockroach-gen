@@ -17,6 +17,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colcontainer"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
+	"github.com/cockroachdb/cockroach/pkg/util/mon"
 	"github.com/cockroachdb/errors"
 	"github.com/marusama/semaphore"
 )
@@ -39,6 +40,7 @@ func NewRelativeRankOperator(
 	outputColIdx int,
 	partitionColIdx int,
 	peersColIdx int,
+	diskAcc *mon.BoundAccount,
 ) (Operator, error) {
 	if len(orderingCols) == 0 {
 		constValue := float64(0)
@@ -59,6 +61,7 @@ func NewRelativeRankOperator(
 		diskQueueCfg: diskQueueCfg,
 		fdSemaphore:  fdSemaphore,
 		inputTypes:   inputTypes,
+		diskAcc:      diskAcc,
 	}
 	switch windowFn {
 	case execinfrapb.WindowerSpec_PERCENT_RANK:
@@ -122,6 +125,8 @@ type relativeRankInitFields struct {
 	diskQueueCfg colcontainer.DiskQueueCfg
 	fdSemaphore  semaphore.Semaphore
 	inputTypes   []coltypes.T
+
+	diskAcc *mon.BoundAccount
 }
 
 type relativeRankSizesState struct {
@@ -162,7 +167,7 @@ type percentRankNoPartitionOp struct {
 	output         coldata.Batch
 }
 
-var _ Operator = &percentRankNoPartitionOp{}
+var _ closableOperator = &percentRankNoPartitionOp{}
 
 func (r *percentRankNoPartitionOp) Init() {
 	r.Input().Init()
@@ -171,7 +176,7 @@ func (r *percentRankNoPartitionOp) Init() {
 	r.bufferedTuples = newSpillingQueue(
 		r.allocator, r.inputTypes,
 		int64(float64(r.memoryLimit)*(1.0-usedMemoryLimitFraction)),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	r.output = r.allocator.NewMemBatch(append(r.inputTypes, coltypes.Float64))
 	// All rank functions start counting from 1. Before we assign the rank to a
@@ -256,7 +261,7 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			continue
 
 		case relativeRankEmitting:
-			if r.scratch, err = r.bufferedTuples.dequeue(); err != nil {
+			if r.scratch, err = r.bufferedTuples.dequeue(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			n := r.scratch.Length()
@@ -311,7 +316,7 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(); err != nil {
+			if err := r.Close(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -324,12 +329,12 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *percentRankNoPartitionOp) Close() error {
+func (r *percentRankNoPartitionOp) Close(ctx context.Context) error {
 	if r.closed {
 		return nil
 	}
 	var lastErr error
-	if err := r.bufferedTuples.close(); err != nil {
+	if err := r.bufferedTuples.close(ctx); err != nil {
 		lastErr = err
 	}
 	r.closed = true
@@ -355,7 +360,7 @@ type percentRankWithPartitionOp struct {
 	output         coldata.Batch
 }
 
-var _ Operator = &percentRankWithPartitionOp{}
+var _ closableOperator = &percentRankWithPartitionOp{}
 
 func (r *percentRankWithPartitionOp) Init() {
 	r.Input().Init()
@@ -364,13 +369,13 @@ func (r *percentRankWithPartitionOp) Init() {
 	r.partitionsState.spillingQueue = newSpillingQueue(
 		r.allocator, []coltypes.T{coltypes.Int64},
 		int64(float64(r.memoryLimit)*relativeRankUtilityQueueMemLimitFraction),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	usedMemoryLimitFraction += relativeRankUtilityQueueMemLimitFraction
 	r.bufferedTuples = newSpillingQueue(
 		r.allocator, r.inputTypes,
 		int64(float64(r.memoryLimit)*(1.0-usedMemoryLimitFraction)),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	r.output = r.allocator.NewMemBatch(append(r.inputTypes, coltypes.Float64))
 	// All rank functions start counting from 1. Before we assign the rank to a
@@ -536,7 +541,7 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			continue
 
 		case relativeRankEmitting:
-			if r.scratch, err = r.bufferedTuples.dequeue(); err != nil {
+			if r.scratch, err = r.bufferedTuples.dequeue(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			n := r.scratch.Length()
@@ -546,7 +551,7 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 			// Get the next batch of partition sizes if we haven't already.
 			if r.partitionsState.dequeuedSizes == nil {
-				if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(); err != nil {
+				if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(ctx); err != nil {
 					execerror.VectorizedInternalPanic(err)
 				}
 				r.partitionsState.idx = 0
@@ -580,7 +585,7 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 				// computed).
 				if partitionCol[i] {
 					if r.partitionsState.idx == r.partitionsState.dequeuedSizes.Length() {
-						if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(); err != nil {
+						if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(ctx); err != nil {
 							execerror.VectorizedInternalPanic(err)
 						}
 						r.partitionsState.idx = 0
@@ -612,7 +617,7 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(); err != nil {
+			if err := r.Close(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -625,15 +630,15 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *percentRankWithPartitionOp) Close() error {
+func (r *percentRankWithPartitionOp) Close(ctx context.Context) error {
 	if r.closed {
 		return nil
 	}
 	var lastErr error
-	if err := r.bufferedTuples.close(); err != nil {
+	if err := r.bufferedTuples.close(ctx); err != nil {
 		lastErr = err
 	}
-	if err := r.partitionsState.close(); err != nil {
+	if err := r.partitionsState.close(ctx); err != nil {
 		lastErr = err
 	}
 	r.closed = true
@@ -660,7 +665,7 @@ type cumeDistNoPartitionOp struct {
 	output         coldata.Batch
 }
 
-var _ Operator = &cumeDistNoPartitionOp{}
+var _ closableOperator = &cumeDistNoPartitionOp{}
 
 func (r *cumeDistNoPartitionOp) Init() {
 	r.Input().Init()
@@ -669,13 +674,13 @@ func (r *cumeDistNoPartitionOp) Init() {
 	r.peerGroupsState.spillingQueue = newSpillingQueue(
 		r.allocator, []coltypes.T{coltypes.Int64},
 		int64(float64(r.memoryLimit)*relativeRankUtilityQueueMemLimitFraction),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	usedMemoryLimitFraction += relativeRankUtilityQueueMemLimitFraction
 	r.bufferedTuples = newSpillingQueue(
 		r.allocator, r.inputTypes,
 		int64(float64(r.memoryLimit)*(1.0-usedMemoryLimitFraction)),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	r.output = r.allocator.NewMemBatch(append(r.inputTypes, coltypes.Float64))
 }
@@ -837,7 +842,7 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			continue
 
 		case relativeRankEmitting:
-			if r.scratch, err = r.bufferedTuples.dequeue(); err != nil {
+			if r.scratch, err = r.bufferedTuples.dequeue(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			n := r.scratch.Length()
@@ -847,7 +852,7 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 			// Get the next batch of peer group sizes if we haven't already.
 			if r.peerGroupsState.dequeuedSizes == nil {
-				if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(); err != nil {
+				if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(ctx); err != nil {
 					execerror.VectorizedInternalPanic(err)
 				}
 				r.peerGroupsState.idx = 0
@@ -887,7 +892,7 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 					// this peer group.
 					r.numPrecedingTuples += r.numPeers
 					if r.peerGroupsState.idx == r.peerGroupsState.dequeuedSizes.Length() {
-						if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(); err != nil {
+						if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(ctx); err != nil {
 							execerror.VectorizedInternalPanic(err)
 						}
 						r.peerGroupsState.idx = 0
@@ -904,7 +909,7 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(); err != nil {
+			if err := r.Close(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -917,15 +922,15 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *cumeDistNoPartitionOp) Close() error {
+func (r *cumeDistNoPartitionOp) Close(ctx context.Context) error {
 	if r.closed {
 		return nil
 	}
 	var lastErr error
-	if err := r.bufferedTuples.close(); err != nil {
+	if err := r.bufferedTuples.close(ctx); err != nil {
 		lastErr = err
 	}
-	if err := r.peerGroupsState.close(); err != nil {
+	if err := r.peerGroupsState.close(ctx); err != nil {
 		lastErr = err
 	}
 	r.closed = true
@@ -953,7 +958,7 @@ type cumeDistWithPartitionOp struct {
 	output         coldata.Batch
 }
 
-var _ Operator = &cumeDistWithPartitionOp{}
+var _ closableOperator = &cumeDistWithPartitionOp{}
 
 func (r *cumeDistWithPartitionOp) Init() {
 	r.Input().Init()
@@ -962,19 +967,19 @@ func (r *cumeDistWithPartitionOp) Init() {
 	r.partitionsState.spillingQueue = newSpillingQueue(
 		r.allocator, []coltypes.T{coltypes.Int64},
 		int64(float64(r.memoryLimit)*relativeRankUtilityQueueMemLimitFraction),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	usedMemoryLimitFraction += relativeRankUtilityQueueMemLimitFraction
 	r.peerGroupsState.spillingQueue = newSpillingQueue(
 		r.allocator, []coltypes.T{coltypes.Int64},
 		int64(float64(r.memoryLimit)*relativeRankUtilityQueueMemLimitFraction),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	usedMemoryLimitFraction += relativeRankUtilityQueueMemLimitFraction
 	r.bufferedTuples = newSpillingQueue(
 		r.allocator, r.inputTypes,
 		int64(float64(r.memoryLimit)*(1.0-usedMemoryLimitFraction)),
-		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(),
+		r.diskQueueCfg, r.fdSemaphore, coldata.BatchSize(), r.diskAcc,
 	)
 	r.output = r.allocator.NewMemBatch(append(r.inputTypes, coltypes.Float64))
 }
@@ -1217,7 +1222,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			continue
 
 		case relativeRankEmitting:
-			if r.scratch, err = r.bufferedTuples.dequeue(); err != nil {
+			if r.scratch, err = r.bufferedTuples.dequeue(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			n := r.scratch.Length()
@@ -1227,7 +1232,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 			// Get the next batch of partition sizes if we haven't already.
 			if r.partitionsState.dequeuedSizes == nil {
-				if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(); err != nil {
+				if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(ctx); err != nil {
 					execerror.VectorizedInternalPanic(err)
 				}
 				r.partitionsState.idx = 0
@@ -1235,7 +1240,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			}
 			// Get the next batch of peer group sizes if we haven't already.
 			if r.peerGroupsState.dequeuedSizes == nil {
-				if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(); err != nil {
+				if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(ctx); err != nil {
 					execerror.VectorizedInternalPanic(err)
 				}
 				r.peerGroupsState.idx = 0
@@ -1269,7 +1274,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 				// computed).
 				if partitionCol[i] {
 					if r.partitionsState.idx == r.partitionsState.dequeuedSizes.Length() {
-						if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(); err != nil {
+						if r.partitionsState.dequeuedSizes, err = r.partitionsState.dequeue(ctx); err != nil {
 							execerror.VectorizedInternalPanic(err)
 						}
 						r.partitionsState.idx = 0
@@ -1288,7 +1293,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 					// this peer group.
 					r.numPrecedingTuples += r.numPeers
 					if r.peerGroupsState.idx == r.peerGroupsState.dequeuedSizes.Length() {
-						if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(); err != nil {
+						if r.peerGroupsState.dequeuedSizes, err = r.peerGroupsState.dequeue(ctx); err != nil {
 							execerror.VectorizedInternalPanic(err)
 						}
 						r.peerGroupsState.idx = 0
@@ -1305,7 +1310,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(); err != nil {
+			if err := r.Close(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -1318,18 +1323,18 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *cumeDistWithPartitionOp) Close() error {
+func (r *cumeDistWithPartitionOp) Close(ctx context.Context) error {
 	if r.closed {
 		return nil
 	}
 	var lastErr error
-	if err := r.bufferedTuples.close(); err != nil {
+	if err := r.bufferedTuples.close(ctx); err != nil {
 		lastErr = err
 	}
-	if err := r.partitionsState.close(); err != nil {
+	if err := r.partitionsState.close(ctx); err != nil {
 		lastErr = err
 	}
-	if err := r.peerGroupsState.close(); err != nil {
+	if err := r.peerGroupsState.close(ctx); err != nil {
 		lastErr = err
 	}
 	r.closed = true
