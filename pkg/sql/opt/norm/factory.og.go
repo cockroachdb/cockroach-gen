@@ -7657,21 +7657,23 @@ func (_f *Factory) ConstructDistinctOn(
 		}
 	}
 
-	// [EliminateDistinctOnNoColumns]
+	// [EliminateDistinctNoColumns]
 	{
 		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnNoColumns) {
-				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
-					input,
-					_f.ConstructConst(
-						tree.NewDInt(1),
-					),
-					_f.funcs.GroupingInputOrdering(groupingPrivate),
-				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateDistinctOnNoColumns, nil, _expr)
+			if !_f.funcs.RaisesErrorOnDup(groupingPrivate) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
+					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
+						input,
+						_f.ConstructConst(
+							tree.NewDInt(1),
+						),
+						_f.funcs.GroupingInputOrdering(groupingPrivate),
+					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateDistinctNoColumns, nil, _expr)
+					}
+					return _expr
 				}
-				return _expr
 			}
 		}
 	}
@@ -7788,18 +7790,41 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 		}
 	}
 
-	// [EliminateUpsertDistinctOnNoColumns]
+	// [EliminateDistinctNoColumns]
 	{
 		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUpsertDistinctOnNoColumns) {
-				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
-					input,
-					_f.funcs.DuplicateUpsertErrText(),
-				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUpsertDistinctOnNoColumns, nil, _expr)
+			if !_f.funcs.RaisesErrorOnDup(groupingPrivate) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
+					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
+						input,
+						_f.ConstructConst(
+							tree.NewDInt(1),
+						),
+						_f.funcs.GroupingInputOrdering(groupingPrivate),
+					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateDistinctNoColumns, nil, _expr)
+					}
+					return _expr
 				}
-				return _expr
+			}
+		}
+	}
+
+	// [EliminateErrorDistinctNoColumns]
+	{
+		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
+			if _f.funcs.RaisesErrorOnDup(groupingPrivate) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateErrorDistinctNoColumns) {
+					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
+						input,
+						_f.funcs.DuplicateUpsertErrText(),
+					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateErrorDistinctNoColumns, nil, _expr)
+					}
+					return _expr
+				}
 			}
 		}
 	}

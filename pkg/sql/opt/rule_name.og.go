@@ -89,8 +89,8 @@ const (
 	ReduceNotNullGroupingCols
 	EliminateAggDistinctForKeys
 	EliminateAggFilteredDistinctForKeys
-	EliminateDistinctOnNoColumns
-	EliminateUpsertDistinctOnNoColumns
+	EliminateDistinctNoColumns
+	EliminateErrorDistinctNoColumns
 	EliminateDistinctOnValues
 	InlineProjectConstants
 	InlineSelectConstants
