@@ -789,52 +789,6 @@ func (m *memColumn) Window(colType coltypes.T, start int, end int) Vec {
 	}
 }
 
-func (m *memColumn) PrettyValueAt(colIdx int, colType coltypes.T) string {
-	if m.nulls.NullAt(colIdx) {
-		return "NULL"
-	}
-	switch colType {
-	case coltypes.Bool:
-		col := m.Bool()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Bytes:
-		col := m.Bytes()
-		v := col.Get(colIdx)
-		return fmt.Sprintf("%v", v)
-	case coltypes.Decimal:
-		col := m.Decimal()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Int16:
-		col := m.Int16()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Int32:
-		col := m.Int32()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Int64:
-		col := m.Int64()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Float64:
-		col := m.Float64()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Timestamp:
-		col := m.Timestamp()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	case coltypes.Interval:
-		col := m.Interval()
-		v := col[colIdx]
-		return fmt.Sprintf("%v", v)
-	default:
-		panic(fmt.Sprintf("unhandled type %d", colType))
-	}
-}
-
 // SetValueAt is an inefficient helper to set the value in a Vec when the type
 // is unknown.
 func SetValueAt(v Vec, elem interface{}, rowIdx int, colType coltypes.T) {

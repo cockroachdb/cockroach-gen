@@ -40575,6 +40575,7 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 		}
 		o.builderState.lBufferedGroupBatch = currentBatch
 		o.builderState.left.curSrcStartIdx = 0
+		o.builderState.left.numRepeatsIdx = 0
 	}
 	initialBuilderState := o.builderState.left
 	o.unlimitedAllocator.PerformOperation(
@@ -40624,6 +40625,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40666,6 +40670,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40708,6 +40715,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40750,6 +40760,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40792,6 +40805,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40834,6 +40850,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40876,6 +40895,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40918,6 +40940,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40960,6 +40985,9 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 									o.builderState.left.numRepeatsIdx += toAppend
 									return
 								}
+								// We need to start building the next column
+								// with the same initial builder state as the
+								// current column.
 								o.builderState.left.setBuilderColumnState(initialBuilderState)
 								continue LeftColLoop
 							}
@@ -40987,11 +41015,15 @@ func (o *mergeJoinFullOuterOp) buildLeftBufferedGroup(
 				}
 				o.builderState.lBufferedGroupBatch = currentBatch
 				batchLength = currentBatch.Length()
-				// Note that here we're not resetting the builder state to
-				// initialBuilderState because we have transitioned to building from a
-				// new batch.
+				// We have transitioned to building from a new batch, so we
+				// need to update the builder state to build from the beginning
+				// of the new batch.
 				o.builderState.left.curSrcStartIdx = 0
 				o.builderState.left.numRepeatsIdx = 0
+				// We also need to update 'initialBuilderState' so that the
+				// builder state gets reset correctly in-between different
+				// columns in the loop above.
+				initialBuilderState = o.builderState.left
 			}
 			o.builderState.lBufferedGroupBatch = nil
 			o.builderState.left.reset()
