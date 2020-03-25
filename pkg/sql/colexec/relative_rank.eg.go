@@ -476,6 +476,9 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			// Then, we need to update the sizes of the partitions.
 			partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 			var runningPartitionsSizesCol []int64
+			if r.partitionsState.runningSizes != nil {
+				runningPartitionsSizesCol = r.partitionsState.runningSizes.ColVec(0).Int64()
+			}
 			if sel != nil {
 				for _, i := range sel[:n] {
 					if partitionCol[i] {
@@ -778,6 +781,9 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			// Next, we need to update the sizes of the peer groups.
 			peersCol := batch.ColVec(r.peersColIdx).Bool()
 			var runningPeerGroupsSizesCol []int64
+			if r.peerGroupsState.runningSizes != nil {
+				runningPeerGroupsSizesCol = r.peerGroupsState.runningSizes.ColVec(0).Int64()
+			}
 			if sel != nil {
 				for _, i := range sel[:n] {
 					if peersCol[i] {
@@ -1093,6 +1099,9 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			// Then, we need to update the sizes of the partitions.
 			partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 			var runningPartitionsSizesCol []int64
+			if r.partitionsState.runningSizes != nil {
+				runningPartitionsSizesCol = r.partitionsState.runningSizes.ColVec(0).Int64()
+			}
 			if sel != nil {
 				for _, i := range sel[:n] {
 					if partitionCol[i] {
@@ -1158,6 +1167,9 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			// Next, we need to update the sizes of the peer groups.
 			peersCol := batch.ColVec(r.peersColIdx).Bool()
 			var runningPeerGroupsSizesCol []int64
+			if r.peerGroupsState.runningSizes != nil {
+				runningPeerGroupsSizesCol = r.peerGroupsState.runningSizes.ColVec(0).Int64()
+			}
 			if sel != nil {
 				for _, i := range sel[:n] {
 					if peersCol[i] {
