@@ -146,7 +146,8 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -194,7 +195,8 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -244,7 +246,8 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -292,7 +295,8 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -427,7 +431,8 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -440,7 +445,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -469,7 +474,8 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -482,7 +488,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -511,7 +517,8 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -524,7 +531,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -553,7 +560,8 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -566,7 +574,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -680,7 +688,8 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -693,7 +702,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -720,7 +729,8 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -733,7 +743,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -762,7 +772,8 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -775,7 +786,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -802,7 +813,8 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -815,7 +827,7 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -929,7 +941,8 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -980,7 +993,8 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1033,7 +1047,8 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1084,7 +1099,8 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1222,7 +1238,8 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1273,7 +1290,8 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1326,7 +1344,8 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1377,7 +1396,8 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1515,7 +1535,8 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1566,7 +1587,8 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1619,7 +1641,8 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1670,7 +1693,8 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1808,7 +1832,8 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1867,7 +1892,8 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1928,7 +1954,8 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1987,7 +2014,8 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2133,7 +2161,8 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2180,7 +2209,8 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2229,7 +2259,8 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2276,7 +2307,8 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2410,7 +2442,8 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2450,7 +2483,8 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2492,7 +2526,8 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2532,7 +2567,8 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2684,7 +2720,8 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2732,7 +2769,8 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2782,7 +2820,8 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2830,7 +2869,8 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2965,7 +3005,8 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -2978,7 +3019,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -3007,7 +3048,8 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3020,7 +3062,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -3049,7 +3091,8 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3062,7 +3105,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -3091,7 +3134,8 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col.Get(i)
+								val := col.Get(i)
+								a.curAgg = append(a.curAgg[:0], val...)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3104,7 +3148,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = append(a.curAgg[:0], candidate...)
 								}
 							}
 						}
@@ -3218,7 +3262,8 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3231,7 +3276,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -3258,7 +3303,8 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3271,7 +3317,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -3300,7 +3346,8 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3313,7 +3360,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -3340,7 +3387,8 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg.Set(&val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3353,7 +3401,7 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg.Set(&candidate)
 								}
 							}
 						}
@@ -3467,7 +3515,8 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3518,7 +3567,8 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3571,7 +3621,8 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3622,7 +3673,8 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3760,7 +3812,8 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3811,7 +3864,8 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3864,7 +3918,8 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3915,7 +3970,8 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4053,7 +4109,8 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4104,7 +4161,8 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4157,7 +4215,8 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4208,7 +4267,8 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4346,7 +4406,8 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4405,7 +4466,8 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4466,7 +4528,8 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4525,7 +4588,8 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4671,7 +4735,8 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4718,7 +4783,8 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4767,7 +4833,8 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4814,7 +4881,8 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4948,7 +5016,8 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4988,7 +5057,8 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = nulls.NullAt(i)
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -5030,7 +5100,8 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -5070,7 +5141,8 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						isNull = false
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
-								a.curAgg = col[i]
+								val := col[i]
+								a.curAgg = val
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
