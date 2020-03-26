@@ -271,6 +271,7 @@ var KeywordsCategories = map[string]string{
 	"preceding":                 "U",
 	"precision":                 "C",
 	"prepare":                   "U",
+	"preserve":                  "U",
 	"primary":                   "R",
 	"priority":                  "U",
 	"public":                    "U",
@@ -687,6 +688,7 @@ var KeywordNames = []string{
 	"preceding",
 	"precision",
 	"prepare",
+	"preserve",
 	"primary",
 	"priority",
 	"public",
@@ -1376,6 +1378,8 @@ func GetKeywordID(k string) int32 {
 		return PRECISION
 	case "prepare":
 		return PREPARE
+	case "preserve":
+		return PRESERVE
 	case "primary":
 		return PRIMARY
 	case "priority":
