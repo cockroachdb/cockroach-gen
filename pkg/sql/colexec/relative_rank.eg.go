@@ -18,6 +18,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
 	"github.com/cockroachdb/cockroach/pkg/util/mon"
+	"github.com/cockroachdb/cockroach/pkg/util/syncutil"
 	"github.com/cockroachdb/errors"
 	"github.com/marusama/semaphore"
 )
@@ -118,8 +119,8 @@ const (
 
 type relativeRankInitFields struct {
 	rankInitFields
+	closerHelper
 
-	closed       bool
 	state        relativeRankState
 	memoryLimit  int64
 	diskQueueCfg colcontainer.DiskQueueCfg
@@ -151,6 +152,12 @@ const relativeRankUtilityQueueMemLimitFraction = 0.1
 
 type percentRankNoPartitionOp struct {
 	relativeRankInitFields
+
+	// mu is used to protect against concurrent IdempotentClose and Next calls,
+	// which are currently allowed.
+	// TODO(asubiotto): Explore calling IdempotentClose from the same goroutine as
+	//  Next, which will simplify this model.
+	mu syncutil.Mutex
 
 	// rank indicates which rank should be assigned to the next tuple.
 	rank int64
@@ -187,6 +194,8 @@ func (r *percentRankNoPartitionOp) Init() {
 }
 
 func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	var err error
 	for {
 		switch r.state {
@@ -316,7 +325,7 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(ctx); err != nil {
+			if err := r.idempotentCloseLocked(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -329,20 +338,31 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *percentRankNoPartitionOp) Close(ctx context.Context) error {
-	if r.closed {
+func (r *percentRankNoPartitionOp) IdempotentClose(ctx context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.idempotentCloseLocked(ctx)
+}
+
+func (r *percentRankNoPartitionOp) idempotentCloseLocked(ctx context.Context) error {
+	if !r.close() {
 		return nil
 	}
 	var lastErr error
 	if err := r.bufferedTuples.close(ctx); err != nil {
 		lastErr = err
 	}
-	r.closed = true
 	return lastErr
 }
 
 type percentRankWithPartitionOp struct {
 	relativeRankInitFields
+
+	// mu is used to protect against concurrent IdempotentClose and Next calls,
+	// which are currently allowed.
+	// TODO(asubiotto): Explore calling IdempotentClose from the same goroutine as
+	//  Next, which will simplify this model.
+	mu syncutil.Mutex
 
 	// rank indicates which rank should be assigned to the next tuple.
 	rank int64
@@ -386,6 +406,8 @@ func (r *percentRankWithPartitionOp) Init() {
 }
 
 func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	var err error
 	for {
 		switch r.state {
@@ -620,7 +642,7 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(ctx); err != nil {
+			if err := r.idempotentCloseLocked(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -633,8 +655,14 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *percentRankWithPartitionOp) Close(ctx context.Context) error {
-	if r.closed {
+func (r *percentRankWithPartitionOp) IdempotentClose(ctx context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.idempotentCloseLocked(ctx)
+}
+
+func (r *percentRankWithPartitionOp) idempotentCloseLocked(ctx context.Context) error {
+	if !r.close() {
 		return nil
 	}
 	var lastErr error
@@ -644,12 +672,17 @@ func (r *percentRankWithPartitionOp) Close(ctx context.Context) error {
 	if err := r.partitionsState.close(ctx); err != nil {
 		lastErr = err
 	}
-	r.closed = true
 	return lastErr
 }
 
 type cumeDistNoPartitionOp struct {
 	relativeRankInitFields
+
+	// mu is used to protect against concurrent IdempotentClose and Next calls,
+	// which are currently allowed.
+	// TODO(asubiotto): Explore calling IdempotentClose from the same goroutine as
+	//  Next, which will simplify this model.
+	mu syncutil.Mutex
 
 	peerGroupsState relativeRankSizesState
 	// numPrecedingTuples stores the number of tuples preceding to the first
@@ -689,6 +722,8 @@ func (r *cumeDistNoPartitionOp) Init() {
 }
 
 func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	var err error
 	for {
 		switch r.state {
@@ -915,7 +950,7 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(ctx); err != nil {
+			if err := r.idempotentCloseLocked(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -928,8 +963,14 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *cumeDistNoPartitionOp) Close(ctx context.Context) error {
-	if r.closed {
+func (r *cumeDistNoPartitionOp) IdempotentClose(ctx context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.idempotentCloseLocked(ctx)
+}
+
+func (r *cumeDistNoPartitionOp) idempotentCloseLocked(ctx context.Context) error {
+	if !r.close() {
 		return nil
 	}
 	var lastErr error
@@ -939,12 +980,17 @@ func (r *cumeDistNoPartitionOp) Close(ctx context.Context) error {
 	if err := r.peerGroupsState.close(ctx); err != nil {
 		lastErr = err
 	}
-	r.closed = true
 	return lastErr
 }
 
 type cumeDistWithPartitionOp struct {
 	relativeRankInitFields
+
+	// mu is used to protect against concurrent IdempotentClose and Next calls,
+	// which are currently allowed.
+	// TODO(asubiotto): Explore calling IdempotentClose from the same goroutine as
+	//  Next, which will simplify this model.
+	mu syncutil.Mutex
 
 	peerGroupsState relativeRankSizesState
 	// numPrecedingTuples stores the number of tuples preceding to the first
@@ -991,6 +1037,8 @@ func (r *cumeDistWithPartitionOp) Init() {
 }
 
 func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	var err error
 	for {
 		switch r.state {
@@ -1322,7 +1370,7 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			return r.output
 
 		case relativeRankFinished:
-			if err := r.Close(ctx); err != nil {
+			if err := r.idempotentCloseLocked(ctx); err != nil {
 				execerror.VectorizedInternalPanic(err)
 			}
 			return coldata.ZeroBatch
@@ -1335,8 +1383,14 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 }
 
-func (r *cumeDistWithPartitionOp) Close(ctx context.Context) error {
-	if r.closed {
+func (r *cumeDistWithPartitionOp) IdempotentClose(ctx context.Context) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.idempotentCloseLocked(ctx)
+}
+
+func (r *cumeDistWithPartitionOp) idempotentCloseLocked(ctx context.Context) error {
+	if !r.close() {
 		return nil
 	}
 	var lastErr error
@@ -1349,6 +1403,5 @@ func (r *cumeDistWithPartitionOp) Close(ctx context.Context) error {
 	if err := r.peerGroupsState.close(ctx); err != nil {
 		lastErr = err
 	}
-	r.closed = true
 	return lastErr
 }

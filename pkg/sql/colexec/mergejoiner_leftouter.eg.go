@@ -26,7 +26,7 @@ import (
 )
 
 type mergeJoinLeftOuterOp struct {
-	mergeJoinBase
+	*mergeJoinBase
 }
 
 var _ InternalMemoryOperator = &mergeJoinLeftOuterOp{}
@@ -36844,6 +36844,8 @@ func (o *mergeJoinLeftOuterOp) build(ctx context.Context) {
 }
 
 func (o *mergeJoinLeftOuterOp) Next(ctx context.Context) coldata.Batch {
+	o.mu.Lock()
+	defer o.mu.Unlock()
 	o.output.ResetInternalBatch()
 	for {
 		switch o.state {
