@@ -29390,11 +29390,15 @@ func (o *mergeJoinLeftSemiOp) Next(ctx context.Context) coldata.Batch {
 				return o.output
 			}
 		case mjDone:
-			if err := o.proberState.lBufferedGroup.close(ctx); err != nil {
-				execerror.VectorizedInternalPanic(err)
+			// Note that resetting of buffered groups will close disk queues
+			// (if there are any).
+			if o.proberState.lBufferedGroupNeedToReset {
+				o.proberState.lBufferedGroup.reset(ctx)
+				o.proberState.lBufferedGroupNeedToReset = false
 			}
-			if err := o.proberState.rBufferedGroup.close(ctx); err != nil {
-				execerror.VectorizedInternalPanic(err)
+			if o.proberState.rBufferedGroupNeedToReset {
+				o.proberState.rBufferedGroup.reset(ctx)
+				o.proberState.rBufferedGroupNeedToReset = false
 			}
 			return coldata.ZeroBatch
 		default:
