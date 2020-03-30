@@ -47,6 +47,7 @@ var KeywordsCategories = map[string]string{
 	"character":                 "C",
 	"characteristics":           "C",
 	"check":                     "R",
+	"close":                     "U",
 	"cluster":                   "U",
 	"coalesce":                  "C",
 	"collate":                   "R",
@@ -88,6 +89,7 @@ var KeywordsCategories = map[string]string{
 	"deallocate":                "U",
 	"dec":                       "C",
 	"decimal":                   "C",
+	"declare":                   "U",
 	"default":                   "R",
 	"deferrable":                "R",
 	"deferred":                  "U",
@@ -464,6 +466,7 @@ var KeywordNames = []string{
 	"character",
 	"characteristics",
 	"check",
+	"close",
 	"cluster",
 	"coalesce",
 	"collate",
@@ -505,6 +508,7 @@ var KeywordNames = []string{
 	"deallocate",
 	"dec",
 	"decimal",
+	"declare",
 	"default",
 	"deferrable",
 	"deferred",
@@ -930,6 +934,8 @@ func GetKeywordID(k string) int32 {
 		return CHARACTERISTICS
 	case "check":
 		return CHECK
+	case "close":
+		return CLOSE
 	case "cluster":
 		return CLUSTER
 	case "coalesce":
@@ -1012,6 +1018,8 @@ func GetKeywordID(k string) int32 {
 		return DEC
 	case "decimal":
 		return DECIMAL
+	case "declare":
+		return DECLARE
 	case "default":
 		return DEFAULT
 	case "deferrable":
