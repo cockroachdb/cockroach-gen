@@ -31,6 +31,7 @@ var reservedKeywords = map[string]struct{}{
 	"collate":           {},
 	"collation":         {},
 	"column":            {},
+	"concurrently":      {},
 	"constraint":        {},
 	"create":            {},
 	"cross":             {},
