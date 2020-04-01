@@ -158,6 +158,7 @@ var KeywordsCategories = map[string]string{
 	"immediate":                 "U",
 	"import":                    "U",
 	"in":                        "R",
+	"include":                   "U",
 	"increment":                 "U",
 	"incremental":               "U",
 	"index":                     "R",
@@ -578,6 +579,7 @@ var KeywordNames = []string{
 	"immediate",
 	"import",
 	"in",
+	"include",
 	"increment",
 	"incremental",
 	"index",
@@ -1158,6 +1160,8 @@ func GetKeywordID(k string) int32 {
 		return IMPORT
 	case "in":
 		return IN
+	case "include":
+		return INCLUDE
 	case "increment":
 		return INCREMENT
 	case "incremental":
