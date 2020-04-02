@@ -1153,21 +1153,13 @@ func IsEnforcerOp(e Expr) bool {
 }
 
 var TelemetryOperators = [...]Operator{
-	AntiJoinOp,
 	AntiJoinApplyOp,
 	DistinctOnOp,
-	FullJoinOp,
 	GroupByOp,
-	InnerJoinOp,
 	InnerJoinApplyOp,
-	LeftJoinOp,
 	LeftJoinApplyOp,
-	LookupJoinOp,
-	MergeJoinOp,
 	ProjectSetOp,
-	RightJoinOp,
 	ScalarGroupByOp,
-	SemiJoinOp,
 	SemiJoinApplyOp,
 	SortOp,
 	UpsertDistinctOnOp,
@@ -1176,10 +1168,9 @@ var TelemetryOperators = [...]Operator{
 
 func IsTelemetryOp(e Expr) bool {
 	switch e.Op() {
-	case AntiJoinOp, AntiJoinApplyOp, DistinctOnOp, FullJoinOp,
-		GroupByOp, InnerJoinOp, InnerJoinApplyOp, LeftJoinOp, LeftJoinApplyOp,
-		LookupJoinOp, MergeJoinOp, ProjectSetOp, RightJoinOp, ScalarGroupByOp,
-		SemiJoinOp, SemiJoinApplyOp, SortOp, UpsertDistinctOnOp, ZigzagJoinOp:
+	case AntiJoinApplyOp, DistinctOnOp, GroupByOp, InnerJoinApplyOp,
+		LeftJoinApplyOp, ProjectSetOp, ScalarGroupByOp, SemiJoinApplyOp, SortOp,
+		UpsertDistinctOnOp, ZigzagJoinOp:
 		return true
 	}
 	return false
