@@ -182,6 +182,7 @@ const (
 	EliminateExistsProject
 	EliminateExistsGroupBy
 	IntroduceExistsLimit
+	EliminateExistsLimit
 	NormalizeJSONFieldAccess
 	NormalizeJSONContains
 	SimplifyCaseWhenConstValue

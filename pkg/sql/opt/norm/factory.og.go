@@ -8721,23 +8721,47 @@ func (_f *Factory) ConstructExists(
 
 	// [IntroduceExistsLimit]
 	{
-		if !(input.Op() == opt.ProjectOp || input.Op() == opt.GroupByOp || input.Op() == opt.DistinctOnOp) {
-			if !_f.funcs.HasOuterCols(input) {
-				if !_f.funcs.HasZeroOrOneRow(input) {
-					if !_f.funcs.IsLimited(subqueryPrivate) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.IntroduceExistsLimit) {
-							_expr := _f.ConstructExists(
-								_f.ConstructLimit(
-									input,
-									_f.ConstructConst(
-										tree.NewDInt(1),
-									),
-									_f.funcs.EmptyOrdering(),
+		if !_f.funcs.HasOuterCols(input) {
+			if !_f.funcs.HasZeroOrOneRow(input) {
+				if !_f.funcs.IsLimited(subqueryPrivate) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.IntroduceExistsLimit) {
+						_expr := _f.ConstructExists(
+							_f.ConstructLimit(
+								input,
+								_f.ConstructConst(
+									tree.NewDInt(1),
 								),
-								_f.funcs.MakeLimited(subqueryPrivate),
+								_f.funcs.EmptyOrdering(),
+							),
+							_f.funcs.MakeLimited(subqueryPrivate),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.IntroduceExistsLimit, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateExistsLimit]
+	{
+		_limit, _ := input.(*memo.LimitExpr)
+		if _limit != nil {
+			input := _limit.Input
+			if _f.funcs.HasOuterCols(input) {
+				_const, _ := _limit.Limit.(*memo.ConstExpr)
+				if _const != nil {
+					limit := _const.Value
+					if _f.funcs.IsPositiveLimit(limit) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsLimit) {
+							_expr := _f.ConstructExists(
+								input,
+								subqueryPrivate,
 							)
 							if _f.appliedRule != nil {
-								_f.appliedRule(opt.IntroduceExistsLimit, nil, _expr)
+								_f.appliedRule(opt.EliminateExistsLimit, nil, _expr)
 							}
 							return _expr
 						}
