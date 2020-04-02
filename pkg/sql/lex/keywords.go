@@ -294,6 +294,7 @@ var KeywordsCategories = map[string]string{
 	"regproc":                   "U",
 	"regprocedure":              "U",
 	"regtype":                   "U",
+	"reindex":                   "U",
 	"release":                   "U",
 	"rename":                    "U",
 	"repeatable":                "U",
@@ -715,6 +716,7 @@ var KeywordNames = []string{
 	"regproc",
 	"regprocedure",
 	"regtype",
+	"reindex",
 	"release",
 	"rename",
 	"repeatable",
@@ -1432,6 +1434,8 @@ func GetKeywordID(k string) int32 {
 		return REGPROCEDURE
 	case "regtype":
 		return REGTYPE
+	case "reindex":
+		return REINDEX
 	case "release":
 		return RELEASE
 	case "rename":
