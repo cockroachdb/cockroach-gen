@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 )
 
 type selPrefixBytesBytesConstOp struct {
@@ -123,7 +122,6 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -294,7 +292,6 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -465,7 +462,6 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -636,7 +632,6 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -807,7 +802,6 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
@@ -978,7 +972,6 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	p.allocator.MaybeAddColumn(batch, coltypes.Bool, p.outputIdx)
 	vec := batch.ColVec(p.colIdx)
 	col := vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)

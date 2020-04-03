@@ -47,6 +47,7 @@ func NewWindowPeerGrouper(
 			return nil, err
 		}
 	}
+	input = newVectorTypeEnforcer(allocator, input, coltypes.Bool, outputColIdx)
 	initFields := windowPeerGrouperInitFields{
 		OneInputNode:    NewOneInputNode(input),
 		allocator:       allocator,
@@ -102,7 +103,6 @@ func (p *windowPeerGrouperNoPartitionOp) Next(ctx context.Context) coldata.Batch
 	if n == 0 {
 		return b
 	}
-	p.allocator.MaybeAddColumn(b, coltypes.Bool, p.outputColIdx)
 	sel := b.Selection()
 	peersVec := b.ColVec(p.outputColIdx).Bool()
 	if sel != nil {
@@ -136,7 +136,6 @@ func (p *windowPeerGrouperWithPartitionOp) Next(ctx context.Context) coldata.Bat
 	if n == 0 {
 		return b
 	}
-	p.allocator.MaybeAddColumn(b, coltypes.Bool, p.outputColIdx)
 	partitionCol := b.ColVec(p.partitionColIdx).Bool()
 	sel := b.Selection()
 	peersVec := b.ColVec(p.outputColIdx).Bool()
@@ -175,7 +174,6 @@ func (p *windowPeerGrouperAllPeersNoPartitionOp) Next(ctx context.Context) colda
 	if n == 0 {
 		return b
 	}
-	p.allocator.MaybeAddColumn(b, coltypes.Bool, p.outputColIdx)
 	sel := b.Selection()
 	peersVec := b.ColVec(p.outputColIdx).Bool()
 	if sel != nil {
@@ -211,7 +209,6 @@ func (p *windowPeerGrouperAllPeersWithPartitionOp) Next(ctx context.Context) col
 	if n == 0 {
 		return b
 	}
-	p.allocator.MaybeAddColumn(b, coltypes.Bool, p.outputColIdx)
 	partitionCol := b.ColVec(p.partitionColIdx).Bool()
 	sel := b.Selection()
 	peersVec := b.ColVec(p.outputColIdx).Bool()

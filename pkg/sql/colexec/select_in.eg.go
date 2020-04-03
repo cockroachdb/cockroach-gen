@@ -43,6 +43,7 @@ func GetInProjectionOperator(
 	datumTuple *tree.DTuple,
 	negate bool,
 ) (Operator, error) {
+	input = newVectorTypeEnforcer(allocator, input, coltypes.Bool, resultIdx)
 	var err error
 	switch t := typeconv.FromColumnType(ct); t {
 	case coltypes.Bool:
@@ -428,7 +429,6 @@ func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Bool()
@@ -653,7 +653,6 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Bytes()
@@ -878,7 +877,6 @@ func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Decimal()
@@ -1110,7 +1108,6 @@ func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Int16()
@@ -1342,7 +1339,6 @@ func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Int32()
@@ -1574,7 +1570,6 @@ func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Int64()
@@ -1814,7 +1809,6 @@ func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Float64()
@@ -2042,7 +2036,6 @@ func (pi *projectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Timestamp()
@@ -2263,7 +2256,6 @@ func (pi *projectInOpInterval) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	pi.allocator.MaybeAddColumn(batch, coltypes.Bool, pi.outputIdx)
 
 	vec := batch.ColVec(pi.colIdx)
 	col := vec.Interval()

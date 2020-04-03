@@ -101,7 +101,6 @@ func (s *substringInt16Int16Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -177,7 +176,6 @@ func (s *substringInt16Int32Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -253,7 +251,6 @@ func (s *substringInt16Int64Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -329,7 +326,6 @@ func (s *substringInt32Int16Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -405,7 +401,6 @@ func (s *substringInt32Int32Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -481,7 +476,6 @@ func (s *substringInt32Int64Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -557,7 +551,6 @@ func (s *substringInt64Int16Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -633,7 +626,6 @@ func (s *substringInt64Int32Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()
@@ -709,7 +701,6 @@ func (s *substringInt64Int64Operator) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	s.allocator.MaybeAddColumn(batch, coltypes.Bytes, s.outputIdx)
 
 	sel := batch.Selection()
 	runeVec := batch.ColVec(s.argumentCols[0]).Bytes()

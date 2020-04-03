@@ -1762,18 +1762,19 @@ func GetCastOperator(
 	fromType *semtypes.T,
 	toType *semtypes.T,
 ) (Operator, error) {
+	to := typeconv.FromColumnType(toType)
+	input = newVectorTypeEnforcer(allocator, input, to, resultIdx)
 	if fromType.Family() == semtypes.UnknownFamily {
 		return &castOpNullAny{
 			OneInputNode: NewOneInputNode(input),
 			allocator:    allocator,
 			colIdx:       colIdx,
 			outputIdx:    resultIdx,
-			toType:       typeconv.FromColumnType(toType),
 		}, nil
 	}
 	switch from := typeconv.FromColumnType(fromType); from {
 	case coltypes.Bool:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
@@ -1823,12 +1824,12 @@ func GetCastOperator(
 			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
 		}
 	case coltypes.Bytes:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		default:
 			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
 		}
 	case coltypes.Decimal:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
@@ -1851,7 +1852,7 @@ func GetCastOperator(
 			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
 		}
 	case coltypes.Int16:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
@@ -1910,7 +1911,7 @@ func GetCastOperator(
 			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
 		}
 	case coltypes.Int32:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
@@ -1960,7 +1961,7 @@ func GetCastOperator(
 			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
 		}
 	case coltypes.Int64:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
@@ -2001,7 +2002,7 @@ func GetCastOperator(
 			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
 		}
 	case coltypes.Float64:
-		switch to := typeconv.FromColumnType(toType); to {
+		switch to {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
@@ -2069,7 +2070,6 @@ type castOpNullAny struct {
 	allocator *Allocator
 	colIdx    int
 	outputIdx int
-	toType    coltypes.T
 }
 
 var _ Operator = &castOpNullAny{}
@@ -2084,7 +2084,6 @@ func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	c.allocator.MaybeAddColumn(batch, c.toType, c.outputIdx)
 	vec := batch.ColVec(c.colIdx)
 	projVec := batch.ColVec(c.outputIdx)
 	vecNulls := vec.Nulls()
@@ -2131,7 +2130,6 @@ func (c *castOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	c.allocator.MaybeAddColumn(batch, c.toType, c.outputIdx)
 	vec := batch.ColVec(c.colIdx)
 	projVec := batch.ColVec(c.outputIdx)
 	c.allocator.PerformOperation(

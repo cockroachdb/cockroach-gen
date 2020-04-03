@@ -24,6 +24,7 @@ import (
 func NewRowNumberOperator(
 	allocator *Allocator, input Operator, outputColIdx int, partitionColIdx int,
 ) Operator {
+	input = newVectorTypeEnforcer(allocator, input, coltypes.Int64, outputColIdx)
 	base := rowNumberBase{
 		OneInputNode:    NewOneInputNode(input),
 		allocator:       allocator,
@@ -63,7 +64,6 @@ func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -92,8 +92,6 @@ func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	if batch.Length() == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Bool, r.partitionColIdx)
-	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	rowNumberCol := batch.ColVec(r.outputColIdx).Int64()

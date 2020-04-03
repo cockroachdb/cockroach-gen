@@ -14,7 +14,6 @@ import (
 	"fmt"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfra"
 )
@@ -100,7 +99,6 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	if origLen == 0 {
 		return coldata.ZeroBatch
 	}
-	o.allocator.MaybeAddColumn(batch, coltypes.Bool, o.outputIdx)
 	usesSel := false
 	if sel := batch.Selection(); sel != nil {
 		copy(o.origSel[:origLen], sel[:origLen])
@@ -531,7 +529,6 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	if origLen == 0 {
 		return coldata.ZeroBatch
 	}
-	o.allocator.MaybeAddColumn(batch, coltypes.Bool, o.outputIdx)
 	usesSel := false
 	if sel := batch.Selection(); sel != nil {
 		copy(o.origSel[:origLen], sel[:origLen])

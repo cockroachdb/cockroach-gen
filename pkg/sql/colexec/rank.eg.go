@@ -36,6 +36,7 @@ func NewRankOperator(
 	if len(orderingCols) == 0 {
 		return NewConstOp(allocator, input, coltypes.Int64, int64(1), outputColIdx)
 	}
+	input = newVectorTypeEnforcer(allocator, input, coltypes.Int64, outputColIdx)
 	initFields := rankInitFields{
 		OneInputNode:    NewOneInputNode(input),
 		allocator:       allocator,
@@ -95,7 +96,6 @@ func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -153,7 +153,6 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
@@ -224,7 +223,6 @@ func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
 	sel := batch.Selection()
@@ -280,7 +278,6 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	if n == 0 {
 		return coldata.ZeroBatch
 	}
-	r.allocator.MaybeAddColumn(batch, coltypes.Int64, r.outputColIdx)
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
 	rankCol := batch.ColVec(r.outputColIdx).Int64()
