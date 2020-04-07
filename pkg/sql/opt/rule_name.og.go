@@ -205,9 +205,9 @@ const (
 	RemoveNotNullCondition
 	InlineConstVar
 	PushSelectIntoProjectSet
+	PushFilterIntoSetOp
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
-	PushFilterIntoSetOp
 	EliminateWindow
 	ReduceWindowPartitionCols
 	SimplifyWindowOrdering
