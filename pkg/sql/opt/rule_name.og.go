@@ -241,6 +241,7 @@ const (
 	GenerateIndexScans
 	GenerateConstrainedScans
 	GenerateInvertedIndexScans
+	GenerateUnionSelects
 
 	// NumRuleNames tracks the total count of rule names.
 	NumRuleNames
