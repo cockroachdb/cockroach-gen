@@ -138,6 +138,9 @@ var KeywordsCategories = map[string]string{
 	"from":                      "R",
 	"full":                      "T",
 	"function":                  "U",
+	"geography":                 "C",
+	"geometry":                  "C",
+	"geometrycollection":        "U",
 	"global":                    "U",
 	"grant":                     "R",
 	"grants":                    "U",
@@ -205,6 +208,7 @@ var KeywordsCategories = map[string]string{
 	"level":                     "U",
 	"like":                      "T",
 	"limit":                     "R",
+	"linestring":                "U",
 	"list":                      "U",
 	"local":                     "U",
 	"localtime":                 "R",
@@ -220,6 +224,9 @@ var KeywordsCategories = map[string]string{
 	"minute":                    "U",
 	"minvalue":                  "U",
 	"month":                     "U",
+	"multilinestring":           "U",
+	"multipoint":                "U",
+	"multipolygon":              "U",
 	"name":                      "U",
 	"names":                     "U",
 	"nan":                       "U",
@@ -271,6 +278,8 @@ var KeywordsCategories = map[string]string{
 	"placing":                   "R",
 	"plan":                      "U",
 	"plans":                     "U",
+	"point":                     "C",
+	"polygon":                   "C",
 	"position":                  "C",
 	"preceding":                 "U",
 	"precision":                 "C",
@@ -560,6 +569,9 @@ var KeywordNames = []string{
 	"from",
 	"full",
 	"function",
+	"geography",
+	"geometry",
+	"geometrycollection",
 	"global",
 	"grant",
 	"grants",
@@ -627,6 +639,7 @@ var KeywordNames = []string{
 	"level",
 	"like",
 	"limit",
+	"linestring",
 	"list",
 	"local",
 	"localtime",
@@ -642,6 +655,9 @@ var KeywordNames = []string{
 	"minute",
 	"minvalue",
 	"month",
+	"multilinestring",
+	"multipoint",
+	"multipolygon",
 	"name",
 	"names",
 	"nan",
@@ -693,6 +709,8 @@ var KeywordNames = []string{
 	"placing",
 	"plan",
 	"plans",
+	"point",
+	"polygon",
 	"position",
 	"preceding",
 	"precision",
@@ -1122,6 +1140,12 @@ func GetKeywordID(k string) int32 {
 		return FULL
 	case "function":
 		return FUNCTION
+	case "geography":
+		return GEOGRAPHY
+	case "geometry":
+		return GEOMETRY
+	case "geometrycollection":
+		return GEOMETRYCOLLECTION
 	case "global":
 		return GLOBAL
 	case "grant":
@@ -1256,6 +1280,8 @@ func GetKeywordID(k string) int32 {
 		return LIKE
 	case "limit":
 		return LIMIT
+	case "linestring":
+		return LINESTRING
 	case "list":
 		return LIST
 	case "local":
@@ -1286,6 +1312,12 @@ func GetKeywordID(k string) int32 {
 		return MINVALUE
 	case "month":
 		return MONTH
+	case "multilinestring":
+		return MULTILINESTRING
+	case "multipoint":
+		return MULTIPOINT
+	case "multipolygon":
+		return MULTIPOLYGON
 	case "name":
 		return NAME
 	case "names":
@@ -1388,6 +1420,10 @@ func GetKeywordID(k string) int32 {
 		return PLAN
 	case "plans":
 		return PLANS
+	case "point":
+		return POINT
+	case "polygon":
+		return POLYGON
 	case "position":
 		return POSITION
 	case "preceding":
