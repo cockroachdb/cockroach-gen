@@ -10,6 +10,7 @@ var KeywordsCategories = map[string]string{
 	"aggregate":                 "U",
 	"all":                       "R",
 	"alter":                     "U",
+	"always":                    "U",
 	"analyse":                   "R",
 	"analyze":                   "R",
 	"and":                       "R",
@@ -55,6 +56,7 @@ var KeywordsCategories = map[string]string{
 	"column":                    "R",
 	"columns":                   "U",
 	"comment":                   "U",
+	"comments":                  "U",
 	"commit":                    "U",
 	"committed":                 "U",
 	"compact":                   "U",
@@ -92,6 +94,7 @@ var KeywordsCategories = map[string]string{
 	"decimal":                   "C",
 	"declare":                   "U",
 	"default":                   "R",
+	"defaults":                  "U",
 	"deferrable":                "R",
 	"deferred":                  "U",
 	"delete":                    "U",
@@ -109,6 +112,7 @@ var KeywordsCategories = map[string]string{
 	"escape":                    "U",
 	"except":                    "R",
 	"exclude":                   "U",
+	"excluding":                 "U",
 	"execute":                   "U",
 	"exists":                    "C",
 	"experimental":              "U",
@@ -138,6 +142,7 @@ var KeywordsCategories = map[string]string{
 	"from":                      "R",
 	"full":                      "T",
 	"function":                  "U",
+	"generated":                 "U",
 	"geography":                 "C",
 	"geometry":                  "C",
 	"geometrycollection":        "U",
@@ -153,6 +158,7 @@ var KeywordsCategories = map[string]string{
 	"high":                      "U",
 	"histogram":                 "U",
 	"hour":                      "U",
+	"identity":                  "U",
 	"if":                        "C",
 	"iferror":                   "C",
 	"ifnull":                    "C",
@@ -162,6 +168,7 @@ var KeywordsCategories = map[string]string{
 	"import":                    "U",
 	"in":                        "R",
 	"include":                   "U",
+	"including":                 "U",
 	"increment":                 "U",
 	"incremental":               "U",
 	"index":                     "R",
@@ -359,6 +366,7 @@ var KeywordsCategories = map[string]string{
 	"statistics":                "U",
 	"status":                    "U",
 	"stdin":                     "U",
+	"storage":                   "U",
 	"store":                     "U",
 	"stored":                    "U",
 	"storing":                   "U",
@@ -441,6 +449,7 @@ var KeywordNames = []string{
 	"aggregate",
 	"all",
 	"alter",
+	"always",
 	"analyse",
 	"analyze",
 	"and",
@@ -486,6 +495,7 @@ var KeywordNames = []string{
 	"column",
 	"columns",
 	"comment",
+	"comments",
 	"commit",
 	"committed",
 	"compact",
@@ -523,6 +533,7 @@ var KeywordNames = []string{
 	"decimal",
 	"declare",
 	"default",
+	"defaults",
 	"deferrable",
 	"deferred",
 	"delete",
@@ -540,6 +551,7 @@ var KeywordNames = []string{
 	"escape",
 	"except",
 	"exclude",
+	"excluding",
 	"execute",
 	"exists",
 	"experimental",
@@ -569,6 +581,7 @@ var KeywordNames = []string{
 	"from",
 	"full",
 	"function",
+	"generated",
 	"geography",
 	"geometry",
 	"geometrycollection",
@@ -584,6 +597,7 @@ var KeywordNames = []string{
 	"high",
 	"histogram",
 	"hour",
+	"identity",
 	"if",
 	"iferror",
 	"ifnull",
@@ -593,6 +607,7 @@ var KeywordNames = []string{
 	"import",
 	"in",
 	"include",
+	"including",
 	"increment",
 	"incremental",
 	"index",
@@ -790,6 +805,7 @@ var KeywordNames = []string{
 	"statistics",
 	"status",
 	"stdin",
+	"storage",
 	"store",
 	"stored",
 	"storing",
@@ -884,6 +900,8 @@ func GetKeywordID(k string) int32 {
 		return ALL
 	case "alter":
 		return ALTER
+	case "always":
+		return ALWAYS
 	case "analyse":
 		return ANALYSE
 	case "analyze":
@@ -974,6 +992,8 @@ func GetKeywordID(k string) int32 {
 		return COLUMNS
 	case "comment":
 		return COMMENT
+	case "comments":
+		return COMMENTS
 	case "commit":
 		return COMMIT
 	case "committed":
@@ -1048,6 +1068,8 @@ func GetKeywordID(k string) int32 {
 		return DECLARE
 	case "default":
 		return DEFAULT
+	case "defaults":
+		return DEFAULTS
 	case "deferrable":
 		return DEFERRABLE
 	case "deferred":
@@ -1082,6 +1104,8 @@ func GetKeywordID(k string) int32 {
 		return EXCEPT
 	case "exclude":
 		return EXCLUDE
+	case "excluding":
+		return EXCLUDING
 	case "execute":
 		return EXECUTE
 	case "exists":
@@ -1140,6 +1164,8 @@ func GetKeywordID(k string) int32 {
 		return FULL
 	case "function":
 		return FUNCTION
+	case "generated":
+		return GENERATED
 	case "geography":
 		return GEOGRAPHY
 	case "geometry":
@@ -1170,6 +1196,8 @@ func GetKeywordID(k string) int32 {
 		return HISTOGRAM
 	case "hour":
 		return HOUR
+	case "identity":
+		return IDENTITY
 	case "if":
 		return IF
 	case "iferror":
@@ -1188,6 +1216,8 @@ func GetKeywordID(k string) int32 {
 		return IN
 	case "include":
 		return INCLUDE
+	case "including":
+		return INCLUDING
 	case "increment":
 		return INCREMENT
 	case "incremental":
@@ -1582,6 +1612,8 @@ func GetKeywordID(k string) int32 {
 		return STATUS
 	case "stdin":
 		return STDIN
+	case "storage":
+		return STORAGE
 	case "store":
 		return STORE
 	case "stored":
