@@ -263,27 +263,31 @@ func (_e *explorer) exploreSelect(
 									left := _or.Left
 									right := _or.Right
 									if !_e.funcs.ColsAreEqual(_e.funcs.ExprOuterCols(left), _e.funcs.ExprOuterCols(right)) {
-										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateUnionSelects) {
-											rightScan := _e.funcs.DuplicateScanPrivate(scanPrivate)
-											_expr := &memo.UnionExpr{
-												Left: _e.f.ConstructSelect(
-													input,
-													_e.funcs.ReplaceFiltersItem(filters, item, left),
-												),
-												Right: _e.f.ConstructSelect(
-													_e.f.ConstructScan(
-														rightScan,
-													),
-													_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, right), scanPrivate, rightScan),
-												),
-												SetPrivate: *_e.funcs.MakeSetPrivateForUnionSelects(scanPrivate, rightScan, scanPrivate),
-											}
-											_interned := _e.mem.AddUnionToGroup(_expr, _root)
-											if _e.o.appliedRule != nil {
-												if _interned != _expr {
-													_e.o.appliedRule(opt.GenerateUnionSelects, _root, nil)
-												} else {
-													_e.o.appliedRule(opt.GenerateUnionSelects, _root, _interned)
+										if _e.funcs.CanMaybeConstrainIndexWithExpr(scanPrivate, left) {
+											if _e.funcs.CanMaybeConstrainIndexWithExpr(scanPrivate, right) {
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateUnionSelects) {
+													rightScan := _e.funcs.DuplicateScanPrivate(scanPrivate)
+													_expr := &memo.UnionExpr{
+														Left: _e.f.ConstructSelect(
+															input,
+															_e.funcs.ReplaceFiltersItem(filters, item, left),
+														),
+														Right: _e.f.ConstructSelect(
+															_e.f.ConstructScan(
+																rightScan,
+															),
+															_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, right), scanPrivate, rightScan),
+														),
+														SetPrivate: *_e.funcs.MakeSetPrivateForUnionSelects(scanPrivate, rightScan, scanPrivate),
+													}
+													_interned := _e.mem.AddUnionToGroup(_expr, _root)
+													if _e.o.appliedRule != nil {
+														if _interned != _expr {
+															_e.o.appliedRule(opt.GenerateUnionSelects, _root, nil)
+														} else {
+															_e.o.appliedRule(opt.GenerateUnionSelects, _root, _interned)
+														}
+													}
 												}
 											}
 										}
