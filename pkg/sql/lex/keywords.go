@@ -27,17 +27,12 @@ var KeywordsCategories = map[string]string{
 	"begin":                     "U",
 	"between":                   "C",
 	"bigint":                    "C",
-	"bigserial":                 "U",
 	"bit":                       "C",
-	"blob":                      "U",
-	"bool":                      "U",
 	"boolean":                   "C",
 	"both":                      "R",
 	"bucket_count":              "U",
 	"bundle":                    "U",
 	"by":                        "U",
-	"bytea":                     "U",
-	"bytes":                     "U",
 	"cache":                     "U",
 	"cancel":                    "U",
 	"cascade":                   "U",
@@ -87,7 +82,6 @@ var KeywordsCategories = map[string]string{
 	"data":                      "U",
 	"database":                  "U",
 	"databases":                 "U",
-	"date":                      "U",
 	"day":                       "U",
 	"deallocate":                "U",
 	"dec":                       "C",
@@ -133,8 +127,6 @@ var KeywordsCategories = map[string]string{
 	"filter":                    "U",
 	"first":                     "U",
 	"float":                     "C",
-	"float4":                    "U",
-	"float8":                    "U",
 	"following":                 "U",
 	"for":                       "R",
 	"force_index":               "U",
@@ -173,17 +165,11 @@ var KeywordsCategories = map[string]string{
 	"incremental":               "U",
 	"index":                     "R",
 	"indexes":                   "U",
-	"inet":                      "U",
 	"initially":                 "R",
 	"inject":                    "U",
 	"inner":                     "T",
 	"insert":                    "U",
 	"int":                       "C",
-	"int2":                      "U",
-	"int2vector":                "U",
-	"int4":                      "U",
-	"int64":                     "U",
-	"int8":                      "U",
 	"integer":                   "C",
 	"interleave":                "U",
 	"intersect":                 "R",
@@ -198,7 +184,6 @@ var KeywordsCategories = map[string]string{
 	"jobs":                      "U",
 	"join":                      "T",
 	"json":                      "U",
-	"jsonb":                     "U",
 	"key":                       "U",
 	"keys":                      "U",
 	"kv":                        "U",
@@ -234,7 +219,6 @@ var KeywordsCategories = map[string]string{
 	"multilinestring":           "U",
 	"multipoint":                "U",
 	"multipolygon":              "U",
-	"name":                      "U",
 	"names":                     "U",
 	"nan":                       "U",
 	"natural":                   "T",
@@ -256,9 +240,7 @@ var KeywordsCategories = map[string]string{
 	"of":                        "U",
 	"off":                       "U",
 	"offset":                    "R",
-	"oid":                       "U",
 	"oids":                      "U",
-	"oidvector":                 "U",
 	"on":                        "R",
 	"only":                      "R",
 	"operator":                  "U",
@@ -305,11 +287,6 @@ var KeywordsCategories = map[string]string{
 	"recursive":                 "U",
 	"ref":                       "U",
 	"references":                "R",
-	"regclass":                  "U",
-	"regnamespace":              "U",
-	"regproc":                   "U",
-	"regprocedure":              "U",
-	"regtype":                   "U",
 	"reindex":                   "U",
 	"release":                   "U",
 	"rename":                    "U",
@@ -339,10 +316,6 @@ var KeywordsCategories = map[string]string{
 	"select":                    "R",
 	"sequence":                  "U",
 	"sequences":                 "U",
-	"serial":                    "U",
-	"serial2":                   "U",
-	"serial4":                   "U",
-	"serial8":                   "U",
 	"serializable":              "U",
 	"server":                    "U",
 	"session":                   "U",
@@ -357,7 +330,6 @@ var KeywordsCategories = map[string]string{
 	"simple":                    "U",
 	"skip":                      "U",
 	"smallint":                  "C",
-	"smallserial":               "U",
 	"snapshot":                  "U",
 	"some":                      "R",
 	"split":                     "U",
@@ -371,7 +343,7 @@ var KeywordsCategories = map[string]string{
 	"stored":                    "U",
 	"storing":                   "U",
 	"strict":                    "U",
-	"string":                    "U",
+	"string":                    "C",
 	"subscription":              "U",
 	"substring":                 "C",
 	"symmetric":                 "R",
@@ -416,7 +388,6 @@ var KeywordsCategories = map[string]string{
 	"user":                      "R",
 	"users":                     "U",
 	"using":                     "R",
-	"uuid":                      "U",
 	"valid":                     "U",
 	"validate":                  "U",
 	"value":                     "U",
@@ -466,17 +437,12 @@ var KeywordNames = []string{
 	"begin",
 	"between",
 	"bigint",
-	"bigserial",
 	"bit",
-	"blob",
-	"bool",
 	"boolean",
 	"both",
 	"bucket_count",
 	"bundle",
 	"by",
-	"bytea",
-	"bytes",
 	"cache",
 	"cancel",
 	"cascade",
@@ -526,7 +492,6 @@ var KeywordNames = []string{
 	"data",
 	"database",
 	"databases",
-	"date",
 	"day",
 	"deallocate",
 	"dec",
@@ -572,8 +537,6 @@ var KeywordNames = []string{
 	"filter",
 	"first",
 	"float",
-	"float4",
-	"float8",
 	"following",
 	"for",
 	"force_index",
@@ -612,17 +575,11 @@ var KeywordNames = []string{
 	"incremental",
 	"index",
 	"indexes",
-	"inet",
 	"initially",
 	"inject",
 	"inner",
 	"insert",
 	"int",
-	"int2",
-	"int2vector",
-	"int4",
-	"int64",
-	"int8",
 	"integer",
 	"interleave",
 	"intersect",
@@ -637,7 +594,6 @@ var KeywordNames = []string{
 	"jobs",
 	"join",
 	"json",
-	"jsonb",
 	"key",
 	"keys",
 	"kv",
@@ -673,7 +629,6 @@ var KeywordNames = []string{
 	"multilinestring",
 	"multipoint",
 	"multipolygon",
-	"name",
 	"names",
 	"nan",
 	"natural",
@@ -695,9 +650,7 @@ var KeywordNames = []string{
 	"of",
 	"off",
 	"offset",
-	"oid",
 	"oids",
-	"oidvector",
 	"on",
 	"only",
 	"operator",
@@ -744,11 +697,6 @@ var KeywordNames = []string{
 	"recursive",
 	"ref",
 	"references",
-	"regclass",
-	"regnamespace",
-	"regproc",
-	"regprocedure",
-	"regtype",
 	"reindex",
 	"release",
 	"rename",
@@ -778,10 +726,6 @@ var KeywordNames = []string{
 	"select",
 	"sequence",
 	"sequences",
-	"serial",
-	"serial2",
-	"serial4",
-	"serial8",
 	"serializable",
 	"server",
 	"session",
@@ -796,7 +740,6 @@ var KeywordNames = []string{
 	"simple",
 	"skip",
 	"smallint",
-	"smallserial",
 	"snapshot",
 	"some",
 	"split",
@@ -855,7 +798,6 @@ var KeywordNames = []string{
 	"user",
 	"users",
 	"using",
-	"uuid",
 	"valid",
 	"validate",
 	"value",
@@ -934,14 +876,8 @@ func GetKeywordID(k string) int32 {
 		return BETWEEN
 	case "bigint":
 		return BIGINT
-	case "bigserial":
-		return BIGSERIAL
 	case "bit":
 		return BIT
-	case "blob":
-		return BLOB
-	case "bool":
-		return BOOL
 	case "boolean":
 		return BOOLEAN
 	case "both":
@@ -952,10 +888,6 @@ func GetKeywordID(k string) int32 {
 		return BUNDLE
 	case "by":
 		return BY
-	case "bytea":
-		return BYTEA
-	case "bytes":
-		return BYTES
 	case "cache":
 		return CACHE
 	case "cancel":
@@ -1054,8 +986,6 @@ func GetKeywordID(k string) int32 {
 		return DATABASE
 	case "databases":
 		return DATABASES
-	case "date":
-		return DATE
 	case "day":
 		return DAY
 	case "deallocate":
@@ -1146,10 +1076,6 @@ func GetKeywordID(k string) int32 {
 		return FIRST
 	case "float":
 		return FLOAT
-	case "float4":
-		return FLOAT4
-	case "float8":
-		return FLOAT8
 	case "following":
 		return FOLLOWING
 	case "for":
@@ -1226,8 +1152,6 @@ func GetKeywordID(k string) int32 {
 		return INDEX
 	case "indexes":
 		return INDEXES
-	case "inet":
-		return INET
 	case "initially":
 		return INITIALLY
 	case "inject":
@@ -1238,16 +1162,6 @@ func GetKeywordID(k string) int32 {
 		return INSERT
 	case "int":
 		return INT
-	case "int2":
-		return INT2
-	case "int2vector":
-		return INT2VECTOR
-	case "int4":
-		return INT4
-	case "int64":
-		return INT64
-	case "int8":
-		return INT8
 	case "integer":
 		return INTEGER
 	case "interleave":
@@ -1276,8 +1190,6 @@ func GetKeywordID(k string) int32 {
 		return JOIN
 	case "json":
 		return JSON
-	case "jsonb":
-		return JSONB
 	case "key":
 		return KEY
 	case "keys":
@@ -1348,8 +1260,6 @@ func GetKeywordID(k string) int32 {
 		return MULTIPOINT
 	case "multipolygon":
 		return MULTIPOLYGON
-	case "name":
-		return NAME
 	case "names":
 		return NAMES
 	case "nan":
@@ -1392,12 +1302,8 @@ func GetKeywordID(k string) int32 {
 		return OFF
 	case "offset":
 		return OFFSET
-	case "oid":
-		return OID
 	case "oids":
 		return OIDS
-	case "oidvector":
-		return OIDVECTOR
 	case "on":
 		return ON
 	case "only":
@@ -1490,16 +1396,6 @@ func GetKeywordID(k string) int32 {
 		return REF
 	case "references":
 		return REFERENCES
-	case "regclass":
-		return REGCLASS
-	case "regnamespace":
-		return REGNAMESPACE
-	case "regproc":
-		return REGPROC
-	case "regprocedure":
-		return REGPROCEDURE
-	case "regtype":
-		return REGTYPE
 	case "reindex":
 		return REINDEX
 	case "release":
@@ -1558,14 +1454,6 @@ func GetKeywordID(k string) int32 {
 		return SEQUENCE
 	case "sequences":
 		return SEQUENCES
-	case "serial":
-		return SERIAL
-	case "serial2":
-		return SERIAL2
-	case "serial4":
-		return SERIAL4
-	case "serial8":
-		return SERIAL8
 	case "serializable":
 		return SERIALIZABLE
 	case "server":
@@ -1594,8 +1482,6 @@ func GetKeywordID(k string) int32 {
 		return SKIP
 	case "smallint":
 		return SMALLINT
-	case "smallserial":
-		return SMALLSERIAL
 	case "snapshot":
 		return SNAPSHOT
 	case "some":
@@ -1712,8 +1598,6 @@ func GetKeywordID(k string) int32 {
 		return USERS
 	case "using":
 		return USING
-	case "uuid":
-		return UUID
 	case "valid":
 		return VALID
 	case "validate":
