@@ -13796,6 +13796,7 @@ type CreateViewPrivate struct {
 	ViewName    string
 	Temporary   bool
 	IfNotExists bool
+	Replace     bool
 
 	// ViewQuery contains the query for the view; data sources are always fully
 	// qualified.
@@ -24007,6 +24008,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.hasher.HashString(val.ViewName)
 	in.hasher.HashBool(val.Temporary)
 	in.hasher.HashBool(val.IfNotExists)
+	in.hasher.HashBool(val.Replace)
 	in.hasher.HashString(val.ViewQuery)
 	in.hasher.HashPresentation(val.Columns)
 	in.hasher.HashViewDeps(val.Deps)
@@ -24018,6 +24020,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 				in.hasher.IsStringEqual(val.ViewName, existing.ViewName) &&
 				in.hasher.IsBoolEqual(val.Temporary, existing.Temporary) &&
 				in.hasher.IsBoolEqual(val.IfNotExists, existing.IfNotExists) &&
+				in.hasher.IsBoolEqual(val.Replace, existing.Replace) &&
 				in.hasher.IsStringEqual(val.ViewQuery, existing.ViewQuery) &&
 				in.hasher.IsPresentationEqual(val.Columns, existing.Columns) &&
 				in.hasher.IsViewDepsEqual(val.Deps, existing.Deps) {
