@@ -1056,140 +1056,6 @@ type ScanPrivate struct {
 	PartitionConstrainedScan bool
 }
 
-// VirtualScanExpr returns a result set containing every row in a virtual table.
-// Virtual tables are system tables that are populated "on the fly" with rows
-// synthesized from system metadata and other state. An example is the
-// "information_schema.tables" virtual table which returns one row for each
-// accessible system or user table.
-//
-// VirtualScan has many of the same characteristics as the Scan operator.
-// However, virtual tables do not have indexes or keys, and the physical operator
-// used to scan virtual tables does not support limits or constraints. Therefore,
-// nearly all the rules that apply to Scan do not apply to VirtualScan, so it
-// makes sense to have a separate operator.
-type VirtualScanExpr struct {
-	VirtualScanPrivate
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &VirtualScanExpr{}
-
-func (e *VirtualScanExpr) Op() opt.Operator {
-	return opt.VirtualScanOp
-}
-
-func (e *VirtualScanExpr) ChildCount() int {
-	return 0
-}
-
-func (e *VirtualScanExpr) Child(nth int) opt.Expr {
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *VirtualScanExpr) Private() interface{} {
-	return &e.VirtualScanPrivate
-}
-
-func (e *VirtualScanExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *VirtualScanExpr) SetChild(nth int, child opt.Expr) {
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *VirtualScanExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *VirtualScanExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *VirtualScanExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *VirtualScanExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *VirtualScanExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *VirtualScanExpr) ProvidedPhysical() *physical.Provided {
-	return &e.grp.bestProps().provided
-}
-
-func (e *VirtualScanExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *VirtualScanExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *VirtualScanExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *VirtualScanExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *VirtualScanExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type virtualScanGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first VirtualScanExpr
-	best  bestProps
-}
-
-var _ exprGroup = &virtualScanGroup{}
-
-func (g *virtualScanGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *virtualScanGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *virtualScanGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *virtualScanGroup) bestProps() *bestProps {
-	return &g.best
-}
-
-type VirtualScanPrivate struct {
-	// Table identifies the virtual table to synthesize and scan. It is an id
-	// that can be passed to the Metadata.Table method in order to fetch
-	// cat.Table metadata.
-	Table opt.TableID
-
-	// Cols specifies the set of columns that the VirtualScan operator projects.
-	// This is always every column in the virtual table (i.e. never a subset even
-	// if all columns are not needed).
-	Cols opt.ColSet
-}
-
 // SequenceSelectExpr represents a read from a sequence as a data source. It always returns
 // three columns, last_value, log_cnt, and is_called, with a single row. last_value is
 // the most recent value returned from the sequence and log_cnt and is_called are
@@ -15596,28 +15462,6 @@ func (m *Memo) MemoizeScan(
 	return interned.FirstExpr()
 }
 
-func (m *Memo) MemoizeVirtualScan(
-	virtualScanPrivate *VirtualScanPrivate,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(virtualScanGroup{}))
-	grp := &virtualScanGroup{mem: m, first: VirtualScanExpr{
-		VirtualScanPrivate: *virtualScanPrivate,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternVirtualScan(e)
-	if interned == e {
-		if m.newGroupFn != nil {
-			m.newGroupFn(e)
-		}
-		m.logPropsBuilder.buildVirtualScanProps(e, &grp.rel)
-		grp.rel.Populated = true
-		m.memEstimate += size
-		m.CheckExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
 func (m *Memo) MemoizeSequenceSelect(
 	sequenceSelectPrivate *SequenceSelectPrivate,
 ) RelExpr {
@@ -19229,20 +19073,6 @@ func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 	return interned
 }
 
-func (m *Memo) AddVirtualScanToGroup(e *VirtualScanExpr, grp RelExpr) *VirtualScanExpr {
-	const size = int64(unsafe.Sizeof(VirtualScanExpr{}))
-	interned := m.interner.InternVirtualScan(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.CheckExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
 func (m *Memo) AddSequenceSelectToGroup(e *SequenceSelectExpr, grp RelExpr) *SequenceSelectExpr {
 	const size = int64(unsafe.Sizeof(SequenceSelectExpr{}))
 	interned := m.interner.InternSequenceSelect(e)
@@ -20004,8 +19834,6 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternFKChecksItem(t)
 	case *ScanExpr:
 		return in.InternScan(t)
-	case *VirtualScanExpr:
-		return in.InternVirtualScan(t)
 	case *SequenceSelectExpr:
 		return in.InternSequenceSelect(t)
 	case *ValuesExpr:
@@ -20596,26 +20424,6 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternVirtualScan(val *VirtualScanExpr) *VirtualScanExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.VirtualScanOp)
-	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColSet(val.Cols)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*VirtualScanExpr); ok {
-			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
 				return existing
 			}
 		}
@@ -24353,8 +24161,6 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildDeleteProps(t, rel)
 	case *ScanExpr:
 		b.buildScanProps(t, rel)
-	case *VirtualScanExpr:
-		b.buildVirtualScanProps(t, rel)
 	case *SequenceSelectExpr:
 		b.buildSequenceSelectProps(t, rel)
 	case *ValuesExpr:

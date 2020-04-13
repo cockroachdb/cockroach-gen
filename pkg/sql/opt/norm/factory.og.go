@@ -250,25 +250,6 @@ func (_f *Factory) ConstructScan(
 	return _f.onConstructRelational(e)
 }
 
-// ConstructVirtualScan constructs an expression for the VirtualScan operator.
-// VirtualScan returns a result set containing every row in a virtual table.
-// Virtual tables are system tables that are populated "on the fly" with rows
-// synthesized from system metadata and other state. An example is the
-// "information_schema.tables" virtual table which returns one row for each
-// accessible system or user table.
-//
-// VirtualScan has many of the same characteristics as the Scan operator.
-// However, virtual tables do not have indexes or keys, and the physical operator
-// used to scan virtual tables does not support limits or constraints. Therefore,
-// nearly all the rules that apply to Scan do not apply to VirtualScan, so it
-// makes sense to have a separate operator.
-func (_f *Factory) ConstructVirtualScan(
-	virtualScanPrivate *memo.VirtualScanPrivate,
-) memo.RelExpr {
-	e := _f.mem.MemoizeVirtualScan(virtualScanPrivate)
-	return _f.onConstructRelational(e)
-}
-
 // ConstructSequenceSelect constructs an expression for the SequenceSelect operator.
 // SequenceSelect represents a read from a sequence as a data source. It always returns
 // three columns, last_value, log_cnt, and is_called, with a single row. last_value is
@@ -14895,9 +14876,6 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.ScanExpr:
 		return t
 
-	case *memo.VirtualScanExpr:
-		return t
-
 	case *memo.SequenceSelectExpr:
 		return t
 
@@ -16315,9 +16293,6 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.ScanExpr:
 		return f.mem.MemoizeScan(&t.ScanPrivate)
 
-	case *memo.VirtualScanExpr:
-		return f.mem.MemoizeVirtualScan(&t.VirtualScanPrivate)
-
 	case *memo.SequenceSelectExpr:
 		return f.mem.MemoizeSequenceSelect(&t.SequenceSelectPrivate)
 
@@ -17383,10 +17358,6 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ScanOp:
 		return f.ConstructScan(
 			args[0].(*memo.ScanPrivate),
-		)
-	case opt.VirtualScanOp:
-		return f.ConstructVirtualScan(
-			args[0].(*memo.VirtualScanPrivate),
 		)
 	case opt.SequenceSelectOp:
 		return f.ConstructSequenceSelect(
