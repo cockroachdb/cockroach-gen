@@ -234,7 +234,7 @@ func (_e *explorer) exploreSelect(
 		}
 	}
 
-	// [GenerateUnionSelects]
+	// [SplitDisjunction]
 	{
 		_partlyExplored := _rootOrd < _rootState.start
 		input := _root.Input
@@ -262,11 +262,11 @@ func (_e *explorer) exploreSelect(
 								if _or != nil {
 									left := _or.Left
 									right := _or.Right
-									if !_e.funcs.ColsAreEqual(_e.funcs.ExprOuterCols(left), _e.funcs.ExprOuterCols(right)) {
-										if _e.funcs.CanMaybeConstrainIndexWithExpr(scanPrivate, left) {
-											if _e.funcs.CanMaybeConstrainIndexWithExpr(scanPrivate, right) {
-												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateUnionSelects) {
-													rightScan := _e.funcs.DuplicateScanPrivate(scanPrivate)
+									if !_e.funcs.ColsAreEqual(_e.funcs.OuterCols(left), _e.funcs.OuterCols(right)) {
+										if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(left)) {
+											if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(right)) {
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
+													rightScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
 													_expr := &memo.UnionExpr{
 														Left: _e.f.ConstructSelect(
 															input,
@@ -274,18 +274,92 @@ func (_e *explorer) exploreSelect(
 														),
 														Right: _e.f.ConstructSelect(
 															_e.f.ConstructScan(
-																rightScan,
+																rightScanPrivate,
 															),
-															_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, right), scanPrivate, rightScan),
+															_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, right), scanPrivate, rightScanPrivate),
 														),
-														SetPrivate: *_e.funcs.MakeSetPrivateForUnionSelects(scanPrivate, rightScan, scanPrivate),
+														SetPrivate: *_e.funcs.MakeSetPrivateForUnionSelects(scanPrivate, rightScanPrivate),
 													}
 													_interned := _e.mem.AddUnionToGroup(_expr, _root)
 													if _e.o.appliedRule != nil {
 														if _interned != _expr {
-															_e.o.appliedRule(opt.GenerateUnionSelects, _root, nil)
+															_e.o.appliedRule(opt.SplitDisjunction, _root, nil)
 														} else {
-															_e.o.appliedRule(opt.GenerateUnionSelects, _root, _interned)
+															_e.o.appliedRule(opt.SplitDisjunction, _root, _interned)
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [SplitDisjunctionAddKey]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		input := _root.Input
+		_state := _e.lookupExploreState(input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						if !_e.funcs.HasStrictKey(input) {
+							filters := _root.Filters
+							for i := range filters {
+								item := &filters[i]
+								_or, _ := item.Condition.(*memo.OrExpr)
+								if _or != nil {
+									left := _or.Left
+									right := _or.Right
+									if !_e.funcs.ColsAreEqual(_e.funcs.OuterCols(left), _e.funcs.OuterCols(right)) {
+										if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(left)) {
+											if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(right)) {
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionAddKey) {
+													leftScanPrivate := _e.funcs.AddPrimaryKeyColsToScanPrivate(scanPrivate)
+													rightScanPrivate := _e.funcs.DuplicateScanPrivate(leftScanPrivate)
+													_expr := &memo.ProjectExpr{
+														Input: _e.f.ConstructUnion(
+															_e.f.ConstructSelect(
+																_e.f.ConstructScan(
+																	leftScanPrivate,
+																),
+																_e.funcs.ReplaceFiltersItem(filters, item, left),
+															),
+															_e.f.ConstructSelect(
+																_e.f.ConstructScan(
+																	rightScanPrivate,
+																),
+																_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, right), leftScanPrivate, rightScanPrivate),
+															),
+															_e.funcs.MakeSetPrivateForUnionSelects(leftScanPrivate, rightScanPrivate),
+														),
+														Projections: memo.EmptyProjectionsExpr,
+														Passthrough: _e.funcs.OutputCols(input),
+													}
+													_interned := _e.mem.AddProjectToGroup(_expr, _root)
+													if _e.o.appliedRule != nil {
+														if _interned != _expr {
+															_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, nil)
+														} else {
+															_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, _interned)
 														}
 													}
 												}

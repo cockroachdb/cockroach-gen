@@ -241,7 +241,8 @@ const (
 	GenerateIndexScans
 	GenerateConstrainedScans
 	GenerateInvertedIndexScans
-	GenerateUnionSelects
+	SplitDisjunction
+	SplitDisjunctionAddKey
 
 	// NumRuleNames tracks the total count of rule names.
 	NumRuleNames
