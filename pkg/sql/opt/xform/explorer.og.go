@@ -267,24 +267,20 @@ func (_e *explorer) exploreSelect(
 											if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairRight(pair))) {
 												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
 													rightScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
-													_expr := &memo.DistinctOnExpr{
-														Input: _e.f.ConstructUnionAll(
-															_e.f.ConstructSelect(
-																input,
-																_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairLeft(pair)),
-															),
-															_e.f.ConstructSelect(
-																_e.f.ConstructScan(
-																	rightScanPrivate,
-																),
-																_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairRight(pair)), scanPrivate, rightScanPrivate),
-															),
-															_e.funcs.MakeSetPrivateForSplitDisjunction(scanPrivate, rightScanPrivate),
+													_expr := &memo.UnionExpr{
+														Left: _e.f.ConstructSelect(
+															input,
+															_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairLeft(pair)),
 														),
-														Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(input)),
-														GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(input)),
+														Right: _e.f.ConstructSelect(
+															_e.f.ConstructScan(
+																rightScanPrivate,
+															),
+															_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairRight(pair)), scanPrivate, rightScanPrivate),
+														),
+														SetPrivate: *_e.funcs.MakeSetPrivateForSplitDisjunction(scanPrivate, rightScanPrivate),
 													}
-													_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
+													_interned := _e.mem.AddUnionToGroup(_expr, _root)
 													if _e.o.appliedRule != nil {
 														if _interned != _expr {
 															_e.o.appliedRule(opt.SplitDisjunction, _root, nil)
@@ -338,27 +334,22 @@ func (_e *explorer) exploreSelect(
 											if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairRight(pair))) {
 												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionAddKey) {
 													leftScanPrivate := _e.funcs.AddPrimaryKeyColsToScanPrivate(scanPrivate)
-													leftScan := _e.f.ConstructScan(
-														leftScanPrivate,
-													)
 													rightScanPrivate := _e.funcs.DuplicateScanPrivate(leftScanPrivate)
 													_expr := &memo.ProjectExpr{
-														Input: _e.f.ConstructDistinctOn(
-															_e.f.ConstructUnionAll(
-																_e.f.ConstructSelect(
-																	leftScan,
-																	_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairLeft(pair)),
+														Input: _e.f.ConstructUnion(
+															_e.f.ConstructSelect(
+																_e.f.ConstructScan(
+																	leftScanPrivate,
 																),
-																_e.f.ConstructSelect(
-																	_e.f.ConstructScan(
-																		rightScanPrivate,
-																	),
-																	_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairRight(pair)), leftScanPrivate, rightScanPrivate),
-																),
-																_e.funcs.MakeSetPrivateForSplitDisjunction(leftScanPrivate, rightScanPrivate),
+																_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairLeft(pair)),
 															),
-															_e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(leftScan)),
-															_e.funcs.MakeGrouping(_e.funcs.KeyCols(leftScan)),
+															_e.f.ConstructSelect(
+																_e.f.ConstructScan(
+																	rightScanPrivate,
+																),
+																_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairRight(pair)), leftScanPrivate, rightScanPrivate),
+															),
+															_e.funcs.MakeSetPrivateForSplitDisjunction(leftScanPrivate, rightScanPrivate),
 														),
 														Projections: memo.EmptyProjectionsExpr,
 														Passthrough: _e.funcs.OutputCols(input),
