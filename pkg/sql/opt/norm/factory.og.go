@@ -7520,6 +7520,38 @@ func (_f *Factory) ConstructScalarGroupBy(
 		}
 	}
 
+	// [PushAggDistinctIntoScalarGroupBy]
+	{
+		if len(aggregations) == 1 {
+			item := &aggregations[0]
+			_aggDistinct, _ := item.Agg.(*memo.AggDistinctExpr)
+			if _aggDistinct != nil {
+				agg := _aggDistinct.Input
+				aggColID := item.Col
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushAggDistinctIntoScalarGroupBy) {
+					_expr := _f.ConstructScalarGroupBy(
+						_f.ConstructDistinctOn(
+							input,
+							memo.EmptyAggregationsExpr,
+							_f.funcs.MakeUnorderedGrouping(_f.funcs.ExtractAggInputColumns(agg)),
+						),
+						memo.AggregationsExpr{
+							_f.ConstructAggregationsItem(
+								agg,
+								aggColID,
+							),
+						},
+						groupingPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushAggDistinctIntoScalarGroupBy, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [SimplifyGroupByOrdering]
 	{
 		if _f.funcs.CanSimplifyGroupingOrdering(input, groupingPrivate) {

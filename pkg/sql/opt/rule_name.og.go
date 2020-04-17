@@ -92,6 +92,7 @@ const (
 	EliminateDistinctNoColumns
 	EliminateErrorDistinctNoColumns
 	EliminateDistinctOnValues
+	PushAggDistinctIntoScalarGroupBy
 	InlineProjectConstants
 	InlineSelectConstants
 	InlineJoinConstantsLeft
