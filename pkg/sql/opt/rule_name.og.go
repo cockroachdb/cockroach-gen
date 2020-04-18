@@ -94,6 +94,7 @@ const (
 	EliminateDistinctOnValues
 	PushAggDistinctIntoScalarGroupBy
 	PushAggFilterIntoScalarGroupBy
+	ConvertCountToCountRows
 	InlineProjectConstants
 	InlineSelectConstants
 	InlineJoinConstantsLeft
