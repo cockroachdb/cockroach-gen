@@ -7552,6 +7552,42 @@ func (_f *Factory) ConstructScalarGroupBy(
 		}
 	}
 
+	// [PushAggFilterIntoScalarGroupBy]
+	{
+		if len(aggregations) == 1 {
+			item := &aggregations[0]
+			_aggFilter, _ := item.Agg.(*memo.AggFilterExpr)
+			if _aggFilter != nil {
+				agg := _aggFilter.Input
+				condition := _aggFilter.Filter
+				aggColID := item.Col
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushAggFilterIntoScalarGroupBy) {
+					_expr := _f.ConstructScalarGroupBy(
+						_f.ConstructSelect(
+							input,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									condition,
+								),
+							},
+						),
+						memo.AggregationsExpr{
+							_f.ConstructAggregationsItem(
+								agg,
+								aggColID,
+							),
+						},
+						groupingPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushAggFilterIntoScalarGroupBy, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [SimplifyGroupByOrdering]
 	{
 		if _f.funcs.CanSimplifyGroupingOrdering(input, groupingPrivate) {
@@ -7563,6 +7599,24 @@ func (_f *Factory) ConstructScalarGroupBy(
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.SimplifyGroupByOrdering, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [PruneGroupByCols]
+	{
+		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededGroupingCols(groupingPrivate))
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
+				_expr := _f.ConstructScalarGroupBy(
+					_f.funcs.PruneCols(input, needed),
+					aggregations,
+					_f.funcs.PruneOrderingGroupBy(groupingPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneGroupByCols, nil, _expr)
 				}
 				return _expr
 			}

@@ -93,6 +93,7 @@ const (
 	EliminateErrorDistinctNoColumns
 	EliminateDistinctOnValues
 	PushAggDistinctIntoScalarGroupBy
+	PushAggFilterIntoScalarGroupBy
 	InlineProjectConstants
 	InlineSelectConstants
 	InlineJoinConstantsLeft
