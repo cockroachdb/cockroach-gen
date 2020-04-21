@@ -18,11 +18,21 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
+)
+
+// Remove unused warnings.
+var (
+	_ = execgen.UNSAFEGET
+	_ = colexecerror.InternalError
 )
 
 // Enum used to represent comparison results
@@ -35,17 +45,17 @@ const (
 )
 
 func GetInProjectionOperator(
-	allocator *Allocator,
-	ct *types.T,
-	input Operator,
+	allocator *colmem.Allocator,
+	typ *types.T,
+	input colexecbase.Operator,
 	colIdx int,
 	resultIdx int,
 	datumTuple *tree.DTuple,
 	negate bool,
-) (Operator, error) {
-	input = newVectorTypeEnforcer(allocator, input, coltypes.Bool, resultIdx)
+) (colexecbase.Operator, error) {
+	input = newVectorTypeEnforcer(allocator, input, types.Bool, resultIdx)
 	var err error
-	switch t := typeconv.FromColumnType(ct); t {
+	switch typeconv.FromColumnType(typ) {
 	case coltypes.Bool:
 		obj := &projectInOpBool{
 			OneInputNode: NewOneInputNode(input),
@@ -54,7 +64,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -67,7 +77,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +90,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -93,7 +103,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +116,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +129,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +142,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +155,7 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -158,28 +168,28 @@ func GetInProjectionOperator(
 			outputIdx:    resultIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
 		return obj, nil
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled type: %s", typ)
 	}
 }
 
 func GetInOperator(
-	ct *types.T, input Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
-) (Operator, error) {
+	typ *types.T, input colexecbase.Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
+) (colexecbase.Operator, error) {
 	var err error
-	switch t := typeconv.FromColumnType(ct); t {
+	switch typeconv.FromColumnType(typ) {
 	case coltypes.Bool:
 		obj := &selectInOpBool{
 			OneInputNode: NewOneInputNode(input),
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +200,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -201,7 +211,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -212,7 +222,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +233,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -234,7 +244,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -245,7 +255,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -256,7 +266,7 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
@@ -267,13 +277,13 @@ func GetInOperator(
 			colIdx:       colIdx,
 			negate:       negate,
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(ct, datumTuple)
+		obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(typ, datumTuple)
 		if err != nil {
 			return nil, err
 		}
 		return obj, nil
 	default:
-		return nil, errors.Errorf("unhandled type: %s", t)
+		return nil, errors.Errorf("unhandled type: %s", typ)
 	}
 }
 
@@ -287,7 +297,7 @@ type selectInOpBool struct {
 
 type projectInOpBool struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []bool
@@ -295,10 +305,10 @@ type projectInOpBool struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpBool{}
+var _ colexecbase.Operator = &projectInOpBool{}
 
-func fillDatumRowBool(ct *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowBool(typ *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []bool
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -515,7 +525,7 @@ type selectInOpBytes struct {
 
 type projectInOpBytes struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow [][]byte
@@ -523,10 +533,10 @@ type projectInOpBytes struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpBytes{}
+var _ colexecbase.Operator = &projectInOpBytes{}
 
-func fillDatumRowBytes(ct *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowBytes(typ *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result [][]byte
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -743,7 +753,7 @@ type selectInOpDecimal struct {
 
 type projectInOpDecimal struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []apd.Decimal
@@ -751,10 +761,10 @@ type projectInOpDecimal struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpDecimal{}
+var _ colexecbase.Operator = &projectInOpDecimal{}
 
-func fillDatumRowDecimal(ct *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowDecimal(typ *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []apd.Decimal
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -963,7 +973,7 @@ type selectInOpInt16 struct {
 
 type projectInOpInt16 struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []int16
@@ -971,10 +981,10 @@ type projectInOpInt16 struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpInt16{}
+var _ colexecbase.Operator = &projectInOpInt16{}
 
-func fillDatumRowInt16(ct *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt16(typ *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []int16
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1194,7 +1204,7 @@ type selectInOpInt32 struct {
 
 type projectInOpInt32 struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []int32
@@ -1202,10 +1212,10 @@ type projectInOpInt32 struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpInt32{}
+var _ colexecbase.Operator = &projectInOpInt32{}
 
-func fillDatumRowInt32(ct *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt32(typ *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []int32
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1425,7 +1435,7 @@ type selectInOpInt64 struct {
 
 type projectInOpInt64 struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []int64
@@ -1433,10 +1443,10 @@ type projectInOpInt64 struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpInt64{}
+var _ colexecbase.Operator = &projectInOpInt64{}
 
-func fillDatumRowInt64(ct *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInt64(typ *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []int64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1656,7 +1666,7 @@ type selectInOpFloat64 struct {
 
 type projectInOpFloat64 struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []float64
@@ -1664,10 +1674,10 @@ type projectInOpFloat64 struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpFloat64{}
+var _ colexecbase.Operator = &projectInOpFloat64{}
 
-func fillDatumRowFloat64(ct *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowFloat64(typ *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []float64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1895,7 +1905,7 @@ type selectInOpTimestamp struct {
 
 type projectInOpTimestamp struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []time.Time
@@ -1903,10 +1913,10 @@ type projectInOpTimestamp struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpTimestamp{}
+var _ colexecbase.Operator = &projectInOpTimestamp{}
 
-func fillDatumRowTimestamp(ct *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowTimestamp(typ *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []time.Time
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -2122,7 +2132,7 @@ type selectInOpInterval struct {
 
 type projectInOpInterval struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 	filterRow []duration.Duration
@@ -2130,10 +2140,10 @@ type projectInOpInterval struct {
 	negate    bool
 }
 
-var _ Operator = &projectInOpInterval{}
+var _ colexecbase.Operator = &projectInOpInterval{}
 
-func fillDatumRowInterval(ct *types.T, datumTuple *tree.DTuple) ([]duration.Duration, bool, error) {
-	conv := typeconv.GetDatumToPhysicalFn(ct)
+func fillDatumRowInterval(typ *types.T, datumTuple *tree.DTuple) ([]duration.Duration, bool, error) {
+	conv := getDatumToPhysicalFn(typ)
 	var result []duration.Duration
 	hasNulls := false
 	for _, d := range datumTuple.D {

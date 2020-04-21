@@ -13,14 +13,16 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
-func newSumAgg(t coltypes.T) (aggregateFunc, error) {
-	switch t {
+func newSumAgg(t *types.T) (aggregateFunc, error) {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Decimal:
 		return &sumDecimalAgg{}, nil
 	case coltypes.Int16:
@@ -129,7 +131,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(i)
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -158,7 +160,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(i)
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -188,7 +190,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -216,7 +218,7 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curAgg, &a.scratch.curAgg, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -323,7 +325,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -358,7 +360,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -394,7 +396,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -428,7 +430,7 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -538,7 +540,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -573,7 +575,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -609,7 +611,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -643,7 +645,7 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := a.scratch.curAgg + col[i]
 						if (result < a.scratch.curAgg) != (col[i] < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -753,7 +755,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -788,7 +790,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -824,7 +826,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}
@@ -858,7 +860,7 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					{
 						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						a.scratch.curAgg = result
 					}

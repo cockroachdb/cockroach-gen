@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/apd"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
@@ -27,7 +27,7 @@ func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -48,7 +48,7 @@ func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -69,7 +69,7 @@ func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -88,13 +88,13 @@ func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	{
 
 		if b == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -115,7 +115,7 @@ func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -136,7 +136,7 @@ func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -157,7 +157,7 @@ func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -176,13 +176,13 @@ func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	{
 
 		if b == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -203,7 +203,7 @@ func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -224,7 +224,7 @@ func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -245,7 +245,7 @@ func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -264,13 +264,13 @@ func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	{
 
 		if b == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -286,7 +286,7 @@ func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	// to go around "unused" error.
 	_ = decimalScratch
 	if _, err := tree.ExactCtx.Add(&r, &a, &b); err != nil {
-		execerror.NonVectorizedPanic(err)
+		colexecerror.ExpectedError(err)
 	}
 	return r
 }
@@ -300,7 +300,7 @@ func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	// to go around "unused" error.
 	_ = decimalScratch
 	if _, err := tree.ExactCtx.Sub(&r, &a, &b); err != nil {
-		execerror.NonVectorizedPanic(err)
+		colexecerror.ExpectedError(err)
 	}
 	return r
 }
@@ -314,7 +314,7 @@ func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	// to go around "unused" error.
 	_ = decimalScratch
 	if _, err := tree.ExactCtx.Mul(&r, &a, &b); err != nil {
-		execerror.NonVectorizedPanic(err)
+		colexecerror.ExpectedError(err)
 	}
 	return r
 }
@@ -331,10 +331,10 @@ func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	{
 		cond, err := tree.DecimalCtx.Quo(&r, &a, &b)
 		if cond.DivisionByZero() {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -352,7 +352,7 @@ func performMultDecimalInterval(a apd.Decimal, b duration.Duration) duration.Dur
 
 	f, err := a.Float64()
 	if err != nil {
-		execerror.VectorizedInternalPanic(err)
+		colexecerror.InternalError(err)
 	}
 	r = b.MulFloat(f)
 	return r
@@ -370,7 +370,7 @@ func performPlusInt16Int16(a int16, b int16) int16 {
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -390,7 +390,7 @@ func performMinusInt16Int16(a int16, b int16) int16 {
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -413,9 +413,9 @@ func performMultInt16Int16(a int16, b int16) int16 {
 			if a != 0 && b != 0 {
 				sameSign := (a < 0) == (b < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/b != a {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -436,13 +436,13 @@ func performDivInt16Int16(a int16, b int16) apd.Decimal {
 
 	{
 		if b == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(a), 0)
 		rightTmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -461,7 +461,7 @@ func performPlusInt16Int32(a int16, b int32) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -481,7 +481,7 @@ func performMinusInt16Int32(a int16, b int32) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -504,9 +504,9 @@ func performMultInt16Int32(a int16, b int32) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -527,13 +527,13 @@ func performDivInt16Int32(a int16, b int32) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -552,7 +552,7 @@ func performPlusInt16Int64(a int16, b int64) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -572,7 +572,7 @@ func performMinusInt16Int64(a int16, b int64) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -595,9 +595,9 @@ func performMultInt16Int64(a int16, b int64) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -618,13 +618,13 @@ func performDivInt16Int64(a int16, b int64) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -647,7 +647,7 @@ func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -670,7 +670,7 @@ func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -693,7 +693,7 @@ func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -715,11 +715,11 @@ func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 
 		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if cond.DivisionByZero() {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -750,7 +750,7 @@ func performPlusInt32Int16(a int32, b int16) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -770,7 +770,7 @@ func performMinusInt32Int16(a int32, b int16) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -793,9 +793,9 @@ func performMultInt32Int16(a int32, b int16) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -816,13 +816,13 @@ func performDivInt32Int16(a int32, b int16) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -841,7 +841,7 @@ func performPlusInt32Int32(a int32, b int32) int32 {
 	{
 		result := a + b
 		if (result < a) != (b < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -861,7 +861,7 @@ func performMinusInt32Int32(a int32, b int32) int32 {
 	{
 		result := a - b
 		if (result < a) != (b > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -884,9 +884,9 @@ func performMultInt32Int32(a int32, b int32) int32 {
 			if a != 0 && b != 0 {
 				sameSign := (a < 0) == (b < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/b != a {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -907,13 +907,13 @@ func performDivInt32Int32(a int32, b int32) apd.Decimal {
 
 	{
 		if b == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(a), 0)
 		rightTmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -932,7 +932,7 @@ func performPlusInt32Int64(a int32, b int64) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -952,7 +952,7 @@ func performMinusInt32Int64(a int32, b int64) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -975,9 +975,9 @@ func performMultInt32Int64(a int32, b int64) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -998,13 +998,13 @@ func performDivInt32Int64(a int32, b int64) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1027,7 +1027,7 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1050,7 +1050,7 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1073,7 +1073,7 @@ func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1095,11 +1095,11 @@ func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 
 		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if cond.DivisionByZero() {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1130,7 +1130,7 @@ func performPlusInt64Int16(a int64, b int16) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -1150,7 +1150,7 @@ func performMinusInt64Int16(a int64, b int16) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -1173,9 +1173,9 @@ func performMultInt64Int16(a int64, b int16) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -1196,13 +1196,13 @@ func performDivInt64Int16(a int64, b int16) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1221,7 +1221,7 @@ func performPlusInt64Int32(a int64, b int32) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -1241,7 +1241,7 @@ func performMinusInt64Int32(a int64, b int32) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -1264,9 +1264,9 @@ func performMultInt64Int32(a int64, b int32) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -1287,13 +1287,13 @@ func performDivInt64Int32(a int64, b int32) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1312,7 +1312,7 @@ func performPlusInt64Int64(a int64, b int64) int64 {
 	{
 		result := int64(a) + int64(b)
 		if (result < int64(a)) != (int64(b) < 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -1332,7 +1332,7 @@ func performMinusInt64Int64(a int64, b int64) int64 {
 	{
 		result := int64(a) - int64(b)
 		if (result < int64(a)) != (int64(b) > 0) {
-			execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -1355,9 +1355,9 @@ func performMultInt64Int64(a int64, b int64) int64 {
 			if int64(a) != 0 && int64(b) != 0 {
 				sameSign := (int64(a) < 0) == (int64(b) < 0)
 				if (result < 0) == sameSign {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				} else if result/int64(b) != int64(a) {
-					execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
 		}
@@ -1378,13 +1378,13 @@ func performDivInt64Int64(a int64, b int64) apd.Decimal {
 
 	{
 		if int64(b) == 0 {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
 		leftTmpDec.SetFinite(int64(int64(a)), 0)
 		rightTmpDec.SetFinite(int64(int64(b)), 0)
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1407,7 +1407,7 @@ func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1430,7 +1430,7 @@ func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1453,7 +1453,7 @@ func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1475,11 +1475,11 @@ func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 
 		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if cond.DivisionByZero() {
-			execerror.NonVectorizedPanic(tree.ErrDivByZero)
+			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
 		if err != nil {
-			execerror.NonVectorizedPanic(err)
+			colexecerror.ExpectedError(err)
 		}
 	}
 
@@ -1619,7 +1619,7 @@ func performDivIntervalInt16(a duration.Duration, b int16) duration.Duration {
 	_ = decimalScratch
 
 	if b == 0 {
-		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		colexecerror.ExpectedError(tree.ErrDivByZero)
 	}
 	r = a.Div(int64(b))
 	return r
@@ -1647,7 +1647,7 @@ func performDivIntervalInt32(a duration.Duration, b int32) duration.Duration {
 	_ = decimalScratch
 
 	if b == 0 {
-		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		colexecerror.ExpectedError(tree.ErrDivByZero)
 	}
 	r = a.Div(int64(b))
 	return r
@@ -1675,7 +1675,7 @@ func performDivIntervalInt64(a duration.Duration, b int64) duration.Duration {
 	_ = decimalScratch
 
 	if b == 0 {
-		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		colexecerror.ExpectedError(tree.ErrDivByZero)
 	}
 	r = a.Div(int64(b))
 	return r
@@ -1703,7 +1703,7 @@ func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration
 	_ = decimalScratch
 
 	if b == 0.0 {
-		execerror.NonVectorizedPanic(tree.ErrDivByZero)
+		colexecerror.ExpectedError(tree.ErrDivByZero)
 	}
 	r = a.DivFloat(float64(b))
 	return r
@@ -1720,7 +1720,7 @@ func performMultIntervalDecimal(a duration.Duration, b apd.Decimal) duration.Dur
 
 	f, err := b.Float64()
 	if err != nil {
-		execerror.VectorizedInternalPanic(err)
+		colexecerror.InternalError(err)
 	}
 	r = a.MulFloat(f)
 	return r
@@ -2473,7 +2473,7 @@ func performEQDecimalFloat64(a apd.Decimal, b float64) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
@@ -2499,7 +2499,7 @@ func performNEDecimalFloat64(a apd.Decimal, b float64) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
@@ -2525,7 +2525,7 @@ func performLTDecimalFloat64(a apd.Decimal, b float64) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
@@ -2551,7 +2551,7 @@ func performLEDecimalFloat64(a apd.Decimal, b float64) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
@@ -2577,7 +2577,7 @@ func performGTDecimalFloat64(a apd.Decimal, b float64) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
@@ -2603,7 +2603,7 @@ func performGEDecimalFloat64(a apd.Decimal, b float64) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
@@ -6289,7 +6289,7 @@ func performEQFloat64Decimal(a float64, b apd.Decimal) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
@@ -6315,7 +6315,7 @@ func performNEFloat64Decimal(a float64, b apd.Decimal) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
@@ -6341,7 +6341,7 @@ func performLTFloat64Decimal(a float64, b apd.Decimal) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
@@ -6367,7 +6367,7 @@ func performLEFloat64Decimal(a float64, b apd.Decimal) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
@@ -6393,7 +6393,7 @@ func performGTFloat64Decimal(a float64, b apd.Decimal) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
@@ -6419,7 +6419,7 @@ func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
 		{
 			tmpDec := &decimalScratch.tmpDec1
 			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				execerror.NonVectorizedPanic(err)
+				colexecerror.ExpectedError(err)
 			}
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}

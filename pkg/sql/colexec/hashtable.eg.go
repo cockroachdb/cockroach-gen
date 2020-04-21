@@ -16,9 +16,15 @@ import (
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // checkCol determines if the current key column in the groupID buckets matches
 // the specified equality column key. If there is a match, then the key is added
@@ -27,7 +33,7 @@ import (
 // there is no match.
 func (ht *hashTable) checkCol(
 	probeVec, buildVec coldata.Vec,
-	probeType, buildType coltypes.T,
+	probeType, buildType *types.T,
 	keyColIdx int,
 	nToCheck uint64,
 	probeSel []int,
@@ -37,9 +43,9 @@ func (ht *hashTable) checkCol(
 	// In order to inline the templated code of overloads, we need to have a
 	// `decimalScratch` local variable of type `decimalOverloadScratch`.
 	decimalScratch := ht.decimalScratch
-	switch probeType {
+	switch typeconv.FromColumnType(probeType) {
 	case coltypes.Bool:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Bool:
 			probeKeys := probeVec.Bool()
 			buildKeys := buildVec.Bool()
@@ -1118,10 +1124,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Bytes:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Bytes:
 			probeKeys := probeVec.Bytes()
 			buildKeys := buildVec.Bytes()
@@ -2040,10 +2046,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Decimal:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Decimal:
 			probeKeys := probeVec.Decimal()
 			buildKeys := buildVec.Decimal()
@@ -6132,7 +6138,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6182,7 +6188,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6231,7 +6237,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6282,7 +6288,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6329,7 +6335,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6399,7 +6405,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6449,7 +6455,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6498,7 +6504,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6549,7 +6555,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6596,7 +6602,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6668,7 +6674,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6718,7 +6724,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6767,7 +6773,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6818,7 +6824,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6865,7 +6871,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -6935,7 +6941,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -6985,7 +6991,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -7034,7 +7040,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -7085,7 +7091,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -7132,7 +7138,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 											}
@@ -7150,10 +7156,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Int16:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Decimal:
 			probeKeys := probeVec.Int16()
 			buildKeys := buildVec.Decimal()
@@ -12900,10 +12906,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Int32:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Decimal:
 			probeKeys := probeVec.Int32()
 			buildKeys := buildVec.Decimal()
@@ -18650,10 +18656,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Int64:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Decimal:
 			probeKeys := probeVec.Int64()
 			buildKeys := buildVec.Decimal()
@@ -24400,10 +24406,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Float64:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Decimal:
 			probeKeys := probeVec.Float64()
 			buildKeys := buildVec.Decimal()
@@ -24464,7 +24470,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -24514,7 +24520,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -24563,7 +24569,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -24614,7 +24620,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -24661,7 +24667,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -24731,7 +24737,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -24781,7 +24787,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -24830,7 +24836,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -24881,7 +24887,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -24928,7 +24934,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -25000,7 +25006,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -25050,7 +25056,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -25099,7 +25105,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -25150,7 +25156,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -25197,7 +25203,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -25267,7 +25273,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -25317,7 +25323,7 @@ func (ht *hashTable) checkCol(
 												{
 													tmpDec := &decimalScratch.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-														execerror.NonVectorizedPanic(err)
+														colexecerror.ExpectedError(err)
 													}
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -25366,7 +25372,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -25417,7 +25423,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -25464,7 +25470,7 @@ func (ht *hashTable) checkCol(
 											{
 												tmpDec := &decimalScratch.tmpDec1
 												if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
-													execerror.NonVectorizedPanic(err)
+													colexecerror.ExpectedError(err)
 												}
 												cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 											}
@@ -30670,10 +30676,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Timestamp:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Timestamp:
 			probeKeys := probeVec.Timestamp()
 			buildKeys := buildVec.Timestamp()
@@ -31732,10 +31738,10 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	case coltypes.Interval:
-		switch buildType {
+		switch typeconv.FromColumnType(buildType) {
 		case coltypes.Interval:
 			probeKeys := probeVec.Interval()
 			buildKeys := buildVec.Interval()
@@ -32654,17 +32660,17 @@ func (ht *hashTable) checkCol(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", buildType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", buildType))
 		}
 	default:
-		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", probeType))
+		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", probeType))
 	}
 }
 
 func (ht *hashTable) checkColForDistinctTuples(
-	probeVec, buildVec coldata.Vec, probeType coltypes.T, nToCheck uint64, probeSel []int,
+	probeVec, buildVec coldata.Vec, probeType *types.T, nToCheck uint64, probeSel []int,
 ) {
-	switch probeType {
+	switch typeconv.FromColumnType(probeType) {
 	case coltypes.Bool:
 		probeKeys := probeVec.Bool()
 		buildKeys := buildVec.Bool()
@@ -37513,7 +37519,7 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 		}
 	default:
-		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", probeType))
+		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", probeType))
 	}
 }
 
@@ -37527,7 +37533,7 @@ func (ht *hashTable) checkBuildForDistinct(
 	probeVecs []coldata.Vec, nToCheck uint64, probeSel []int,
 ) uint64 {
 	if probeSel == nil {
-		execerror.VectorizedInternalPanic("invalid selection vector")
+		colexecerror.InternalError("invalid selection vector")
 	}
 	copy(ht.probeScratch.distinct, zeroBoolColumn)
 
@@ -37559,7 +37565,7 @@ func (ht *hashTable) checkBuildForDistinct(
 // new length of toCheck is returned by this function.
 func (ht *hashTable) check(
 	probeVecs []coldata.Vec,
-	probeKeyTypes []coltypes.T,
+	probeKeyTypes []types.T,
 	buildKeyCols []uint32,
 	nToCheck uint64,
 	probeSel []int,
@@ -37611,7 +37617,7 @@ func (ht *hashTable) check(
 // in the probe table.
 func (ht *hashTable) checkProbeForDistinct(vecs []coldata.Vec, nToCheck uint64, sel []int) uint64 {
 	for i := range ht.keyCols {
-		ht.checkCol(vecs[i], vecs[i], ht.keyTypes[i], ht.keyTypes[i], i, nToCheck, sel, sel)
+		ht.checkCol(vecs[i], vecs[i], &ht.keyTypes[i], &ht.keyTypes[i], i, nToCheck, sel, sel)
 	}
 
 	nDiffers := uint64(0)
@@ -37700,7 +37706,7 @@ func (ht *hashTable) updateSel(b coldata.Batch) {
 // list is reconstructed to only hold the indices of the eqCol keys that have
 // not been found. The new length of toCheck is returned by this function.
 func (ht *hashTable) distinctCheck(
-	probeKeyTypes []coltypes.T, nToCheck uint64, probeSel []int,
+	probeKeyTypes []types.T, nToCheck uint64, probeSel []int,
 ) uint64 {
 	probeVecs := ht.probeScratch.keys
 	buildVecs := ht.vals.ColVecs()

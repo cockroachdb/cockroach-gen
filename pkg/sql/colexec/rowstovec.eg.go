@@ -15,36 +15,40 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
+
 // EncDatumRowsToColVec converts one column from EncDatumRows to a column
 // vector. columnIdx is the 0-based index of the column in the EncDatumRows.
 func EncDatumRowsToColVec(
-	allocator *Allocator,
+	allocator *colmem.Allocator,
 	rows sqlbase.EncDatumRows,
 	vec coldata.Vec,
 	columnIdx int,
-	columnType *types.T,
+	typ *types.T,
 	alloc *sqlbase.DatumAlloc,
 ) error {
 	var err error
 	allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
-			switch columnType.Family() {
+			switch typ.Family() {
 			case types.BoolFamily:
 				col := vec.Bool()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -63,11 +67,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.BytesFamily:
 				col := vec.Bytes()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -86,11 +90,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.DateFamily:
 				col := vec.Int64()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -109,11 +113,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.DecimalFamily:
 				col := vec.Decimal()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -131,14 +135,14 @@ func EncDatumRowsToColVec(
 					}
 				}
 			case types.FloatFamily:
-				switch columnType.Width() {
+				switch typ.Width() {
 				case 32:
 					col := vec.Float64()
-					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+					datumToPhysicalFn := getDatumToPhysicalFn(typ)
 					for i := range rows {
 						row := rows[i]
 						if row[columnIdx].Datum == nil {
-							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 								return
 							}
 						}
@@ -157,11 +161,11 @@ func EncDatumRowsToColVec(
 					}
 				case 64:
 					col := vec.Float64()
-					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+					datumToPhysicalFn := getDatumToPhysicalFn(typ)
 					for i := range rows {
 						row := rows[i]
 						if row[columnIdx].Datum == nil {
-							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 								return
 							}
 						}
@@ -179,17 +183,17 @@ func EncDatumRowsToColVec(
 						}
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
+					colexecerror.InternalError(fmt.Sprintf("unsupported width %d for type %s", typ.Width(), typ.String()))
 				}
 			case types.IntFamily:
-				switch columnType.Width() {
+				switch typ.Width() {
 				case 16:
 					col := vec.Int16()
-					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+					datumToPhysicalFn := getDatumToPhysicalFn(typ)
 					for i := range rows {
 						row := rows[i]
 						if row[columnIdx].Datum == nil {
-							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 								return
 							}
 						}
@@ -208,11 +212,11 @@ func EncDatumRowsToColVec(
 					}
 				case 32:
 					col := vec.Int32()
-					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+					datumToPhysicalFn := getDatumToPhysicalFn(typ)
 					for i := range rows {
 						row := rows[i]
 						if row[columnIdx].Datum == nil {
-							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 								return
 							}
 						}
@@ -231,11 +235,11 @@ func EncDatumRowsToColVec(
 					}
 				case 64:
 					col := vec.Int64()
-					datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+					datumToPhysicalFn := getDatumToPhysicalFn(typ)
 					for i := range rows {
 						row := rows[i]
 						if row[columnIdx].Datum == nil {
-							if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+							if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 								return
 							}
 						}
@@ -253,15 +257,15 @@ func EncDatumRowsToColVec(
 						}
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported width %d for column type %s", columnType.Width(), columnType.String()))
+					colexecerror.InternalError(fmt.Sprintf("unsupported width %d for type %s", typ.Width(), typ.String()))
 				}
 			case types.IntervalFamily:
 				col := vec.Interval()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -280,11 +284,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.OidFamily:
 				col := vec.Int64()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -303,11 +307,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.StringFamily:
 				col := vec.Bytes()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -326,11 +330,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.TimestampFamily:
 				col := vec.Timestamp()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -349,11 +353,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.TimestampTZFamily:
 				col := vec.Timestamp()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -372,11 +376,11 @@ func EncDatumRowsToColVec(
 				}
 			case types.UuidFamily:
 				col := vec.Bytes()
-				datumToPhysicalFn := typeconv.GetDatumToPhysicalFn(columnType)
+				datumToPhysicalFn := getDatumToPhysicalFn(typ)
 				for i := range rows {
 					row := rows[i]
 					if row[columnIdx].Datum == nil {
-						if err = row[columnIdx].EnsureDecoded(columnType, alloc); err != nil {
+						if err = row[columnIdx].EnsureDecoded(typ, alloc); err != nil {
 							return
 						}
 					}
@@ -394,7 +398,7 @@ func EncDatumRowsToColVec(
 					}
 				}
 			default:
-				execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported column type %s", columnType.String()))
+				colexecerror.InternalError(fmt.Sprintf("unsupported type %s", typ.String()))
 			}
 		},
 	)

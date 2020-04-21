@@ -18,10 +18,16 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // vecComparator is a helper for the ordered synchronizer. It stores multiple
 // column vectors of a single type and facilitates comparing values between
@@ -447,8 +453,8 @@ func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int
 	}
 }
 
-func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
-	switch t {
+func GetVecComparator(t *types.T, numVecs int) vecComparator {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		return &BoolVecComparator{
 			vecs:  make([][]bool, numVecs),
@@ -495,7 +501,7 @@ func GetVecComparator(t coltypes.T, numVecs int) vecComparator {
 			nulls: make([]*coldata.Nulls, numVecs),
 		}
 	}
-	execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %v", t))
+	colexecerror.InternalError(fmt.Sprintf("unhandled type %v", t))
 	// This code is unreachable, but the compiler cannot infer that.
 	return nil
 }

@@ -11,11 +11,11 @@ package colexec
 
 import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	// HACK: crlfmt removes the "*/}}" comment if it's the last line in the import
-	// block. This was picked because it sorts after "pkg/sql/colexec/execerror" and
-	// has no deps.
-	_ "github.com/cockroachdb/cockroach/pkg/util/bufalloc"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 )
+
+// Remove unused warning.
+var _ = colexecerror.InternalError
 
 func newBoolAndAgg() aggregateFunc {
 	return &boolAndAgg{}

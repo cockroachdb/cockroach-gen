@@ -18,12 +18,14 @@ import (
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
-	// HACK: crlfmt removes the "*/}}" comment if it's the last line in the
-	// import block. This was picked because it sorts after
-	// "pkg/sql/colexec/execgen" and has no deps.
-	_ "github.com/cockroachdb/cockroach/pkg/util/bufalloc"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // rehash takes an element of a key (tuple representing a row of equality
 // column values) at a given column and computes a new hash by applying a
@@ -31,14 +33,14 @@ import (
 func rehash(
 	ctx context.Context,
 	buckets []uint64,
-	t coltypes.T,
+	t *types.T,
 	col coldata.Vec,
 	nKeys int,
 	sel []int,
 	cancelChecker CancelChecker,
 	decimalScratch decimalOverloadScratch,
 ) {
-	switch t {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		keys, nulls := col.Bool(), col.Nulls()
 		if col.MaybeHasNulls() {
@@ -770,6 +772,6 @@ func rehash(
 		}
 
 	default:
-		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", t))
+		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", t))
 	}
 }

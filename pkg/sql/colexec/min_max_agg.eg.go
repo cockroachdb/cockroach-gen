@@ -17,13 +17,24 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
-func newMinAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
-	switch t {
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
+
+// Remove unused warning.
+var _ = colexecerror.InternalError
+
+func newMinAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		return &minBoolAgg{allocator: allocator}, nil
 	case coltypes.Bytes:
@@ -48,7 +59,7 @@ func newMinAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
 }
 
 type minBoolAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -333,7 +344,7 @@ func (a *minBoolAgg) HandleEmptyInputScalar() {
 }
 
 type minBytesAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -590,7 +601,7 @@ func (a *minBytesAgg) HandleEmptyInputScalar() {
 }
 
 type minDecimalAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -843,7 +854,7 @@ func (a *minDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type minInt16Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -1140,7 +1151,7 @@ func (a *minInt16Agg) HandleEmptyInputScalar() {
 }
 
 type minInt32Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -1437,7 +1448,7 @@ func (a *minInt32Agg) HandleEmptyInputScalar() {
 }
 
 type minInt64Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -1734,7 +1745,7 @@ func (a *minInt64Agg) HandleEmptyInputScalar() {
 }
 
 type minFloat64Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -2063,7 +2074,7 @@ func (a *minFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type minTimestampAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -2344,7 +2355,7 @@ func (a *minTimestampAgg) HandleEmptyInputScalar() {
 }
 
 type minIntervalAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -2596,8 +2607,8 @@ func (a *minIntervalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
-func newMaxAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
-	switch t {
+func newMaxAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		return &maxBoolAgg{allocator: allocator}, nil
 	case coltypes.Bytes:
@@ -2622,7 +2633,7 @@ func newMaxAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
 }
 
 type maxBoolAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -2907,7 +2918,7 @@ func (a *maxBoolAgg) HandleEmptyInputScalar() {
 }
 
 type maxBytesAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -3164,7 +3175,7 @@ func (a *maxBytesAgg) HandleEmptyInputScalar() {
 }
 
 type maxDecimalAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -3417,7 +3428,7 @@ func (a *maxDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type maxInt16Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -3714,7 +3725,7 @@ func (a *maxInt16Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt32Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -4011,7 +4022,7 @@ func (a *maxInt32Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt64Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -4308,7 +4319,7 @@ func (a *maxInt64Agg) HandleEmptyInputScalar() {
 }
 
 type maxFloat64Agg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -4637,7 +4648,7 @@ func (a *maxFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type maxTimestampAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int
@@ -4918,7 +4929,7 @@ func (a *maxTimestampAgg) HandleEmptyInputScalar() {
 }
 
 type maxIntervalAgg struct {
-	allocator *Allocator
+	allocator *colmem.Allocator
 	done      bool
 	groups    []bool
 	curIdx    int

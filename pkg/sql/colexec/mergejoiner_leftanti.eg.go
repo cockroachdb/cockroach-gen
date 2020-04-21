@@ -19,11 +19,15 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 type mergeJoinLeftAntiOp struct {
 	*mergeJoinBase
@@ -40,8 +44,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -64,23 +70,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -101,7 +110,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -329,7 +338,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -517,7 +526,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -705,7 +714,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -948,7 +957,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -1191,7 +1200,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -1434,7 +1443,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -1717,7 +1726,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -1940,7 +1949,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -2116,7 +2125,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -2134,7 +2143,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -2353,7 +2362,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -2532,7 +2541,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -2711,7 +2720,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -2945,7 +2954,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -3179,7 +3188,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -3413,7 +3422,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -3687,7 +3696,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -3901,7 +3910,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -4068,7 +4077,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -4088,7 +4097,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -4303,7 +4312,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -4478,7 +4487,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -4653,7 +4662,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -4883,7 +4892,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -5113,7 +5122,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -5343,7 +5352,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -5613,7 +5622,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -5823,7 +5832,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -5986,7 +5995,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -6004,7 +6013,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -6210,7 +6219,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -6376,7 +6385,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -6542,7 +6551,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -6763,7 +6772,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -6984,7 +6993,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -7205,7 +7214,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -7466,7 +7475,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -7667,7 +7676,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -7821,7 +7830,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -7840,8 +7849,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -7864,23 +7875,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -7901,7 +7915,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -8129,7 +8143,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -8317,7 +8331,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -8505,7 +8519,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -8748,7 +8762,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -8991,7 +9005,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -9234,7 +9248,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -9517,7 +9531,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -9740,7 +9754,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -9916,7 +9930,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -9934,7 +9948,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -10153,7 +10167,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -10332,7 +10346,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -10511,7 +10525,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -10745,7 +10759,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -10979,7 +10993,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -11213,7 +11227,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -11487,7 +11501,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -11701,7 +11715,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -11868,7 +11882,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -11888,7 +11902,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -12103,7 +12117,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -12278,7 +12292,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -12453,7 +12467,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -12683,7 +12697,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -12913,7 +12927,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -13143,7 +13157,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -13413,7 +13427,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -13623,7 +13637,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -13786,7 +13800,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -13804,7 +13818,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -14010,7 +14024,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -14176,7 +14190,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -14342,7 +14356,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -14563,7 +14577,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -14784,7 +14798,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -15005,7 +15019,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -15266,7 +15280,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -15467,7 +15481,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -15621,7 +15635,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -15640,8 +15654,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -15664,23 +15680,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -15701,7 +15720,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -15929,7 +15948,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -16117,7 +16136,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -16305,7 +16324,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -16548,7 +16567,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -16791,7 +16810,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -17034,7 +17053,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -17317,7 +17336,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -17540,7 +17559,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -17716,7 +17735,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -17734,7 +17753,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -17953,7 +17972,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -18132,7 +18151,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -18311,7 +18330,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -18545,7 +18564,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -18779,7 +18798,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -19013,7 +19032,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -19287,7 +19306,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -19501,7 +19520,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -19668,7 +19687,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -19688,7 +19707,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -19903,7 +19922,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -20078,7 +20097,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -20253,7 +20272,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -20483,7 +20502,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -20713,7 +20732,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -20943,7 +20962,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -21213,7 +21232,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -21423,7 +21442,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -21586,7 +21605,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -21604,7 +21623,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -21810,7 +21829,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -21976,7 +21995,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -22142,7 +22161,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -22363,7 +22382,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -22584,7 +22603,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -22805,7 +22824,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -23066,7 +23085,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -23267,7 +23286,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -23421,7 +23440,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -23440,8 +23459,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -23464,23 +23485,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -23501,7 +23525,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -23729,7 +23753,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -23917,7 +23941,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -24105,7 +24129,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -24348,7 +24372,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -24591,7 +24615,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -24834,7 +24858,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -25117,7 +25141,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -25340,7 +25364,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -25516,7 +25540,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -25534,7 +25558,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -25753,7 +25777,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -25932,7 +25956,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -26111,7 +26135,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -26345,7 +26369,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -26579,7 +26603,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -26813,7 +26837,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -27087,7 +27111,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -27301,7 +27325,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -27468,7 +27492,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -27488,7 +27512,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -27703,7 +27727,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -27878,7 +27902,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -28053,7 +28077,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -28283,7 +28307,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -28513,7 +28537,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -28743,7 +28767,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -29013,7 +29037,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -29223,7 +29247,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -29386,7 +29410,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -29404,7 +29428,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -29610,7 +29634,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -29776,7 +29800,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -29942,7 +29966,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -30163,7 +30187,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -30384,7 +30408,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -30605,7 +30629,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -30866,7 +30890,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -31067,7 +31091,7 @@ EqLoop:
 
 						if lGroup.unmatched {
 							if curLIdx+1 != curLLength {
-								execerror.VectorizedInternalPanic(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
 							}
 							// The row already does not have a match, so we don't need to do any
 							// additional processing.
@@ -31221,7 +31245,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -31263,7 +31287,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 		func() {
 			// Loop over every column.
 		LeftColLoop:
-			for colIdx, colType := range input.sourceTypes {
+			for colIdx, colType := range input.sourcePhysTypes {
 				outStartIdx := destStartIdx
 				out := o.output.ColVec(colIdx)
 				var src coldata.Vec
@@ -31825,7 +31849,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -32353,7 +32377,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				} else {
@@ -32901,7 +32925,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -33420,7 +33444,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				}
@@ -33451,7 +33475,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 	if currentBatch == nil {
 		currentBatch, err = bufferedGroup.dequeue(ctx)
 		if err != nil {
-			execerror.VectorizedInternalPanic(err)
+			colexecerror.InternalError(err)
 		}
 		o.builderState.lBufferedGroupBatch = currentBatch
 		o.builderState.left.curSrcStartIdx = 0
@@ -33466,7 +33490,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 				var updatedDestStartIdx int
 				// Loop over every column.
 			LeftColLoop:
-				for colIdx, colType := range input.sourceTypes {
+				for colIdx, colType := range input.sourcePhysTypes {
 					outStartIdx := destStartIdx
 					src := currentBatch.ColVec(colIdx)
 					out := o.output.ColVec(colIdx)
@@ -33877,7 +33901,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							o.builderState.left.numRepeatsIdx = 0
 						}
 					default:
-						execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 					}
 					updatedDestStartIdx = outStartIdx
 					o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -33891,7 +33915,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 				o.unlimitedAllocator.ReleaseBatch(currentBatch)
 				currentBatch, err = bufferedGroup.dequeue(ctx)
 				if err != nil {
-					execerror.VectorizedInternalPanic(err)
+					colexecerror.InternalError(err)
 				}
 				o.builderState.lBufferedGroupBatch = currentBatch
 				batchLength = currentBatch.Length()
@@ -33942,7 +33966,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 		func() {
 			// Loop over every column.
 		RightColLoop:
-			for colIdx, colType := range input.sourceTypes {
+			for colIdx, colType := range input.sourcePhysTypes {
 				outStartIdx := destStartIdx
 				out := o.output.ColVec(colIdx + colOffset)
 				var src coldata.Vec
@@ -34540,7 +34564,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -35113,7 +35137,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				} else {
@@ -35706,7 +35730,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -36279,7 +36303,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				}
@@ -36317,7 +36341,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 				if currentBatch == nil {
 					currentBatch, err = bufferedGroup.dequeue(ctx)
 					if err != nil {
-						execerror.VectorizedInternalPanic(err)
+						colexecerror.InternalError(err)
 					}
 					o.builderState.rBufferedGroupBatch = currentBatch
 					o.builderState.right.curSrcStartIdx = 0
@@ -36330,7 +36354,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 					}
 
 					// Loop over every column.
-					for colIdx, colType := range input.sourceTypes {
+					for colIdx, colType := range input.sourcePhysTypes {
 						out := o.output.ColVec(colIdx + colOffset)
 						src := currentBatch.ColVec(colIdx)
 						switch colType {
@@ -36569,7 +36593,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 								)
 							}
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 					outStartIdx += toAppend
@@ -36585,7 +36609,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 					o.unlimitedAllocator.ReleaseBatch(currentBatch)
 					currentBatch, err = bufferedGroup.dequeue(ctx)
 					if err != nil {
-						execerror.VectorizedInternalPanic(err)
+						colexecerror.InternalError(err)
 					}
 					o.builderState.rBufferedGroupBatch = currentBatch
 					batchLength = currentBatch.Length()
@@ -36594,7 +36618,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 				// We have fully processed all the batches from the buffered group, so
 				// we need to rewind it.
 				if err := bufferedGroup.rewind(); err != nil {
-					execerror.VectorizedInternalPanic(err)
+					colexecerror.InternalError(err)
 				}
 				o.builderState.rBufferedGroupBatch = nil
 			}
@@ -36710,7 +36734,7 @@ func (o *mergeJoinLeftAntiOp) build(ctx context.Context) {
 			o.buildLeftBufferedGroup(ctx, o.builderState.lGroups[0], &o.left, o.proberState.lBufferedGroup, outStartIdx)
 
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
+			colexecerror.InternalError(fmt.Sprintf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
 		}
 	}
 }
@@ -36799,7 +36823,7 @@ func (o *mergeJoinLeftAntiOp) Next(ctx context.Context) coldata.Batch {
 			}
 			return coldata.ZeroBatch
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unexpected merge joiner state in Next: %v", o.state))
+			colexecerror.InternalError(fmt.Sprintf("unexpected merge joiner state in Next: %v", o.state))
 		}
 	}
 }

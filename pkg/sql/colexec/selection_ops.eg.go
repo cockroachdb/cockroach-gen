@@ -18,13 +18,18 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // selConstOpBase contains all of the fields for binary selections with a
 // constant, except for the constant itself.
@@ -9954,7 +9959,7 @@ func (p *selEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -9982,7 +9987,7 @@ func (p *selEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10010,7 +10015,7 @@ func (p *selEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10038,7 +10043,7 @@ func (p *selEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10104,7 +10109,7 @@ func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10135,7 +10140,7 @@ func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10164,7 +10169,7 @@ func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10195,7 +10200,7 @@ func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10258,7 +10263,7 @@ func (p *selNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10286,7 +10291,7 @@ func (p *selNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10314,7 +10319,7 @@ func (p *selNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10342,7 +10347,7 @@ func (p *selNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10408,7 +10413,7 @@ func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10439,7 +10444,7 @@ func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10468,7 +10473,7 @@ func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10499,7 +10504,7 @@ func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10562,7 +10567,7 @@ func (p *selLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10590,7 +10595,7 @@ func (p *selLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10618,7 +10623,7 @@ func (p *selLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10646,7 +10651,7 @@ func (p *selLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10712,7 +10717,7 @@ func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10743,7 +10748,7 @@ func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10772,7 +10777,7 @@ func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10803,7 +10808,7 @@ func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -10866,7 +10871,7 @@ func (p *selLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10894,7 +10899,7 @@ func (p *selLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10922,7 +10927,7 @@ func (p *selLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -10950,7 +10955,7 @@ func (p *selLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11016,7 +11021,7 @@ func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11047,7 +11052,7 @@ func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11076,7 +11081,7 @@ func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11107,7 +11112,7 @@ func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11170,7 +11175,7 @@ func (p *selGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11198,7 +11203,7 @@ func (p *selGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11226,7 +11231,7 @@ func (p *selGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11254,7 +11259,7 @@ func (p *selGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11320,7 +11325,7 @@ func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11351,7 +11356,7 @@ func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11380,7 +11385,7 @@ func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11411,7 +11416,7 @@ func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11474,7 +11479,7 @@ func (p *selGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11502,7 +11507,7 @@ func (p *selGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11530,7 +11535,7 @@ func (p *selGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11558,7 +11563,7 @@ func (p *selGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg, tmpDec)
 						}
@@ -11624,7 +11629,7 @@ func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11655,7 +11660,7 @@ func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11684,7 +11689,7 @@ func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -11715,7 +11720,7 @@ func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg2)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(&arg1, tmpDec)
 						}
@@ -41730,7 +41735,7 @@ func (p *selEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -41758,7 +41763,7 @@ func (p *selEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -41786,7 +41791,7 @@ func (p *selEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -41814,7 +41819,7 @@ func (p *selEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -41880,7 +41885,7 @@ func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -41911,7 +41916,7 @@ func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -41940,7 +41945,7 @@ func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -41971,7 +41976,7 @@ func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42034,7 +42039,7 @@ func (p *selNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42062,7 +42067,7 @@ func (p *selNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42090,7 +42095,7 @@ func (p *selNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42118,7 +42123,7 @@ func (p *selNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42184,7 +42189,7 @@ func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42215,7 +42220,7 @@ func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42244,7 +42249,7 @@ func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42275,7 +42280,7 @@ func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42338,7 +42343,7 @@ func (p *selLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42366,7 +42371,7 @@ func (p *selLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42394,7 +42399,7 @@ func (p *selLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42422,7 +42427,7 @@ func (p *selLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42488,7 +42493,7 @@ func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42519,7 +42524,7 @@ func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42548,7 +42553,7 @@ func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42579,7 +42584,7 @@ func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42642,7 +42647,7 @@ func (p *selLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42670,7 +42675,7 @@ func (p *selLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42698,7 +42703,7 @@ func (p *selLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42726,7 +42731,7 @@ func (p *selLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42792,7 +42797,7 @@ func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42823,7 +42828,7 @@ func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42852,7 +42857,7 @@ func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42883,7 +42888,7 @@ func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -42946,7 +42951,7 @@ func (p *selGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -42974,7 +42979,7 @@ func (p *selGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43002,7 +43007,7 @@ func (p *selGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43030,7 +43035,7 @@ func (p *selGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43096,7 +43101,7 @@ func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43127,7 +43132,7 @@ func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43156,7 +43161,7 @@ func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43187,7 +43192,7 @@ func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43250,7 +43255,7 @@ func (p *selGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43278,7 +43283,7 @@ func (p *selGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43306,7 +43311,7 @@ func (p *selGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43334,7 +43339,7 @@ func (p *selGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &p.constArg)
 						}
@@ -43400,7 +43405,7 @@ func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43431,7 +43436,7 @@ func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43460,7 +43465,7 @@ func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -43491,7 +43496,7 @@ func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 						{
 							tmpDec := &decimalScratch.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg1)); err != nil {
-								execerror.NonVectorizedPanic(err)
+								colexecerror.ExpectedError(err)
 							}
 							cmpResult = tree.CompareDecimals(tmpDec, &arg2)
 						}
@@ -56145,14 +56150,14 @@ func (p *selGEIntervalIntervalOp) Init() {
 // GetSelectionConstOperator returns the appropriate constant selection operator
 // for the given left and right column types and comparison.
 func GetSelectionConstOperator(
-	leftColType *types.T,
-	constColType *types.T,
+	leftType *types.T,
+	constType *types.T,
 	cmpOp tree.ComparisonOperator,
-	input Operator,
+	input colexecbase.Operator,
 	colIdx int,
 	constArg tree.Datum,
-) (Operator, error) {
-	c, err := typeconv.GetDatumToPhysicalFn(constColType)(constArg)
+) (colexecbase.Operator, error) {
+	c, err := getDatumToPhysicalFn(constType)(constArg)
 	if err != nil {
 		return nil, err
 	}
@@ -56160,9 +56165,9 @@ func GetSelectionConstOperator(
 		OneInputNode: NewOneInputNode(input),
 		colIdx:       colIdx,
 	}
-	switch leftType := typeconv.FromColumnType(leftColType); leftType {
+	switch typeconv.FromColumnType(leftType) {
 	case coltypes.Bool:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Bool:
 			switch cmpOp {
 			case tree.EQ:
@@ -56181,10 +56186,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Bytes:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Bytes:
 			switch cmpOp {
 			case tree.EQ:
@@ -56203,10 +56208,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Decimal:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56293,10 +56298,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Int16:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56383,10 +56388,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Int32:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56473,10 +56478,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Int64:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56563,10 +56568,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Float64:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56653,10 +56658,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Timestamp:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Timestamp:
 			switch cmpOp {
 			case tree.EQ:
@@ -56675,10 +56680,10 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	case coltypes.Interval:
-		switch rightType := typeconv.FromColumnType(constColType); rightType {
+		switch typeconv.FromColumnType(constType) {
 		case coltypes.Interval:
 			switch cmpOp {
 			case tree.EQ:
@@ -56697,7 +56702,7 @@ func GetSelectionConstOperator(
 				return nil, errors.Errorf("unhandled comparison operator: %s", cmpOp)
 			}
 		default:
-			return nil, errors.Errorf("unhandled right type: %s", rightType)
+			return nil, errors.Errorf("unhandled const type: %s", constType)
 		}
 	default:
 		return nil, errors.Errorf("unhandled left type: %s", leftType)
@@ -56707,21 +56712,21 @@ func GetSelectionConstOperator(
 // GetSelectionOperator returns the appropriate two column selection operator
 // for the given left and right column types and comparison.
 func GetSelectionOperator(
-	leftColType *types.T,
-	rightColType *types.T,
+	leftType *types.T,
+	rightType *types.T,
 	cmpOp tree.ComparisonOperator,
-	input Operator,
+	input colexecbase.Operator,
 	col1Idx int,
 	col2Idx int,
-) (Operator, error) {
+) (colexecbase.Operator, error) {
 	selOpBase := selOpBase{
 		OneInputNode: NewOneInputNode(input),
 		col1Idx:      col1Idx,
 		col2Idx:      col2Idx,
 	}
-	switch leftType := typeconv.FromColumnType(leftColType); leftType {
+	switch typeconv.FromColumnType(leftType) {
 	case coltypes.Bool:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Bool:
 			switch cmpOp {
 			case tree.EQ:
@@ -56743,7 +56748,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Bytes:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Bytes:
 			switch cmpOp {
 			case tree.EQ:
@@ -56765,7 +56770,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Decimal:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56855,7 +56860,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Int16:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -56945,7 +56950,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Int32:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -57035,7 +57040,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Int64:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -57125,7 +57130,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Float64:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Decimal:
 			switch cmpOp {
 			case tree.EQ:
@@ -57215,7 +57220,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Timestamp:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Timestamp:
 			switch cmpOp {
 			case tree.EQ:
@@ -57237,7 +57242,7 @@ func GetSelectionOperator(
 			return nil, errors.Errorf("unhandled right type: %s", rightType)
 		}
 	case coltypes.Interval:
-		switch rightType := typeconv.FromColumnType(rightColType); rightType {
+		switch typeconv.FromColumnType(rightType) {
 		case coltypes.Interval:
 			switch cmpOp {
 			case tree.EQ:

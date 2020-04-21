@@ -16,17 +16,29 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
+
 // NewConstOp creates a new operator that produces a constant value constVal of
 // type t at index outputIdx.
 func NewConstOp(
-	allocator *Allocator, input Operator, t coltypes.T, constVal interface{}, outputIdx int,
-) (Operator, error) {
+	allocator *colmem.Allocator,
+	input colexecbase.Operator,
+	t *types.T,
+	constVal interface{},
+	outputIdx int,
+) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, t, outputIdx)
-	switch t {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		return &constBoolOp{
 			OneInputNode: NewOneInputNode(input),
@@ -98,7 +110,7 @@ func NewConstOp(
 type constBoolOp struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  bool
 }
@@ -136,7 +148,7 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 type constBytesOp struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  []byte
 }
@@ -176,7 +188,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 type constDecimalOp struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  apd.Decimal
 }
@@ -214,7 +226,7 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 type constInt16Op struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  int16
 }
@@ -252,7 +264,7 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 type constInt32Op struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  int32
 }
@@ -290,7 +302,7 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 type constInt64Op struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  int64
 }
@@ -328,7 +340,7 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 type constFloat64Op struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  float64
 }
@@ -366,7 +378,7 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 type constTimestampOp struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  time.Time
 }
@@ -404,7 +416,7 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 type constIntervalOp struct {
 	OneInputNode
 
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 	constVal  duration.Duration
 }
@@ -441,7 +453,9 @@ func (c constIntervalOp) Next(ctx context.Context) coldata.Batch {
 
 // NewConstNullOp creates a new operator that produces a constant (untyped) NULL
 // value at index outputIdx.
-func NewConstNullOp(allocator *Allocator, input Operator, outputIdx int, typ coltypes.T) Operator {
+func NewConstNullOp(
+	allocator *colmem.Allocator, input colexecbase.Operator, outputIdx int, typ *types.T,
+) colexecbase.Operator {
 	input = newVectorTypeEnforcer(allocator, input, typ, outputIdx)
 	return &constNullOp{
 		OneInputNode: NewOneInputNode(input),
@@ -452,11 +466,11 @@ func NewConstNullOp(allocator *Allocator, input Operator, outputIdx int, typ col
 
 type constNullOp struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	outputIdx int
 }
 
-var _ Operator = &constNullOp{}
+var _ colexecbase.Operator = &constNullOp{}
 
 func (c constNullOp) Init() {
 	c.input.Init()

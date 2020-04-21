@@ -18,10 +18,15 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // isBufferedGroupFinished checks to see whether or not the buffered group
 // corresponding to input continues in batch.
@@ -44,9 +49,9 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 	// Check all equality columns in the first row of batch to make sure we're in
 	// the same group.
 	for _, colIdx := range input.eqCols[:len(input.eqCols)] {
-		colTyp := input.sourceTypes[colIdx]
+		typ := input.sourceTypes[colIdx]
 
-		switch colTyp {
+		switch typeconv.FromColumnType(&typ) {
 		case coltypes.Bool:
 			// We perform this null check on every equality column of the first
 			// buffered tuple regardless of the join type since it is done only once
@@ -367,7 +372,7 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 				return true
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colTyp))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", &typ))
 		}
 	}
 	return false

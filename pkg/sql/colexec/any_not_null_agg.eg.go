@@ -15,12 +15,16 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/pkg/errors"
 )
 
-func newAnyNotNullAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error) {
-	switch t {
+func newAnyNotNullAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		return &anyNotNullBoolAgg{allocator: allocator}, nil
 	case coltypes.Bytes:
@@ -44,10 +48,13 @@ func newAnyNotNullAgg(allocator *Allocator, t coltypes.T) (aggregateFunc, error)
 	}
 }
 
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
+
 // anyNotNullBoolAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullBoolAgg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -239,7 +246,7 @@ func (a *anyNotNullBoolAgg) HandleEmptyInputScalar() {
 // anyNotNullBytesAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullBytesAgg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -435,7 +442,7 @@ func (a *anyNotNullBytesAgg) HandleEmptyInputScalar() {
 // anyNotNullDecimalAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullDecimalAgg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -627,7 +634,7 @@ func (a *anyNotNullDecimalAgg) HandleEmptyInputScalar() {
 // anyNotNullInt16Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt16Agg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -819,7 +826,7 @@ func (a *anyNotNullInt16Agg) HandleEmptyInputScalar() {
 // anyNotNullInt32Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt32Agg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -1011,7 +1018,7 @@ func (a *anyNotNullInt32Agg) HandleEmptyInputScalar() {
 // anyNotNullInt64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt64Agg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -1203,7 +1210,7 @@ func (a *anyNotNullInt64Agg) HandleEmptyInputScalar() {
 // anyNotNullFloat64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullFloat64Agg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -1395,7 +1402,7 @@ func (a *anyNotNullFloat64Agg) HandleEmptyInputScalar() {
 // anyNotNullTimestampAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullTimestampAgg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
@@ -1587,7 +1594,7 @@ func (a *anyNotNullTimestampAgg) HandleEmptyInputScalar() {
 // anyNotNullIntervalAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullIntervalAgg struct {
-	allocator                   *Allocator
+	allocator                   *colmem.Allocator
 	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec

@@ -16,17 +16,23 @@ import (
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // valuesDiffer takes in two ColVecs as well as values indices to check whether
 // the values differ. This function pays attention to NULLs, and two NULL
 // values do *not* differ.
 func valuesDiffer(
-	t coltypes.T, aColVec coldata.Vec, aValueIdx int, bColVec coldata.Vec, bValueIdx int,
+	t *types.T, aColVec coldata.Vec, aValueIdx int, bColVec coldata.Vec, bValueIdx int,
 ) bool {
-	switch t {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Bool:
 		aCol := aColVec.Bool()
 		bCol := bColVec.Bool()
@@ -302,7 +308,7 @@ func valuesDiffer(
 
 		return unique
 	default:
-		execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported valuesDiffer type %s", t))
+		colexecerror.InternalError(fmt.Sprintf("unsupported valuesDiffer type %s", t))
 		// This code is unreachable, but the compiler cannot infer that.
 		return false
 	}

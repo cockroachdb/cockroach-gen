@@ -13,13 +13,15 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/pkg/errors"
 )
 
-func newAvgAgg(t coltypes.T) (aggregateFunc, error) {
-	switch t {
+func newAvgAgg(t *types.T) (aggregateFunc, error) {
+	switch typeconv.FromColumnType(t) {
 	case coltypes.Decimal:
 		return &avgDecimalAgg{}, nil
 	case coltypes.Float64:
@@ -95,7 +97,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		} else {
 			a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 			if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
-				execerror.VectorizedInternalPanic(err)
+				colexecerror.InternalError(err)
 			}
 		}
 		a.scratch.curIdx++
@@ -119,7 +121,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
-								execerror.VectorizedInternalPanic(err)
+								colexecerror.InternalError(err)
 							}
 						}
 					}
@@ -133,7 +135,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(i)
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
@@ -153,7 +155,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
-								execerror.VectorizedInternalPanic(err)
+								colexecerror.InternalError(err)
 							}
 						}
 					}
@@ -167,7 +169,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = nulls.NullAt(i)
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
@@ -189,7 +191,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
-								execerror.VectorizedInternalPanic(err)
+								colexecerror.InternalError(err)
 							}
 						}
 					}
@@ -202,7 +204,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
@@ -222,7 +224,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						} else {
 							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
 							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
-								execerror.VectorizedInternalPanic(err)
+								colexecerror.InternalError(err)
 							}
 						}
 					}
@@ -235,7 +237,7 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				isNull = false
 				if !isNull {
 					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						execerror.NonVectorizedPanic(err)
+						colexecerror.ExpectedError(err)
 					}
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true

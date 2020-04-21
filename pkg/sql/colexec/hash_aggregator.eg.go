@@ -16,9 +16,15 @@ import (
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 // match takes a selection vector and compares it against the values of the key
 // of its aggregation function. It returns a selection vector representing the
@@ -35,7 +41,7 @@ func (v hashAggFuncs) match(
 	sel []int,
 	b coldata.Batch,
 	keyCols []uint32,
-	keyTypes []coltypes.T,
+	keyTypes []types.T,
 	keyMapping coldata.Batch,
 	diff []bool,
 ) (bool, []int) {
@@ -56,7 +62,7 @@ func (v hashAggFuncs) match(
 
 		keyTyp := keyTypes[keyIdx]
 
-		switch keyTyp {
+		switch typeconv.FromColumnType(&keyTyp) {
 		case coltypes.Bool:
 			lhsCol := lhs.Bool()
 			rhsCol := rhs.Bool()
@@ -1163,7 +1169,7 @@ func (v hashAggFuncs) match(
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", keyTyp))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", &keyTyp))
 		}
 	}
 

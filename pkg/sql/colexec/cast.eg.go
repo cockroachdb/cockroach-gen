@@ -17,17 +17,23 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	semtypes "github.com/cockroachdb/cockroach/pkg/sql/types"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/pkg/errors"
 )
 
-func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, sel []int) {
-	switch fromType {
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
+
+func cast(fromType, toType *types.T, inputVec, outputVec coldata.Vec, n int, sel []int) {
+	switch typeconv.FromColumnType(fromType) {
 	case coltypes.Bool:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			inputCol := inputVec.Bool()
 			outputCol := outputVec.Bool()
@@ -359,15 +365,15 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	case coltypes.Bytes:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	case coltypes.Decimal:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			inputCol := inputVec.Decimal()
 			outputCol := outputVec.Bool()
@@ -477,10 +483,10 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	case coltypes.Int16:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			inputCol := inputVec.Int16()
 			outputCol := outputVec.Bool()
@@ -822,10 +828,10 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	case coltypes.Int32:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			inputCol := inputVec.Int32()
 			outputCol := outputVec.Bool()
@@ -1109,10 +1115,10 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	case coltypes.Int64:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			inputCol := inputVec.Int64()
 			outputCol := outputVec.Bool()
@@ -1338,10 +1344,10 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	case coltypes.Float64:
-		switch toType {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			inputCol := inputVec.Float64()
 			outputCol := outputVec.Bool()
@@ -1419,7 +1425,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 								var tmpDec apd.Decimal
 								_, tmpErr := tmpDec.SetFloat64(float64(v))
 								if tmpErr != nil {
-									execerror.NonVectorizedPanic(tmpErr)
+									colexecerror.ExpectedError(tmpErr)
 								}
 								r = tmpDec
 							}
@@ -1440,7 +1446,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 								var tmpDec apd.Decimal
 								_, tmpErr := tmpDec.SetFloat64(float64(v))
 								if tmpErr != nil {
-									execerror.NonVectorizedPanic(tmpErr)
+									colexecerror.ExpectedError(tmpErr)
 								}
 								r = tmpDec
 							}
@@ -1460,7 +1466,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var tmpDec apd.Decimal
 							_, tmpErr := tmpDec.SetFloat64(float64(v))
 							if tmpErr != nil {
-								execerror.NonVectorizedPanic(tmpErr)
+								colexecerror.ExpectedError(tmpErr)
 							}
 							r = tmpDec
 						}
@@ -1477,7 +1483,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var tmpDec apd.Decimal
 							_, tmpErr := tmpDec.SetFloat64(float64(v))
 							if tmpErr != nil {
-								execerror.NonVectorizedPanic(tmpErr)
+								colexecerror.ExpectedError(tmpErr)
 							}
 							r = tmpDec
 						}
@@ -1502,7 +1508,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var r int16
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 							r = int16(v)
 
@@ -1519,7 +1525,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var r int16
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 							r = int16(v)
 
@@ -1535,7 +1541,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 						var r int16
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						r = int16(v)
 
@@ -1548,7 +1554,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 						var r int16
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						r = int16(v)
 
@@ -1572,7 +1578,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var r int32
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 							r = int32(v)
 
@@ -1589,7 +1595,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var r int32
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 							r = int32(v)
 
@@ -1605,7 +1611,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 						var r int32
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						r = int32(v)
 
@@ -1618,7 +1624,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 						var r int32
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						r = int32(v)
 
@@ -1642,7 +1648,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var r int64
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 							r = int64(v)
 
@@ -1659,7 +1665,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 							var r int64
 
 							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-								execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 							r = int64(v)
 
@@ -1675,7 +1681,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 						var r int64
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						r = int64(v)
 
@@ -1688,7 +1694,7 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 						var r int64
 
 						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-							execerror.NonVectorizedPanic(tree.ErrIntOutOfRange)
+							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						r = int64(v)
 
@@ -1747,24 +1753,23 @@ func cast(fromType, toType coltypes.T, inputVec, outputVec coldata.Vec, n int, s
 				}
 			}
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
+			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
 	default:
-		execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled FROM type: %s", fromType))
+		colexecerror.InternalError(fmt.Sprintf("unhandled FROM type: %s", fromType))
 	}
 }
 
 func GetCastOperator(
-	allocator *Allocator,
-	input Operator,
+	allocator *colmem.Allocator,
+	input colexecbase.Operator,
 	colIdx int,
 	resultIdx int,
-	fromType *semtypes.T,
-	toType *semtypes.T,
-) (Operator, error) {
-	to := typeconv.FromColumnType(toType)
-	input = newVectorTypeEnforcer(allocator, input, to, resultIdx)
-	if fromType.Family() == semtypes.UnknownFamily {
+	fromType *types.T,
+	toType *types.T,
+) (colexecbase.Operator, error) {
+	input = newVectorTypeEnforcer(allocator, input, toType, resultIdx)
+	if fromType.Family() == types.UnknownFamily {
 		return &castOpNullAny{
 			OneInputNode: NewOneInputNode(input),
 			allocator:    allocator,
@@ -1772,17 +1777,17 @@ func GetCastOperator(
 			outputIdx:    resultIdx,
 		}, nil
 	}
-	switch from := typeconv.FromColumnType(fromType); from {
+	switch typeconv.FromColumnType(fromType) {
 	case coltypes.Bool:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int16:
 			return &castOp{
@@ -1790,8 +1795,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int32:
 			return &castOp{
@@ -1799,8 +1804,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int64:
 			return &castOp{
@@ -1808,8 +1813,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Float64:
 			return &castOp{
@@ -1817,27 +1822,27 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	case coltypes.Bytes:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	case coltypes.Decimal:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Decimal:
 			return &castOp{
@@ -1845,22 +1850,22 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	case coltypes.Int16:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Decimal:
 			return &castOp{
@@ -1868,8 +1873,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int16:
 			return &castOp{
@@ -1877,8 +1882,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int32:
 			return &castOp{
@@ -1886,8 +1891,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int64:
 			return &castOp{
@@ -1895,8 +1900,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Float64:
 			return &castOp{
@@ -1904,22 +1909,22 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	case coltypes.Int32:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Decimal:
 			return &castOp{
@@ -1927,8 +1932,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int32:
 			return &castOp{
@@ -1936,8 +1941,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int64:
 			return &castOp{
@@ -1945,8 +1950,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Float64:
 			return &castOp{
@@ -1954,22 +1959,22 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	case coltypes.Int64:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Decimal:
 			return &castOp{
@@ -1977,8 +1982,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int64:
 			return &castOp{
@@ -1986,8 +1991,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Float64:
 			return &castOp{
@@ -1995,22 +2000,22 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	case coltypes.Float64:
-		switch to {
+		switch typeconv.FromColumnType(toType) {
 		case coltypes.Bool:
 			return &castOp{
 				OneInputNode: NewOneInputNode(input),
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Decimal:
 			return &castOp{
@@ -2018,8 +2023,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int16:
 			return &castOp{
@@ -2027,8 +2032,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int32:
 			return &castOp{
@@ -2036,8 +2041,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Int64:
 			return &castOp{
@@ -2045,8 +2050,8 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		case coltypes.Float64:
 			return &castOp{
@@ -2054,25 +2059,25 @@ func GetCastOperator(
 				allocator:    allocator,
 				colIdx:       colIdx,
 				outputIdx:    resultIdx,
-				fromType:     from,
-				toType:       to,
+				fromType:     fromType,
+				toType:       toType,
 			}, nil
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", from, to)
+			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
 		}
 	default:
-		return nil, errors.Errorf("unhandled FROM type: %s", from)
+		return nil, errors.Errorf("unhandled FROM type: %s", fromType)
 	}
 }
 
 type castOpNullAny struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
 }
 
-var _ Operator = &castOpNullAny{}
+var _ colexecbase.Operator = &castOpNullAny{}
 
 func (c *castOpNullAny) Init() {
 	c.input.Init()
@@ -2094,7 +2099,7 @@ func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 			if vecNulls.NullAt(i) {
 				projNulls.SetNull(i)
 			} else {
-				execerror.VectorizedInternalPanic(errors.Errorf("unexpected non-null at index %d", i))
+				colexecerror.InternalError(errors.Errorf("unexpected non-null at index %d", i))
 			}
 		}
 	} else {
@@ -2102,7 +2107,7 @@ func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 			if vecNulls.NullAt(i) {
 				projNulls.SetNull(i)
 			} else {
-				execerror.VectorizedInternalPanic(fmt.Errorf("unexpected non-null at index %d", i))
+				colexecerror.InternalError(fmt.Errorf("unexpected non-null at index %d", i))
 			}
 		}
 	}
@@ -2111,14 +2116,14 @@ func (c *castOpNullAny) Next(ctx context.Context) coldata.Batch {
 
 type castOp struct {
 	OneInputNode
-	allocator *Allocator
+	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
-	fromType  coltypes.T
-	toType    coltypes.T
+	fromType  *types.T
+	toType    *types.T
 }
 
-var _ Operator = &castOp{}
+var _ colexecbase.Operator = &castOp{}
 
 func (c *castOp) Init() {
 	c.input.Init()

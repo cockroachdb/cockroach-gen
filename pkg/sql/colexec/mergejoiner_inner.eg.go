@@ -19,11 +19,15 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
+
+// Remove unused warning.
+var _ = execgen.UNSAFEGET
 
 type mergeJoinInnerOp struct {
 	*mergeJoinBase
@@ -40,8 +44,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -64,23 +70,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -1662,7 +1671,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -3160,7 +3169,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -4660,7 +4669,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -6077,7 +6086,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -6096,8 +6105,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -6120,23 +6131,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -7718,7 +7732,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -9216,7 +9230,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -10716,7 +10730,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -12133,7 +12147,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -12152,8 +12166,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -12176,23 +12192,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -13774,7 +13793,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -15272,7 +15291,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -16772,7 +16791,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -18189,7 +18208,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -18208,8 +18227,10 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftPhysType := o.left.sourceTypes[leftColIdx]
-		rightPhysType := o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		leftPhysType := o.left.sourcePhysTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
+		rightPhysType := o.right.sourcePhysTypes[rightColIdx]
 		colType := leftPhysType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -18232,23 +18253,26 @@ EqLoop:
 			case coltypes.Float64:
 				castLeftToRight = rightPhysType == coltypes.Decimal
 			}
-			toType := leftPhysType
+
+			toType, toPhysType := leftType, leftPhysType
 			if castLeftToRight {
-				toType = rightPhysType
+				toType, toPhysType = rightType, rightPhysType
 			}
-			tempVec := o.scratch.tempVecByType[toType]
+			tempVec := o.scratch.tempVecByType[toPhysType]
 			if tempVec == nil {
-				tempVec = o.unlimitedAllocator.NewMemColumn(toType, coldata.BatchSize())
-				o.scratch.tempVecByType[toType] = tempVec
+				// TODO(yuzefovich): this will need to be changed once we fully
+				// support coltypes.Datum.
+				tempVec = o.unlimitedAllocator.NewMemColumn(&toType, coldata.BatchSize())
+				o.scratch.tempVecByType[toPhysType] = tempVec
 			} else {
 				tempVec.Nulls().UnsetNulls()
 			}
 			if castLeftToRight {
-				cast(leftPhysType, rightPhysType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
+				cast(&leftType, &rightType, lVec, tempVec, o.proberState.lBatch.Length(), lSel)
 				lVec = tempVec
-				colType = o.right.sourceTypes[rightColIdx]
+				colType = rightPhysType
 			} else {
-				cast(rightPhysType, leftPhysType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
+				cast(&rightType, &leftType, rVec, tempVec, o.proberState.rBatch.Length(), rSel)
 				rVec = tempVec
 			}
 		}
@@ -19830,7 +19854,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -21328,7 +21352,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		} else {
@@ -22828,7 +22852,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			} else {
 
@@ -24245,7 +24269,7 @@ EqLoop:
 						o.proberState.rIdx = curRIdx
 					}
 				default:
-					execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
 			}
 		}
@@ -24287,7 +24311,7 @@ func (o *mergeJoinInnerOp) buildLeftGroupsFromBatch(
 		func() {
 			// Loop over every column.
 		LeftColLoop:
-			for colIdx, colType := range input.sourceTypes {
+			for colIdx, colType := range input.sourcePhysTypes {
 				outStartIdx := destStartIdx
 				out := o.output.ColVec(colIdx)
 				var src coldata.Vec
@@ -24822,7 +24846,7 @@ func (o *mergeJoinInnerOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -25323,7 +25347,7 @@ func (o *mergeJoinInnerOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				} else {
@@ -25844,7 +25868,7 @@ func (o *mergeJoinInnerOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -26336,7 +26360,7 @@ func (o *mergeJoinInnerOp) buildLeftGroupsFromBatch(
 							}
 							o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				}
@@ -26367,7 +26391,7 @@ func (o *mergeJoinInnerOp) buildLeftBufferedGroup(
 	if currentBatch == nil {
 		currentBatch, err = bufferedGroup.dequeue(ctx)
 		if err != nil {
-			execerror.VectorizedInternalPanic(err)
+			colexecerror.InternalError(err)
 		}
 		o.builderState.lBufferedGroupBatch = currentBatch
 		o.builderState.left.curSrcStartIdx = 0
@@ -26382,7 +26406,7 @@ func (o *mergeJoinInnerOp) buildLeftBufferedGroup(
 				var updatedDestStartIdx int
 				// Loop over every column.
 			LeftColLoop:
-				for colIdx, colType := range input.sourceTypes {
+				for colIdx, colType := range input.sourcePhysTypes {
 					outStartIdx := destStartIdx
 					src := currentBatch.ColVec(colIdx)
 					out := o.output.ColVec(colIdx)
@@ -26793,7 +26817,7 @@ func (o *mergeJoinInnerOp) buildLeftBufferedGroup(
 							o.builderState.left.numRepeatsIdx = 0
 						}
 					default:
-						execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+						colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 					}
 					updatedDestStartIdx = outStartIdx
 					o.builderState.left.setBuilderColumnState(initialBuilderState)
@@ -26807,7 +26831,7 @@ func (o *mergeJoinInnerOp) buildLeftBufferedGroup(
 				o.unlimitedAllocator.ReleaseBatch(currentBatch)
 				currentBatch, err = bufferedGroup.dequeue(ctx)
 				if err != nil {
-					execerror.VectorizedInternalPanic(err)
+					colexecerror.InternalError(err)
 				}
 				o.builderState.lBufferedGroupBatch = currentBatch
 				batchLength = currentBatch.Length()
@@ -26858,7 +26882,7 @@ func (o *mergeJoinInnerOp) buildRightGroupsFromBatch(
 		func() {
 			// Loop over every column.
 		RightColLoop:
-			for colIdx, colType := range input.sourceTypes {
+			for colIdx, colType := range input.sourcePhysTypes {
 				outStartIdx := destStartIdx
 				out := o.output.ColVec(colIdx + colOffset)
 				var src coldata.Vec
@@ -27456,7 +27480,7 @@ func (o *mergeJoinInnerOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -28029,7 +28053,7 @@ func (o *mergeJoinInnerOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				} else {
@@ -28622,7 +28646,7 @@ func (o *mergeJoinInnerOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					} else {
 
@@ -29195,7 +29219,7 @@ func (o *mergeJoinInnerOp) buildRightGroupsFromBatch(
 							}
 							o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 				}
@@ -29233,7 +29257,7 @@ func (o *mergeJoinInnerOp) buildRightBufferedGroup(
 				if currentBatch == nil {
 					currentBatch, err = bufferedGroup.dequeue(ctx)
 					if err != nil {
-						execerror.VectorizedInternalPanic(err)
+						colexecerror.InternalError(err)
 					}
 					o.builderState.rBufferedGroupBatch = currentBatch
 					o.builderState.right.curSrcStartIdx = 0
@@ -29246,7 +29270,7 @@ func (o *mergeJoinInnerOp) buildRightBufferedGroup(
 					}
 
 					// Loop over every column.
-					for colIdx, colType := range input.sourceTypes {
+					for colIdx, colType := range input.sourcePhysTypes {
 						out := o.output.ColVec(colIdx + colOffset)
 						src := currentBatch.ColVec(colIdx)
 						switch colType {
@@ -29485,7 +29509,7 @@ func (o *mergeJoinInnerOp) buildRightBufferedGroup(
 								)
 							}
 						default:
-							execerror.VectorizedInternalPanic(fmt.Sprintf("unhandled type %d", colType))
+							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 						}
 					}
 					outStartIdx += toAppend
@@ -29501,7 +29525,7 @@ func (o *mergeJoinInnerOp) buildRightBufferedGroup(
 					o.unlimitedAllocator.ReleaseBatch(currentBatch)
 					currentBatch, err = bufferedGroup.dequeue(ctx)
 					if err != nil {
-						execerror.VectorizedInternalPanic(err)
+						colexecerror.InternalError(err)
 					}
 					o.builderState.rBufferedGroupBatch = currentBatch
 					batchLength = currentBatch.Length()
@@ -29510,7 +29534,7 @@ func (o *mergeJoinInnerOp) buildRightBufferedGroup(
 				// We have fully processed all the batches from the buffered group, so
 				// we need to rewind it.
 				if err := bufferedGroup.rewind(); err != nil {
-					execerror.VectorizedInternalPanic(err)
+					colexecerror.InternalError(err)
 				}
 				o.builderState.rBufferedGroupBatch = nil
 			}
@@ -29626,7 +29650,7 @@ func (o *mergeJoinInnerOp) build(ctx context.Context) {
 			o.buildRightBufferedGroup(ctx, o.builderState.rGroups[0], len(o.left.sourceTypes), &o.right, o.proberState.rBufferedGroup, outStartIdx)
 
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
+			colexecerror.InternalError(fmt.Sprintf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
 		}
 	}
 }
@@ -29699,7 +29723,7 @@ func (o *mergeJoinInnerOp) Next(ctx context.Context) coldata.Batch {
 			}
 			return coldata.ZeroBatch
 		default:
-			execerror.VectorizedInternalPanic(fmt.Sprintf("unexpected merge joiner state in Next: %v", o.state))
+			colexecerror.InternalError(fmt.Sprintf("unexpected merge joiner state in Next: %v", o.state))
 		}
 	}
 }
