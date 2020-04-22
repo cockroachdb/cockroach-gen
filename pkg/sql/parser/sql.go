@@ -18386,7 +18386,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
 //line sql-gen.y:3869
 		{
-			sqlVAL.union.val = &tree.ShowTables{TableNamePrefix: tree.TableNamePrefix{
+			sqlVAL.union.val = &tree.ShowTables{ObjectNamePrefix: tree.ObjectNamePrefix{
 				CatalogName:     tree.Name(sqlDollar[4].str),
 				ExplicitCatalog: true,
 				SchemaName:      tree.Name(sqlDollar[6].str),
@@ -18398,7 +18398,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 //line sql-gen.y:3879
 		{
-			sqlVAL.union.val = &tree.ShowTables{TableNamePrefix: tree.TableNamePrefix{
+			sqlVAL.union.val = &tree.ShowTables{ObjectNamePrefix: tree.ObjectNamePrefix{
 
 				SchemaName:     tree.Name(sqlDollar[4].str),
 				ExplicitSchema: true,
@@ -25073,8 +25073,8 @@ sqldefault:
 		{
 
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
-			indexName := tree.UnrestrictedName(name.TableName)
-			name.TableName = ""
+			indexName := tree.UnrestrictedName(name.ObjectName)
+			name.ObjectName = ""
 			sqlVAL.union.val = tree.TableIndexName{
 				Table: name,
 				Index: indexName,
