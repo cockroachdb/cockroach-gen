@@ -8045,7 +8045,7 @@ func (_f *Factory) ConstructUnionAll(
 				_expr := _f.ConstructProject(
 					left,
 					_f.funcs.ProjectColMapLeft(colmap),
-					_f.funcs.MakeEmptyColSet(),
+					_f.funcs.ProjectPassthroughLeft(colmap),
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.EliminateUnionAllLeft, nil, _expr)
@@ -8063,7 +8063,7 @@ func (_f *Factory) ConstructUnionAll(
 				_expr := _f.ConstructProject(
 					right,
 					_f.funcs.ProjectColMapRight(colmap),
-					_f.funcs.MakeEmptyColSet(),
+					_f.funcs.ProjectPassthroughRight(colmap),
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.EliminateUnionAllRight, nil, _expr)
