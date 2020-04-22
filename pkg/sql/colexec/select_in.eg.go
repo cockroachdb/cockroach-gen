@@ -446,6 +446,11 @@ func (pi *projectInOpBool) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -670,6 +675,11 @@ func (pi *projectInOpBytes) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -894,6 +904,11 @@ func (pi *projectInOpDecimal) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -1125,6 +1140,11 @@ func (pi *projectInOpInt16) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -1356,6 +1376,11 @@ func (pi *projectInOpInt32) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -1587,6 +1612,11 @@ func (pi *projectInOpInt64) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -1826,6 +1856,11 @@ func (pi *projectInOpFloat64) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -2053,6 +2088,11 @@ func (pi *projectInOpTimestamp) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 
@@ -2273,6 +2313,11 @@ func (pi *projectInOpInterval) Next(ctx context.Context) coldata.Batch {
 	projVec := batch.ColVec(pi.outputIdx)
 	projCol := projVec.Bool()
 	projNulls := projVec.Nulls()
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projNulls.UnsetNulls()
+	}
 
 	n := batch.Length()
 

@@ -103,7 +103,13 @@ func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
-	rankCol := batch.ColVec(r.outputColIdx).Int64()
+	rankVec := batch.ColVec(r.outputColIdx)
+	if rankVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		rankVec.Nulls().UnsetNulls()
+	}
+	rankCol := rankVec.Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
@@ -161,7 +167,13 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
-	rankCol := batch.ColVec(r.outputColIdx).Int64()
+	rankVec := batch.ColVec(r.outputColIdx)
+	if rankVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		rankVec.Nulls().UnsetNulls()
+	}
+	rankCol := rankVec.Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
@@ -230,7 +242,13 @@ func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
-	rankCol := batch.ColVec(r.outputColIdx).Int64()
+	rankVec := batch.ColVec(r.outputColIdx)
+	if rankVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		rankVec.Nulls().UnsetNulls()
+	}
+	rankCol := rankVec.Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
@@ -286,7 +304,13 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 	partitionCol := batch.ColVec(r.partitionColIdx).Bool()
 	peersCol := batch.ColVec(r.peersColIdx).Bool()
-	rankCol := batch.ColVec(r.outputColIdx).Int64()
+	rankVec := batch.ColVec(r.outputColIdx)
+	if rankVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		rankVec.Nulls().UnsetNulls()
+	}
+	rankCol := rankVec.Int64()
 	sel := batch.Selection()
 	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {

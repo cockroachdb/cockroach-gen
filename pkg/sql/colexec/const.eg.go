@@ -127,6 +127,11 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Bool()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -165,6 +170,11 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Bytes()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -205,6 +215,11 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Decimal()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -243,6 +258,11 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int16()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -281,6 +301,11 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int32()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -319,6 +344,11 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Int64()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -357,6 +387,11 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Float64()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -395,6 +430,11 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Timestamp()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -433,6 +473,11 @@ func (c constIntervalOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(c.outputIdx)
 	col := vec.Interval()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
@@ -485,6 +530,11 @@ func (c constNullOp) Next(ctx context.Context) coldata.Batch {
 
 	col := batch.ColVec(c.outputIdx)
 	nulls := col.Nulls()
+	if col.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		nulls.UnsetNulls()
+	}
 	if sel := batch.Selection(); sel != nil {
 		for _, i := range sel[:n] {
 			nulls.SetNull(i)

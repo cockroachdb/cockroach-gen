@@ -113,6 +113,11 @@ func (s *substringInt16Int16Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int16()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int16()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -188,6 +193,11 @@ func (s *substringInt16Int32Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int16()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int32()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -263,6 +273,11 @@ func (s *substringInt16Int64Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int16()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int64()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -338,6 +353,11 @@ func (s *substringInt32Int16Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int32()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int16()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -413,6 +433,11 @@ func (s *substringInt32Int32Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int32()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int32()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -488,6 +513,11 @@ func (s *substringInt32Int64Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int32()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int64()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -563,6 +593,11 @@ func (s *substringInt64Int16Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int64()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int16()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -638,6 +673,11 @@ func (s *substringInt64Int32Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int64()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int32()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
@@ -713,6 +753,11 @@ func (s *substringInt64Int64Operator) Next(ctx context.Context) coldata.Batch {
 	startVec := batch.ColVec(s.argumentCols[1]).Int64()
 	lengthVec := batch.ColVec(s.argumentCols[2]).Int64()
 	outputVec := batch.ColVec(s.outputIdx)
+	if outputVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		outputVec.Nulls().UnsetNulls()
+	}
 	outputCol := outputVec.Bytes()
 	s.allocator.PerformOperation(
 		[]coldata.Vec{outputVec},
