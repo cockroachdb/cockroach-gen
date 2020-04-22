@@ -10279,6 +10279,110 @@ func (e *UnaryComplementExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type UnarySqrtExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &UnarySqrtExpr{}
+
+func (e *UnarySqrtExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *UnarySqrtExpr) Op() opt.Operator {
+	return opt.UnarySqrtOp
+}
+
+func (e *UnarySqrtExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UnarySqrtExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UnarySqrtExpr) Private() interface{} {
+	return nil
+}
+
+func (e *UnarySqrtExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnarySqrtExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UnarySqrtExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type UnaryCbrtExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &UnaryCbrtExpr{}
+
+func (e *UnaryCbrtExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *UnaryCbrtExpr) Op() opt.Operator {
+	return opt.UnaryCbrtOp
+}
+
+func (e *UnaryCbrtExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UnaryCbrtExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UnaryCbrtExpr) Private() interface{} {
+	return nil
+}
+
+func (e *UnaryCbrtExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UnaryCbrtExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UnaryCbrtExpr) DataType() *types.T {
+	return e.Typ
+}
+
 // CastExpr converts the input expression into an expression of the target type.
 // Note that the conversion may cause trunction based on the target types' width,
 // such as in this example:
@@ -17665,6 +17769,46 @@ func (m *Memo) MemoizeUnaryComplement(
 	return interned
 }
 
+func (m *Memo) MemoizeUnarySqrt(
+	input opt.ScalarExpr,
+) *UnarySqrtExpr {
+	const size = int64(unsafe.Sizeof(UnarySqrtExpr{}))
+	e := &UnarySqrtExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternUnarySqrt(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeUnaryCbrt(
+	input opt.ScalarExpr,
+) *UnaryCbrtExpr {
+	const size = int64(unsafe.Sizeof(UnaryCbrtExpr{}))
+	e := &UnaryCbrtExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternUnaryCbrt(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeCast(
 	input opt.ScalarExpr,
 	typ *types.T,
@@ -20044,6 +20188,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternUnaryMinus(t)
 	case *UnaryComplementExpr:
 		return in.InternUnaryComplement(t)
+	case *UnarySqrtExpr:
+		return in.InternUnarySqrt(t)
+	case *UnaryCbrtExpr:
+		return in.InternUnaryCbrt(t)
 	case *CastExpr:
 		return in.InternCast(t)
 	case *IfErrExpr:
@@ -22703,6 +22851,42 @@ func (in *interner) InternUnaryComplement(val *UnaryComplementExpr) *UnaryComple
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*UnaryComplementExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnarySqrt(val *UnarySqrtExpr) *UnarySqrtExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnarySqrtOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnarySqrtExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUnaryCbrt(val *UnaryCbrtExpr) *UnaryCbrtExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UnaryCbrtOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UnaryCbrtExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}

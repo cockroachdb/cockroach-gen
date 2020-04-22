@@ -13965,6 +13965,82 @@ func (_f *Factory) ConstructUnaryComplement(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructUnarySqrt constructs an expression for the UnarySqrt operator.
+func (_f *Factory) ConstructUnarySqrt(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldNullUnary]
+	{
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
+				_expr := _f.funcs.FoldNullUnary(opt.UnarySqrtOp, input).(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldUnary]
+	{
+		if _f.funcs.IsConstValueOrTuple(input) {
+			result := _f.funcs.FoldUnary(opt.UnarySqrtOp, input)
+			if _f.funcs.Succeeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnary, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeUnarySqrt(input)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructUnaryCbrt constructs an expression for the UnaryCbrt operator.
+func (_f *Factory) ConstructUnaryCbrt(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldNullUnary]
+	{
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryCbrtOp, input).(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldUnary]
+	{
+		if _f.funcs.IsConstValueOrTuple(input) {
+			result := _f.funcs.FoldUnary(opt.UnaryCbrtOp, input)
+			if _f.funcs.Succeeded(result) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnary, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeUnaryCbrt(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructCast constructs an expression for the Cast operator.
 // Cast converts the input expression into an expression of the target type.
 // Note that the conversion may cause trunction based on the target types' width,
@@ -15770,6 +15846,20 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.UnarySqrtExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructUnarySqrt(input)
+		}
+		return t
+
+	case *memo.UnaryCbrtExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructUnaryCbrt(input)
+		}
+		return t
+
 	case *memo.CastExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -17025,6 +17115,16 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.UnarySqrtExpr:
+		return f.ConstructUnarySqrt(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.UnaryCbrtExpr:
+		return f.ConstructUnaryCbrt(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.CastExpr:
 		return f.ConstructCast(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -18006,6 +18106,14 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.UnaryComplementOp:
 		return f.ConstructUnaryComplement(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.UnarySqrtOp:
+		return f.ConstructUnarySqrt(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.UnaryCbrtOp:
+		return f.ConstructUnaryCbrt(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.CastOp:
