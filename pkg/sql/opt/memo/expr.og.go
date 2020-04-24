@@ -6017,6 +6017,10 @@ type WithPrivate struct {
 	// it in the EXPLAIN plan).
 	OriginalExpr tree.Statement
 
+	// Mtr is used to specify whether or not to override the optimizer's
+	// default decision for materializing or not materializing tables.
+	Mtr tree.MaterializeClause
+
 	// Name is used to identify the with for debugging purposes.
 	Name string
 }
@@ -21434,6 +21438,7 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 	in.hasher.HashRelExpr(val.Main)
 	in.hasher.HashWithID(val.ID)
 	in.hasher.HashStatement(val.OriginalExpr)
+	in.hasher.HashMaterializeClause(val.Mtr)
 	in.hasher.HashString(val.Name)
 
 	in.cache.Start(in.hasher.hash)
@@ -21443,6 +21448,7 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 				in.hasher.IsRelExprEqual(val.Main, existing.Main) &&
 				in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
 				in.hasher.IsStatementEqual(val.OriginalExpr, existing.OriginalExpr) &&
+				in.hasher.IsMaterializeClauseEqual(val.Mtr, existing.Mtr) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) {
 				return existing
 			}
