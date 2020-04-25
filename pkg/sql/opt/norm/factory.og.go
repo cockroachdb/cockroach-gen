@@ -1815,16 +1815,20 @@ func (_f *Factory) ConstructInnerJoin(
 						rightWithCanary := _f.funcs.EnsureCanary(input, canaryCol)
 						translatedAggs := _f.funcs.EnsureAggsCanIgnoreNulls(rightWithCanary, aggregations)
 						_expr := _f.ConstructSelect(
-							_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
-								_f.ConstructLeftJoinApply(
-									leftWithKey,
-									rightWithCanary,
-									memo.EmptyFiltersExpr,
-									private,
-								),
-								_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
-								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
-							), translatedAggs, rightWithCanary, aggregations, canaryCol),
+							_f.ConstructProject(
+								_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
+									_f.ConstructLeftJoinApply(
+										leftWithKey,
+										rightWithCanary,
+										memo.EmptyFiltersExpr,
+										private,
+									),
+									_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
+									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
+								), translatedAggs, rightWithCanary, aggregations, canaryCol),
+								memo.EmptyProjectionsExpr,
+								_f.funcs.OutputCols2(left, right),
+							),
 							on,
 						)
 						if _f.appliedRule != nil {
@@ -1850,15 +1854,19 @@ func (_f *Factory) ConstructInnerJoin(
 						private := joinPrivate
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_expr := _f.ConstructDistinctOn(
-								_f.ConstructInnerJoin(
-									newLeft,
-									input,
-									on,
-									private,
+							_expr := _f.ConstructProject(
+								_f.ConstructDistinctOn(
+									_f.ConstructInnerJoin(
+										newLeft,
+										input,
+										on,
+										private,
+									),
+									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
-								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+								memo.EmptyProjectionsExpr,
+								_f.funcs.OutputCols2(left, right),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -2592,15 +2600,19 @@ func (_f *Factory) ConstructLeftJoin(
 						private := joinPrivate
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_expr := _f.ConstructDistinctOn(
-								_f.ConstructLeftJoin(
-									newLeft,
-									input,
-									on,
-									private,
+							_expr := _f.ConstructProject(
+								_f.ConstructDistinctOn(
+									_f.ConstructLeftJoin(
+										newLeft,
+										input,
+										on,
+										private,
+									),
+									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
-								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+								memo.EmptyProjectionsExpr,
+								_f.funcs.OutputCols2(left, right),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -3758,15 +3770,19 @@ func (_f *Factory) ConstructSemiJoin(
 					private := joinPrivate
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
-						_expr := _f.ConstructGroupBy(
-							_f.ConstructInnerJoinApply(
-								newLeft,
-								right,
-								on,
-								private,
+						_expr := _f.ConstructProject(
+							_f.ConstructGroupBy(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									right,
+									on,
+									private,
+								),
+								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
+								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
 							),
-							_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-							_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSemiJoin, nil, _expr)
@@ -5063,16 +5079,20 @@ func (_f *Factory) ConstructInnerJoinApply(
 						rightWithCanary := _f.funcs.EnsureCanary(input, canaryCol)
 						translatedAggs := _f.funcs.EnsureAggsCanIgnoreNulls(rightWithCanary, aggregations)
 						_expr := _f.ConstructSelect(
-							_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
-								_f.ConstructLeftJoinApply(
-									leftWithKey,
-									rightWithCanary,
-									memo.EmptyFiltersExpr,
-									private,
-								),
-								_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
-								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
-							), translatedAggs, rightWithCanary, aggregations, canaryCol),
+							_f.ConstructProject(
+								_f.funcs.TranslateNonIgnoreAggs(_f.ConstructGroupBy(
+									_f.ConstructLeftJoinApply(
+										leftWithKey,
+										rightWithCanary,
+										memo.EmptyFiltersExpr,
+										private,
+									),
+									_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
+									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
+								), translatedAggs, rightWithCanary, aggregations, canaryCol),
+								memo.EmptyProjectionsExpr,
+								_f.funcs.OutputCols2(left, right),
+							),
 							on,
 						)
 						if _f.appliedRule != nil {
@@ -5098,15 +5118,19 @@ func (_f *Factory) ConstructInnerJoinApply(
 						private := joinPrivate
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_expr := _f.ConstructDistinctOn(
-								_f.ConstructInnerJoinApply(
-									newLeft,
-									input,
-									on,
-									private,
+							_expr := _f.ConstructProject(
+								_f.ConstructDistinctOn(
+									_f.ConstructInnerJoinApply(
+										newLeft,
+										input,
+										on,
+										private,
+									),
+									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
-								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+								memo.EmptyProjectionsExpr,
+								_f.funcs.OutputCols2(left, right),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -5839,15 +5863,19 @@ func (_f *Factory) ConstructLeftJoinApply(
 						private := joinPrivate
 						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimitOne) {
 							newLeft := _f.funcs.EnsureKey(left)
-							_expr := _f.ConstructDistinctOn(
-								_f.ConstructLeftJoinApply(
-									newLeft,
-									input,
-									on,
-									private,
+							_expr := _f.ConstructProject(
+								_f.ConstructDistinctOn(
+									_f.ConstructLeftJoinApply(
+										newLeft,
+										input,
+										on,
+										private,
+									),
+									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
+									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
-								_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-								_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+								memo.EmptyProjectionsExpr,
+								_f.funcs.OutputCols2(left, right),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -6355,15 +6383,19 @@ func (_f *Factory) ConstructSemiJoinApply(
 					private := joinPrivate
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
-						_expr := _f.ConstructGroupBy(
-							_f.ConstructInnerJoinApply(
-								newLeft,
-								right,
-								on,
-								private,
+						_expr := _f.ConstructProject(
+							_f.ConstructGroupBy(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									right,
+									on,
+									private,
+								),
+								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
+								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
 							),
-							_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-							_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSemiJoin, nil, _expr)
