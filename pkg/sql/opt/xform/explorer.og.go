@@ -256,42 +256,35 @@ func (_e *explorer) exploreSelect(
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						if _e.funcs.HasStrictKey(input) {
 							filters := _root.Filters
-							for i := range filters {
-								item := &filters[i]
-								or := item.Condition
-								_or, _ := or.(*memo.OrExpr)
-								if _or != nil {
-									pair := _e.funcs.ExprPairForSplitDisjunction(or)
-									if _e.funcs.ExprPairSucceeded(pair) {
-										if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairLeft(pair))) {
-											if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairRight(pair))) {
-												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
-													rightScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
-													_expr := &memo.DistinctOnExpr{
-														Input: _e.f.ConstructUnionAll(
-															_e.f.ConstructSelect(
-																input,
-																_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairLeft(pair)),
-															),
-															_e.f.ConstructSelect(
-																_e.f.ConstructScan(
-																	rightScanPrivate,
-																),
-																_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairRight(pair)), scanPrivate, rightScanPrivate),
-															),
-															_e.funcs.MakeSetPrivateForSplitDisjunction(scanPrivate, rightScanPrivate),
+							pair := _e.funcs.ExprPairForSplitDisjunction(filters)
+							if _e.funcs.ExprPairSucceeded(pair) {
+								if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairLeft(pair))) {
+									if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairRight(pair))) {
+										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
+											rightScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
+											_expr := &memo.DistinctOnExpr{
+												Input: _e.f.ConstructUnionAll(
+													_e.f.ConstructSelect(
+														input,
+														_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairLeft(pair)),
+													),
+													_e.f.ConstructSelect(
+														_e.f.ConstructScan(
+															rightScanPrivate,
 														),
-														Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(input)),
-														GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(input)),
-													}
-													_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
-													if _e.o.appliedRule != nil {
-														if _interned != _expr {
-															_e.o.appliedRule(opt.SplitDisjunction, _root, nil)
-														} else {
-															_e.o.appliedRule(opt.SplitDisjunction, _root, _interned)
-														}
-													}
+														_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairRight(pair)), scanPrivate, rightScanPrivate),
+													),
+													_e.funcs.MakeSetPrivateForSplitDisjunction(scanPrivate, rightScanPrivate),
+												),
+												Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(input)),
+												GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(input)),
+											}
+											_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
+											if _e.o.appliedRule != nil {
+												if _interned != _expr {
+													_e.o.appliedRule(opt.SplitDisjunction, _root, nil)
+												} else {
+													_e.o.appliedRule(opt.SplitDisjunction, _root, _interned)
 												}
 											}
 										}
@@ -327,50 +320,43 @@ func (_e *explorer) exploreSelect(
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						if !_e.funcs.HasStrictKey(input) {
 							filters := _root.Filters
-							for i := range filters {
-								item := &filters[i]
-								or := item.Condition
-								_or, _ := or.(*memo.OrExpr)
-								if _or != nil {
-									pair := _e.funcs.ExprPairForSplitDisjunction(or)
-									if _e.funcs.ExprPairSucceeded(pair) {
-										if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairLeft(pair))) {
-											if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairRight(pair))) {
-												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionAddKey) {
-													leftScanPrivate := _e.funcs.AddPrimaryKeyColsToScanPrivate(scanPrivate)
-													leftScan := _e.f.ConstructScan(
-														leftScanPrivate,
-													)
-													rightScanPrivate := _e.funcs.DuplicateScanPrivate(leftScanPrivate)
-													_expr := &memo.ProjectExpr{
-														Input: _e.f.ConstructDistinctOn(
-															_e.f.ConstructUnionAll(
-																_e.f.ConstructSelect(
-																	leftScan,
-																	_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairLeft(pair)),
-																),
-																_e.f.ConstructSelect(
-																	_e.f.ConstructScan(
-																		rightScanPrivate,
-																	),
-																	_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, item, _e.funcs.ExprPairRight(pair)), leftScanPrivate, rightScanPrivate),
-																),
-																_e.funcs.MakeSetPrivateForSplitDisjunction(leftScanPrivate, rightScanPrivate),
-															),
-															_e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(leftScan)),
-															_e.funcs.MakeGrouping(_e.funcs.KeyCols(leftScan)),
+							pair := _e.funcs.ExprPairForSplitDisjunction(filters)
+							if _e.funcs.ExprPairSucceeded(pair) {
+								if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairLeft(pair))) {
+									if _e.funcs.CanMaybeConstrainIndexWithCols(scanPrivate, _e.funcs.OuterCols(_e.funcs.ExprPairRight(pair))) {
+										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionAddKey) {
+											leftScanPrivate := _e.funcs.AddPrimaryKeyColsToScanPrivate(scanPrivate)
+											leftScan := _e.f.ConstructScan(
+												leftScanPrivate,
+											)
+											rightScanPrivate := _e.funcs.DuplicateScanPrivate(leftScanPrivate)
+											_expr := &memo.ProjectExpr{
+												Input: _e.f.ConstructDistinctOn(
+													_e.f.ConstructUnionAll(
+														_e.f.ConstructSelect(
+															leftScan,
+															_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairLeft(pair)),
 														),
-														Projections: memo.EmptyProjectionsExpr,
-														Passthrough: _e.funcs.OutputCols(input),
-													}
-													_interned := _e.mem.AddProjectToGroup(_expr, _root)
-													if _e.o.appliedRule != nil {
-														if _interned != _expr {
-															_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, nil)
-														} else {
-															_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, _interned)
-														}
-													}
+														_e.f.ConstructSelect(
+															_e.f.ConstructScan(
+																rightScanPrivate,
+															),
+															_e.funcs.MapScanFilterCols(_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairRight(pair)), leftScanPrivate, rightScanPrivate),
+														),
+														_e.funcs.MakeSetPrivateForSplitDisjunction(leftScanPrivate, rightScanPrivate),
+													),
+													_e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(leftScan)),
+													_e.funcs.MakeGrouping(_e.funcs.KeyCols(leftScan)),
+												),
+												Projections: memo.EmptyProjectionsExpr,
+												Passthrough: _e.funcs.OutputCols(input),
+											}
+											_interned := _e.mem.AddProjectToGroup(_expr, _root)
+											if _e.o.appliedRule != nil {
+												if _interned != _expr {
+													_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, nil)
+												} else {
+													_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, _interned)
 												}
 											}
 										}
