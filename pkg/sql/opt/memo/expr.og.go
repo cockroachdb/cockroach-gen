@@ -5,6 +5,7 @@ package memo
 import (
 	"unsafe"
 
+	"github.com/cockroachdb/cockroach/pkg/geo/geoindex"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
@@ -2711,6 +2712,191 @@ type LookupJoinPrivate struct {
 	// conditions on the KeyCols. These filters are needed by the statistics code to
 	// correctly estimate selectivity.
 	ConstFilters FiltersExpr
+	JoinPrivate
+}
+
+// GeoLookupJoinExpr represents a join between an input expression and an index,
+// where the index is an inverted index on a Geometry or Geography column.
+//
+// A GeoLookupJoin can be generated for queries containing a join where one of
+// the join conditions is a geospatial binary function such as ST_Covers or
+// ST_CoveredBy, and at least one of the two inputs to the function is an
+// indexed geospatial column. The type of geospatial function implies the
+// GeoRelationshipType (Covers, CoveredBy or Intersects) for the join, which is
+// stored in the GeoLookupJoinPrivate and affects how the join is executed. For
+// a full list of the geospatial functions that can be index-accelerated and
+// their corresponding GeoRelationshipTypes, see geoRelationshipMap in
+// xform/custom_funcs.go.
+//
+// The GeoLookupJoin has no false negatives, but it may return false positives
+// that would not have been returned by the original geospatial function
+// join predicate. Therefore, the original function must still be applied on
+// the output of the join. Since the inverted index does not actually include
+// the geospatial column (or any other columns besides the primary key columns),
+// the GeoLookupJoin will be wrapped in an index join. The geospatial function
+// and any other filters on non-key columns will be appied as filters on the
+// outer index join.
+type GeoLookupJoinExpr struct {
+	Input RelExpr
+
+	// On only contains filters on the input columns and primary key columns of
+	// the inverted index's base table. (Since the indexed geospatial column is
+	// not actually included in the index, the GeoLookupJoin must be wrapped in
+	// an index join, which will contain the original geospatial function as one
+	// of its On conditions.)
+	On FiltersExpr
+	GeoLookupJoinPrivate
+
+	// lookupProps caches relational properties for the "table" side of the lookup
+	// join, treating it as if it were another relational input. This makes the
+	// lookup join appear more like other join operators.
+	lookupProps props.Relational
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &GeoLookupJoinExpr{}
+
+func (e *GeoLookupJoinExpr) Op() opt.Operator {
+	return opt.GeoLookupJoinOp
+}
+
+func (e *GeoLookupJoinExpr) ChildCount() int {
+	return 2
+}
+
+func (e *GeoLookupJoinExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.On
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *GeoLookupJoinExpr) Private() interface{} {
+	return &e.GeoLookupJoinPrivate
+}
+
+func (e *GeoLookupJoinExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *GeoLookupJoinExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.On = *child.(*FiltersExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *GeoLookupJoinExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *GeoLookupJoinExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *GeoLookupJoinExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *GeoLookupJoinExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *GeoLookupJoinExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *GeoLookupJoinExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *GeoLookupJoinExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *GeoLookupJoinExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *GeoLookupJoinExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *GeoLookupJoinExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *GeoLookupJoinExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type geoLookupJoinGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first GeoLookupJoinExpr
+	best  bestProps
+}
+
+var _ exprGroup = &geoLookupJoinGroup{}
+
+func (g *geoLookupJoinGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *geoLookupJoinGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *geoLookupJoinGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *geoLookupJoinGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type GeoLookupJoinPrivate struct {
+	// JoinType is InnerJoin, LeftJoin, SemiJoin, or AntiJoin.
+	JoinType opt.Operator
+
+	// GeoRelationshipType is Covers, CoveredBy, or Intersects.
+	GeoRelationshipType geoindex.RelationshipType
+
+	// Table identifies the table do to lookups in.
+	Table opt.TableID
+
+	// Index identifies the geospatial inverted index to do lookups in. It can
+	// be passed to the cat.Table.Index() method in order to fetch the cat.Index
+	// metadata.
+	Index cat.IndexOrdinal
+
+	// GeoCol is the geospatial column (produced by the input) used to
+	// determine the keys (i.e., s2 CellIDs) to scan in the inverted index.
+	GeoCol opt.ColumnID
+
+	// Cols is the set of columns produced by the geospatial lookup join. This
+	// set can contain columns from the input and columns from the index. Any
+	// columns not in the input are retrieved from the index.
+	Cols opt.ColSet
 	JoinPrivate
 }
 
@@ -16023,6 +16209,33 @@ func (m *Memo) MemoizeLookupJoin(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeGeoLookupJoin(
+	input RelExpr,
+	on FiltersExpr,
+	geoLookupJoinPrivate *GeoLookupJoinPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(geoLookupJoinGroup{}))
+	grp := &geoLookupJoinGroup{mem: m, first: GeoLookupJoinExpr{
+		Input:                input,
+		On:                   on,
+		GeoLookupJoinPrivate: *geoLookupJoinPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternGeoLookupJoin(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		e.initUnexportedFields(m)
+		m.logPropsBuilder.buildGeoLookupJoinProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeMergeJoin(
 	left RelExpr,
 	right RelExpr,
@@ -19554,6 +19767,21 @@ func (m *Memo) AddLookupJoinToGroup(e *LookupJoinExpr, grp RelExpr) *LookupJoinE
 	return interned
 }
 
+func (m *Memo) AddGeoLookupJoinToGroup(e *GeoLookupJoinExpr, grp RelExpr) *GeoLookupJoinExpr {
+	const size = int64(unsafe.Sizeof(GeoLookupJoinExpr{}))
+	interned := m.interner.InternGeoLookupJoin(e)
+	if interned == e {
+		e.initUnexportedFields(m)
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddMergeJoinToGroup(e *MergeJoinExpr, grp RelExpr) *MergeJoinExpr {
 	const size = int64(unsafe.Sizeof(MergeJoinExpr{}))
 	interned := m.interner.InternMergeJoin(e)
@@ -20183,6 +20411,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternIndexJoin(t)
 	case *LookupJoinExpr:
 		return in.InternLookupJoin(t)
+	case *GeoLookupJoinExpr:
+		return in.InternGeoLookupJoin(t)
 	case *MergeJoinExpr:
 		return in.InternMergeJoin(t)
 	case *ZigzagJoinExpr:
@@ -21040,6 +21270,40 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
+				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternGeoLookupJoin(val *GeoLookupJoinExpr) *GeoLookupJoinExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.GeoLookupJoinOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFiltersExpr(val.On)
+	in.hasher.HashOperator(val.JoinType)
+	in.hasher.HashGeoRelationshipType(val.GeoRelationshipType)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashIndexOrdinal(val.Index)
+	in.hasher.HashColumnID(val.GeoCol)
+	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashJoinFlags(val.Flags)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*GeoLookupJoinExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
+				in.hasher.IsOperatorEqual(val.JoinType, existing.JoinType) &&
+				in.hasher.IsGeoRelationshipTypeEqual(val.GeoRelationshipType, existing.GeoRelationshipType) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
+				in.hasher.IsColumnIDEqual(val.GeoCol, existing.GeoCol) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
 				return existing
 			}
@@ -24580,6 +24844,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildIndexJoinProps(t, rel)
 	case *LookupJoinExpr:
 		b.buildLookupJoinProps(t, rel)
+	case *GeoLookupJoinExpr:
+		b.buildGeoLookupJoinProps(t, rel)
 	case *MergeJoinExpr:
 		b.buildMergeJoinProps(t, rel)
 	case *ZigzagJoinExpr:

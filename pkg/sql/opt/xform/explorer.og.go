@@ -464,6 +464,57 @@ func (_e *explorer) exploreInnerJoin(
 		}
 	}
 
+	// [GenerateGeoLookupJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						if _e.funcs.HasInvertedIndexes(scanPrivate) {
+							on := _root.On
+							for i := range on {
+								_item := &on[i]
+								fn := _item.Condition
+								_function, _ := fn.(*memo.FunctionExpr)
+								if _function != nil {
+									if _e.funcs.IsGeoIndexFunction(fn) {
+										if _e.funcs.HasAllVariableArgs(fn) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateGeoLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, on, private, fn)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateLookupJoinsWithFilter]
 	{
 		_partlyExplored := _rootOrd < _rootState.start
@@ -919,6 +970,57 @@ func (_e *explorer) exploreSemiJoin(
 		}
 	}
 
+	// [GenerateGeoLookupJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						if _e.funcs.HasInvertedIndexes(scanPrivate) {
+							on := _root.On
+							for i := range on {
+								_item := &on[i]
+								fn := _item.Condition
+								_function, _ := fn.(*memo.FunctionExpr)
+								if _function != nil {
+									if _e.funcs.IsGeoIndexFunction(fn) {
+										if _e.funcs.HasAllVariableArgs(fn) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateGeoLookupJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private, fn)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
@@ -979,6 +1081,57 @@ func (_e *explorer) exploreAntiJoin(
 							_e.funcs.GenerateLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateGeoLookupJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						if _e.funcs.HasInvertedIndexes(scanPrivate) {
+							on := _root.On
+							for i := range on {
+								_item := &on[i]
+								fn := _item.Condition
+								_function, _ := fn.(*memo.FunctionExpr)
+								if _function != nil {
+									if _e.funcs.IsGeoIndexFunction(fn) {
+										if _e.funcs.HasAllVariableArgs(fn) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateGeoLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private, fn)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
 							}
 						}
 					}
