@@ -1296,7 +1296,7 @@ func (_f *Factory) ConstructProject(
 
 	// [PruneAggCols]
 	{
-		if input.Op() == opt.GroupByOp || input.Op() == opt.ScalarGroupByOp || input.Op() == opt.DistinctOnOp {
+		if input.Op() == opt.GroupByOp || input.Op() == opt.ScalarGroupByOp || input.Op() == opt.DistinctOnOp || input.Op() == opt.EnsureDistinctOnOp {
 			innerInput := input.Child(0).(memo.RelExpr)
 			aggregations := *input.Child(1).(*memo.AggregationsExpr)
 			groupingPrivate := input.Private().(*memo.GroupingPrivate)
@@ -1824,7 +1824,7 @@ func (_f *Factory) ConstructInnerJoin(
 										private,
 									),
 									_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
-									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
+									_f.funcs.MakeGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
 								), translatedAggs, rightWithCanary, aggregations, canaryCol),
 								memo.EmptyProjectionsExpr,
 								_f.funcs.OutputCols2(left, right),
@@ -1863,7 +1863,7 @@ func (_f *Factory) ConstructInnerJoin(
 										private,
 									),
 									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
 								_f.funcs.OutputCols2(left, right),
@@ -1910,6 +1910,41 @@ func (_f *Factory) ConstructInnerJoin(
 						_f.appliedRule(opt.TryDecorrelateWindow, nil, _expr)
 					}
 					return _expr
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateMax1Row]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_max1Row, _ := right.(*memo.Max1RowExpr)
+			if _max1Row != nil {
+				input := _max1Row.Input
+				errorText := _max1Row.ErrorText
+				if len(on) == 0 {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateMax1Row) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_expr := _f.ConstructProject(
+							_f.ConstructEnsureDistinctOn(
+								_f.ConstructInnerJoin(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+									private,
+								),
+								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.UnionCols(_f.funcs.NonKeyCols(newLeft), _f.funcs.OutputCols(input))),
+								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
+						}
+						return _expr
+					}
 				}
 			}
 		}
@@ -2609,7 +2644,7 @@ func (_f *Factory) ConstructLeftJoin(
 										private,
 									),
 									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
 								_f.funcs.OutputCols2(left, right),
@@ -2619,6 +2654,41 @@ func (_f *Factory) ConstructLeftJoin(
 							}
 							return _expr
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateMax1Row]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_max1Row, _ := right.(*memo.Max1RowExpr)
+			if _max1Row != nil {
+				input := _max1Row.Input
+				errorText := _max1Row.ErrorText
+				if len(on) == 0 {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateMax1Row) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_expr := _f.ConstructProject(
+							_f.ConstructEnsureDistinctOn(
+								_f.ConstructLeftJoin(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+									private,
+								),
+								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.UnionCols(_f.funcs.NonKeyCols(newLeft), _f.funcs.OutputCols(input))),
+								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
+						}
+						return _expr
 					}
 				}
 			}
@@ -3779,7 +3849,7 @@ func (_f *Factory) ConstructSemiJoin(
 									private,
 								),
 								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
+								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering()),
 							),
 							memo.EmptyProjectionsExpr,
 							_f.funcs.OutputCols2(left, right),
@@ -5088,7 +5158,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 										private,
 									),
 									_f.funcs.AppendAggCols2(translatedAggs, opt.ConstAggOp, _f.funcs.NonKeyCols(leftWithKey), opt.AnyNotNullAggOp, _f.funcs.CanaryColSet(canaryCol)),
-									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
+									_f.funcs.MakeGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
 								), translatedAggs, rightWithCanary, aggregations, canaryCol),
 								memo.EmptyProjectionsExpr,
 								_f.funcs.OutputCols2(left, right),
@@ -5127,7 +5197,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 										private,
 									),
 									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
 								_f.funcs.OutputCols2(left, right),
@@ -5202,6 +5272,41 @@ func (_f *Factory) ConstructInnerJoinApply(
 						_f.appliedRule(opt.TryDecorrelateWindow, nil, _expr)
 					}
 					return _expr
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateMax1Row]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_max1Row, _ := right.(*memo.Max1RowExpr)
+			if _max1Row != nil {
+				input := _max1Row.Input
+				errorText := _max1Row.ErrorText
+				if len(on) == 0 {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateMax1Row) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_expr := _f.ConstructProject(
+							_f.ConstructEnsureDistinctOn(
+								_f.ConstructInnerJoinApply(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+									private,
+								),
+								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.UnionCols(_f.funcs.NonKeyCols(newLeft), _f.funcs.OutputCols(input))),
+								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
+						}
+						return _expr
+					}
 				}
 			}
 		}
@@ -5872,7 +5977,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 										private,
 									),
 									_f.funcs.MakeAggCols2(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft), opt.FirstAggOp, _f.funcs.OutputCols(input)),
-									_f.funcs.MakeOrderedGrouping(_f.funcs.KeyCols(newLeft), ordering),
+									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
 								_f.funcs.OutputCols2(left, right),
@@ -5882,6 +5987,41 @@ func (_f *Factory) ConstructLeftJoinApply(
 							}
 							return _expr
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// [TryDecorrelateMax1Row]
+	{
+		if _f.funcs.HasOuterCols(right) {
+			_max1Row, _ := right.(*memo.Max1RowExpr)
+			if _max1Row != nil {
+				input := _max1Row.Input
+				errorText := _max1Row.ErrorText
+				if len(on) == 0 {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateMax1Row) {
+						newLeft := _f.funcs.EnsureKey(left)
+						_expr := _f.ConstructProject(
+							_f.ConstructEnsureDistinctOn(
+								_f.ConstructLeftJoinApply(
+									newLeft,
+									input,
+									memo.EmptyFiltersExpr,
+									private,
+								),
+								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.UnionCols(_f.funcs.NonKeyCols(newLeft), _f.funcs.OutputCols(input))),
+								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
+							),
+							memo.EmptyProjectionsExpr,
+							_f.funcs.OutputCols2(left, right),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
+						}
+						return _expr
 					}
 				}
 			}
@@ -6392,7 +6532,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 									private,
 								),
 								_f.funcs.MakeAggCols(opt.ConstAggOp, _f.funcs.NonKeyCols(newLeft)),
-								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft)),
+								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering()),
 							),
 							memo.EmptyProjectionsExpr,
 							_f.funcs.OutputCols2(left, right),
@@ -7592,7 +7732,7 @@ func (_f *Factory) ConstructScalarGroupBy(
 						_f.ConstructDistinctOn(
 							input,
 							memo.EmptyAggregationsExpr,
-							_f.funcs.MakeUnorderedGrouping(_f.funcs.ExtractAggInputColumns(agg)),
+							_f.funcs.MakeGrouping(_f.funcs.ExtractAggInputColumns(agg), _f.funcs.EmptyOrdering()),
 						),
 						memo.AggregationsExpr{
 							_f.ConstructAggregationsItem(
@@ -7883,6 +8023,100 @@ func (_f *Factory) ConstructDistinctOn(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructEnsureDistinctOn constructs an expression for the EnsureDistinctOn operator.
+// EnsureDistinctOn is a variation on DistinctOn that is only used to replace a
+// Max1Row operator in a decorrelation attempt. It raises an error if any
+// distinct grouping contains more than one row. Or in other words, it "ensures"
+// that the input is distinct on the grouping columns.
+//
+// Rules should only "push through" or eliminate an EnsureDistinctOn if they
+// preserve the expected error behavior. For example, it would be invalid to
+// push a Select filter into an EnsureDistinctOn, as it might eliminate rows
+// that would otherwise trigger the EnsureDistinctOn error.
+func (_f *Factory) ConstructEnsureDistinctOn(
+	input memo.RelExpr,
+	aggregations memo.AggregationsExpr,
+	groupingPrivate *memo.GroupingPrivate,
+) memo.RelExpr {
+	// [EliminateDistinct]
+	{
+		aggs := aggregations
+		if _f.funcs.ColsAreStrictKey(_f.funcs.GroupingCols(groupingPrivate), input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
+				_expr := _f.ConstructProject(
+					input,
+					memo.EmptyProjectionsExpr,
+					_f.funcs.GroupingOutputCols(groupingPrivate, aggs),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateGroupByProject]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
+					_expr := _f.ConstructEnsureDistinctOn(
+						innerInput,
+						aggregations,
+						groupingPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [EliminateEnsureDistinctNoColumns]
+	{
+		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
+			if _f.funcs.RaisesErrorOnDup(groupingPrivate) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEnsureDistinctNoColumns) {
+					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
+						input,
+						_f.funcs.ErrorOnDup(groupingPrivate),
+					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateEnsureDistinctNoColumns, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [PruneGroupByCols]
+	{
+		needed := _f.funcs.UnionCols(_f.funcs.AggregationOuterCols(aggregations), _f.funcs.NeededGroupingCols(groupingPrivate))
+		if _f.funcs.CanPruneCols(input, needed) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.PruneGroupByCols) {
+				_expr := _f.ConstructEnsureDistinctOn(
+					_f.funcs.PruneCols(input, needed),
+					aggregations,
+					_f.funcs.PruneOrderingGroupBy(groupingPrivate, needed),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.PruneGroupByCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeEnsureDistinctOn(input, aggregations, groupingPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructUpsertDistinctOn constructs an expression for the UpsertDistinctOn operator.
 // UpsertDistinctOn is a variation on DistinctOn that is only used with UPSERT
 // and INSERT..ON CONFLICT statements. It differs from DistinctOn in two ways:
@@ -7964,17 +8198,17 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 		}
 	}
 
-	// [EliminateErrorDistinctNoColumns]
+	// [EliminateEnsureDistinctNoColumns]
 	{
 		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
 			if _f.funcs.RaisesErrorOnDup(groupingPrivate) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateErrorDistinctNoColumns) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEnsureDistinctNoColumns) {
 					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
 						input,
-						_f.funcs.DuplicateUpsertErrText(),
+						_f.funcs.ErrorOnDup(groupingPrivate),
 					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateErrorDistinctNoColumns, nil, _expr)
+						_f.appliedRule(opt.EliminateEnsureDistinctNoColumns, nil, _expr)
 					}
 					return _expr
 				}
@@ -14306,7 +14540,7 @@ func (_f *Factory) ConstructArrayFlatten(
 										_f.funcs.MakeArrayAggCol(_f.funcs.ArrayType(requestedCol)),
 									),
 								},
-								_f.funcs.MakeOrderedGrouping(_f.funcs.MakeEmptyColSet(), _f.funcs.SubqueryOrdering(subquery)),
+								_f.funcs.MakeGrouping(_f.funcs.MakeEmptyColSet(), _f.funcs.SubqueryOrdering(subquery)),
 							),
 							_f.funcs.MakeUnorderedSubquery(),
 						),
@@ -15292,6 +15526,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
 		if input != t.Input || aggregationsChanged {
 			return f.ConstructDistinctOn(input, aggregations, &t.GroupingPrivate)
+		}
+		return t
+
+	case *memo.EnsureDistinctOnExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
+		if input != t.Input || aggregationsChanged {
+			return f.ConstructEnsureDistinctOn(input, aggregations, &t.GroupingPrivate)
 		}
 		return t
 
@@ -16705,6 +16947,13 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.GroupingPrivate,
 		)
 
+	case *memo.EnsureDistinctOnExpr:
+		return f.ConstructEnsureDistinctOn(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultAggregationsExpr(t.Aggregations, replace),
+			&t.GroupingPrivate,
+		)
+
 	case *memo.UpsertDistinctOnExpr:
 		return f.ConstructUpsertDistinctOn(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -17758,6 +18007,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.DistinctOnOp:
 		return f.ConstructDistinctOn(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.AggregationsExpr),
+			args[2].(*memo.GroupingPrivate),
+		)
+	case opt.EnsureDistinctOnOp:
+		return f.ConstructEnsureDistinctOn(
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.AggregationsExpr),
 			args[2].(*memo.GroupingPrivate),

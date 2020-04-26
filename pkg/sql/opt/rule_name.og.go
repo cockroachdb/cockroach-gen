@@ -55,6 +55,7 @@ const (
 	TryDecorrelateLimitOne
 	TryDecorrelateProjectSet
 	TryDecorrelateWindow
+	TryDecorrelateMax1Row
 	HoistSelectExists
 	HoistSelectNotExists
 	HoistSelectSubquery
@@ -90,7 +91,7 @@ const (
 	EliminateAggDistinctForKeys
 	EliminateAggFilteredDistinctForKeys
 	EliminateDistinctNoColumns
-	EliminateErrorDistinctNoColumns
+	EliminateEnsureDistinctNoColumns
 	EliminateDistinctOnValues
 	PushAggDistinctIntoScalarGroupBy
 	PushAggFilterIntoScalarGroupBy

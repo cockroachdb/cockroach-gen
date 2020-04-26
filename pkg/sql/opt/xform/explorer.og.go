@@ -277,7 +277,7 @@ func (_e *explorer) exploreSelect(
 													_e.funcs.MakeSetPrivateForSplitDisjunction(scanPrivate, rightScanPrivate),
 												),
 												Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(input)),
-												GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(input)),
+												GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(input), _e.funcs.EmptyOrdering()),
 											}
 											_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
 											if _e.o.appliedRule != nil {
@@ -346,7 +346,7 @@ func (_e *explorer) exploreSelect(
 														_e.funcs.MakeSetPrivateForSplitDisjunction(leftScanPrivate, rightScanPrivate),
 													),
 													_e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(leftScan)),
-													_e.funcs.MakeGrouping(_e.funcs.KeyCols(leftScan)),
+													_e.funcs.MakeGrouping(_e.funcs.KeyCols(leftScan), _e.funcs.EmptyOrdering()),
 												),
 												Projections: memo.EmptyProjectionsExpr,
 												Passthrough: _e.funcs.OutputCols(input),
@@ -839,7 +839,7 @@ func (_e *explorer) exploreSemiJoin(
 								_e.f.ConstructDistinctOn(
 									right,
 									memo.EmptyAggregationsExpr,
-									_e.funcs.MakeGrouping(_e.funcs.IntersectionCols(_e.funcs.OutputCols(right), _e.funcs.FilterOuterCols(on))),
+									_e.funcs.MakeGrouping(_e.funcs.IntersectionCols(_e.funcs.OutputCols(right), _e.funcs.FilterOuterCols(on)), _e.funcs.EmptyOrdering()),
 								),
 								on,
 								private,
