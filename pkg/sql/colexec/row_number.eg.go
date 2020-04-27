@@ -63,7 +63,8 @@ var _ colexecbase.Operator = &rowNumberNoPartitionOp{}
 
 func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
+	n := batch.Length()
+	if n == 0 {
 		return coldata.ZeroBatch
 	}
 
@@ -76,12 +77,12 @@ func (r *rowNumberNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	rowNumberCol := rowNumberVec.Int64()
 	sel := batch.Selection()
 	if sel != nil {
-		for i := 0; i < batch.Length(); i++ {
+		for _, i := range sel[:n] {
 			r.rowNumber++
-			rowNumberCol[sel[i]] = r.rowNumber
+			rowNumberCol[i] = r.rowNumber
 		}
 	} else {
-		for i := 0; i < batch.Length(); i++ {
+		for i := range rowNumberCol[:n] {
 			r.rowNumber++
 			rowNumberCol[i] = r.rowNumber
 		}
@@ -97,7 +98,8 @@ var _ colexecbase.Operator = &rowNumberWithPartitionOp{}
 
 func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	batch := r.Input().Next(ctx)
-	if batch.Length() == 0 {
+	n := batch.Length()
+	if n == 0 {
 		return coldata.ZeroBatch
 	}
 
@@ -111,15 +113,15 @@ func (r *rowNumberWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	rowNumberCol := rowNumberVec.Int64()
 	sel := batch.Selection()
 	if sel != nil {
-		for i := 0; i < batch.Length(); i++ {
-			if partitionCol[sel[i]] {
-				r.rowNumber = 1
+		for _, i := range sel[:n] {
+			if partitionCol[i] {
+				r.rowNumber = 0
 			}
 			r.rowNumber++
-			rowNumberCol[sel[i]] = r.rowNumber
+			rowNumberCol[i] = r.rowNumber
 		}
 	} else {
-		for i := 0; i < batch.Length(); i++ {
+		for i := range rowNumberCol[:n] {
 			if partitionCol[i] {
 				r.rowNumber = 0
 			}

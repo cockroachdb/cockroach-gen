@@ -111,7 +111,6 @@ func (r *rankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 	rankCol := rankVec.Int64()
 	sel := batch.Selection()
-	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
 		for _, i := range sel[:n] {
 			if peersCol[i] {
@@ -175,14 +174,15 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 	rankCol := rankVec.Int64()
 	sel := batch.Selection()
-	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
 		for _, i := range sel[:n] {
 			if partitionCol[i] {
-				r.rank = 1
+				// We need to reset the internal state because of the new partition.
+				// Note that the beginning of new partition necessarily starts a new
+				// peer group, so peersCol[i] *must* be true, and we will correctly
+				// update the rank before setting it to rankCol.
+				r.rank = 0
 				r.rankIncrement = 1
-				rankCol[i] = 1
-				continue
 			}
 			if peersCol[i] {
 				r.rank += r.rankIncrement
@@ -196,10 +196,12 @@ func (r *rankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	} else {
 		for i := range rankCol[:n] {
 			if partitionCol[i] {
-				r.rank = 1
+				// We need to reset the internal state because of the new partition.
+				// Note that the beginning of new partition necessarily starts a new
+				// peer group, so peersCol[i] *must* be true, and we will correctly
+				// update the rank before setting it to rankCol.
+				r.rank = 0
 				r.rankIncrement = 1
-				rankCol[i] = 1
-				continue
 			}
 			if peersCol[i] {
 				r.rank += r.rankIncrement
@@ -250,7 +252,6 @@ func (r *denseRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 	rankCol := rankVec.Int64()
 	sel := batch.Selection()
-	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
 		for _, i := range sel[:n] {
 			if peersCol[i] {
@@ -312,14 +313,15 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	}
 	rankCol := rankVec.Int64()
 	sel := batch.Selection()
-	// TODO(yuzefovich): template out sel vs non-sel cases.
 	if sel != nil {
 		for _, i := range sel[:n] {
 			if partitionCol[i] {
-				r.rank = 1
+				// We need to reset the internal state because of the new partition.
+				// Note that the beginning of new partition necessarily starts a new
+				// peer group, so peersCol[i] *must* be true, and we will correctly
+				// update the rank before setting it to rankCol.
+				r.rank = 0
 				r.rankIncrement = 1
-				rankCol[i] = 1
-				continue
 			}
 			if peersCol[i] {
 				r.rank++
@@ -332,10 +334,12 @@ func (r *denseRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 	} else {
 		for i := range rankCol[:n] {
 			if partitionCol[i] {
-				r.rank = 1
+				// We need to reset the internal state because of the new partition.
+				// Note that the beginning of new partition necessarily starts a new
+				// peer group, so peersCol[i] *must* be true, and we will correctly
+				// update the rank before setting it to rankCol.
+				r.rank = 0
 				r.rankIncrement = 1
-				rankCol[i] = 1
-				continue
 			}
 			if peersCol[i] {
 				r.rank++

@@ -251,12 +251,14 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			r.scratch = r.allocator.NewMemBatchWithSize(r.inputTypes, n)
 			r.allocator.PerformOperation(r.scratch.ColVecs(), func() {
 				for colIdx, vec := range r.scratch.ColVecs() {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       batch.ColVec(colIdx),
-							Sel:       sel,
-							SrcEndIdx: n,
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       batch.ColVec(colIdx),
+								Sel:       sel,
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -284,13 +286,15 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 
 			r.output.ResetInternalBatch()
 			// First, we copy over the buffered up columns.
-			r.allocator.PerformOperation(r.output.ColVecs()[:r.outputColIdx], func() {
-				for colIdx, vec := range r.output.ColVecs()[:r.outputColIdx] {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       r.scratch.ColVec(colIdx),
-							SrcEndIdx: n,
+			r.allocator.PerformOperation(r.output.ColVecs()[:len(r.inputTypes)], func() {
+				for colIdx, vec := range r.output.ColVecs()[:len(r.inputTypes)] {
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       r.scratch.ColVec(colIdx),
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -483,12 +487,14 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			r.scratch = r.allocator.NewMemBatchWithSize(r.inputTypes, n)
 			r.allocator.PerformOperation(r.scratch.ColVecs(), func() {
 				for colIdx, vec := range r.scratch.ColVecs() {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       batch.ColVec(colIdx),
-							Sel:       sel,
-							SrcEndIdx: n,
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       batch.ColVec(colIdx),
+								Sel:       sel,
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -588,13 +594,15 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 
 			r.output.ResetInternalBatch()
 			// First, we copy over the buffered up columns.
-			r.allocator.PerformOperation(r.output.ColVecs()[:r.outputColIdx], func() {
-				for colIdx, vec := range r.output.ColVecs()[:r.outputColIdx] {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       r.scratch.ColVec(colIdx),
-							SrcEndIdx: n,
+			r.allocator.PerformOperation(r.output.ColVecs()[:len(r.inputTypes)], func() {
+				for colIdx, vec := range r.output.ColVecs()[:len(r.inputTypes)] {
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       r.scratch.ColVec(colIdx),
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -797,12 +805,14 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 			r.scratch = r.allocator.NewMemBatchWithSize(r.inputTypes, n)
 			r.allocator.PerformOperation(r.scratch.ColVecs(), func() {
 				for colIdx, vec := range r.scratch.ColVecs() {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       batch.ColVec(colIdx),
-							Sel:       sel,
-							SrcEndIdx: n,
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       batch.ColVec(colIdx),
+								Sel:       sel,
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -905,13 +915,15 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 
 			r.output.ResetInternalBatch()
 			// First, we copy over the buffered up columns.
-			r.allocator.PerformOperation(r.output.ColVecs()[:r.outputColIdx], func() {
-				for colIdx, vec := range r.output.ColVecs()[:r.outputColIdx] {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       r.scratch.ColVec(colIdx),
-							SrcEndIdx: n,
+			r.allocator.PerformOperation(r.output.ColVecs()[:len(r.inputTypes)], func() {
+				for colIdx, vec := range r.output.ColVecs()[:len(r.inputTypes)] {
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       r.scratch.ColVec(colIdx),
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -1132,12 +1144,14 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 			r.scratch = r.allocator.NewMemBatchWithSize(r.inputTypes, n)
 			r.allocator.PerformOperation(r.scratch.ColVecs(), func() {
 				for colIdx, vec := range r.scratch.ColVecs() {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       batch.ColVec(colIdx),
-							Sel:       sel,
-							SrcEndIdx: n,
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       batch.ColVec(colIdx),
+								Sel:       sel,
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
@@ -1312,13 +1326,15 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 
 			r.output.ResetInternalBatch()
 			// First, we copy over the buffered up columns.
-			r.allocator.PerformOperation(r.output.ColVecs()[:r.outputColIdx], func() {
-				for colIdx, vec := range r.output.ColVecs()[:r.outputColIdx] {
-					vec.Append(
-						coldata.SliceArgs{
-							ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
-							Src:       r.scratch.ColVec(colIdx),
-							SrcEndIdx: n,
+			r.allocator.PerformOperation(r.output.ColVecs()[:len(r.inputTypes)], func() {
+				for colIdx, vec := range r.output.ColVecs()[:len(r.inputTypes)] {
+					vec.Copy(
+						coldata.CopySliceArgs{
+							SliceArgs: coldata.SliceArgs{
+								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
+								Src:       r.scratch.ColVec(colIdx),
+								SrcEndIdx: n,
+							},
 						},
 					)
 				}
