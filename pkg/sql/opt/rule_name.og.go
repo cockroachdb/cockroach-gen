@@ -150,6 +150,7 @@ const (
 	EliminateProject
 	MergeProjects
 	MergeProjectWithValues
+	ConvertZipArraysToValues
 	PruneProjectCols
 	PruneScanCols
 	PruneSelectCols

@@ -8825,6 +8825,24 @@ func (_f *Factory) ConstructProjectSet(
 		}
 	}
 
+	// [ConvertZipArraysToValues]
+	{
+		if _f.funcs.CanConstructValuesFromZips(zip) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ConvertZipArraysToValues) {
+				_expr := _f.ConstructInnerJoinApply(
+					input,
+					_f.funcs.ConstructValuesFromZips(zip),
+					memo.EmptyFiltersExpr,
+					_f.funcs.EmptyJoinPrivate(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ConvertZipArraysToValues, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [HoistProjectSetSubquery]
 	{
 		for i := range zip {
