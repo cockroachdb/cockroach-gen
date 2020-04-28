@@ -126,23 +126,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -240,24 +237,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -303,15 +287,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -393,16 +374,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -448,15 +424,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -538,16 +511,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -593,26 +561,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -716,27 +681,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -782,26 +731,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -905,27 +851,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -971,26 +901,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -1094,27 +1021,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -1160,34 +1071,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -1307,35 +1215,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -1381,22 +1265,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -1492,23 +1373,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -1554,15 +1423,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -1644,16 +1510,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -1700,23 +1561,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -1810,24 +1668,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -1868,15 +1713,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -1954,16 +1796,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -2004,15 +1841,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -2090,16 +1924,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -2140,26 +1969,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -2259,27 +2085,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -2320,26 +2130,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -2439,27 +2246,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -2500,26 +2291,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -2619,27 +2407,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -2680,34 +2452,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -2823,35 +2592,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -2892,22 +2637,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -2999,23 +2741,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -3056,15 +2786,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -3142,16 +2869,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -3200,23 +2922,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -3310,24 +3029,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -3368,15 +3074,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -3454,16 +3157,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -3504,15 +3202,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -3590,16 +3285,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -3640,26 +3330,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -3759,27 +3446,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -3820,26 +3491,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -3939,27 +3607,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4000,26 +3652,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -4119,27 +3768,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4180,34 +3813,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -4323,35 +3953,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4392,22 +3998,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -4499,23 +4102,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4556,15 +4147,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -4642,16 +4230,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4693,23 +4276,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -4799,24 +4379,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4852,15 +4419,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -4934,16 +4498,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -4979,15 +4538,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -5061,16 +4617,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -5106,26 +4657,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -5221,27 +4769,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -5277,26 +4809,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -5392,27 +4921,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -5448,26 +4961,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -5563,27 +5073,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -5619,34 +5113,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -5758,35 +5249,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -5822,22 +5289,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -5925,23 +5389,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -5977,15 +5429,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -6059,16 +5508,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -6187,23 +5631,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -6301,24 +5742,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -6364,15 +5792,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -6454,16 +5879,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -6509,15 +5929,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -6599,16 +6016,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -6654,26 +6066,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -6777,27 +6186,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -6843,26 +6236,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -6966,27 +6356,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -7032,26 +6406,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -7155,27 +6526,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -7221,34 +6576,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -7368,35 +6720,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -7442,22 +6770,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -7553,23 +6878,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -7615,15 +6928,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -7705,16 +7015,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -7761,23 +7066,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -7871,24 +7173,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -7929,15 +7218,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -8015,16 +7301,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -8065,15 +7346,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -8151,16 +7429,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -8201,26 +7474,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -8320,27 +7590,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -8381,26 +7635,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -8500,27 +7751,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -8561,26 +7796,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -8680,27 +7912,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -8741,34 +7957,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -8884,35 +8097,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -8953,22 +8142,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -9060,23 +8246,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -9117,15 +8291,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -9203,16 +8374,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -9261,23 +8427,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -9371,24 +8534,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -9429,15 +8579,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -9515,16 +8662,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -9565,15 +8707,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -9651,16 +8790,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -9701,26 +8835,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -9820,27 +8951,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -9881,26 +8996,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10000,27 +9112,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -10061,26 +9157,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10180,27 +9273,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -10241,34 +9318,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10384,35 +9458,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -10453,22 +9503,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10560,23 +9607,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -10617,15 +9652,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10703,16 +9735,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -10754,23 +9781,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10860,24 +9884,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -10913,15 +9924,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -10995,16 +10003,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -11040,15 +10043,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -11122,16 +10122,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -11167,26 +10162,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -11282,27 +10274,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -11338,26 +10314,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -11453,27 +10426,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -11509,26 +10466,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -11624,27 +10578,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -11680,34 +10618,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -11819,35 +10754,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -11883,22 +10794,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -11986,23 +10894,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -12038,15 +10934,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -12120,16 +11013,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -12248,23 +11136,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -12362,24 +11247,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -12425,15 +11297,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -12515,16 +11384,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -12570,15 +11434,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -12660,16 +11521,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -12715,26 +11571,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -12838,27 +11691,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -12904,26 +11741,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -13027,27 +11861,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -13093,26 +11911,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -13216,27 +12031,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -13282,34 +12081,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -13429,35 +12225,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -13503,22 +12275,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -13614,23 +12383,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -13676,15 +12433,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -13766,16 +12520,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -13822,23 +12571,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -13932,24 +12678,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -13990,15 +12723,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -14076,16 +12806,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -14126,15 +12851,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -14212,16 +12934,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -14262,26 +12979,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -14381,27 +13095,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -14442,26 +13140,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -14561,27 +13256,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -14622,26 +13301,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -14741,27 +13417,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -14802,34 +13462,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -14945,35 +13602,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15014,22 +13647,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -15121,23 +13751,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15178,15 +13796,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -15264,16 +13879,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15322,23 +13932,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -15432,24 +14039,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15490,15 +14084,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -15576,16 +14167,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15626,15 +14212,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -15712,16 +14295,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15762,26 +14340,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -15881,27 +14456,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -15942,26 +14501,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -16061,27 +14617,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -16122,26 +14662,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -16241,27 +14778,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -16302,34 +14823,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -16445,35 +14963,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -16514,22 +15008,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -16621,23 +15112,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -16678,15 +15157,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -16764,16 +15240,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -16815,23 +15286,20 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -16921,24 +15389,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -16974,15 +15429,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -17056,16 +15508,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -17101,15 +15548,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -17183,16 +15627,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -17228,26 +15667,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -17343,27 +15779,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -17399,26 +15819,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -17514,27 +15931,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -17570,26 +15971,23 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -17685,27 +16083,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -17741,34 +16123,31 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -17880,35 +16259,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -17944,22 +16299,19 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -18047,23 +16399,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -18099,15 +16439,12 @@ EqLoop:
 							rSelIdx := rSel[curRIdx]
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -18181,16 +16518,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -18309,23 +16641,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -18423,24 +16752,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -18486,15 +16802,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -18576,16 +16889,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -18631,15 +16939,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -18721,16 +17026,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -18776,26 +17076,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -18899,27 +17196,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -18965,26 +17246,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -19088,27 +17366,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -19154,26 +17416,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -19277,27 +17536,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -19343,34 +17586,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -19490,35 +17730,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -19564,22 +17780,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -19675,23 +17888,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -19737,15 +17938,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -19827,16 +18025,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -19883,23 +18076,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -19993,24 +18183,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -20051,15 +18228,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -20137,16 +18311,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -20187,15 +18356,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -20273,16 +18439,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -20323,26 +18484,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -20442,27 +18600,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -20503,26 +18645,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -20622,27 +18761,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -20683,26 +18806,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -20802,27 +18922,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -20863,34 +18967,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21006,35 +19107,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -21075,22 +19152,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21182,23 +19256,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -21239,15 +19301,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21325,16 +19384,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -21383,23 +19437,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21493,24 +19544,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -21551,15 +19589,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21637,16 +19672,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -21687,15 +19717,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21773,16 +19800,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -21823,26 +19845,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -21942,27 +19961,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -22003,26 +20006,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -22122,27 +20122,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -22183,26 +20167,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -22302,27 +20283,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -22363,34 +20328,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -22506,35 +20468,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -22575,22 +20513,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -22682,23 +20617,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -22739,15 +20662,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -22825,16 +20745,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -22876,23 +20791,20 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if !lVal && rVal {
-									cmpResult = -1
-								} else if lVal && !rVal {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-
-								match = cmpResult == 0
+							if !lVal && rVal {
+								cmp = -1
+							} else if lVal && !rVal {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -22982,24 +20894,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if !lVal && rVal {
-										cmpResult = -1
-									} else if lVal && !rVal {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -23035,15 +20934,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys.Get(rSelIdx)
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = bytes.Compare(lVal, rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = bytes.Compare(lVal, rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -23117,16 +21013,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = bytes.Compare(lVal, rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -23162,15 +21053,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = tree.CompareDecimals(&lVal, &rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = tree.CompareDecimals(&lVal, &rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -23244,16 +21132,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = tree.CompareDecimals(&lVal, &rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -23289,26 +21172,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -23404,27 +21284,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -23460,26 +21324,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -23575,27 +21436,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -23631,26 +21476,23 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
+								a, b := int64(lVal), int64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else {
+									cmp = 0
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -23746,27 +21588,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else {
-											cmpResult = 0
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -23802,34 +21628,31 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
 							{
-								var cmpResult int
-
-								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmpResult = -1
-									} else if a > b {
-										cmpResult = 1
-									} else if a == b {
-										cmpResult = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmpResult = 0
-										} else {
-											cmpResult = -1
-										}
+								a, b := float64(lVal), float64(rVal)
+								if a < b {
+									cmp = -1
+								} else if a > b {
+									cmp = 1
+								} else if a == b {
+									cmp = 0
+								} else if math.IsNaN(a) {
+									if math.IsNaN(b) {
+										cmp = 0
 									} else {
-										cmpResult = 1
+										cmp = -1
 									}
+								} else {
+									cmp = 1
 								}
-
-								match = cmpResult == 0
 							}
 
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -23941,35 +21764,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmpResult = -1
-										} else if a > b {
-											cmpResult = 1
-										} else if a == b {
-											cmpResult = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmpResult = 0
-											} else {
-												cmpResult = -1
-											}
-										} else {
-											cmpResult = 1
-										}
-									}
-
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -24005,22 +21804,19 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
+							var (
+								cmp   int
+								match bool
+							)
 
-							{
-								var cmpResult int
-
-								if lVal.Before(rVal) {
-									cmpResult = -1
-								} else if rVal.Before(lVal) {
-									cmpResult = 1
-								} else {
-									cmpResult = 0
-								}
-								match = cmpResult == 0
+							if lVal.Before(rVal) {
+								cmp = -1
+							} else if rVal.Before(lVal) {
+								cmp = 1
+							} else {
+								cmp = 0
 							}
-
-							if match {
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -24108,23 +21904,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-
-									if lVal.Before(rVal) {
-										cmpResult = -1
-									} else if rVal.Before(lVal) {
-										cmpResult = 1
-									} else {
-										cmpResult = 0
-									}
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
@@ -24160,15 +21944,12 @@ EqLoop:
 							rSelIdx := curRIdx
 							rVal := rKeys[rSelIdx]
 
-							var match bool
-
-							{
-								var cmpResult int
-								cmpResult = lVal.Compare(rVal)
-								match = cmpResult == 0
-							}
-
-							if match {
+							var (
+								cmp   int
+								match bool
+							)
+							cmp = lVal.Compare(rVal)
+							if cmp == 0 {
 								// Find the length of the groups on each side.
 								lGroupLength, rGroupLength := 1, 1
 								lComplete, rComplete := false, false
@@ -24242,16 +22023,11 @@ EqLoop:
 									o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 								}
 							} else { // mismatch
-								var incrementLeft bool
-
-								{
-									var cmpResult int
-									cmpResult = lVal.Compare(rVal)
-									incrementLeft = cmpResult < 0
-								}
-
-								// Switch the direction of increment if we're sorted descendingly.
-								incrementLeft = incrementLeft == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+								// The line below is a compact form of the following:
+								//   incrementLeft :=
+								//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+								//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+								incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
 								if incrementLeft {
 									curLIdx++
 
