@@ -257,7 +257,7 @@ func (o *OrderedSynchronizer) Init() {
 			o.outColsMap[i] = len(o.outIntervalCols)
 			o.outIntervalCols = append(o.outIntervalCols, outVec.Interval())
 		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", &o.typs[i]))
+			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", o.typs[i].String()))
 		}
 	}
 	for i := range o.inputs {

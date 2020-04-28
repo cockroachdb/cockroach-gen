@@ -22,6 +22,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	// However, the scratch is not used in all of the selection operators, so
 	// we add this to go around "unused" error.
 	_ = decimalScratch
+	var isNull bool
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -40,7 +41,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -56,7 +57,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -70,7 +71,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -86,7 +87,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -123,7 +124,8 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -197,6 +199,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	// However, the scratch is not used in all of the selection operators, so
 	// we add this to go around "unused" error.
 	_ = decimalScratch
+	var isNull bool
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -215,7 +218,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -231,7 +234,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -245,7 +248,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -261,7 +264,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -298,7 +301,8 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -372,6 +376,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	// However, the scratch is not used in all of the selection operators, so
 	// we add this to go around "unused" error.
 	_ = decimalScratch
+	var isNull bool
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -390,7 +395,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -406,7 +411,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -420,7 +425,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -436,7 +441,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -473,7 +478,8 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -547,6 +553,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	// However, the scratch is not used in all of the selection operators, so
 	// we add this to go around "unused" error.
 	_ = decimalScratch
+	var isNull bool
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -565,7 +572,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -581,7 +588,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -595,7 +602,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -611,7 +618,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -648,7 +655,8 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -722,6 +730,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	// However, the scratch is not used in all of the selection operators, so
 	// we add this to go around "unused" error.
 	_ = decimalScratch
+	var isNull bool
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -740,7 +749,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -756,7 +765,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -770,7 +779,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -786,7 +795,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -823,7 +832,8 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -897,6 +907,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	// However, the scratch is not used in all of the selection operators, so
 	// we add this to go around "unused" error.
 	_ = decimalScratch
+	var isNull bool
 	for {
 		batch := p.input.Next(ctx)
 		if batch.Length() == 0 {
@@ -915,7 +926,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -931,7 +942,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					isNull := nulls.NullAt(i)
+					isNull = nulls.NullAt(i)
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -945,7 +956,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -961,7 +972,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					isNull := false
+					isNull = false
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -998,7 +1009,8 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the

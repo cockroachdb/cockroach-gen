@@ -48,9 +48,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -69,9 +70,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -92,9 +94,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -110,9 +113,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -134,9 +138,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -152,9 +157,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys.Get(nKeys - 1)
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -172,9 +178,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys.Get(selIdx)
 					p := uintptr(buckets[i])
 
@@ -187,9 +194,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys.Get(nKeys - 1)
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys.Get(selIdx)
 					p := uintptr(buckets[i])
 
@@ -208,9 +216,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -231,9 +240,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -256,9 +266,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -276,9 +287,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -302,9 +314,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -321,9 +334,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -342,9 +356,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -358,9 +373,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -380,9 +396,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -399,9 +416,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -420,9 +438,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -436,9 +455,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -458,9 +478,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -477,9 +498,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -498,9 +520,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -514,9 +537,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -536,9 +560,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -557,9 +582,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -580,9 +606,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -598,9 +625,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -622,9 +650,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -640,9 +669,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -660,9 +690,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -675,9 +706,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -696,9 +728,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -716,9 +749,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					if nulls.NullAt(selIdx) {
 						continue
 					}
@@ -738,9 +772,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = sel[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := sel[i]
+					selIdx = sel[i]
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 
@@ -755,9 +790,10 @@ func rehash(
 				// Early bounds checks.
 				_ = buckets[nKeys-1]
 				_ = keys[nKeys-1]
+				var selIdx int
 				for i := 0; i < nKeys; i++ {
 					cancelChecker.check(ctx)
-					selIdx := i
+					selIdx = i
 					v := keys[selIdx]
 					p := uintptr(buckets[i])
 

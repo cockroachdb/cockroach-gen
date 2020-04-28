@@ -50,7 +50,8 @@ func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bool()
+	var col []bool
+	col = vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -182,7 +183,8 @@ func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bool()
+	var col []bool
+	col = vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -314,7 +316,8 @@ func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bool()
+	var col []bool
+	col = vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -446,7 +449,8 @@ func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bool()
+	var col []bool
+	col = vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -578,7 +582,8 @@ func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bool()
+	var col []bool
+	col = vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -710,7 +715,8 @@ func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bool()
+	var col []bool
+	col = vec.Bool()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -842,7 +848,8 @@ func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -946,7 +953,8 @@ func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1050,7 +1058,8 @@ func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1154,7 +1163,8 @@ func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1258,7 +1268,8 @@ func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1362,7 +1373,8 @@ func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Bytes()
+	var col *coldata.Bytes
+	col = vec.Bytes()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1466,7 +1478,8 @@ func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1550,7 +1563,8 @@ func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1634,7 +1648,8 @@ func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1718,7 +1733,8 @@ func (p projDivDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1834,7 +1850,8 @@ func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1934,7 +1951,8 @@ func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2034,7 +2052,8 @@ func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2134,7 +2153,8 @@ func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2234,7 +2254,8 @@ func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2334,7 +2355,8 @@ func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2434,7 +2456,8 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2546,7 +2569,8 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2658,7 +2682,8 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2770,7 +2795,8 @@ func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -2898,7 +2924,8 @@ func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3022,7 +3049,8 @@ func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3146,7 +3174,8 @@ func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3270,7 +3299,8 @@ func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3394,7 +3424,8 @@ func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3518,7 +3549,8 @@ func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3642,7 +3674,8 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3754,7 +3787,8 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3866,7 +3900,8 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -3978,7 +4013,8 @@ func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4106,7 +4142,8 @@ func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4230,7 +4267,8 @@ func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4354,7 +4392,8 @@ func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4478,7 +4517,8 @@ func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4602,7 +4642,8 @@ func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4726,7 +4767,8 @@ func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4850,7 +4892,8 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -4962,7 +5005,8 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5074,7 +5118,8 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5186,7 +5231,8 @@ func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5314,7 +5360,8 @@ func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5438,7 +5485,8 @@ func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5562,7 +5610,8 @@ func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5686,7 +5735,8 @@ func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5810,7 +5860,8 @@ func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -5934,7 +5985,8 @@ func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6058,7 +6110,8 @@ func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6190,7 +6243,8 @@ func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6322,7 +6376,8 @@ func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6454,7 +6509,8 @@ func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6586,7 +6642,8 @@ func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6718,7 +6775,8 @@ func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6850,7 +6908,8 @@ func (p projMultDecimalConstIntervalOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -6946,7 +7005,8 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7066,7 +7126,8 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7186,7 +7247,8 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7306,7 +7368,8 @@ func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7438,7 +7501,8 @@ func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7562,7 +7626,8 @@ func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7686,7 +7751,8 @@ func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7810,7 +7876,8 @@ func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -7934,7 +8001,8 @@ func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8058,7 +8126,8 @@ func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8182,7 +8251,8 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8290,7 +8360,8 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8398,7 +8469,8 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8534,7 +8606,8 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8658,7 +8731,8 @@ func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8802,7 +8876,8 @@ func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -8946,7 +9021,8 @@ func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9090,7 +9166,8 @@ func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9234,7 +9311,8 @@ func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9378,7 +9456,8 @@ func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9522,7 +9601,8 @@ func (p projPlusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9630,7 +9710,8 @@ func (p projMinusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9738,7 +9819,8 @@ func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9874,7 +9956,8 @@ func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -9998,7 +10081,8 @@ func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10142,7 +10226,8 @@ func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10286,7 +10371,8 @@ func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10430,7 +10516,8 @@ func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10574,7 +10661,8 @@ func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10718,7 +10806,8 @@ func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10862,7 +10951,8 @@ func (p projPlusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -10970,7 +11060,8 @@ func (p projMinusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11078,7 +11169,8 @@ func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11214,7 +11306,8 @@ func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11338,7 +11431,8 @@ func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11482,7 +11576,8 @@ func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11626,7 +11721,8 @@ func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11770,7 +11866,8 @@ func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -11914,7 +12011,8 @@ func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -12058,7 +12156,8 @@ func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -12202,7 +12301,8 @@ func (p projEQInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -12378,7 +12478,8 @@ func (p projNEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -12554,7 +12655,8 @@ func (p projLTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -12730,7 +12832,8 @@ func (p projLEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -12906,7 +13009,8 @@ func (p projGTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13082,7 +13186,8 @@ func (p projGEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13258,7 +13363,8 @@ func (p projMultInt16ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13334,7 +13440,8 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13454,7 +13561,8 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13574,7 +13682,8 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13694,7 +13803,8 @@ func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13826,7 +13936,8 @@ func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -13950,7 +14061,8 @@ func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14074,7 +14186,8 @@ func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14198,7 +14311,8 @@ func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14322,7 +14436,8 @@ func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14446,7 +14561,8 @@ func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14570,7 +14686,8 @@ func (p projPlusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14678,7 +14795,8 @@ func (p projMinusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14786,7 +14904,8 @@ func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -14922,7 +15041,8 @@ func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15046,7 +15166,8 @@ func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15190,7 +15311,8 @@ func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15334,7 +15456,8 @@ func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15478,7 +15601,8 @@ func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15622,7 +15746,8 @@ func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15766,7 +15891,8 @@ func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -15910,7 +16036,8 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16018,7 +16145,8 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16126,7 +16254,8 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16262,7 +16391,8 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16386,7 +16516,8 @@ func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16530,7 +16661,8 @@ func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16674,7 +16806,8 @@ func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16818,7 +16951,8 @@ func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -16962,7 +17096,8 @@ func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17106,7 +17241,8 @@ func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17250,7 +17386,8 @@ func (p projPlusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17358,7 +17495,8 @@ func (p projMinusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17466,7 +17604,8 @@ func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17602,7 +17741,8 @@ func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17726,7 +17866,8 @@ func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -17870,7 +18011,8 @@ func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18014,7 +18156,8 @@ func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18158,7 +18301,8 @@ func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18302,7 +18446,8 @@ func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18446,7 +18591,8 @@ func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18590,7 +18736,8 @@ func (p projEQInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18766,7 +18913,8 @@ func (p projNEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -18942,7 +19090,8 @@ func (p projLTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19118,7 +19267,8 @@ func (p projLEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19294,7 +19444,8 @@ func (p projGTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19470,7 +19621,8 @@ func (p projGEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19646,7 +19798,8 @@ func (p projMultInt32ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19722,7 +19875,8 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19842,7 +19996,8 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -19962,7 +20117,8 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20082,7 +20238,8 @@ func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20214,7 +20371,8 @@ func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20338,7 +20496,8 @@ func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20462,7 +20621,8 @@ func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20586,7 +20746,8 @@ func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20710,7 +20871,8 @@ func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20834,7 +20996,8 @@ func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -20958,7 +21121,8 @@ func (p projPlusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21066,7 +21230,8 @@ func (p projMinusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21174,7 +21339,8 @@ func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21310,7 +21476,8 @@ func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21434,7 +21601,8 @@ func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21578,7 +21746,8 @@ func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21722,7 +21891,8 @@ func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -21866,7 +22036,8 @@ func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22010,7 +22181,8 @@ func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22154,7 +22326,8 @@ func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22298,7 +22471,8 @@ func (p projPlusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22406,7 +22580,8 @@ func (p projMinusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22514,7 +22689,8 @@ func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22650,7 +22826,8 @@ func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22774,7 +22951,8 @@ func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -22918,7 +23096,8 @@ func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23062,7 +23241,8 @@ func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23206,7 +23386,8 @@ func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23350,7 +23531,8 @@ func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23494,7 +23676,8 @@ func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23638,7 +23821,8 @@ func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23746,7 +23930,8 @@ func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23854,7 +24039,8 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -23990,7 +24176,8 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24114,7 +24301,8 @@ func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24258,7 +24446,8 @@ func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24402,7 +24591,8 @@ func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24546,7 +24736,8 @@ func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24690,7 +24881,8 @@ func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24834,7 +25026,8 @@ func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -24978,7 +25171,8 @@ func (p projEQInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -25154,7 +25348,8 @@ func (p projNEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -25330,7 +25525,8 @@ func (p projLTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -25506,7 +25702,8 @@ func (p projLEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -25682,7 +25879,8 @@ func (p projGTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -25858,7 +26056,8 @@ func (p projGEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26034,7 +26233,8 @@ func (p projMultInt64ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26110,7 +26310,8 @@ func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26242,7 +26443,8 @@ func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26374,7 +26576,8 @@ func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26506,7 +26709,8 @@ func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26638,7 +26842,8 @@ func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26770,7 +26975,8 @@ func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -26902,7 +27108,8 @@ func (p projEQFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -27078,7 +27285,8 @@ func (p projNEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -27254,7 +27462,8 @@ func (p projLTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -27430,7 +27639,8 @@ func (p projLEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -27606,7 +27816,8 @@ func (p projGTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -27782,7 +27993,8 @@ func (p projGEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -27958,7 +28170,8 @@ func (p projEQFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -28134,7 +28347,8 @@ func (p projNEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -28310,7 +28524,8 @@ func (p projLTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -28486,7 +28701,8 @@ func (p projLEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -28662,7 +28878,8 @@ func (p projGTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -28838,7 +29055,8 @@ func (p projGEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -29014,7 +29232,8 @@ func (p projEQFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -29190,7 +29409,8 @@ func (p projNEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -29366,7 +29586,8 @@ func (p projLTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -29542,7 +29763,8 @@ func (p projLEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -29718,7 +29940,8 @@ func (p projGTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -29894,7 +30117,8 @@ func (p projGEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30070,7 +30294,8 @@ func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30146,7 +30371,8 @@ func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30222,7 +30448,8 @@ func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30298,7 +30525,8 @@ func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30374,7 +30602,8 @@ func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30550,7 +30779,8 @@ func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30726,7 +30956,8 @@ func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -30902,7 +31133,8 @@ func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31078,7 +31310,8 @@ func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31254,7 +31487,8 @@ func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31430,7 +31664,8 @@ func (p projMultFloat64ConstIntervalOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31506,7 +31741,8 @@ func (p projMinusTimestampConstTimestampOp) Next(ctx context.Context) coldata.Ba
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31594,7 +31830,8 @@ func (p projEQTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31722,7 +31959,8 @@ func (p projNETimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31850,7 +32088,8 @@ func (p projLTTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -31978,7 +32217,8 @@ func (p projLETimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32106,7 +32346,8 @@ func (p projGTTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32234,7 +32475,8 @@ func (p projGETimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32362,7 +32604,8 @@ func (p projPlusTimestampConstIntervalOp) Next(ctx context.Context) coldata.Batc
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32438,7 +32681,8 @@ func (p projMinusTimestampConstIntervalOp) Next(ctx context.Context) coldata.Bat
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32514,7 +32758,8 @@ func (p projMultIntervalConstDecimalOp) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Decimal()
+	var col []apd.Decimal
+	col = vec.Decimal()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32610,7 +32855,8 @@ func (p projMultIntervalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32686,7 +32932,8 @@ func (p projDivIntervalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int16()
+	var col []int16
+	col = vec.Int16()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32778,7 +33025,8 @@ func (p projMultIntervalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32854,7 +33102,8 @@ func (p projDivIntervalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int32()
+	var col []int32
+	col = vec.Int32()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -32946,7 +33195,8 @@ func (p projMultIntervalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33022,7 +33272,8 @@ func (p projDivIntervalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Int64()
+	var col []int64
+	col = vec.Int64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33114,7 +33365,8 @@ func (p projMultIntervalConstFloat64Op) Next(ctx context.Context) coldata.Batch 
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33190,7 +33442,8 @@ func (p projDivIntervalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Float64()
+	var col []float64
+	col = vec.Float64()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33282,7 +33535,8 @@ func (p projPlusIntervalConstTimestampOp) Next(ctx context.Context) coldata.Batc
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Timestamp()
+	var col []time.Time
+	col = vec.Timestamp()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33358,7 +33612,8 @@ func (p projPlusIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33434,7 +33689,8 @@ func (p projMinusIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batc
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33510,7 +33766,8 @@ func (p projEQIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33610,7 +33867,8 @@ func (p projNEIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33710,7 +33968,8 @@ func (p projLTIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33810,7 +34069,8 @@ func (p projLEIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -33910,7 +34170,8 @@ func (p projGTIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -34010,7 +34271,8 @@ func (p projGEIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 	vec := batch.ColVec(p.colIdx)
-	col := vec.Interval()
+	var col []duration.Duration
+	col = vec.Interval()
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -34112,7 +34374,11 @@ func GetProjectionLConstOperator(
 		colIdx:       colIdx,
 		outputIdx:    outputIdx,
 	}
-	c, err := getDatumToPhysicalFn(leftType)(constArg)
+	var (
+		c   interface{}
+		err error
+	)
+	c, err = getDatumToPhysicalFn(leftType)(constArg)
 	if err != nil {
 		return nil, err
 	}

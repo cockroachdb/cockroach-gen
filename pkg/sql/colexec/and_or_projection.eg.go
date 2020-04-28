@@ -118,7 +118,10 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 	// not get the projection for the right side.
 	// knownResult indicates the boolean value which if present on the left side
 	// fully determines the result of the logical operation.
-	knownResult := false
+	var (
+		knownResult             bool
+		isLeftNull, isRightNull bool
+	)
 	leftCol := batch.ColVec(o.leftIdx)
 	leftColVals := leftCol.Bool()
 	var curIdx int
@@ -128,7 +131,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
 			for _, i := range origSel {
-				isLeftNull := leftNulls.NullAt(i)
+				isLeftNull = leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -138,7 +141,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			for _, i := range origSel {
-				isLeftNull := false
+				isLeftNull = false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -153,7 +156,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
 			for i := 0; i < origLen; i++ {
-				isLeftNull := leftNulls.NullAt(i)
+				isLeftNull = leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -163,7 +166,7 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			for i := 0; i < origLen; i++ {
-				isLeftNull := false
+				isLeftNull = false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -217,12 +220,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -247,12 +250,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -275,12 +278,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -305,12 +308,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -336,12 +339,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -366,12 +369,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -394,12 +397,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -424,12 +427,12 @@ func (o *andProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for AND'ing two booleans are:
 						// 1. if at least one of the values is FALSE, then the result is also FALSE
@@ -553,7 +556,11 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 	// not get the projection for the right side.
 	// knownResult indicates the boolean value which if present on the left side
 	// fully determines the result of the logical operation.
-	knownResult := true
+	var (
+		knownResult             bool
+		isLeftNull, isRightNull bool
+	)
+	knownResult = true
 	leftCol := batch.ColVec(o.leftIdx)
 	leftColVals := leftCol.Bool()
 	var curIdx int
@@ -563,7 +570,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
 			for _, i := range origSel {
-				isLeftNull := leftNulls.NullAt(i)
+				isLeftNull = leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -573,7 +580,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			for _, i := range origSel {
-				isLeftNull := false
+				isLeftNull = false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -588,7 +595,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		if leftCol.MaybeHasNulls() {
 			leftNulls := leftCol.Nulls()
 			for i := 0; i < origLen; i++ {
-				isLeftNull := leftNulls.NullAt(i)
+				isLeftNull = leftNulls.NullAt(i)
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -598,7 +605,7 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			}
 		} else {
 			for i := 0; i < origLen; i++ {
-				isLeftNull := false
+				isLeftNull = false
 				if isLeftNull || leftColVals[i] != knownResult {
 					// We add the tuple into the selection vector if the left value is NULL or
 					// it is different from knownResult.
@@ -652,12 +659,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -682,12 +689,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -710,12 +717,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -740,12 +747,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := leftNulls.NullAt(idx)
+					isLeftNull = leftNulls.NullAt(idx)
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -771,12 +778,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 			rightNulls := rightCol.Nulls()
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -801,12 +808,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := rightNulls.NullAt(idx)
+						isRightNull = rightNulls.NullAt(idx)
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -829,12 +836,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 		} else {
 			if sel := batch.Selection(); sel != nil {
 				for _, idx := range sel[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE
@@ -859,12 +866,12 @@ func (o *orProjOp) Next(ctx context.Context) coldata.Batch {
 				}
 				_ = outputColVals[origLen-1]
 				for idx := range leftColVals[:origLen] {
-					isLeftNull := false
+					isLeftNull = false
 					leftVal := leftColVals[idx]
 					if !isLeftNull && leftVal == knownResult {
 						outputColVals[idx] = leftVal
 					} else {
-						isRightNull := false
+						isRightNull = false
 						rightVal := rightColVals[idx]
 						// The rules for OR'ing two booleans are:
 						// 1. if at least one of the values is TRUE, then the result is also TRUE

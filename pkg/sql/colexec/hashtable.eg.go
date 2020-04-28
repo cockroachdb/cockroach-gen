@@ -57,8 +57,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -71,10 +73,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -120,8 +122,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -134,10 +138,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -171,8 +175,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -185,10 +191,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -221,8 +227,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -235,9 +243,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -270,8 +278,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -284,9 +294,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -324,8 +334,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -338,10 +350,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -387,8 +399,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -401,10 +415,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -438,8 +452,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -452,10 +468,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -488,8 +504,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -502,9 +520,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -537,8 +555,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -551,9 +571,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -593,8 +613,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -607,10 +629,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -656,8 +678,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -670,10 +694,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -707,8 +731,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -721,10 +747,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -757,8 +783,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -771,9 +799,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -806,8 +834,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -820,9 +850,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -860,8 +890,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -874,10 +906,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -923,8 +955,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -937,10 +971,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -974,8 +1008,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -988,10 +1024,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1024,8 +1060,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1038,9 +1076,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1073,8 +1111,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1087,9 +1127,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1139,8 +1179,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1153,10 +1195,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1194,8 +1236,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1208,10 +1252,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1237,8 +1281,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1251,10 +1297,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1279,8 +1325,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1293,9 +1341,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1320,8 +1368,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1334,9 +1384,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1366,8 +1416,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1380,10 +1432,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1421,8 +1473,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1435,10 +1489,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1464,8 +1518,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1478,10 +1534,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1506,8 +1562,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1520,9 +1578,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1547,8 +1605,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1561,9 +1621,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1595,8 +1655,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1609,10 +1671,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1650,8 +1712,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1664,10 +1728,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1693,8 +1757,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1707,10 +1773,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1735,8 +1801,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1749,9 +1817,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1776,8 +1844,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1790,9 +1860,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1822,8 +1892,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1836,10 +1908,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1877,8 +1949,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -1891,10 +1965,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -1920,8 +1994,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1934,10 +2010,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -1962,8 +2038,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -1976,9 +2054,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2003,8 +2081,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2017,9 +2097,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2061,8 +2141,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2075,10 +2157,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2116,8 +2198,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2130,10 +2214,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2159,8 +2243,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2173,10 +2259,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2201,8 +2287,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2215,9 +2303,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2242,8 +2330,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2256,9 +2346,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2288,8 +2378,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2302,10 +2394,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2343,8 +2435,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2357,10 +2451,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2386,8 +2480,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2400,10 +2496,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2428,8 +2524,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2442,9 +2540,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2469,8 +2567,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2483,9 +2583,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2517,8 +2617,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2531,10 +2633,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2572,8 +2674,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2586,10 +2690,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2615,8 +2719,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2629,10 +2735,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2657,8 +2763,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2671,9 +2779,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2698,8 +2806,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2712,9 +2822,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2744,8 +2854,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2758,10 +2870,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2799,8 +2911,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2813,10 +2927,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2842,8 +2956,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2856,10 +2972,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2884,8 +3000,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2898,9 +3016,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -2925,8 +3043,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -2939,9 +3059,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -2978,8 +3098,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -2992,10 +3114,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3039,8 +3161,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3053,10 +3177,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3088,8 +3212,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3102,10 +3228,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3136,8 +3262,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3150,9 +3278,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3183,8 +3311,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3197,9 +3327,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3235,8 +3365,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3249,10 +3381,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3296,8 +3428,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3310,10 +3444,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3345,8 +3479,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3359,10 +3495,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3393,8 +3529,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3407,9 +3545,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3440,8 +3578,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3454,9 +3594,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3494,8 +3634,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3508,10 +3650,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3555,8 +3697,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3569,10 +3713,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3604,8 +3748,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3618,10 +3764,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3652,8 +3798,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3666,9 +3814,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3699,8 +3847,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3713,9 +3863,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3751,8 +3901,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3765,10 +3917,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3812,8 +3964,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -3826,10 +3980,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3861,8 +4015,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3875,10 +4031,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -3909,8 +4065,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3923,9 +4081,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -3956,8 +4114,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -3970,9 +4130,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4015,8 +4175,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4029,10 +4191,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4076,8 +4238,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4090,10 +4254,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4125,8 +4289,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4139,10 +4305,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4173,8 +4339,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4187,9 +4355,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4220,8 +4388,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4234,9 +4404,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4272,8 +4442,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4286,10 +4458,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4333,8 +4505,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4347,10 +4521,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4382,8 +4556,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4396,10 +4572,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4430,8 +4606,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4444,9 +4622,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4477,8 +4655,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4491,9 +4671,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4531,8 +4711,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4545,10 +4727,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4592,8 +4774,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4606,10 +4790,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4641,8 +4825,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4655,10 +4841,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4689,8 +4875,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4703,9 +4891,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4736,8 +4924,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4750,9 +4940,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4788,8 +4978,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4802,10 +4994,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4849,8 +5041,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -4863,10 +5057,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4898,8 +5092,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4912,10 +5108,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -4946,8 +5142,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -4960,9 +5158,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -4993,8 +5191,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5007,9 +5207,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5052,8 +5252,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5066,10 +5268,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5113,8 +5315,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5127,10 +5331,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5162,8 +5366,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5176,10 +5382,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5210,8 +5416,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5224,9 +5432,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5257,8 +5465,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5271,9 +5481,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5309,8 +5519,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5323,10 +5535,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5370,8 +5582,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5384,10 +5598,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5419,8 +5633,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5433,10 +5649,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5467,8 +5683,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5481,9 +5699,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5514,8 +5732,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5528,9 +5748,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5568,8 +5788,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5582,10 +5804,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5629,8 +5851,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5643,10 +5867,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5678,8 +5902,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5692,10 +5918,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5726,8 +5952,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5740,9 +5968,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5773,8 +6001,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5787,9 +6017,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5825,8 +6055,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5839,10 +6071,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5886,8 +6118,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -5900,10 +6134,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -5935,8 +6169,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5949,10 +6185,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -5983,8 +6219,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -5997,9 +6235,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6030,8 +6268,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6044,9 +6284,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6089,8 +6329,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6103,10 +6345,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6152,8 +6394,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6166,10 +6410,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6203,8 +6447,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6217,10 +6463,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6253,8 +6499,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6267,9 +6515,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6302,8 +6550,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6316,9 +6566,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6356,8 +6606,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6370,10 +6622,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6419,8 +6671,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6433,10 +6687,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6470,8 +6724,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6484,10 +6740,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6520,8 +6776,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6534,9 +6792,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6569,8 +6827,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6583,9 +6843,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6625,8 +6885,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6639,10 +6901,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6688,8 +6950,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6702,10 +6966,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6739,8 +7003,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6753,10 +7019,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6789,8 +7055,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6803,9 +7071,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6838,8 +7106,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -6852,9 +7122,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -6892,8 +7162,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6906,10 +7178,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -6955,8 +7227,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -6969,10 +7243,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7006,8 +7280,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7020,10 +7296,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7056,8 +7332,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7070,9 +7348,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7105,8 +7383,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7119,9 +7399,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7171,8 +7451,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7185,10 +7467,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7232,8 +7514,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7246,10 +7530,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7281,8 +7565,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7295,10 +7581,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7329,8 +7615,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7343,9 +7631,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7376,8 +7664,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7390,9 +7680,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7428,8 +7718,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7442,10 +7734,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7489,8 +7781,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7503,10 +7797,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7538,8 +7832,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7552,10 +7848,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7586,8 +7882,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7600,9 +7898,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7633,8 +7931,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7647,9 +7947,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7687,8 +7987,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7701,10 +8003,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7748,8 +8050,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7762,10 +8066,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7797,8 +8101,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7811,10 +8117,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7845,8 +8151,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7859,9 +8167,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -7892,8 +8200,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -7906,9 +8216,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -7944,8 +8254,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -7958,10 +8270,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8005,8 +8317,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8019,10 +8333,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8054,8 +8368,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8068,10 +8384,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8102,8 +8418,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8116,9 +8434,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8149,8 +8467,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8163,9 +8483,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8208,8 +8528,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8222,10 +8544,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8274,8 +8596,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8288,10 +8612,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8328,8 +8652,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8342,10 +8668,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8381,8 +8707,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8395,9 +8723,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8433,8 +8761,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8447,9 +8777,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8490,8 +8820,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8504,10 +8836,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8556,8 +8888,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8570,10 +8904,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8610,8 +8944,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8624,10 +8960,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8663,8 +8999,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8677,9 +9015,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8715,8 +9053,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8729,9 +9069,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8774,8 +9114,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8788,10 +9130,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8840,8 +9182,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -8854,10 +9198,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8894,8 +9238,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8908,10 +9254,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -8947,8 +9293,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -8961,9 +9309,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -8999,8 +9347,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9013,9 +9363,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9056,8 +9406,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9070,10 +9422,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9122,8 +9474,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9136,10 +9490,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9176,8 +9530,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9190,10 +9546,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9229,8 +9585,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9243,9 +9601,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9281,8 +9639,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9295,9 +9655,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9345,8 +9705,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9359,10 +9721,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9411,8 +9773,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9425,10 +9789,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9465,8 +9829,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9479,10 +9845,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9518,8 +9884,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9532,9 +9900,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9570,8 +9938,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9584,9 +9954,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9627,8 +9997,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9641,10 +10013,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9693,8 +10065,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9707,10 +10081,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9747,8 +10121,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9761,10 +10137,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9800,8 +10176,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9814,9 +10192,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9852,8 +10230,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -9866,9 +10246,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -9911,8 +10291,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9925,10 +10307,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -9977,8 +10359,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -9991,10 +10375,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10031,8 +10415,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10045,10 +10431,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10084,8 +10470,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10098,9 +10486,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10136,8 +10524,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10150,9 +10540,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10193,8 +10583,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -10207,10 +10599,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10259,8 +10651,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -10273,10 +10667,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10313,8 +10707,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10327,10 +10723,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10366,8 +10762,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10380,9 +10778,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10418,8 +10816,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10432,9 +10832,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10482,8 +10882,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -10496,10 +10898,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10548,8 +10950,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -10562,10 +10966,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10602,8 +11006,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10616,10 +11022,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10655,8 +11061,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10669,9 +11077,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10707,8 +11115,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10721,9 +11131,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10764,8 +11174,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -10778,10 +11190,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10830,8 +11242,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -10844,10 +11258,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10884,8 +11298,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10898,10 +11314,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -10937,8 +11353,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -10951,9 +11369,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -10989,8 +11407,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11003,9 +11423,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11048,8 +11468,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11062,10 +11484,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11114,8 +11536,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11128,10 +11552,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11168,8 +11592,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11182,10 +11608,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11221,8 +11647,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11235,9 +11663,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11273,8 +11701,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11287,9 +11717,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11330,8 +11760,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11344,10 +11776,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11396,8 +11828,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11410,10 +11844,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11450,8 +11884,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11464,10 +11900,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11503,8 +11939,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11517,9 +11955,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11555,8 +11993,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11569,9 +12009,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11619,8 +12059,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11633,10 +12075,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11693,8 +12135,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11707,10 +12151,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11755,8 +12199,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11769,10 +12215,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11816,8 +12262,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11830,9 +12278,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -11876,8 +12324,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -11890,9 +12340,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -11941,8 +12391,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -11955,10 +12407,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12015,8 +12467,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12029,10 +12483,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12077,8 +12531,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12091,10 +12547,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -12138,8 +12594,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12152,9 +12610,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12198,8 +12656,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12212,9 +12672,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -12265,8 +12725,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12279,10 +12741,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12339,8 +12801,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12353,10 +12817,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12401,8 +12865,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12415,10 +12881,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -12462,8 +12928,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12476,9 +12944,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12522,8 +12990,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12536,9 +13006,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -12587,8 +13057,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12601,10 +13073,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12661,8 +13133,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12675,10 +13149,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12723,8 +13197,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12737,10 +13213,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -12784,8 +13260,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12798,9 +13276,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12844,8 +13322,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -12858,9 +13338,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -12921,8 +13401,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12935,10 +13417,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -12982,8 +13464,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -12996,10 +13480,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13031,8 +13515,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13045,10 +13531,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13079,8 +13565,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13093,9 +13581,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13126,8 +13614,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13140,9 +13630,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13178,8 +13668,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13192,10 +13684,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13239,8 +13731,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13253,10 +13747,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13288,8 +13782,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13302,10 +13798,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13336,8 +13832,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13350,9 +13848,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13383,8 +13881,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13397,9 +13897,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13437,8 +13937,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13451,10 +13953,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13498,8 +14000,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13512,10 +14016,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13547,8 +14051,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13561,10 +14067,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13595,8 +14101,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13609,9 +14117,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13642,8 +14150,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13656,9 +14166,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13694,8 +14204,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13708,10 +14220,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13755,8 +14267,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13769,10 +14283,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13804,8 +14318,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13818,10 +14334,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13852,8 +14368,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13866,9 +14384,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -13899,8 +14417,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -13913,9 +14433,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -13958,8 +14478,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -13972,10 +14494,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14024,8 +14546,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14038,10 +14562,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14078,8 +14602,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14092,10 +14618,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14131,8 +14657,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14145,9 +14673,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14183,8 +14711,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14197,9 +14727,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14240,8 +14770,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14254,10 +14786,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14306,8 +14838,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14320,10 +14854,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14360,8 +14894,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14374,10 +14910,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14413,8 +14949,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14427,9 +14965,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14465,8 +15003,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14479,9 +15019,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14524,8 +15064,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14538,10 +15080,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14590,8 +15132,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14604,10 +15148,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14644,8 +15188,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14658,10 +15204,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14697,8 +15243,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14711,9 +15259,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14749,8 +15297,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14763,9 +15313,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14806,8 +15356,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14820,10 +15372,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14872,8 +15424,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -14886,10 +15440,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -14926,8 +15480,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14940,10 +15496,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -14979,8 +15535,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -14993,9 +15551,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15031,8 +15589,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15045,9 +15605,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15095,8 +15655,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15109,10 +15671,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15161,8 +15723,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15175,10 +15739,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15215,8 +15779,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15229,10 +15795,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15268,8 +15834,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15282,9 +15850,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15320,8 +15888,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15334,9 +15904,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15377,8 +15947,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15391,10 +15963,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15443,8 +16015,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15457,10 +16031,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15497,8 +16071,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15511,10 +16087,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15550,8 +16126,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15564,9 +16142,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15602,8 +16180,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15616,9 +16196,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15661,8 +16241,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15675,10 +16257,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15727,8 +16309,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15741,10 +16325,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15781,8 +16365,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15795,10 +16381,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15834,8 +16420,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15848,9 +16436,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -15886,8 +16474,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -15900,9 +16490,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -15943,8 +16533,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -15957,10 +16549,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16009,8 +16601,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16023,10 +16617,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16063,8 +16657,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16077,10 +16673,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16116,8 +16712,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16130,9 +16728,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16168,8 +16766,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16182,9 +16782,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16232,8 +16832,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16246,10 +16848,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16298,8 +16900,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16312,10 +16916,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16352,8 +16956,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16366,10 +16972,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16405,8 +17011,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16419,9 +17027,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16457,8 +17065,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16471,9 +17081,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16514,8 +17124,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16528,10 +17140,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16580,8 +17192,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16594,10 +17208,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16634,8 +17248,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16648,10 +17264,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16687,8 +17303,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16701,9 +17319,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16739,8 +17357,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16753,9 +17373,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16798,8 +17418,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16812,10 +17434,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16864,8 +17486,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -16878,10 +17502,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -16918,8 +17542,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16932,10 +17558,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -16971,8 +17597,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -16985,9 +17613,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17023,8 +17651,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17037,9 +17667,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -17080,8 +17710,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -17094,10 +17726,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17146,8 +17778,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -17160,10 +17794,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17200,8 +17834,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17214,10 +17850,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -17253,8 +17889,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17267,9 +17905,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17305,8 +17943,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17319,9 +17959,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -17369,8 +18009,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -17383,10 +18025,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17443,8 +18085,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -17457,10 +18101,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17505,8 +18149,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17519,10 +18165,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -17566,8 +18212,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17580,9 +18228,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17626,8 +18274,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17640,9 +18290,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -17691,8 +18341,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -17705,10 +18357,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17765,8 +18417,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -17779,10 +18433,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17827,8 +18481,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17841,10 +18497,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -17888,8 +18544,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17902,9 +18560,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -17948,8 +18606,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -17962,9 +18622,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18015,8 +18675,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18029,10 +18691,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18089,8 +18751,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18103,10 +18767,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18151,8 +18815,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18165,10 +18831,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18212,8 +18878,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18226,9 +18894,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18272,8 +18940,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18286,9 +18956,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18337,8 +19007,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18351,10 +19023,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18411,8 +19083,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18425,10 +19099,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18473,8 +19147,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18487,10 +19163,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18534,8 +19210,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18548,9 +19226,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18594,8 +19272,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18608,9 +19288,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18671,8 +19351,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18685,10 +19367,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18732,8 +19414,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18746,10 +19430,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18781,8 +19465,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18795,10 +19481,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18829,8 +19515,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18843,9 +19531,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18876,8 +19564,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -18890,9 +19580,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -18928,8 +19618,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -18942,10 +19634,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -18989,8 +19681,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19003,10 +19697,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19038,8 +19732,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19052,10 +19748,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19086,8 +19782,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19100,9 +19798,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19133,8 +19831,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19147,9 +19847,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19187,8 +19887,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19201,10 +19903,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19248,8 +19950,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19262,10 +19966,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19297,8 +20001,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19311,10 +20017,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19345,8 +20051,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19359,9 +20067,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19392,8 +20100,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19406,9 +20116,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19444,8 +20154,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19458,10 +20170,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19505,8 +20217,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19519,10 +20233,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19554,8 +20268,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19568,10 +20284,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19602,8 +20318,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19616,9 +20334,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19649,8 +20367,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19663,9 +20383,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19708,8 +20428,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19722,10 +20444,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19774,8 +20496,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -19788,10 +20512,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19828,8 +20552,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19842,10 +20568,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19881,8 +20607,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19895,9 +20623,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -19933,8 +20661,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -19947,9 +20677,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -19990,8 +20720,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20004,10 +20736,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20056,8 +20788,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20070,10 +20804,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20110,8 +20844,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20124,10 +20860,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -20163,8 +20899,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20177,9 +20915,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20215,8 +20953,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20229,9 +20969,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -20274,8 +21014,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20288,10 +21030,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20340,8 +21082,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20354,10 +21098,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20394,8 +21138,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20408,10 +21154,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -20447,8 +21193,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20461,9 +21209,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20499,8 +21247,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20513,9 +21263,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -20556,8 +21306,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20570,10 +21322,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20622,8 +21374,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20636,10 +21390,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20676,8 +21430,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20690,10 +21446,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -20729,8 +21485,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20743,9 +21501,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20781,8 +21539,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20795,9 +21555,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -20845,8 +21605,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20859,10 +21621,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20911,8 +21673,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -20925,10 +21689,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -20965,8 +21729,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -20979,10 +21745,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21018,8 +21784,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21032,9 +21800,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21070,8 +21838,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21084,9 +21854,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21127,8 +21897,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21141,10 +21913,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21193,8 +21965,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21207,10 +21981,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21247,8 +22021,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21261,10 +22037,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21300,8 +22076,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21314,9 +22092,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21352,8 +22130,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21366,9 +22146,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21411,8 +22191,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21425,10 +22207,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21477,8 +22259,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21491,10 +22275,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21531,8 +22315,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21545,10 +22331,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21584,8 +22370,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21598,9 +22386,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21636,8 +22424,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21650,9 +22440,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21693,8 +22483,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21707,10 +22499,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21759,8 +22551,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21773,10 +22567,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21813,8 +22607,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21827,10 +22623,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21866,8 +22662,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21880,9 +22678,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -21918,8 +22716,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -21932,9 +22732,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -21982,8 +22782,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -21996,10 +22798,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22048,8 +22850,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22062,10 +22866,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22102,8 +22906,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22116,10 +22922,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -22155,8 +22961,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22169,9 +22977,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22207,8 +23015,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22221,9 +23031,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -22264,8 +23074,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22278,10 +23090,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22330,8 +23142,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22344,10 +23158,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22384,8 +23198,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22398,10 +23214,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -22437,8 +23253,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22451,9 +23269,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22489,8 +23307,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22503,9 +23323,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -22548,8 +23368,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22562,10 +23384,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22614,8 +23436,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22628,10 +23452,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22668,8 +23492,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22682,10 +23508,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -22721,8 +23547,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22735,9 +23563,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22773,8 +23601,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22787,9 +23617,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -22830,8 +23660,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22844,10 +23676,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22896,8 +23728,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -22910,10 +23744,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -22950,8 +23784,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -22964,10 +23800,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23003,8 +23839,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23017,9 +23855,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23055,8 +23893,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23069,9 +23909,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23119,8 +23959,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -23133,10 +23975,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23193,8 +24035,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -23207,10 +24051,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23255,8 +24099,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23269,10 +24115,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23316,8 +24162,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23330,9 +24178,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23376,8 +24224,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23390,9 +24240,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23441,8 +24291,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -23455,10 +24307,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23515,8 +24367,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -23529,10 +24383,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23577,8 +24431,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23591,10 +24447,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23638,8 +24494,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23652,9 +24510,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23698,8 +24556,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23712,9 +24572,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23765,8 +24625,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -23779,10 +24641,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23839,8 +24701,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -23853,10 +24717,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -23901,8 +24765,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23915,10 +24781,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -23962,8 +24828,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -23976,9 +24844,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24022,8 +24890,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24036,9 +24906,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24087,8 +24957,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24101,10 +24973,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24161,8 +25033,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24175,10 +25049,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24223,8 +25097,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24237,10 +25113,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24284,8 +25160,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24298,9 +25176,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24344,8 +25222,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24358,9 +25238,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24421,8 +25301,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24435,10 +25317,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24484,8 +25366,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24498,10 +25382,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24535,8 +25419,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24549,10 +25435,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24585,8 +25471,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24599,9 +25487,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24634,8 +25522,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24648,9 +25538,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24688,8 +25578,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24702,10 +25594,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24751,8 +25643,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24765,10 +25659,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24802,8 +25696,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24816,10 +25712,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24852,8 +25748,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24866,9 +25764,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -24901,8 +25799,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -24915,9 +25815,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -24957,8 +25857,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -24971,10 +25873,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25020,8 +25922,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25034,10 +25938,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25071,8 +25975,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25085,10 +25991,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -25121,8 +26027,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25135,9 +26043,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25170,8 +26078,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25184,9 +26094,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -25224,8 +26134,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25238,10 +26150,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25287,8 +26199,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25301,10 +26215,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25338,8 +26252,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25352,10 +26268,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -25388,8 +26304,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25402,9 +26320,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25437,8 +26355,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25451,9 +26371,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -25498,8 +26418,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25512,10 +26434,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25572,8 +26494,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25586,10 +26510,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25634,8 +26558,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25648,10 +26574,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -25695,8 +26621,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25709,9 +26637,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25755,8 +26683,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25769,9 +26699,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -25820,8 +26750,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25834,10 +26766,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25894,8 +26826,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -25908,10 +26842,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -25956,8 +26890,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -25970,10 +26906,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26017,8 +26953,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26031,9 +26969,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26077,8 +27015,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26091,9 +27031,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26144,8 +27084,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -26158,10 +27100,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26218,8 +27160,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -26232,10 +27176,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26280,8 +27224,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26294,10 +27240,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26341,8 +27287,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26355,9 +27303,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26401,8 +27349,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26415,9 +27365,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26466,8 +27416,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -26480,10 +27432,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26540,8 +27492,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -26554,10 +27508,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26602,8 +27556,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26616,10 +27572,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26663,8 +27619,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26677,9 +27635,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26723,8 +27681,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26737,9 +27697,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26795,8 +27755,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -26809,10 +27771,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26869,8 +27831,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -26883,10 +27847,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -26931,8 +27895,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -26945,10 +27911,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -26992,8 +27958,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27006,9 +27974,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27052,8 +28020,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27066,9 +28036,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -27117,8 +28087,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -27131,10 +28103,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27191,8 +28163,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -27205,10 +28179,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27253,8 +28227,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27267,10 +28243,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -27314,8 +28290,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27328,9 +28306,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27374,8 +28352,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27388,9 +28368,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -27441,8 +28421,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -27455,10 +28437,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27515,8 +28497,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -27529,10 +28513,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27577,8 +28561,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27591,10 +28577,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -27638,8 +28624,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27652,9 +28640,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27698,8 +28686,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27712,9 +28702,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -27763,8 +28753,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -27777,10 +28769,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27837,8 +28829,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -27851,10 +28845,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -27899,8 +28893,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27913,10 +28909,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -27960,8 +28956,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -27974,9 +28972,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28020,8 +29018,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28034,9 +29034,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -28092,8 +29092,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -28106,10 +29108,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28166,8 +29168,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -28180,10 +29184,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28228,8 +29232,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28242,10 +29248,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -28289,8 +29295,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28303,9 +29311,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28349,8 +29357,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28363,9 +29373,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -28414,8 +29424,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -28428,10 +29440,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28488,8 +29500,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -28502,10 +29516,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28550,8 +29564,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28564,10 +29580,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -28611,8 +29627,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28625,9 +29643,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28671,8 +29689,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28685,9 +29705,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -28738,8 +29758,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -28752,10 +29774,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28812,8 +29834,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -28826,10 +29850,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28874,8 +29898,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28888,10 +29914,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -28935,8 +29961,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -28949,9 +29977,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -28995,8 +30023,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29009,9 +30039,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -29060,8 +30090,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -29074,10 +30106,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29134,8 +30166,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -29148,10 +30182,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29196,8 +30230,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29210,10 +30246,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -29257,8 +30293,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29271,9 +30309,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29317,8 +30355,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29331,9 +30371,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -29389,8 +30429,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -29403,10 +30445,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29463,8 +30505,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -29477,10 +30521,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29525,8 +30569,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29539,10 +30585,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -29586,8 +30632,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29600,9 +30648,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29646,8 +30694,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29660,9 +30710,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -29711,8 +30761,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -29725,10 +30777,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29785,8 +30837,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -29799,10 +30853,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29847,8 +30901,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29861,10 +30917,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -29908,8 +30964,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29922,9 +30980,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -29968,8 +31026,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -29982,9 +31042,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30035,8 +31095,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30049,10 +31111,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30109,8 +31171,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30123,10 +31187,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30171,8 +31235,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30185,10 +31251,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30232,8 +31298,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30246,9 +31314,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30292,8 +31360,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30306,9 +31376,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30357,8 +31427,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30371,10 +31443,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30431,8 +31503,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30445,10 +31519,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30493,8 +31567,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30507,10 +31583,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30554,8 +31630,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30568,9 +31646,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30614,8 +31692,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30628,9 +31708,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30691,8 +31771,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30705,10 +31787,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30753,8 +31835,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30767,10 +31851,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30803,8 +31887,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30817,10 +31903,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30852,8 +31938,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30866,9 +31954,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -30900,8 +31988,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -30914,9 +32004,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -30953,8 +32043,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -30967,10 +32059,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31015,8 +32107,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31029,10 +32123,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31065,8 +32159,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31079,10 +32175,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31114,8 +32210,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31128,9 +32226,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31162,8 +32260,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31176,9 +32276,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31217,8 +32317,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31231,10 +32333,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31279,8 +32381,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31293,10 +32397,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31329,8 +32433,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31343,10 +32449,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31378,8 +32484,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31392,9 +32500,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31426,8 +32534,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31440,9 +32550,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31479,8 +32589,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31493,10 +32605,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31541,8 +32653,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31555,10 +32669,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31591,8 +32705,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31605,10 +32721,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31640,8 +32756,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31654,9 +32772,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31688,8 +32806,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31702,9 +32822,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31753,8 +32873,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31767,10 +32889,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31808,8 +32930,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31822,10 +32946,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31851,8 +32975,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31865,10 +32991,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31893,8 +33019,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31907,9 +33035,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -31934,8 +33062,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -31948,9 +33078,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -31980,8 +33110,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -31994,10 +33126,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32035,8 +33167,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -32049,10 +33183,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := probeSel[toCheck]
+										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32078,8 +33212,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32092,10 +33228,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -32120,8 +33256,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32134,9 +33272,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32161,8 +33299,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32175,9 +33315,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := probeSel[toCheck]
+									probeIdx = probeSel[toCheck]
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -32209,8 +33349,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -32223,10 +33365,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32264,8 +33406,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -32278,10 +33422,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := buildSel[keyID-1]
+										buildIdx = buildSel[keyID-1]
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32307,8 +33451,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32321,10 +33467,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -32349,8 +33495,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32363,9 +33511,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32390,8 +33538,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32404,9 +33554,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := buildSel[keyID-1]
+									buildIdx = buildSel[keyID-1]
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -32436,8 +33586,10 @@ func (ht *hashTable) checkCol(
 							if ht.allowNullEquality {
 								// The allowNullEquality flag only matters if both vectors have nulls.
 								// This lets us avoid writing all 2^3 conditional branches.
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -32450,10 +33602,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32491,8 +33643,10 @@ func (ht *hashTable) checkCol(
 
 								}
 							} else {
-								probeIsNull := false
-								buildIsNull := false
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
 								// Early bounds check.
 								_ = ht.probeScratch.toCheck[nToCheck-1]
 								for i := uint64(0); i < nToCheck; i++ {
@@ -32505,10 +33659,10 @@ func (ht *hashTable) checkCol(
 										// compared to the corresponding probe table to determine if a match is
 										// found.
 
-										probeIdx := int(toCheck)
+										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-										buildIdx := int(keyID - 1)
+										buildIdx = int(keyID - 1)
 
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32534,8 +33688,10 @@ func (ht *hashTable) checkCol(
 								}
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32548,10 +33704,10 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 									probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -32576,8 +33732,10 @@ func (ht *hashTable) checkCol(
 						}
 					} else {
 						if buildVec.MaybeHasNulls() {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32590,9 +33748,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32617,8 +33775,10 @@ func (ht *hashTable) checkCol(
 
 							}
 						} else {
-							probeIsNull := false
-							buildIsNull := false
+							var (
+								probeIdx, buildIdx       int
+								probeIsNull, buildIsNull bool
+							)
 							// Early bounds check.
 							_ = ht.probeScratch.toCheck[nToCheck-1]
 							for i := uint64(0); i < nToCheck; i++ {
@@ -32631,9 +33791,9 @@ func (ht *hashTable) checkCol(
 									// compared to the corresponding probe table to determine if a match is
 									// found.
 
-									probeIdx := int(toCheck)
+									probeIdx = int(toCheck)
 
-									buildIdx := int(keyID - 1)
+									buildIdx = int(keyID - 1)
 
 									if probeIsNull {
 										ht.probeScratch.groupID[toCheck] = 0
@@ -32678,8 +33838,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -32692,10 +33854,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32745,8 +33907,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -32759,10 +33923,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -32812,8 +33976,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -32826,9 +33992,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -32878,8 +34044,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -32892,9 +34060,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -32947,8 +34115,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -32961,10 +34131,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33014,8 +34184,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33028,10 +34200,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33081,8 +34253,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33095,9 +34269,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33147,8 +34321,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33161,9 +34337,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33221,8 +34397,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33235,10 +34413,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33280,8 +34458,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33294,10 +34474,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33339,8 +34519,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33353,9 +34535,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33397,8 +34579,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33411,9 +34595,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33458,8 +34642,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33472,10 +34658,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33517,8 +34703,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33531,10 +34719,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33576,8 +34764,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33590,9 +34780,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33634,8 +34824,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33648,9 +34840,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33700,8 +34892,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33714,10 +34908,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33759,8 +34953,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33773,10 +34969,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33818,8 +35014,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33832,9 +35030,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33876,8 +35074,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33890,9 +35090,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -33937,8 +35137,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -33951,10 +35153,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -33996,8 +35198,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34010,10 +35214,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34055,8 +35259,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34069,9 +35275,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34113,8 +35319,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34127,9 +35335,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34179,8 +35387,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34193,10 +35403,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34249,8 +35459,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34263,10 +35475,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34319,8 +35531,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34333,9 +35547,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34388,8 +35602,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34402,9 +35618,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34460,8 +35676,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34474,10 +35692,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34530,8 +35748,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34544,10 +35764,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34600,8 +35820,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34614,9 +35836,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34669,8 +35891,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34683,9 +35907,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34746,8 +35970,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34760,10 +35986,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34816,8 +36042,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34830,10 +36058,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -34886,8 +36114,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34900,9 +36130,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -34955,8 +36185,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -34969,9 +36201,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35027,8 +36259,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35041,10 +36275,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35097,8 +36331,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35111,10 +36347,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35167,8 +36403,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35181,9 +36419,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35236,8 +36474,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35250,9 +36490,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35313,8 +36553,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35327,10 +36569,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35383,8 +36625,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35397,10 +36641,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35453,8 +36697,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35467,9 +36713,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35522,8 +36768,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35536,9 +36784,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35594,8 +36842,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35608,10 +36858,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35664,8 +36914,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35678,10 +36930,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35734,8 +36986,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35748,9 +37002,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35803,8 +37057,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35817,9 +37073,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -35880,8 +37136,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35894,10 +37152,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -35958,8 +37216,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -35972,10 +37232,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36036,8 +37296,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36050,9 +37312,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36113,8 +37375,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36127,9 +37391,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36193,8 +37457,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36207,10 +37473,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36271,8 +37537,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36285,10 +37553,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36349,8 +37617,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36363,9 +37633,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36426,8 +37696,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36440,9 +37712,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36511,8 +37783,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36525,10 +37799,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36577,8 +37851,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36591,10 +37867,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36643,8 +37919,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36657,9 +37935,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36708,8 +37986,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36722,9 +38002,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36776,8 +38056,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36790,10 +38072,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36842,8 +38124,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36856,10 +38140,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -36908,8 +38192,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36922,9 +38208,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -36973,8 +38259,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -36987,9 +38275,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -37046,8 +38334,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		if probeSel != nil {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37060,10 +38350,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -37105,8 +38395,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37119,10 +38411,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -37164,8 +38456,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37178,9 +38472,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -37222,8 +38516,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37236,9 +38532,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := probeSel[toCheck]
+							probeIdx = probeSel[toCheck]
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -37283,8 +38579,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 		} else {
 			if probeVec.MaybeHasNulls() {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37297,10 +38595,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -37342,8 +38640,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37356,10 +38656,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 							probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -37401,8 +38701,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 				}
 			} else {
 				if buildVec.MaybeHasNulls() {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37415,9 +38717,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							buildIsNull = buildVec.Nulls().NullAt(buildIdx)
 
@@ -37459,8 +38761,10 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 					}
 				} else {
-					probeIsNull := false
-					buildIsNull := false
+					var (
+						probeIdx, buildIdx       int
+						probeIsNull, buildIsNull bool
+					)
 					// Early bounds check.
 					_ = ht.probeScratch.toCheck[nToCheck-1]
 					for i := uint64(0); i < nToCheck; i++ {
@@ -37473,9 +38777,9 @@ func (ht *hashTable) checkColForDistinctTuples(
 							// compared to the corresponding probe table to determine if a match is
 							// found.
 
-							probeIdx := int(toCheck)
+							probeIdx = int(toCheck)
 
-							buildIdx := int(keyID - 1)
+							buildIdx = int(keyID - 1)
 
 							if probeIsNull && buildIsNull {
 								// Both values are NULLs, and since we're allowing null equality, we
@@ -37519,7 +38823,7 @@ func (ht *hashTable) checkColForDistinctTuples(
 
 		}
 	default:
-		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", probeType))
+		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", probeType.Name()))
 	}
 }
 

@@ -26,6 +26,55 @@ import (
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
+// populateSels populates intermediate selection vectors (stored in
+// op.scratch.sels) for each hash code present in b. hashBuffer must contain
+// the hash codes for all of the tuples in b.
+func (op *hashAggregator) populateSels(b coldata.Batch, hashBuffer []uint64) {
+	// Note: we don't need to reset any of the slices in op.scratch.sels since
+	// they all are of zero length here (see the comment for op.scratch.sels
+	// for context).
+	op.scratch.hashCodeForSelsSlot = op.scratch.hashCodeForSelsSlot[:0]
+	if batchSelection := b.Selection(); batchSelection != nil {
+		for selIdx, hashCode := range hashBuffer {
+			selsSlot := -1
+			for slot, hash := range op.scratch.hashCodeForSelsSlot {
+				if hash == hashCode {
+					// We have already seen a tuple with the same hashCode
+					// previously, so we will append into the same sels slot.
+					selsSlot = slot
+					break
+				}
+			}
+			if selsSlot < 0 {
+				// This is the first tuple in hashBuffer with this hashCode, so we
+				// will add this tuple to the next available sels slot.
+				selsSlot = len(op.scratch.hashCodeForSelsSlot)
+				op.scratch.hashCodeForSelsSlot = append(op.scratch.hashCodeForSelsSlot, hashCode)
+			}
+			op.scratch.sels[selsSlot] = append(op.scratch.sels[selsSlot], batchSelection[selIdx])
+		}
+	} else {
+		for selIdx, hashCode := range hashBuffer {
+			selsSlot := -1
+			for slot, hash := range op.scratch.hashCodeForSelsSlot {
+				if hash == hashCode {
+					// We have already seen a tuple with the same hashCode
+					// previously, so we will append into the same sels slot.
+					selsSlot = slot
+					break
+				}
+			}
+			if selsSlot < 0 {
+				// This is the first tuple in hashBuffer with this hashCode, so we
+				// will add this tuple to the next available sels slot.
+				selsSlot = len(op.scratch.hashCodeForSelsSlot)
+				op.scratch.hashCodeForSelsSlot = append(op.scratch.hashCodeForSelsSlot, hashCode)
+			}
+			op.scratch.sels[selsSlot] = append(op.scratch.sels[selsSlot], selIdx)
+		}
+	}
+}
+
 // match takes a selection vector and compares it against the values of the key
 // of its aggregation function. It returns a selection vector representing the
 // unmatched tuples and a boolean to indicate whether or not there are any
@@ -70,9 +119,7 @@ func (v hashAggFuncs) match(
 			rhs := b.ColVec(int(colIdx))
 			rhsHasNull := rhs.MaybeHasNulls()
 
-			keyTyp := keyTypes[keyIdx]
-
-			switch typeconv.FromColumnType(&keyTyp) {
+			switch typeconv.FromColumnType(&keyTypes[keyIdx]) {
 			case coltypes.Bool:
 				lhsCol := lhs.Bool()
 				rhsCol := rhs.Bool()
@@ -1179,7 +1226,7 @@ func (v hashAggFuncs) match(
 					}
 				}
 			default:
-				colexecerror.InternalError(fmt.Sprintf("unhandled type %s", &keyTyp))
+				colexecerror.InternalError(fmt.Sprintf("unhandled type %s", keyTypes[keyIdx].String()))
 			}
 		}
 	}
