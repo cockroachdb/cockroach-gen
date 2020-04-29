@@ -184,6 +184,7 @@ const (
 	NormalizeInConst
 	FoldInNull
 	UnifyComparisonTypes
+	EliminateExistsZeroRows
 	EliminateExistsProject
 	EliminateExistsGroupBy
 	IntroduceExistsLimit

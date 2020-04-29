@@ -9120,6 +9120,19 @@ func (_f *Factory) ConstructExists(
 	input memo.RelExpr,
 	subqueryPrivate *memo.SubqueryPrivate,
 ) opt.ScalarExpr {
+	// [EliminateExistsZeroRows]
+	{
+		if _f.funcs.HasZeroRows(input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsZeroRows) {
+				_expr := _f.ConstructFalse()
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateExistsZeroRows, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [EliminateExistsProject]
 	{
 		_project, _ := input.(*memo.ProjectExpr)
