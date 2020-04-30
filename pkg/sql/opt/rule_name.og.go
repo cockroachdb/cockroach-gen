@@ -198,6 +198,8 @@ const (
 	SimplifyAnyScalarArray
 	FoldCollate
 	NormalizeArrayFlattenToAgg
+	SimplifySameVarEqualities
+	SimplifySameVarInequalities
 	SimplifySelectFilters
 	ConsolidateSelectFilters
 	DetectSelectContradiction

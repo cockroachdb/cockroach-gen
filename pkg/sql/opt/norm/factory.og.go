@@ -360,18 +360,20 @@ func (_f *Factory) ConstructSelect(
 	// [SimplifySelectFilters]
 	{
 		for i := range filters {
-			_item := &filters[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(filters) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectFilters) {
-						_expr := _f.ConstructSelect(
-							input,
-							_f.funcs.SimplifyFilters(filters),
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifySelectFilters, nil, _expr)
+			item := &filters[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(filters) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySelectFilters) {
+							_expr := _f.ConstructSelect(
+								input,
+								_f.funcs.SimplifyFilters(filters),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifySelectFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -1616,21 +1618,23 @@ func (_f *Factory) ConstructInnerJoin(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructInnerJoin(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructInnerJoin(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -2544,21 +2548,23 @@ func (_f *Factory) ConstructLeftJoin(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructLeftJoin(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructLeftJoin(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3154,21 +3160,23 @@ func (_f *Factory) ConstructRightJoin(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructRightJoin(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructRightJoin(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3417,21 +3425,23 @@ func (_f *Factory) ConstructFullJoin(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructFullJoin(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructFullJoin(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3754,21 +3764,23 @@ func (_f *Factory) ConstructSemiJoin(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructSemiJoin(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructSemiJoin(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -4395,21 +4407,23 @@ func (_f *Factory) ConstructAntiJoin(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructAntiJoin(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructAntiJoin(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -4967,21 +4981,23 @@ func (_f *Factory) ConstructInnerJoinApply(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructInnerJoinApply(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructInnerJoinApply(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -5857,21 +5873,23 @@ func (_f *Factory) ConstructLeftJoinApply(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructLeftJoinApply(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructLeftJoinApply(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -6454,21 +6472,23 @@ func (_f *Factory) ConstructSemiJoinApply(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructSemiJoinApply(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructSemiJoinApply(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -7003,21 +7023,23 @@ func (_f *Factory) ConstructAntiJoinApply(
 	// [SimplifyJoinFilters]
 	{
 		for i := range on {
-			_item := &on[i]
-			if _item.Condition.Op() == opt.AndOp || _item.Condition.Op() == opt.TrueOp || _item.Condition.Op() == opt.FalseOp || _item.Condition.Op() == opt.NullOp {
-				if !_f.funcs.IsFilterFalse(on) {
-					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
-						_expr := _f.ConstructAntiJoinApply(
-							left,
-							right,
-							_f.funcs.SimplifyFilters(on),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+			item := &on[i]
+			if item.Condition.Op() == opt.AndOp || item.Condition.Op() == opt.TrueOp || item.Condition.Op() == opt.FalseOp || item.Condition.Op() == opt.NullOp || item.Condition.Op() == opt.OrOp {
+				if !_f.funcs.IsUnsimplifiableOr(item) {
+					if !_f.funcs.IsFilterFalse(on) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyJoinFilters) {
+							_expr := _f.ConstructAntiJoinApply(
+								left,
+								right,
+								_f.funcs.SimplifyFilters(on),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.SimplifyJoinFilters, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -10009,6 +10031,36 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [SimplifySameVarEqualities]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.funcs.VarsAreSame(left, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
+						typ := _f.funcs.TypeOf(left)
+						_expr := _f.ConstructOr(
+							_f.ConstructIsNot(
+								left,
+								_f.ConstructNull(
+									typ,
+								),
+							),
+							_f.ConstructNull(
+								typ,
+							),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySameVarEqualities, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeEq(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -10205,6 +10257,36 @@ func (_f *Factory) ConstructLt(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [SimplifySameVarInequalities]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.funcs.VarsAreSame(left, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
+						typ := _f.funcs.TypeOf(left)
+						_expr := _f.ConstructAnd(
+							_f.ConstructIs(
+								left,
+								_f.ConstructNull(
+									typ,
+								),
+							),
+							_f.ConstructNull(
+								typ,
+							),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySameVarInequalities, nil, _expr)
 						}
 						return _expr
 					}
@@ -10417,6 +10499,36 @@ func (_f *Factory) ConstructGt(
 		}
 	}
 
+	// [SimplifySameVarInequalities]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.funcs.VarsAreSame(left, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
+						typ := _f.funcs.TypeOf(left)
+						_expr := _f.ConstructAnd(
+							_f.ConstructIs(
+								left,
+								_f.ConstructNull(
+									typ,
+								),
+							),
+							_f.ConstructNull(
+								typ,
+							),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySameVarInequalities, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeGt(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -10613,6 +10725,36 @@ func (_f *Factory) ConstructLe(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [SimplifySameVarEqualities]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.funcs.VarsAreSame(left, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
+						typ := _f.funcs.TypeOf(left)
+						_expr := _f.ConstructOr(
+							_f.ConstructIsNot(
+								left,
+								_f.ConstructNull(
+									typ,
+								),
+							),
+							_f.ConstructNull(
+								typ,
+							),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySameVarEqualities, nil, _expr)
 						}
 						return _expr
 					}
@@ -10825,6 +10967,36 @@ func (_f *Factory) ConstructGe(
 		}
 	}
 
+	// [SimplifySameVarEqualities]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.funcs.VarsAreSame(left, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
+						typ := _f.funcs.TypeOf(left)
+						_expr := _f.ConstructOr(
+							_f.ConstructIsNot(
+								left,
+								_f.ConstructNull(
+									typ,
+								),
+							),
+							_f.ConstructNull(
+								typ,
+							),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySameVarEqualities, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeGe(left, right)
 	return _f.onConstructScalar(e)
 }
@@ -10937,6 +11109,36 @@ func (_f *Factory) ConstructNe(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [SimplifySameVarInequalities]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_variable2, _ := right.(*memo.VariableExpr)
+			if _variable2 != nil {
+				if _f.funcs.VarsAreSame(left, right) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
+						typ := _f.funcs.TypeOf(left)
+						_expr := _f.ConstructAnd(
+							_f.ConstructIs(
+								left,
+								_f.ConstructNull(
+									typ,
+								),
+							),
+							_f.ConstructNull(
+								typ,
+							),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.SimplifySameVarInequalities, nil, _expr)
 						}
 						return _expr
 					}
