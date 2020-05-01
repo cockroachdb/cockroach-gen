@@ -361,6 +361,9 @@ type MutationPrivate struct {
 	// is zero.
 	WithID opt.WithID
 
+	// FKCascades stores metadata necessary for building cascading queries.
+	FKCascades FKCascades
+
 	// FKFallback is true if we need to fall back to the legacy path for FK
 	// checks / cascades.
 	FKFallback bool
@@ -20768,6 +20771,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
+	in.hasher.HashFKCascades(val.FKCascades)
 	in.hasher.HashBool(val.FKFallback)
 
 	in.cache.Start(in.hasher.hash)
@@ -20784,6 +20788,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
+				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) &&
 				in.hasher.IsBoolEqual(val.FKFallback, existing.FKFallback) {
 				return existing
 			}
@@ -20808,6 +20813,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
+	in.hasher.HashFKCascades(val.FKCascades)
 	in.hasher.HashBool(val.FKFallback)
 
 	in.cache.Start(in.hasher.hash)
@@ -20824,6 +20830,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
+				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) &&
 				in.hasher.IsBoolEqual(val.FKFallback, existing.FKFallback) {
 				return existing
 			}
@@ -20848,6 +20855,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
+	in.hasher.HashFKCascades(val.FKCascades)
 	in.hasher.HashBool(val.FKFallback)
 
 	in.cache.Start(in.hasher.hash)
@@ -20864,6 +20872,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
+				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) &&
 				in.hasher.IsBoolEqual(val.FKFallback, existing.FKFallback) {
 				return existing
 			}
@@ -20888,6 +20897,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
+	in.hasher.HashFKCascades(val.FKCascades)
 	in.hasher.HashBool(val.FKFallback)
 
 	in.cache.Start(in.hasher.hash)
@@ -20904,6 +20914,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
+				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) &&
 				in.hasher.IsBoolEqual(val.FKFallback, existing.FKFallback) {
 				return existing
 			}
