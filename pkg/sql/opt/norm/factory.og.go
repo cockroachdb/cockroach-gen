@@ -1109,6 +1109,32 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [FoldTupleAccessIntoValues]
+	{
+		_values, _ := input.(*memo.ValuesExpr)
+		if _values != nil {
+			if _f.funcs.CanUnnestTuplesFromValues(input) {
+				col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(input))
+				if _f.funcs.OnlyTupleColumnsAccessed(projections, col) {
+					if _f.funcs.ColsAreEmpty(passthrough) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.FoldTupleAccessIntoValues) {
+							tuplecols := _f.funcs.MakeColsForUnnestTuples(col)
+							_expr := _f.ConstructProject(
+								_f.funcs.UnnestTuplesFromValues(input, tuplecols),
+								_f.funcs.FoldTupleColumnAccess(projections, tuplecols, col),
+								passthrough,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.FoldTupleAccessIntoValues, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PruneProjectCols]
 	{
 		project := input
