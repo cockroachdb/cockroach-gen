@@ -13,7 +13,6 @@ import (
 	"context"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colcontainer"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -254,7 +253,6 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       batch.ColVec(colIdx),
 								Sel:       sel,
 								SrcEndIdx: n,
@@ -291,7 +289,6 @@ func (r *percentRankNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       r.scratch.ColVec(colIdx),
 								SrcEndIdx: n,
 							},
@@ -490,7 +487,6 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       batch.ColVec(colIdx),
 								Sel:       sel,
 								SrcEndIdx: n,
@@ -599,7 +595,6 @@ func (r *percentRankWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       r.scratch.ColVec(colIdx),
 								SrcEndIdx: n,
 							},
@@ -808,7 +803,6 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       batch.ColVec(colIdx),
 								Sel:       sel,
 								SrcEndIdx: n,
@@ -920,7 +914,6 @@ func (r *cumeDistNoPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       r.scratch.ColVec(colIdx),
 								SrcEndIdx: n,
 							},
@@ -1147,7 +1140,6 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       batch.ColVec(colIdx),
 								Sel:       sel,
 								SrcEndIdx: n,
@@ -1331,7 +1323,6 @@ func (r *cumeDistWithPartitionOp) Next(ctx context.Context) coldata.Batch {
 					vec.Copy(
 						coldata.CopySliceArgs{
 							SliceArgs: coldata.SliceArgs{
-								ColType:   typeconv.FromColumnType(&r.inputTypes[colIdx]),
 								Src:       r.scratch.ColVec(colIdx),
 								SrcEndIdx: n,
 							},

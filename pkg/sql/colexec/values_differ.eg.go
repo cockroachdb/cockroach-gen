@@ -15,8 +15,6 @@ import (
 	"math"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -29,287 +27,312 @@ var _ = execgen.UNSAFEGET
 // valuesDiffer takes in two ColVecs as well as values indices to check whether
 // the values differ. This function pays attention to NULLs, and two NULL
 // values do *not* differ.
-func valuesDiffer(
-	t *types.T, aColVec coldata.Vec, aValueIdx int, bColVec coldata.Vec, bValueIdx int,
-) bool {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		aCol := aColVec.Bool()
-		bCol := bColVec.Bool()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
-
-			if !arg1 && arg2 {
-				cmpResult = -1
-			} else if arg1 && !arg2 {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
+func valuesDiffer(aColVec coldata.Vec, aValueIdx int, bColVec coldata.Vec, bValueIdx int) bool {
+	switch aColVec.CanonicalTypeFamily() {
+	case types.BoolFamily:
+		switch aColVec.Type().Width() {
+		case -1:
+		default:
+			aCol := aColVec.Bool()
+			bCol := bColVec.Bool()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
 			}
-
-			unique = cmpResult != 0
-		}
-
-		return unique
-	case coltypes.Bytes:
-		aCol := aColVec.Bytes()
-		bCol := bColVec.Bytes()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol.Get(aValueIdx)
-		arg2 := bCol.Get(bValueIdx)
-		var unique bool
-
-		{
-			var cmpResult int
-			cmpResult = bytes.Compare(arg1, arg2)
-			unique = cmpResult != 0
-		}
-
-		return unique
-	case coltypes.Decimal:
-		aCol := aColVec.Decimal()
-		bCol := bColVec.Decimal()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
-			cmpResult = tree.CompareDecimals(&arg1, &arg2)
-			unique = cmpResult != 0
-		}
-
-		return unique
-	case coltypes.Int16:
-		aCol := aColVec.Int16()
-		bCol := bColVec.Int16()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
 
 			{
-				a, b := int64(arg1), int64(arg2)
-				if a < b {
+				var cmpResult int
+
+				if !arg1 && arg2 {
 					cmpResult = -1
-				} else if a > b {
+				} else if arg1 && !arg2 {
 					cmpResult = 1
 				} else {
 					cmpResult = 0
 				}
+
+				unique = cmpResult != 0
 			}
 
-			unique = cmpResult != 0
+			return unique
 		}
-
-		return unique
-	case coltypes.Int32:
-		aCol := aColVec.Int32()
-		bCol := bColVec.Int32()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
+	case types.BytesFamily:
+		switch aColVec.Type().Width() {
+		case -1:
+		default:
+			aCol := aColVec.Bytes()
+			bCol := bColVec.Bytes()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol.Get(aValueIdx)
+			arg2 := bCol.Get(bValueIdx)
+			var unique bool
 
 			{
-				a, b := int64(arg1), int64(arg2)
-				if a < b {
-					cmpResult = -1
-				} else if a > b {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
+				var cmpResult int
+				cmpResult = bytes.Compare(arg1, arg2)
+				unique = cmpResult != 0
 			}
 
-			unique = cmpResult != 0
+			return unique
 		}
-
-		return unique
-	case coltypes.Int64:
-		aCol := aColVec.Int64()
-		bCol := bColVec.Int64()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
+	case types.DecimalFamily:
+		switch aColVec.Type().Width() {
+		case -1:
+		default:
+			aCol := aColVec.Decimal()
+			bCol := bColVec.Decimal()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
 
 			{
-				a, b := int64(arg1), int64(arg2)
-				if a < b {
-					cmpResult = -1
-				} else if a > b {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
+				var cmpResult int
+				cmpResult = tree.CompareDecimals(&arg1, &arg2)
+				unique = cmpResult != 0
 			}
 
-			unique = cmpResult != 0
+			return unique
 		}
-
-		return unique
-	case coltypes.Float64:
-		aCol := aColVec.Float64()
-		bCol := bColVec.Float64()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
+	case types.IntFamily:
+		switch aColVec.Type().Width() {
+		case 16:
+			aCol := aColVec.Int16()
+			bCol := bColVec.Int16()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
 
 			{
-				a, b := float64(arg1), float64(arg2)
-				if a < b {
-					cmpResult = -1
-				} else if a > b {
-					cmpResult = 1
-				} else if a == b {
-					cmpResult = 0
-				} else if math.IsNaN(a) {
-					if math.IsNaN(b) {
-						cmpResult = 0
-					} else {
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
 						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
 					}
-				} else {
-					cmpResult = 1
 				}
+
+				unique = cmpResult != 0
 			}
 
-			unique = cmpResult != 0
-		}
-
-		return unique
-	case coltypes.Timestamp:
-		aCol := aColVec.Timestamp()
-		bCol := bColVec.Timestamp()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
-
-		{
-			var cmpResult int
-
-			if arg1.Before(arg2) {
-				cmpResult = -1
-			} else if arg2.Before(arg1) {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
+			return unique
+		case 32:
+			aCol := aColVec.Int32()
+			bCol := bColVec.Int32()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
 			}
-			unique = cmpResult != 0
-		}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
 
-		return unique
-	case coltypes.Interval:
-		aCol := aColVec.Interval()
-		bCol := bColVec.Interval()
-		aNulls := aColVec.Nulls()
-		bNulls := bColVec.Nulls()
-		aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
-		bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
-		if aNull && bNull {
-			return false
-		} else if aNull || bNull {
-			return true
-		}
-		arg1 := aCol[aValueIdx]
-		arg2 := bCol[bValueIdx]
-		var unique bool
+			{
+				var cmpResult int
 
-		{
-			var cmpResult int
-			cmpResult = arg1.Compare(arg2)
-			unique = cmpResult != 0
-		}
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
 
-		return unique
-	default:
-		colexecerror.InternalError(fmt.Sprintf("unsupported valuesDiffer type %s", t))
-		// This code is unreachable, but the compiler cannot infer that.
-		return false
+				unique = cmpResult != 0
+			}
+
+			return unique
+		case -1:
+		default:
+			aCol := aColVec.Int64()
+			bCol := bColVec.Int64()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
+
+			{
+				var cmpResult int
+
+				{
+					a, b := int64(arg1), int64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+				}
+
+				unique = cmpResult != 0
+			}
+
+			return unique
+		}
+	case types.FloatFamily:
+		switch aColVec.Type().Width() {
+		case -1:
+		default:
+			aCol := aColVec.Float64()
+			bCol := bColVec.Float64()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
+
+			{
+				var cmpResult int
+
+				{
+					a, b := float64(arg1), float64(arg2)
+					if a < b {
+						cmpResult = -1
+					} else if a > b {
+						cmpResult = 1
+					} else if a == b {
+						cmpResult = 0
+					} else if math.IsNaN(a) {
+						if math.IsNaN(b) {
+							cmpResult = 0
+						} else {
+							cmpResult = -1
+						}
+					} else {
+						cmpResult = 1
+					}
+				}
+
+				unique = cmpResult != 0
+			}
+
+			return unique
+		}
+	case types.TimestampTZFamily:
+		switch aColVec.Type().Width() {
+		case -1:
+		default:
+			aCol := aColVec.Timestamp()
+			bCol := bColVec.Timestamp()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
+
+			{
+				var cmpResult int
+
+				if arg1.Before(arg2) {
+					cmpResult = -1
+				} else if arg2.Before(arg1) {
+					cmpResult = 1
+				} else {
+					cmpResult = 0
+				}
+				unique = cmpResult != 0
+			}
+
+			return unique
+		}
+	case types.IntervalFamily:
+		switch aColVec.Type().Width() {
+		case -1:
+		default:
+			aCol := aColVec.Interval()
+			bCol := bColVec.Interval()
+			aNulls := aColVec.Nulls()
+			bNulls := bColVec.Nulls()
+			aNull := aNulls.MaybeHasNulls() && aNulls.NullAt(aValueIdx)
+			bNull := bNulls.MaybeHasNulls() && bNulls.NullAt(bValueIdx)
+			if aNull && bNull {
+				return false
+			} else if aNull || bNull {
+				return true
+			}
+			arg1 := aCol[aValueIdx]
+			arg2 := bCol[bValueIdx]
+			var unique bool
+
+			{
+				var cmpResult int
+				cmpResult = arg1.Compare(arg2)
+				unique = cmpResult != 0
+			}
+
+			return unique
+		}
 	}
+	colexecerror.InternalError(fmt.Sprintf("unsupported valuesDiffer type %s", aColVec.Type()))
+	// This code is unreachable, but the compiler cannot infer that.
+	return false
 }

@@ -12,8 +12,7 @@ package colexec
 import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
@@ -21,14 +20,21 @@ import (
 )
 
 func newAvgAgg(t *types.T) (aggregateFunc, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Decimal:
-		return &avgDecimalAgg{}, nil
-	case coltypes.Float64:
-		return &avgFloat64Agg{}, nil
-	default:
-		return nil, errors.Errorf("unsupported avg agg type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &avgDecimalAgg{}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &avgFloat64Agg{}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported avg agg type %s", t.Name())
 }
 
 type avgDecimalAgg struct {

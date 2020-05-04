@@ -14,8 +14,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
@@ -23,33 +22,60 @@ import (
 	"github.com/pkg/errors"
 )
 
-func newAnyNotNullAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return &anyNotNullBoolAgg{allocator: allocator}, nil
-	case coltypes.Bytes:
-		return &anyNotNullBytesAgg{allocator: allocator}, nil
-	case coltypes.Decimal:
-		return &anyNotNullDecimalAgg{allocator: allocator}, nil
-	case coltypes.Int16:
-		return &anyNotNullInt16Agg{allocator: allocator}, nil
-	case coltypes.Int32:
-		return &anyNotNullInt32Agg{allocator: allocator}, nil
-	case coltypes.Int64:
-		return &anyNotNullInt64Agg{allocator: allocator}, nil
-	case coltypes.Float64:
-		return &anyNotNullFloat64Agg{allocator: allocator}, nil
-	case coltypes.Timestamp:
-		return &anyNotNullTimestampAgg{allocator: allocator}, nil
-	case coltypes.Interval:
-		return &anyNotNullIntervalAgg{allocator: allocator}, nil
-	default:
-		return nil, errors.Errorf("unsupported any not null agg type %s", t)
-	}
-}
-
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
+
+func newAnyNotNullAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &anyNotNullBoolAgg{allocator: allocator}, nil
+		}
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &anyNotNullBytesAgg{allocator: allocator}, nil
+		}
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &anyNotNullDecimalAgg{allocator: allocator}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &anyNotNullInt16Agg{allocator: allocator}, nil
+		case 32:
+			return &anyNotNullInt32Agg{allocator: allocator}, nil
+		case -1:
+		default:
+			return &anyNotNullInt64Agg{allocator: allocator}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &anyNotNullFloat64Agg{allocator: allocator}, nil
+		}
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &anyNotNullTimestampAgg{allocator: allocator}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &anyNotNullIntervalAgg{allocator: allocator}, nil
+		}
+	}
+	return nil, errors.Errorf("unsupported any not null agg type %s", t.Name())
+}
 
 // anyNotNullBoolAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.

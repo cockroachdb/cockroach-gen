@@ -16,8 +16,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
@@ -34,28 +33,55 @@ var _ = execgen.UNSAFEGET
 var _ = colexecerror.InternalError
 
 func newMinAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return &minBoolAgg{allocator: allocator}, nil
-	case coltypes.Bytes:
-		return &minBytesAgg{allocator: allocator}, nil
-	case coltypes.Decimal:
-		return &minDecimalAgg{allocator: allocator}, nil
-	case coltypes.Int16:
-		return &minInt16Agg{allocator: allocator}, nil
-	case coltypes.Int32:
-		return &minInt32Agg{allocator: allocator}, nil
-	case coltypes.Int64:
-		return &minInt64Agg{allocator: allocator}, nil
-	case coltypes.Float64:
-		return &minFloat64Agg{allocator: allocator}, nil
-	case coltypes.Timestamp:
-		return &minTimestampAgg{allocator: allocator}, nil
-	case coltypes.Interval:
-		return &minIntervalAgg{allocator: allocator}, nil
-	default:
-		return nil, errors.Errorf("unsupported min agg type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minBoolAgg{allocator: allocator}, nil
+		}
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minBytesAgg{allocator: allocator}, nil
+		}
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minDecimalAgg{allocator: allocator}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &minInt16Agg{allocator: allocator}, nil
+		case 32:
+			return &minInt32Agg{allocator: allocator}, nil
+		case -1:
+		default:
+			return &minInt64Agg{allocator: allocator}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minFloat64Agg{allocator: allocator}, nil
+		}
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minTimestampAgg{allocator: allocator}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minIntervalAgg{allocator: allocator}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported min agg type %s", t.Name())
 }
 
 type minBoolAgg struct {
@@ -2608,28 +2634,55 @@ func (a *minIntervalAgg) HandleEmptyInputScalar() {
 }
 
 func newMaxAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return &maxBoolAgg{allocator: allocator}, nil
-	case coltypes.Bytes:
-		return &maxBytesAgg{allocator: allocator}, nil
-	case coltypes.Decimal:
-		return &maxDecimalAgg{allocator: allocator}, nil
-	case coltypes.Int16:
-		return &maxInt16Agg{allocator: allocator}, nil
-	case coltypes.Int32:
-		return &maxInt32Agg{allocator: allocator}, nil
-	case coltypes.Int64:
-		return &maxInt64Agg{allocator: allocator}, nil
-	case coltypes.Float64:
-		return &maxFloat64Agg{allocator: allocator}, nil
-	case coltypes.Timestamp:
-		return &maxTimestampAgg{allocator: allocator}, nil
-	case coltypes.Interval:
-		return &maxIntervalAgg{allocator: allocator}, nil
-	default:
-		return nil, errors.Errorf("unsupported min agg type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxBoolAgg{allocator: allocator}, nil
+		}
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxBytesAgg{allocator: allocator}, nil
+		}
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxDecimalAgg{allocator: allocator}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &maxInt16Agg{allocator: allocator}, nil
+		case 32:
+			return &maxInt32Agg{allocator: allocator}, nil
+		case -1:
+		default:
+			return &maxInt64Agg{allocator: allocator}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxFloat64Agg{allocator: allocator}, nil
+		}
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxTimestampAgg{allocator: allocator}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxIntervalAgg{allocator: allocator}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported max agg type %s", t.Name())
 }
 
 type maxBoolAgg struct {

@@ -17,8 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -46,7 +45,7 @@ func OrderedDistinctColsToOperators(
 		ok  bool
 	)
 	for i := range distinctCols {
-		input, err = newSingleOrderedDistinct(input, int(distinctCols[i]), distinctCol, &typs[distinctCols[i]])
+		input, err = newSingleDistinct(input, int(distinctCols[i]), distinctCol, &typs[distinctCols[i]])
 		if err != nil {
 			return nil, nil, err
 		}
@@ -67,7 +66,7 @@ type distinctChainOps struct {
 var _ resettableOperator = &distinctChainOps{}
 
 // NewOrderedDistinct creates a new ordered distinct operator on the given
-// input columns with the given coltypes.
+// input columns with the given types.
 func NewOrderedDistinct(
 	input colexecbase.Operator, distinctCols []uint32, typs []types.T,
 ) (colexecbase.Operator, error) {
@@ -84,67 +83,94 @@ func NewOrderedDistinct(
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
-func newSingleOrderedDistinct(
+func newSingleDistinct(
 	input colexecbase.Operator, distinctColIdx int, outputCol []bool, t *types.T,
 ) (colexecbase.Operator, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return &sortedDistinctBoolOp{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Bytes:
-		return &sortedDistinctBytesOp{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Decimal:
-		return &sortedDistinctDecimalOp{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Int16:
-		return &sortedDistinctInt16Op{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Int32:
-		return &sortedDistinctInt32Op{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Int64:
-		return &sortedDistinctInt64Op{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Float64:
-		return &sortedDistinctFloat64Op{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Timestamp:
-		return &sortedDistinctTimestampOp{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	case coltypes.Interval:
-		return &sortedDistinctIntervalOp{
-			OneInputNode:      NewOneInputNode(input),
-			sortedDistinctCol: distinctColIdx,
-			outputCol:         outputCol,
-		}, nil
-	default:
-		return nil, errors.Errorf("unsupported distinct type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &distinctBoolOp{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &distinctBytesOp{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &distinctDecimalOp{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &distinctInt16Op{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		case 32:
+			return &distinctInt32Op{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		case -1:
+		default:
+			return &distinctInt64Op{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &distinctFloat64Op{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &distinctTimestampOp{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &distinctIntervalOp{
+				OneInputNode:   NewOneInputNode(input),
+				distinctColIdx: distinctColIdx,
+				outputCol:      outputCol,
+			}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported distinct type %s", t)
 }
 
 // partitioner is a simple implementation of sorted distinct that's useful for
@@ -166,40 +192,65 @@ type partitioner interface {
 
 // newPartitioner returns a new partitioner on type t.
 func newPartitioner(t *types.T) (partitioner, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return partitionerBool{}, nil
-	case coltypes.Bytes:
-		return partitionerBytes{}, nil
-	case coltypes.Decimal:
-		return partitionerDecimal{}, nil
-	case coltypes.Int16:
-		return partitionerInt16{}, nil
-	case coltypes.Int32:
-		return partitionerInt32{}, nil
-	case coltypes.Int64:
-		return partitionerInt64{}, nil
-	case coltypes.Float64:
-		return partitionerFloat64{}, nil
-	case coltypes.Timestamp:
-		return partitionerTimestamp{}, nil
-	case coltypes.Interval:
-		return partitionerInterval{}, nil
-	default:
-		return nil, errors.Errorf("unsupported partition type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return partitionerBool{}, nil
+		}
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return partitionerBytes{}, nil
+		}
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return partitionerDecimal{}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return partitionerInt16{}, nil
+		case 32:
+			return partitionerInt32{}, nil
+		case -1:
+		default:
+			return partitionerInt64{}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return partitionerFloat64{}, nil
+		}
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return partitionerTimestamp{}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return partitionerInterval{}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported partition type %s", t)
 }
 
-// sortedDistinctBoolOp runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctBoolOp struct {
+// distinctBoolOp runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctBoolOp struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -215,13 +266,13 @@ type sortedDistinctBoolOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctBoolOp{}
+var _ resettableOperator = &distinctBoolOp{}
 
-func (p *sortedDistinctBoolOp) Init() {
+func (p *distinctBoolOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctBoolOp) reset(ctx context.Context) {
+func (p *distinctBoolOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -229,13 +280,13 @@ func (p *sortedDistinctBoolOp) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctBoolOp) Next(ctx context.Context) coldata.Batch {
+func (p *distinctBoolOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -561,16 +612,14 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n int) 
 	}
 }
 
-// sortedDistinctBytesOp runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctBytesOp struct {
+// distinctBytesOp runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctBytesOp struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -586,13 +635,13 @@ type sortedDistinctBytesOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctBytesOp{}
+var _ resettableOperator = &distinctBytesOp{}
 
-func (p *sortedDistinctBytesOp) Init() {
+func (p *distinctBytesOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctBytesOp) reset(ctx context.Context) {
+func (p *distinctBytesOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -600,13 +649,13 @@ func (p *sortedDistinctBytesOp) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctBytesOp) Next(ctx context.Context) coldata.Batch {
+func (p *distinctBytesOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -874,16 +923,14 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n int)
 	}
 }
 
-// sortedDistinctDecimalOp runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctDecimalOp struct {
+// distinctDecimalOp runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctDecimalOp struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -899,13 +946,13 @@ type sortedDistinctDecimalOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctDecimalOp{}
+var _ resettableOperator = &distinctDecimalOp{}
 
-func (p *sortedDistinctDecimalOp) Init() {
+func (p *distinctDecimalOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctDecimalOp) reset(ctx context.Context) {
+func (p *distinctDecimalOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -913,13 +960,13 @@ func (p *sortedDistinctDecimalOp) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctDecimalOp) Next(ctx context.Context) coldata.Batch {
+func (p *distinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -1181,16 +1228,14 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n in
 	}
 }
 
-// sortedDistinctInt16Op runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctInt16Op struct {
+// distinctInt16Op runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctInt16Op struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -1206,13 +1251,13 @@ type sortedDistinctInt16Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctInt16Op{}
+var _ resettableOperator = &distinctInt16Op{}
 
-func (p *sortedDistinctInt16Op) Init() {
+func (p *distinctInt16Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt16Op) reset(ctx context.Context) {
+func (p *distinctInt16Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -1220,13 +1265,13 @@ func (p *sortedDistinctInt16Op) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctInt16Op) Next(ctx context.Context) coldata.Batch {
+func (p *distinctInt16Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -1576,16 +1621,14 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n int)
 	}
 }
 
-// sortedDistinctInt32Op runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctInt32Op struct {
+// distinctInt32Op runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctInt32Op struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -1601,13 +1644,13 @@ type sortedDistinctInt32Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctInt32Op{}
+var _ resettableOperator = &distinctInt32Op{}
 
-func (p *sortedDistinctInt32Op) Init() {
+func (p *distinctInt32Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt32Op) reset(ctx context.Context) {
+func (p *distinctInt32Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -1615,13 +1658,13 @@ func (p *sortedDistinctInt32Op) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctInt32Op) Next(ctx context.Context) coldata.Batch {
+func (p *distinctInt32Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -1971,16 +2014,14 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n int)
 	}
 }
 
-// sortedDistinctInt64Op runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctInt64Op struct {
+// distinctInt64Op runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctInt64Op struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -1996,13 +2037,13 @@ type sortedDistinctInt64Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctInt64Op{}
+var _ resettableOperator = &distinctInt64Op{}
 
-func (p *sortedDistinctInt64Op) Init() {
+func (p *distinctInt64Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctInt64Op) reset(ctx context.Context) {
+func (p *distinctInt64Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -2010,13 +2051,13 @@ func (p *sortedDistinctInt64Op) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctInt64Op) Next(ctx context.Context) coldata.Batch {
+func (p *distinctInt64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -2366,16 +2407,14 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n int)
 	}
 }
 
-// sortedDistinctFloat64Op runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctFloat64Op struct {
+// distinctFloat64Op runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctFloat64Op struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -2391,13 +2430,13 @@ type sortedDistinctFloat64Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctFloat64Op{}
+var _ resettableOperator = &distinctFloat64Op{}
 
-func (p *sortedDistinctFloat64Op) Init() {
+func (p *distinctFloat64Op) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctFloat64Op) reset(ctx context.Context) {
+func (p *distinctFloat64Op) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -2405,13 +2444,13 @@ func (p *sortedDistinctFloat64Op) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctFloat64Op) Next(ctx context.Context) coldata.Batch {
+func (p *distinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -2825,16 +2864,14 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n in
 	}
 }
 
-// sortedDistinctTimestampOp runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctTimestampOp struct {
+// distinctTimestampOp runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctTimestampOp struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -2850,13 +2887,13 @@ type sortedDistinctTimestampOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctTimestampOp{}
+var _ resettableOperator = &distinctTimestampOp{}
 
-func (p *sortedDistinctTimestampOp) Init() {
+func (p *distinctTimestampOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctTimestampOp) reset(ctx context.Context) {
+func (p *distinctTimestampOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -2864,13 +2901,13 @@ func (p *sortedDistinctTimestampOp) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctTimestampOp) Next(ctx context.Context) coldata.Batch {
+func (p *distinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()
@@ -3188,16 +3225,14 @@ func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n 
 	}
 }
 
-// sortedDistinctIntervalOp runs a distinct on the column in sortedDistinctCol,
-// writing true to the resultant bool column for every value that differs from
-// the previous one.
-// TODO(solon): Update this name to remove "sorted". The input values are not
-// necessarily in sorted order.
-type sortedDistinctIntervalOp struct {
+// distinctIntervalOp runs a distinct on the column in distinctColIdx, writing
+// true to the resultant bool column for every value that differs from the
+// previous one.
+type distinctIntervalOp struct {
 	OneInputNode
 
-	// sortedDistinctCol is the index of the column to distinct upon.
-	sortedDistinctCol int
+	// distinctColIdx is the index of the column to distinct upon.
+	distinctColIdx int
 
 	// outputCol is the boolean output column. It is shared by all of the
 	// other distinct operators in a distinct operator set.
@@ -3213,13 +3248,13 @@ type sortedDistinctIntervalOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &sortedDistinctIntervalOp{}
+var _ resettableOperator = &distinctIntervalOp{}
 
-func (p *sortedDistinctIntervalOp) Init() {
+func (p *distinctIntervalOp) Init() {
 	p.input.Init()
 }
 
-func (p *sortedDistinctIntervalOp) reset(ctx context.Context) {
+func (p *distinctIntervalOp) reset(ctx context.Context) {
 	p.foundFirstRow = false
 	p.lastValNull = false
 	if resetter, ok := p.input.(resetter); ok {
@@ -3227,13 +3262,13 @@ func (p *sortedDistinctIntervalOp) reset(ctx context.Context) {
 	}
 }
 
-func (p *sortedDistinctIntervalOp) Next(ctx context.Context) coldata.Batch {
+func (p *distinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 	batch := p.input.Next(ctx)
 	if batch.Length() == 0 {
 		return batch
 	}
 	outputCol := p.outputCol
-	vec := batch.ColVec(p.sortedDistinctCol)
+	vec := batch.ColVec(p.distinctColIdx)
 	var nulls *coldata.Nulls
 	if vec.MaybeHasNulls() {
 		nulls = vec.Nulls()

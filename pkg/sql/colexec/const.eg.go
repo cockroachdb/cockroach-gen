@@ -15,8 +15,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
@@ -38,73 +37,100 @@ func NewConstOp(
 	outputIdx int,
 ) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, t, outputIdx)
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return &constBoolOp{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(bool),
-		}, nil
-	case coltypes.Bytes:
-		return &constBytesOp{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.([]byte),
-		}, nil
-	case coltypes.Decimal:
-		return &constDecimalOp{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(apd.Decimal),
-		}, nil
-	case coltypes.Int16:
-		return &constInt16Op{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(int16),
-		}, nil
-	case coltypes.Int32:
-		return &constInt32Op{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(int32),
-		}, nil
-	case coltypes.Int64:
-		return &constInt64Op{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(int64),
-		}, nil
-	case coltypes.Float64:
-		return &constFloat64Op{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(float64),
-		}, nil
-	case coltypes.Timestamp:
-		return &constTimestampOp{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(time.Time),
-		}, nil
-	case coltypes.Interval:
-		return &constIntervalOp{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			outputIdx:    outputIdx,
-			constVal:     constVal.(duration.Duration),
-		}, nil
-	default:
-		return nil, errors.Errorf("unsupported const type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constBoolOp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(bool),
+			}, nil
+		}
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constBytesOp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.([]byte),
+			}, nil
+		}
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constDecimalOp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(apd.Decimal),
+			}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &constInt16Op{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(int16),
+			}, nil
+		case 32:
+			return &constInt32Op{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(int32),
+			}, nil
+		case -1:
+		default:
+			return &constInt64Op{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(int64),
+			}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constFloat64Op{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(float64),
+			}, nil
+		}
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constTimestampOp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(time.Time),
+			}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constIntervalOp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(duration.Duration),
+			}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported const type %s", t.Name())
 }
 
 type constBoolOp struct {

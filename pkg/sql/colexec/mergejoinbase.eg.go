@@ -17,11 +17,10 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
@@ -49,325 +48,353 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 	// Check all equality columns in the first row of batch to make sure we're in
 	// the same group.
 	for _, colIdx := range input.eqCols[:len(input.eqCols)] {
-		switch typeconv.FromColumnType(&input.sourceTypes[colIdx]) {
-		case coltypes.Bool:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Bool()
-			prevVal := bufferedCol[0]
-			var curVal bool
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Bool()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
-
-				if !prevVal && curVal {
-					cmpResult = -1
-				} else if prevVal && !curVal {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
+		switch input.canonicalTypeFamilies[colIdx] {
+		case types.BoolFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
 				}
-
-				match = cmpResult == 0
-			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Bytes:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Bytes()
-			prevVal := bufferedCol.Get(0)
-			var curVal []byte
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Bytes()
-			curVal = col.Get(tupleToLookAtIdx)
-			var match bool
-
-			{
-				var cmpResult int
-				cmpResult = bytes.Compare(prevVal, curVal)
-				match = cmpResult == 0
-			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Decimal:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Decimal()
-			prevVal := bufferedCol[0]
-			var curVal apd.Decimal
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Decimal()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
-				cmpResult = tree.CompareDecimals(&prevVal, &curVal)
-				match = cmpResult == 0
-			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Int16:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Int16()
-			prevVal := bufferedCol[0]
-			var curVal int16
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Int16()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Bool()
+				prevVal := bufferedCol[0]
+				var curVal bool
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Bool()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
 
 				{
-					a, b := int64(prevVal), int64(curVal)
-					if a < b {
+					var cmpResult int
+
+					if !prevVal && curVal {
 						cmpResult = -1
-					} else if a > b {
+					} else if prevVal && !curVal {
 						cmpResult = 1
 					} else {
 						cmpResult = 0
 					}
+
+					match = cmpResult == 0
 				}
 
-				match = cmpResult == 0
+				if !match {
+					return true
+				}
 			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Int32:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Int32()
-			prevVal := bufferedCol[0]
-			var curVal int32
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Int32()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
+		case types.BytesFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Bytes()
+				prevVal := bufferedCol.Get(0)
+				var curVal []byte
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Bytes()
+				curVal = col.Get(tupleToLookAtIdx)
+				var match bool
 
 				{
-					a, b := int64(prevVal), int64(curVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
+					var cmpResult int
+					cmpResult = bytes.Compare(prevVal, curVal)
+					match = cmpResult == 0
 				}
 
-				match = cmpResult == 0
+				if !match {
+					return true
+				}
 			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Int64:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Int64()
-			prevVal := bufferedCol[0]
-			var curVal int64
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Int64()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
+		case types.DecimalFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Decimal()
+				prevVal := bufferedCol[0]
+				var curVal apd.Decimal
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Decimal()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
 
 				{
-					a, b := int64(prevVal), int64(curVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
+					var cmpResult int
+					cmpResult = tree.CompareDecimals(&prevVal, &curVal)
+					match = cmpResult == 0
 				}
 
-				match = cmpResult == 0
+				if !match {
+					return true
+				}
 			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Float64:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Float64()
-			prevVal := bufferedCol[0]
-			var curVal float64
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Float64()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
+		case types.IntFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case 16:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Int16()
+				prevVal := bufferedCol[0]
+				var curVal int16
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Int16()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
 
 				{
-					a, b := float64(prevVal), float64(curVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else if a == b {
-						cmpResult = 0
-					} else if math.IsNaN(a) {
-						if math.IsNaN(b) {
-							cmpResult = 0
-						} else {
+					var cmpResult int
+
+					{
+						a, b := int64(prevVal), int64(curVal)
+						if a < b {
 							cmpResult = -1
+						} else if a > b {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
 						}
-					} else {
-						cmpResult = 1
 					}
+
+					match = cmpResult == 0
 				}
 
-				match = cmpResult == 0
-			}
-
-			if !match {
-				return true
-			}
-		case coltypes.Timestamp:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Timestamp()
-			prevVal := bufferedCol[0]
-			var curVal time.Time
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Timestamp()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
-
-			{
-				var cmpResult int
-
-				if prevVal.Before(curVal) {
-					cmpResult = -1
-				} else if curVal.Before(prevVal) {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
+				if !match {
+					return true
 				}
-				match = cmpResult == 0
-			}
+			case 32:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Int32()
+				prevVal := bufferedCol[0]
+				var curVal int32
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Int32()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
 
-			if !match {
-				return true
-			}
-		case coltypes.Interval:
-			// We perform this null check on every equality column of the first
-			// buffered tuple regardless of the join type since it is done only once
-			// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
-			// right side being an input) this check will always return false since
-			// nulls couldn't be buffered up though.
-			if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
-				return true
-			}
-			bufferedCol := bufferedGroup.firstTuple[colIdx].Interval()
-			prevVal := bufferedCol[0]
-			var curVal duration.Duration
-			if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-				return true
-			}
-			col := batch.ColVec(int(colIdx)).Interval()
-			curVal = col[tupleToLookAtIdx]
-			var match bool
+				{
+					var cmpResult int
 
-			{
-				var cmpResult int
-				cmpResult = prevVal.Compare(curVal)
-				match = cmpResult == 0
-			}
+					{
+						a, b := int64(prevVal), int64(curVal)
+						if a < b {
+							cmpResult = -1
+						} else if a > b {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+					}
 
-			if !match {
-				return true
+					match = cmpResult == 0
+				}
+
+				if !match {
+					return true
+				}
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Int64()
+				prevVal := bufferedCol[0]
+				var curVal int64
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Int64()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
+
+				{
+					var cmpResult int
+
+					{
+						a, b := int64(prevVal), int64(curVal)
+						if a < b {
+							cmpResult = -1
+						} else if a > b {
+							cmpResult = 1
+						} else {
+							cmpResult = 0
+						}
+					}
+
+					match = cmpResult == 0
+				}
+
+				if !match {
+					return true
+				}
+			}
+		case types.FloatFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Float64()
+				prevVal := bufferedCol[0]
+				var curVal float64
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Float64()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
+
+				{
+					var cmpResult int
+
+					{
+						a, b := float64(prevVal), float64(curVal)
+						if a < b {
+							cmpResult = -1
+						} else if a > b {
+							cmpResult = 1
+						} else if a == b {
+							cmpResult = 0
+						} else if math.IsNaN(a) {
+							if math.IsNaN(b) {
+								cmpResult = 0
+							} else {
+								cmpResult = -1
+							}
+						} else {
+							cmpResult = 1
+						}
+					}
+
+					match = cmpResult == 0
+				}
+
+				if !match {
+					return true
+				}
+			}
+		case types.TimestampTZFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Timestamp()
+				prevVal := bufferedCol[0]
+				var curVal time.Time
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Timestamp()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
+
+				{
+					var cmpResult int
+
+					if prevVal.Before(curVal) {
+						cmpResult = -1
+					} else if curVal.Before(prevVal) {
+						cmpResult = 1
+					} else {
+						cmpResult = 0
+					}
+					match = cmpResult == 0
+				}
+
+				if !match {
+					return true
+				}
+			}
+		case types.IntervalFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Interval()
+				prevVal := bufferedCol[0]
+				var curVal duration.Duration
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Interval()
+				curVal = col[tupleToLookAtIdx]
+				var match bool
+
+				{
+					var cmpResult int
+					cmpResult = prevVal.Compare(curVal)
+					match = cmpResult == 0
+				}
+
+				if !match {
+					return true
+				}
 			}
 		default:
 			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))

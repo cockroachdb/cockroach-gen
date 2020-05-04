@@ -17,8 +17,6 @@ import (
 	"unsafe"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
@@ -33,781 +31,799 @@ var _ = execgen.UNSAFEGET
 func rehash(
 	ctx context.Context,
 	buckets []uint64,
-	t *types.T,
 	col coldata.Vec,
 	nKeys int,
 	sel []int,
 	cancelChecker CancelChecker,
 	decimalScratch decimalOverloadScratch,
 ) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		keys, nulls := col.Bool(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+	switch col.CanonicalTypeFamily() {
+	case types.BoolFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Bool(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					x := 0
-					if v {
-						x = 1
-					}
-					p = p*31 + uintptr(x)
+						x := 0
+						if v {
+							x = 1
+						}
+						p = p*31 + uintptr(x)
 
-					buckets[i] = uint64(p)
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						x := 0
+						if v {
+							x = 1
+						}
+						p = p*31 + uintptr(x)
+
+						buckets[i] = uint64(p)
+					}
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						x := 0
+						if v {
+							x = 1
+						}
+						p = p*31 + uintptr(x)
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					x := 0
-					if v {
-						x = 1
+						x := 0
+						if v {
+							x = 1
+						}
+						p = p*31 + uintptr(x)
+
+						buckets[i] = uint64(p)
 					}
-					p = p*31 + uintptr(x)
-
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					x := 0
-					if v {
-						x = 1
-					}
-					p = p*31 + uintptr(x)
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					x := 0
-					if v {
-						x = 1
-					}
-					p = p*31 + uintptr(x)
-
-					buckets[i] = uint64(p)
-				}
-			}
-		}
-
-	case coltypes.Bytes:
-		keys, nulls := col.Bytes(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys.Get(selIdx)
-					p := uintptr(buckets[i])
-
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys.Get(nKeys - 1)
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys.Get(selIdx)
-					p := uintptr(buckets[i])
-
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
-
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys.Get(selIdx)
-					p := uintptr(buckets[i])
-
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys.Get(nKeys - 1)
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys.Get(selIdx)
-					p := uintptr(buckets[i])
-
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
-
-					buckets[i] = uint64(p)
 				}
 			}
 		}
+	case types.BytesFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Bytes(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
 
-	case coltypes.Decimal:
-		keys, nulls := col.Decimal(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys.Get(nKeys - 1)
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
 
-					// In order for equal decimals to hash to the same value we need to
-					// remove the trailing zeroes if there are any.
-					tmpDec := &decimalScratch.tmpDec1
-					tmpDec.Reduce(&v)
-					b := []byte(tmpDec.String())
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
 
-					buckets[i] = uint64(p)
+						buckets[i] = uint64(p)
+					}
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
+
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys.Get(nKeys - 1)
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
 
-					// In order for equal decimals to hash to the same value we need to
-					// remove the trailing zeroes if there are any.
-					tmpDec := &decimalScratch.tmpDec1
-					tmpDec.Reduce(&v)
-					b := []byte(tmpDec.String())
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(v)))
 
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for equal decimals to hash to the same value we need to
-					// remove the trailing zeroes if there are any.
-					tmpDec := &decimalScratch.tmpDec1
-					tmpDec.Reduce(&v)
-					b := []byte(tmpDec.String())
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for equal decimals to hash to the same value we need to
-					// remove the trailing zeroes if there are any.
-					tmpDec := &decimalScratch.tmpDec1
-					tmpDec.Reduce(&v)
-					b := []byte(tmpDec.String())
-					sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-					p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
-
-					buckets[i] = uint64(p)
+						buckets[i] = uint64(p)
+					}
 				}
 			}
 		}
+	case types.DecimalFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Decimal(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-	case coltypes.Int16:
-		keys, nulls := col.Int16(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
+						// In order for equal decimals to hash to the same value we need to
+						// remove the trailing zeroes if there are any.
+						tmpDec := &decimalScratch.tmpDec1
+						tmpDec.Reduce(&v)
+						b := []byte(tmpDec.String())
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
+						// In order for equal decimals to hash to the same value we need to
+						// remove the trailing zeroes if there are any.
+						tmpDec := &decimalScratch.tmpDec1
+						tmpDec.Reduce(&v)
+						b := []byte(tmpDec.String())
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+
+						buckets[i] = uint64(p)
+					}
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						// In order for equal decimals to hash to the same value we need to
+						// remove the trailing zeroes if there are any.
+						tmpDec := &decimalScratch.tmpDec1
+						tmpDec.Reduce(&v)
+						b := []byte(tmpDec.String())
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+						// In order for equal decimals to hash to the same value we need to
+						// remove the trailing zeroes if there are any.
+						tmpDec := &decimalScratch.tmpDec1
+						tmpDec.Reduce(&v)
+						b := []byte(tmpDec.String())
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
-				}
-			}
-		}
-
-	case coltypes.Int32:
-		keys, nulls := col.Int32(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
 				}
 			}
 		}
+	case types.IntFamily:
+		switch col.Type().Width() {
+		case 16:
+			keys, nulls := col.Int16(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-	case coltypes.Int64:
-		keys, nulls := col.Int64(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
 				}
 			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+		case 32:
+			keys, nulls := col.Int32(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					// In order for integers with different widths but of the same value to
-					// to hash to the same value, we upcast all of them to int64.
-					asInt64 := int64(v)
-					p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
-					buckets[i] = uint64(p)
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
+					}
 				}
 			}
-		}
+		case -1:
+		default:
+			keys, nulls := col.Int64(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-	case coltypes.Float64:
-		keys, nulls := col.Float64(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					f := v
-					if math.IsNaN(float64(f)) {
-						f = 0
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
 					}
-					p = f64hash(noescape(unsafe.Pointer(&f)), p)
-
-					buckets[i] = uint64(p)
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					f := v
-					if math.IsNaN(float64(f)) {
-						f = 0
+						// In order for integers with different widths but of the same value to
+						// to hash to the same value, we upcast all of them to int64.
+						asInt64 := int64(v)
+						p = memhash64(noescape(unsafe.Pointer(&asInt64)), p)
+						buckets[i] = uint64(p)
 					}
-					p = f64hash(noescape(unsafe.Pointer(&f)), p)
-
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					f := v
-					if math.IsNaN(float64(f)) {
-						f = 0
-					}
-					p = f64hash(noescape(unsafe.Pointer(&f)), p)
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					f := v
-					if math.IsNaN(float64(f)) {
-						f = 0
-					}
-					p = f64hash(noescape(unsafe.Pointer(&f)), p)
-
-					buckets[i] = uint64(p)
-				}
-			}
-		}
-
-	case coltypes.Timestamp:
-		keys, nulls := col.Timestamp(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					s := v.UnixNano()
-					p = memhash64(noescape(unsafe.Pointer(&s)), p)
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
-					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					s := v.UnixNano()
-					p = memhash64(noescape(unsafe.Pointer(&s)), p)
-
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					s := v.UnixNano()
-					p = memhash64(noescape(unsafe.Pointer(&s)), p)
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					s := v.UnixNano()
-					p = memhash64(noescape(unsafe.Pointer(&s)), p)
-
-					buckets[i] = uint64(p)
 				}
 			}
 		}
+	case types.FloatFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Float64(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-	case coltypes.Interval:
-		keys, nulls := col.Interval(), col.Nulls()
-		if col.MaybeHasNulls() {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					if nulls.NullAt(selIdx) {
-						continue
+						f := v
+						if math.IsNaN(float64(f)) {
+							f = 0
+						}
+						p = f64hash(noescape(unsafe.Pointer(&f)), p)
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					months, days, nanos := v.Months, v.Days, v.Nanos()
-					p = memhash64(noescape(unsafe.Pointer(&months)), p)
-					p = memhash64(noescape(unsafe.Pointer(&days)), p)
-					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+						f := v
+						if math.IsNaN(float64(f)) {
+							f = 0
+						}
+						p = f64hash(noescape(unsafe.Pointer(&f)), p)
 
-					buckets[i] = uint64(p)
+						buckets[i] = uint64(p)
+					}
 				}
 			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					if nulls.NullAt(selIdx) {
-						continue
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						f := v
+						if math.IsNaN(float64(f)) {
+							f = 0
+						}
+						p = f64hash(noescape(unsafe.Pointer(&f)), p)
+
+						buckets[i] = uint64(p)
 					}
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
-					months, days, nanos := v.Months, v.Days, v.Nanos()
-					p = memhash64(noescape(unsafe.Pointer(&months)), p)
-					p = memhash64(noescape(unsafe.Pointer(&days)), p)
-					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+						f := v
+						if math.IsNaN(float64(f)) {
+							f = 0
+						}
+						p = f64hash(noescape(unsafe.Pointer(&f)), p)
 
-					buckets[i] = uint64(p)
-				}
-			}
-		} else {
-			if sel != nil {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = sel[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = sel[i]
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					months, days, nanos := v.Months, v.Days, v.Nanos()
-					p = memhash64(noescape(unsafe.Pointer(&months)), p)
-					p = memhash64(noescape(unsafe.Pointer(&days)), p)
-					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
-
-					buckets[i] = uint64(p)
-				}
-			} else {
-				// Early bounds checks.
-				_ = buckets[nKeys-1]
-				_ = keys[nKeys-1]
-				var selIdx int
-				for i := 0; i < nKeys; i++ {
-					cancelChecker.check(ctx)
-					selIdx = i
-					v := keys[selIdx]
-					p := uintptr(buckets[i])
-
-					months, days, nanos := v.Months, v.Days, v.Nanos()
-					p = memhash64(noescape(unsafe.Pointer(&months)), p)
-					p = memhash64(noescape(unsafe.Pointer(&days)), p)
-					p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
-
-					buckets[i] = uint64(p)
+						buckets[i] = uint64(p)
+					}
 				}
 			}
 		}
+	case types.TimestampTZFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Timestamp(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
 
+						s := v.UnixNano()
+						p = memhash64(noescape(unsafe.Pointer(&s)), p)
+
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						s := v.UnixNano()
+						p = memhash64(noescape(unsafe.Pointer(&s)), p)
+
+						buckets[i] = uint64(p)
+					}
+				}
+			} else {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						s := v.UnixNano()
+						p = memhash64(noescape(unsafe.Pointer(&s)), p)
+
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						s := v.UnixNano()
+						p = memhash64(noescape(unsafe.Pointer(&s)), p)
+
+						buckets[i] = uint64(p)
+					}
+				}
+			}
+		}
+	case types.IntervalFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Interval(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						months, days, nanos := v.Months, v.Days, v.Nanos()
+						p = memhash64(noescape(unsafe.Pointer(&months)), p)
+						p = memhash64(noescape(unsafe.Pointer(&days)), p)
+						p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						months, days, nanos := v.Months, v.Days, v.Nanos()
+						p = memhash64(noescape(unsafe.Pointer(&months)), p)
+						p = memhash64(noescape(unsafe.Pointer(&days)), p)
+						p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+						buckets[i] = uint64(p)
+					}
+				}
+			} else {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						months, days, nanos := v.Months, v.Days, v.Nanos()
+						p = memhash64(noescape(unsafe.Pointer(&months)), p)
+						p = memhash64(noescape(unsafe.Pointer(&days)), p)
+						p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys[selIdx]
+						p := uintptr(buckets[i])
+
+						months, days, nanos := v.Months, v.Days, v.Nanos()
+						p = memhash64(noescape(unsafe.Pointer(&months)), p)
+						p = memhash64(noescape(unsafe.Pointer(&days)), p)
+						p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+						buckets[i] = uint64(p)
+					}
+				}
+			}
+		}
 	default:
-		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", t))
+		colexecerror.InternalError(fmt.Sprintf("unhandled type %s", col.Type()))
 	}
 }

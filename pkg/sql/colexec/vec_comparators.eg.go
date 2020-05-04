@@ -17,8 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -454,54 +453,82 @@ func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int
 }
 
 func GetVecComparator(t *types.T, numVecs int) vecComparator {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Bool:
-		return &BoolVecComparator{
-			vecs:  make([][]bool, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &BoolVecComparator{
+				vecs:  make([][]bool, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
-	case coltypes.Bytes:
-		return &BytesVecComparator{
-			vecs:  make([]*coldata.Bytes, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &BytesVecComparator{
+				vecs:  make([]*coldata.Bytes, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
-	case coltypes.Decimal:
-		return &DecimalVecComparator{
-			vecs:  make([][]apd.Decimal, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &DecimalVecComparator{
+				vecs:  make([][]apd.Decimal, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
-	case coltypes.Int16:
-		return &Int16VecComparator{
-			vecs:  make([][]int16, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &Int16VecComparator{
+				vecs:  make([][]int16, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
+		case 32:
+			return &Int32VecComparator{
+				vecs:  make([][]int32, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
+		case -1:
+		default:
+			return &Int64VecComparator{
+				vecs:  make([][]int64, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
-	case coltypes.Int32:
-		return &Int32VecComparator{
-			vecs:  make([][]int32, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &Float64VecComparator{
+				vecs:  make([][]float64, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
-	case coltypes.Int64:
-		return &Int64VecComparator{
-			vecs:  make([][]int64, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &TimestampVecComparator{
+				vecs:  make([][]time.Time, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
-	case coltypes.Float64:
-		return &Float64VecComparator{
-			vecs:  make([][]float64, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
-		}
-	case coltypes.Timestamp:
-		return &TimestampVecComparator{
-			vecs:  make([][]time.Time, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
-		}
-	case coltypes.Interval:
-		return &IntervalVecComparator{
-			vecs:  make([][]duration.Duration, numVecs),
-			nulls: make([]*coldata.Nulls, numVecs),
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &IntervalVecComparator{
+				vecs:  make([][]duration.Duration, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
 		}
 	}
-	colexecerror.InternalError(fmt.Sprintf("unhandled type %s", t.Name()))
+	colexecerror.InternalError(fmt.Sprintf("unhandled type %s", t))
 	// This code is unreachable, but the compiler cannot infer that.
 	return nil
 }

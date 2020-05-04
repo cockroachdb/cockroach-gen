@@ -16,8 +16,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -30,1733 +29,2015 @@ import (
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
-func cast(fromType, toType *types.T, inputVec, outputVec coldata.Vec, n int, sel []int) {
-	switch typeconv.FromColumnType(fromType) {
-	case coltypes.Bool:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			inputCol := inputVec.Bool()
-			outputCol := outputVec.Bool()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-							r = v
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-							r = v
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r bool
-						r = v
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r bool
-						r = v
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int16:
-			inputCol := inputVec.Bool()
-			outputCol := outputVec.Int16()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int16
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int16
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int16
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int16
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int32:
-			inputCol := inputVec.Bool()
-			outputCol := outputVec.Int32()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int32
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int32
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int64:
-			inputCol := inputVec.Bool()
-			outputCol := outputVec.Int64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int64
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int64
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Float64:
-			inputCol := inputVec.Bool()
-			outputCol := outputVec.Float64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = 0
-							if v {
-								r = 1
-							}
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r float64
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r float64
-
-						r = 0
-						if v {
-							r = 1
-						}
-
-						outputCol[i] = r
-					}
-				}
-			}
+func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
+	castPerformed := false
+	switch inputVec.CanonicalTypeFamily() {
+	case types.BoolFamily:
+		switch inputVec.Type().Width() {
+		case -1:
 		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
-		}
-	case coltypes.Bytes:
-		switch typeconv.FromColumnType(toType) {
-		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
-		}
-	case coltypes.Decimal:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			inputCol := inputVec.Decimal()
-			outputCol := outputVec.Bool()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v.Sign() != 0
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v.Sign() != 0
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r bool
-
-						r = v.Sign() != 0
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r bool
-
-						r = v.Sign() != 0
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Decimal:
-			inputCol := inputVec.Decimal()
-			outputCol := outputVec.Decimal()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-							r = v
-							outputCol[i].Set(&r)
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-							r = v
-							outputCol[i].Set(&r)
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r apd.Decimal
-						r = v
-						outputCol[i].Set(&r)
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r apd.Decimal
-						r = v
-						outputCol[i].Set(&r)
-					}
-				}
-			}
-		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
-		}
-	case coltypes.Int16:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			inputCol := inputVec.Int16()
-			outputCol := outputVec.Bool()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Decimal:
-			inputCol := inputVec.Int16()
-			outputCol := outputVec.Decimal()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							r = *apd.New(int64(v), 0)
-
-							outputCol[i].Set(&r)
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							r = *apd.New(int64(v), 0)
-
-							outputCol[i].Set(&r)
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r apd.Decimal
-
-						r = *apd.New(int64(v), 0)
-
-						outputCol[i].Set(&r)
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r apd.Decimal
-
-						r = *apd.New(int64(v), 0)
-
-						outputCol[i].Set(&r)
-					}
-				}
-			}
-		case coltypes.Int16:
-			inputCol := inputVec.Int16()
-			outputCol := outputVec.Int16()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int16
-							r = v
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int16
-							r = v
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int16
-						r = v
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int16
-						r = v
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int32:
-			inputCol := inputVec.Int16()
-			outputCol := outputVec.Int32()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-
-							r = int32(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-
-							r = int32(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int32
-
-						r = int32(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int32
-
-						r = int32(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int64:
-			inputCol := inputVec.Int16()
-			outputCol := outputVec.Int64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							r = int64(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							r = int64(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int64
-
-						r = int64(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int64
-
-						r = int64(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Float64:
-			inputCol := inputVec.Int16()
-			outputCol := outputVec.Float64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = float64(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = float64(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r float64
-
-						r = float64(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r float64
-
-						r = float64(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
-		}
-	case coltypes.Int32:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			inputCol := inputVec.Int32()
-			outputCol := outputVec.Bool()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Decimal:
-			inputCol := inputVec.Int32()
-			outputCol := outputVec.Decimal()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							r = *apd.New(int64(v), 0)
-
-							outputCol[i].Set(&r)
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							r = *apd.New(int64(v), 0)
-
-							outputCol[i].Set(&r)
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r apd.Decimal
-
-						r = *apd.New(int64(v), 0)
-
-						outputCol[i].Set(&r)
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r apd.Decimal
-
-						r = *apd.New(int64(v), 0)
-
-						outputCol[i].Set(&r)
-					}
-				}
-			}
-		case coltypes.Int32:
-			inputCol := inputVec.Int32()
-			outputCol := outputVec.Int32()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-							r = v
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-							r = v
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int32
-						r = v
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int32
-						r = v
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int64:
-			inputCol := inputVec.Int32()
-			outputCol := outputVec.Int64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							r = int64(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							r = int64(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int64
-
-						r = int64(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int64
-
-						r = int64(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Float64:
-			inputCol := inputVec.Int32()
-			outputCol := outputVec.Float64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = float64(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = float64(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r float64
-
-						r = float64(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r float64
-
-						r = float64(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
-		}
-	case coltypes.Int64:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			inputCol := inputVec.Int64()
-			outputCol := outputVec.Bool()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Decimal:
-			inputCol := inputVec.Int64()
-			outputCol := outputVec.Decimal()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							r = *apd.New(int64(v), 0)
-
-							outputCol[i].Set(&r)
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							r = *apd.New(int64(v), 0)
-
-							outputCol[i].Set(&r)
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r apd.Decimal
-
-						r = *apd.New(int64(v), 0)
-
-						outputCol[i].Set(&r)
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r apd.Decimal
-
-						r = *apd.New(int64(v), 0)
-
-						outputCol[i].Set(&r)
-					}
-				}
-			}
-		case coltypes.Int64:
-			inputCol := inputVec.Int64()
-			outputCol := outputVec.Int64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-							r = v
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-							r = v
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int64
-						r = v
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int64
-						r = v
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Float64:
-			inputCol := inputVec.Int64()
-			outputCol := outputVec.Float64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = float64(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-
-							r = float64(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r float64
-
-						r = float64(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r float64
-
-						r = float64(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
-		}
-	case coltypes.Float64:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			inputCol := inputVec.Float64()
-			outputCol := outputVec.Bool()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r bool
-
-							r = v != 0
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r bool
-
-						r = v != 0
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Decimal:
-			inputCol := inputVec.Float64()
-			outputCol := outputVec.Decimal()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							{
-								var tmpDec apd.Decimal
-								_, tmpErr := tmpDec.SetFloat64(float64(v))
-								if tmpErr != nil {
-									colexecerror.ExpectedError(tmpErr)
+			switch outputVec.CanonicalTypeFamily() {
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Bool()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+									r = v
+									outputCol[i] = r
 								}
-								r = tmpDec
 							}
-
-							outputCol[i].Set(&r)
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
 						} else {
-							v := inputCol[i]
-							var r apd.Decimal
-
-							{
-								var tmpDec apd.Decimal
-								_, tmpErr := tmpDec.SetFloat64(float64(v))
-								if tmpErr != nil {
-									colexecerror.ExpectedError(tmpErr)
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+									r = v
+									outputCol[i] = r
 								}
-								r = tmpDec
 							}
-
-							outputCol[i].Set(&r)
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r bool
+								r = v
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r bool
+								r = v
+								outputCol[i] = r
+							}
 						}
 					}
+					castPerformed = true
 				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r apd.Decimal
+			case types.FloatFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Bool()
+					outputCol := outputVec.Float64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
 
-						{
-							var tmpDec apd.Decimal
-							_, tmpErr := tmpDec.SetFloat64(float64(v))
-							if tmpErr != nil {
-								colexecerror.ExpectedError(tmpErr)
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
 							}
-							r = tmpDec
-						}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
 
-						outputCol[i].Set(&r)
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r apd.Decimal
+									r = 0
+									if v {
+										r = 1
+									}
 
-						{
-							var tmpDec apd.Decimal
-							_, tmpErr := tmpDec.SetFloat64(float64(v))
-							if tmpErr != nil {
-								colexecerror.ExpectedError(tmpErr)
+									outputCol[i] = r
+								}
 							}
-							r = tmpDec
 						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r float64
 
-						outputCol[i].Set(&r)
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r float64
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						}
 					}
+					castPerformed = true
+				}
+			case types.IntFamily:
+				switch outputVec.Type().Width() {
+				case 16:
+					inputCol := inputVec.Bool()
+					outputCol := outputVec.Int16()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int16
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int16
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case 32:
+					inputCol := inputVec.Bool()
+					outputCol := outputVec.Int32()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int32
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int32
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case -1:
+				default:
+					inputCol := inputVec.Bool()
+					outputCol := outputVec.Int64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									r = 0
+									if v {
+										r = 1
+									}
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int64
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int64
+
+								r = 0
+								if v {
+									r = 1
+								}
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
 				}
 			}
-		case coltypes.Int16:
-			inputCol := inputVec.Float64()
-			outputCol := outputVec.Int16()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int16
-
-							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							}
-							r = int16(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int16
-
-							if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							}
-							r = int16(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int16
-
-						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-						}
-						r = int16(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int16
-
-						if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
-							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-						}
-						r = int16(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int32:
-			inputCol := inputVec.Float64()
-			outputCol := outputVec.Int32()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-
-							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							}
-							r = int32(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int32
-
-							if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							}
-							r = int32(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int32
-
-						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-						}
-						r = int32(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int32
-
-						if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
-							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-						}
-						r = int32(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Int64:
-			inputCol := inputVec.Float64()
-			outputCol := outputVec.Int64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							}
-							r = int64(v)
-
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r int64
-
-							if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							}
-							r = int64(v)
-
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r int64
-
-						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-						}
-						r = int64(v)
-
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r int64
-
-						if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
-							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-						}
-						r = int64(v)
-
-						outputCol[i] = r
-					}
-				}
-			}
-		case coltypes.Float64:
-			inputCol := inputVec.Float64()
-			outputCol := outputVec.Float64()
-			if inputVec.MaybeHasNulls() {
-				inputNulls := inputVec.Nulls()
-				outputNulls := outputVec.Nulls()
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-							r = v
-							outputCol[i] = r
-						}
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						if inputNulls.NullAt(i) {
-							outputNulls.SetNull(i)
-						} else {
-							v := inputCol[i]
-							var r float64
-							r = v
-							outputCol[i] = r
-						}
-					}
-				}
-			} else {
-				if sel != nil {
-					sel = sel[:n]
-					for _, i := range sel {
-						v := inputCol[i]
-						var r float64
-						r = v
-						outputCol[i] = r
-					}
-				} else {
-					inputCol = inputCol[0:n]
-					for i := range inputCol {
-						v := inputCol[i]
-						var r float64
-						r = v
-						outputCol[i] = r
-					}
-				}
-			}
-		default:
-			colexecerror.InternalError(fmt.Sprintf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType))
 		}
-	default:
-		colexecerror.InternalError(fmt.Sprintf("unhandled FROM type: %s", fromType))
+	case types.DecimalFamily:
+		switch inputVec.Type().Width() {
+		case -1:
+		default:
+			switch outputVec.CanonicalTypeFamily() {
+			case types.DecimalFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Decimal()
+					outputCol := outputVec.Decimal()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+									r = v
+									outputCol[i].Set(&r)
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+									r = v
+									outputCol[i].Set(&r)
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r apd.Decimal
+								r = v
+								outputCol[i].Set(&r)
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r apd.Decimal
+								r = v
+								outputCol[i].Set(&r)
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Decimal()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+									r = v.Sign() != 0
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+									r = v.Sign() != 0
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r bool
+								r = v.Sign() != 0
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r bool
+								r = v.Sign() != 0
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			}
+		}
+	case types.IntFamily:
+		switch inputVec.Type().Width() {
+		case 16:
+			switch outputVec.CanonicalTypeFamily() {
+			case types.IntFamily:
+				switch outputVec.Type().Width() {
+				case 16:
+					inputCol := inputVec.Int16()
+					outputCol := outputVec.Int16()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+									r = v
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+									r = v
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int16
+								r = v
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int16
+								r = v
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case 32:
+					inputCol := inputVec.Int16()
+					outputCol := outputVec.Int32()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									r = int32(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									r = int32(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int32
+
+								r = int32(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int32
+
+								r = int32(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case -1:
+				default:
+					inputCol := inputVec.Int16()
+					outputCol := outputVec.Int64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									r = int64(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									r = int64(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int64
+
+								r = int64(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int64
+
+								r = int64(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int16()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.DecimalFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int16()
+					outputCol := outputVec.Decimal()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									r = *apd.New(int64(v), 0)
+
+									outputCol[i].Set(&r)
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									r = *apd.New(int64(v), 0)
+
+									outputCol[i].Set(&r)
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								r = *apd.New(int64(v), 0)
+
+								outputCol[i].Set(&r)
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								r = *apd.New(int64(v), 0)
+
+								outputCol[i].Set(&r)
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.FloatFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int16()
+					outputCol := outputVec.Float64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+
+									r = float64(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+
+									r = float64(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r float64
+
+								r = float64(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r float64
+
+								r = float64(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			}
+		case 32:
+			switch outputVec.CanonicalTypeFamily() {
+			case types.IntFamily:
+				switch outputVec.Type().Width() {
+				case 16:
+					inputCol := inputVec.Int32()
+					outputCol := outputVec.Int16()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									r = int16(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									r = int16(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int16
+
+								r = int16(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int16
+
+								r = int16(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case 32:
+					inputCol := inputVec.Int32()
+					outputCol := outputVec.Int32()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+									r = v
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+									r = v
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int32
+								r = v
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int32
+								r = v
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case -1:
+				default:
+					inputCol := inputVec.Int32()
+					outputCol := outputVec.Int64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									r = int64(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									r = int64(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int64
+
+								r = int64(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int64
+
+								r = int64(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int32()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.DecimalFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int32()
+					outputCol := outputVec.Decimal()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									r = *apd.New(int64(v), 0)
+
+									outputCol[i].Set(&r)
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									r = *apd.New(int64(v), 0)
+
+									outputCol[i].Set(&r)
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								r = *apd.New(int64(v), 0)
+
+								outputCol[i].Set(&r)
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								r = *apd.New(int64(v), 0)
+
+								outputCol[i].Set(&r)
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.FloatFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int32()
+					outputCol := outputVec.Float64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+
+									r = float64(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+
+									r = float64(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r float64
+
+								r = float64(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r float64
+
+								r = float64(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			}
+		case -1:
+		default:
+			switch outputVec.CanonicalTypeFamily() {
+			case types.IntFamily:
+				switch outputVec.Type().Width() {
+				case 16:
+					inputCol := inputVec.Int64()
+					outputCol := outputVec.Int16()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									r = int16(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									r = int16(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int16
+
+								r = int16(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int16
+
+								r = int16(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case 32:
+					inputCol := inputVec.Int64()
+					outputCol := outputVec.Int32()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									r = int32(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									r = int32(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int32
+
+								r = int32(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int32
+
+								r = int32(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case -1:
+				default:
+					inputCol := inputVec.Int64()
+					outputCol := outputVec.Int64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+									r = v
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+									r = v
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int64
+								r = v
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int64
+								r = v
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int64()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.DecimalFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int64()
+					outputCol := outputVec.Decimal()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									r = *apd.New(int64(v), 0)
+
+									outputCol[i].Set(&r)
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									r = *apd.New(int64(v), 0)
+
+									outputCol[i].Set(&r)
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								r = *apd.New(int64(v), 0)
+
+								outputCol[i].Set(&r)
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								r = *apd.New(int64(v), 0)
+
+								outputCol[i].Set(&r)
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.FloatFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Int64()
+					outputCol := outputVec.Float64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+
+									r = float64(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+
+									r = float64(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r float64
+
+								r = float64(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r float64
+
+								r = float64(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			}
+		}
+	case types.FloatFamily:
+		switch inputVec.Type().Width() {
+		case -1:
+		default:
+			switch outputVec.CanonicalTypeFamily() {
+			case types.FloatFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Float64()
+					outputCol := outputVec.Float64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+									r = v
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r float64
+									r = v
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r float64
+								r = v
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r float64
+								r = v
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Float64()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r bool
+
+									r = v != 0
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r bool
+
+								r = v != 0
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.DecimalFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Float64()
+					outputCol := outputVec.Decimal()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									{
+										var tmpDec apd.Decimal
+										_, tmpErr := tmpDec.SetFloat64(float64(v))
+										if tmpErr != nil {
+											colexecerror.ExpectedError(tmpErr)
+										}
+										r = tmpDec
+									}
+
+									outputCol[i].Set(&r)
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r apd.Decimal
+
+									{
+										var tmpDec apd.Decimal
+										_, tmpErr := tmpDec.SetFloat64(float64(v))
+										if tmpErr != nil {
+											colexecerror.ExpectedError(tmpErr)
+										}
+										r = tmpDec
+									}
+
+									outputCol[i].Set(&r)
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								{
+									var tmpDec apd.Decimal
+									_, tmpErr := tmpDec.SetFloat64(float64(v))
+									if tmpErr != nil {
+										colexecerror.ExpectedError(tmpErr)
+									}
+									r = tmpDec
+								}
+
+								outputCol[i].Set(&r)
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r apd.Decimal
+
+								{
+									var tmpDec apd.Decimal
+									_, tmpErr := tmpDec.SetFloat64(float64(v))
+									if tmpErr != nil {
+										colexecerror.ExpectedError(tmpErr)
+									}
+									r = tmpDec
+								}
+
+								outputCol[i].Set(&r)
+							}
+						}
+					}
+					castPerformed = true
+				}
+			case types.IntFamily:
+				switch outputVec.Type().Width() {
+				case 16:
+					inputCol := inputVec.Float64()
+					outputCol := outputVec.Int16()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+										colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+									}
+									r = int16(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int16
+
+									if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+										colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+									}
+									r = int16(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int16
+
+								if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+								}
+								r = int16(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int16
+
+								if math.IsNaN(float64(v)) || v <= float64(math.MinInt16) || v >= float64(math.MaxInt16) {
+									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+								}
+								r = int16(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case 32:
+					inputCol := inputVec.Float64()
+					outputCol := outputVec.Int32()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+										colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+									}
+									r = int32(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int32
+
+									if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+										colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+									}
+									r = int32(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int32
+
+								if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+								}
+								r = int32(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int32
+
+								if math.IsNaN(float64(v)) || v <= float64(math.MinInt32) || v >= float64(math.MaxInt32) {
+									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+								}
+								r = int32(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				case -1:
+				default:
+					inputCol := inputVec.Float64()
+					outputCol := outputVec.Int64()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+										colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+									}
+									r = int64(v)
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol[i]
+									var r int64
+
+									if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+										colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+									}
+									r = int64(v)
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol[i]
+								var r int64
+
+								if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+								}
+								r = int64(v)
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol[0:n]
+							for i := range inputCol {
+								v := inputCol[i]
+								var r int64
+
+								if math.IsNaN(float64(v)) || v <= float64(math.MinInt64) || v >= float64(math.MaxInt64) {
+									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+								}
+								r = int64(v)
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			}
+		}
+	}
+	if !castPerformed {
+		colexecerror.InternalError(fmt.Sprintf("unhandled cast %s -> %s", inputVec.Type(), outputVec.Type()))
 	}
 }
 
@@ -1777,297 +2058,345 @@ func GetCastOperator(
 			outputIdx:    resultIdx,
 		}, nil
 	}
-	switch typeconv.FromColumnType(fromType) {
-	case coltypes.Bool:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int16:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int32:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Float64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
+	leftType, rightType := fromType, toType
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+	case types.BoolFamily:
+		switch leftType.Width() {
+		case -1:
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
+			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			case types.BoolFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.FloatFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.IntFamily:
+				switch rightType.Width() {
+				case 16:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case 32:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
 		}
-	case coltypes.Bytes:
-		switch typeconv.FromColumnType(toType) {
+	case types.DecimalFamily:
+		switch leftType.Width() {
+		case -1:
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
+			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			case types.DecimalFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.BoolFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
 		}
-	case coltypes.Decimal:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Decimal:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
+	case types.IntFamily:
+		switch leftType.Width() {
+		case 16:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			case types.IntFamily:
+				switch rightType.Width() {
+				case 16:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case 32:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.BoolFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.DecimalFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.FloatFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
+		case 32:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			case types.IntFamily:
+				switch rightType.Width() {
+				case 16:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case 32:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.BoolFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.DecimalFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.FloatFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
+		case -1:
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
+			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			case types.IntFamily:
+				switch rightType.Width() {
+				case 16:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case 32:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.BoolFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.DecimalFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.FloatFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
 		}
-	case coltypes.Int16:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Decimal:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int16:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int32:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Float64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
+	case types.FloatFamily:
+		switch leftType.Width() {
+		case -1:
 		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
+			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			case types.FloatFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.BoolFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.DecimalFamily:
+				switch rightType.Width() {
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			case types.IntFamily:
+				switch rightType.Width() {
+				case 16:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case 32:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
 		}
-	case coltypes.Int32:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Decimal:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int32:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Float64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
-		}
-	case coltypes.Int64:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Decimal:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Float64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
-		}
-	case coltypes.Float64:
-		switch typeconv.FromColumnType(toType) {
-		case coltypes.Bool:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Decimal:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int16:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int32:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Int64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		case coltypes.Float64:
-			return &castOp{
-				OneInputNode: NewOneInputNode(input),
-				allocator:    allocator,
-				colIdx:       colIdx,
-				outputIdx:    resultIdx,
-				fromType:     fromType,
-				toType:       toType,
-			}, nil
-		default:
-			return nil, errors.Errorf("unhandled cast FROM -> TO type: %s -> %s", fromType, toType)
-		}
-	default:
-		return nil, errors.Errorf("unhandled FROM type: %s", fromType)
 	}
+	return nil, errors.Errorf("unhandled cast %s -> %s", fromType, toType)
 }
 
 type castOpNullAny struct {
@@ -2124,8 +2453,6 @@ type castOp struct {
 	allocator *colmem.Allocator
 	colIdx    int
 	outputIdx int
-	fromType  *types.T
-	toType    *types.T
 }
 
 var _ colexecbase.Operator = &castOp{}
@@ -2148,7 +2475,7 @@ func (c *castOp) Next(ctx context.Context) coldata.Batch {
 		projVec.Nulls().UnsetNulls()
 	}
 	c.allocator.PerformOperation(
-		[]coldata.Vec{projVec}, func() { cast(c.fromType, c.toType, vec, projVec, n, batch.Selection()) },
+		[]coldata.Vec{projVec}, func() { cast(vec, projVec, n, batch.Selection()) },
 	)
 	return batch
 }

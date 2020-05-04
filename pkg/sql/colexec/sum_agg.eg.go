@@ -12,8 +12,7 @@ package colexec
 import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
@@ -22,22 +21,37 @@ import (
 )
 
 func newSumAgg(t *types.T) (aggregateFunc, error) {
-	switch typeconv.FromColumnType(t) {
-	case coltypes.Decimal:
-		return &sumDecimalAgg{}, nil
-	case coltypes.Int16:
-		return &sumInt16Agg{}, nil
-	case coltypes.Int32:
-		return &sumInt32Agg{}, nil
-	case coltypes.Int64:
-		return &sumInt64Agg{}, nil
-	case coltypes.Float64:
-		return &sumFloat64Agg{}, nil
-	case coltypes.Interval:
-		return &sumIntervalAgg{}, nil
-	default:
-		return nil, errors.Errorf("unsupported sum agg type %s", t)
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &sumDecimalAgg{}, nil
+		}
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			return &sumInt16Agg{}, nil
+		case 32:
+			return &sumInt32Agg{}, nil
+		case -1:
+		default:
+			return &sumInt64Agg{}, nil
+		}
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &sumFloat64Agg{}, nil
+		}
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &sumIntervalAgg{}, nil
+		}
 	}
+	return nil, errors.Errorf("unsupported sum agg type %s", t)
 }
 
 type sumDecimalAgg struct {

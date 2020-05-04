@@ -34,73 +34,6 @@ func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		if b == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
 func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -115,73 +48,6 @@ func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		if b == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
 	}
@@ -210,6 +76,359 @@ func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
+func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	if _, err := tree.ExactCtx.Add(&r, &a, &b); err != nil {
+		colexecerror.ExpectedError(err)
+	}
+	return r
+}
+
+func performPlusInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := a + b
+		if (result < a) != (b < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := a + b
+		if (result < a) != (b < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPlusFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = float64(a) + float64(b)
+	return r
+}
+
+func performPlusTimestampInterval(a time.Time, b duration.Duration) time.Time {
+	var r time.Time
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = duration.Add(a, b)
+	return r
+}
+
+func performPlusIntervalTimestamp(a duration.Duration, b time.Time) time.Time {
+	var r time.Time
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = duration.Add(b, a)
+	return r
+}
+
+func performPlusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = a.Add(b)
+	return r
+}
+
+func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
 func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -224,6 +443,362 @@ func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(b), 0)
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	if _, err := tree.ExactCtx.Sub(&r, &a, &b); err != nil {
+		colexecerror.ExpectedError(err)
+	}
+	return r
+}
+
+func performMinusInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := a - b
+		if (result < a) != (b > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := a - b
+		if (result < a) != (b > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMinusFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = float64(a) - float64(b)
+	return r
+}
+
+func performMinusTimestampTimestamp(a time.Time, b time.Time) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	nanos := a.Sub(b).Nanoseconds()
+	r = duration.MakeDuration(nanos, 0, 0)
+
+	return r
+}
+
+func performMinusTimestampInterval(a time.Time, b duration.Duration) time.Time {
+	var r time.Time
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = duration.Add(a, b.Mul(-1))
+	return r
+}
+
+func performMinusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = a.Sub(b)
+	return r
+}
+
+func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
 	}
@@ -252,59 +827,6 @@ func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-
-		if b == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	if _, err := tree.ExactCtx.Add(&r, &a, &b); err != nil {
-		colexecerror.ExpectedError(err)
-	}
-	return r
-}
-
-func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	if _, err := tree.ExactCtx.Sub(&r, &a, &b); err != nil {
-		colexecerror.ExpectedError(err)
-	}
-	return r
-}
-
 func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -316,28 +838,6 @@ func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	if _, err := tree.ExactCtx.Mul(&r, &a, &b); err != nil {
 		colexecerror.ExpectedError(err)
 	}
-	return r
-}
-
-func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		cond, err := tree.DecimalCtx.Quo(&r, &a, &b)
-		if cond.DivisionByZero() {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
 	return r
 }
 
@@ -355,46 +855,6 @@ func performMultDecimalInterval(a apd.Decimal, b duration.Duration) duration.Dur
 		colexecerror.InternalError(err)
 	}
 	r = b.MulFloat(f)
-	return r
-}
-
-func performPlusInt16Int16(a int16, b int16) int16 {
-	var r int16
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := a + b
-		if (result < a) != (b < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt16Int16(a int16, b int16) int16 {
-	var r int16
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := a - b
-		if (result < a) != (b > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
 	return r
 }
 
@@ -418,70 +878,6 @@ func performMultInt16Int16(a int16, b int16) int16 {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performDivInt16Int16(a int16, b int16) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if b == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(a), 0)
-		rightTmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt16Int32(a int16, b int32) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt16Int32(a int16, b int32) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -516,70 +912,6 @@ func performMultInt16Int32(a int16, b int32) int64 {
 	return r
 }
 
-func performDivInt16Int32(a int16, b int32) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if int64(b) == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt16Int64(a int16, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt16Int64(a int16, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
 func performMultInt16Int64(a int16, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -600,177 +932,6 @@ func performMultInt16Int64(a int16, b int64) int64 {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performDivInt16Int64(a int16, b int64) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if int64(b) == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
-		if cond.DivisionByZero() {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMultInt16Interval(a int16, b duration.Duration) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = b.Mul(int64(a))
-	return r
-}
-
-func performPlusInt32Int16(a int32, b int16) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt32Int16(a int32, b int16) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -805,70 +966,6 @@ func performMultInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performDivInt32Int16(a int32, b int16) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if int64(b) == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt32Int32(a int32, b int32) int32 {
-	var r int32
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := a + b
-		if (result < a) != (b < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt32Int32(a int32, b int32) int32 {
-	var r int32
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := a - b
-		if (result < a) != (b > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
 func performMultInt32Int32(a int32, b int32) int32 {
 	var r int32
 	// In order to inline the templated code of overloads, we need to have a
@@ -889,70 +986,6 @@ func performMultInt32Int32(a int32, b int32) int32 {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performDivInt32Int32(a int32, b int32) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if b == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(a), 0)
-		rightTmpDec.SetFinite(int64(b), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt32Int64(a int32, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt32Int64(a int32, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
 	}
@@ -987,6 +1020,450 @@ func performMultInt32Int64(a int32, b int64) int64 {
 	return r
 }
 
+func performMultInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		result := int64(a) * int64(b)
+		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
+			if int64(a) != 0 && int64(b) != 0 {
+				sameSign := (int64(a) < 0) == (int64(b) < 0)
+				if (result < 0) == sameSign {
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+				} else if result/int64(b) != int64(a) {
+					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+				}
+			}
+		}
+		r = result
+	}
+
+	return r
+}
+
+func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+
+		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
+
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performMultInt64Interval(a int64, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = b.Mul(int64(a))
+	return r
+}
+
+func performMultFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = float64(a) * float64(b)
+	return r
+}
+
+func performMultFloat64Interval(a float64, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = b.MulFloat(float64(a))
+	return r
+}
+
+func performMultIntervalInt64(a duration.Duration, b int64) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = a.Mul(int64(b))
+	return r
+}
+
+func performMultIntervalFloat64(a duration.Duration, b float64) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+	r = a.MulFloat(float64(b))
+	return r
+}
+
+func performMultIntervalDecimal(a duration.Duration, b apd.Decimal) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	f, err := b.Float64()
+	if err != nil {
+		colexecerror.InternalError(err)
+	}
+	r = a.MulFloat(f)
+	return r
+}
+
+func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &decimalScratch.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		cond, err := tree.DecimalCtx.Quo(&r, &a, &b)
+		if cond.DivisionByZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt16Int16(a int16, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(a), 0)
+		rightTmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt16Int32(a int16, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt16Int64(a int16, b int64) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt32Int16(a int32, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt32Int32(a int32, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(a), 0)
+		rightTmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
 func performDivInt32Int64(a int32, b int64) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1011,7 +1488,7 @@ func performDivInt32Int64(a int32, b int64) apd.Decimal {
 	return r
 }
 
-func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+func performDivInt64Int16(a int64, b int16) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -1021,12 +1498,13 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	_ = decimalScratch
 
 	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
-
-		if err != nil {
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
 	}
@@ -1034,7 +1512,7 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+func performDivInt64Int32(a int64, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -1044,12 +1522,13 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	_ = decimalScratch
 
 	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
-
-		if err != nil {
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
 	}
@@ -1057,7 +1536,31 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+func performDivInt64Int64(a int64, b int64) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+		leftTmpDec.SetFinite(int64(int64(a)), 0)
+		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -1070,7 +1573,10 @@ func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		tmpDec := &decimalScratch.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
 
-		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
+		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
+		if cond.DivisionByZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
 
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1106,360 +1612,6 @@ func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performMultInt32Interval(a int32, b duration.Duration) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = b.Mul(int64(a))
-	return r
-}
-
-func performPlusInt64Int16(a int64, b int16) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt64Int16(a int64, b int16) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMultInt64Int16(a int64, b int16) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
-				if (result < 0) == sameSign {
-					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
-					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				}
-			}
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performDivInt64Int16(a int64, b int16) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if int64(b) == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt64Int32(a int64, b int32) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt64Int32(a int64, b int32) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMultInt64Int32(a int64, b int32) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
-				if (result < 0) == sameSign {
-					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
-					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				}
-			}
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performDivInt64Int32(a int64, b int32) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if int64(b) == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt64Int64(a int64, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) + int64(b)
-		if (result < int64(a)) != (int64(b) < 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMinusInt64Int64(a int64, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) - int64(b)
-		if (result < int64(a)) != (int64(b) > 0) {
-			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performMultInt64Int64(a int64, b int64) int64 {
-	var r int64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
-				if (result < 0) == sameSign {
-					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
-					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				}
-			}
-		}
-		r = result
-	}
-
-	return r
-}
-
-func performDivInt64Int64(a int64, b int64) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		if int64(b) == 0 {
-			colexecerror.ExpectedError(tree.ErrDivByZero)
-		}
-		leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
-		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
-func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
-	var r apd.Decimal
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		tmpDec := &decimalScratch.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
-
-		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
-
-		if err != nil {
-			colexecerror.ExpectedError(err)
-		}
-	}
-
-	return r
-}
-
 func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1486,54 +1638,6 @@ func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performMultInt64Interval(a int64, b duration.Duration) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = b.Mul(int64(a))
-	return r
-}
-
-func performPlusFloat64Float64(a float64, b float64) float64 {
-	var r float64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = float64(a) + float64(b)
-	return r
-}
-
-func performMinusFloat64Float64(a float64, b float64) float64 {
-	var r float64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = float64(a) - float64(b)
-	return r
-}
-
-func performMultFloat64Float64(a float64, b float64) float64 {
-	var r float64
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = float64(a) * float64(b)
-	return r
-}
-
 func performDivFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1543,125 +1647,6 @@ func performDivFloat64Float64(a float64, b float64) float64 {
 	// to go around "unused" error.
 	_ = decimalScratch
 	r = float64(a) / float64(b)
-	return r
-}
-
-func performMultFloat64Interval(a float64, b duration.Duration) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = b.MulFloat(float64(a))
-	return r
-}
-
-func performMinusTimestampTimestamp(a time.Time, b time.Time) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	nanos := a.Sub(b).Nanoseconds()
-	r = duration.MakeDuration(nanos, 0, 0)
-
-	return r
-}
-
-func performPlusTimestampInterval(a time.Time, b duration.Duration) time.Time {
-	var r time.Time
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = duration.Add(a, b)
-	return r
-}
-
-func performMinusTimestampInterval(a time.Time, b duration.Duration) time.Time {
-	var r time.Time
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = duration.Add(a, b.Mul(-1))
-	return r
-}
-
-func performMultIntervalInt16(a duration.Duration, b int16) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = a.Mul(int64(b))
-	return r
-}
-
-func performDivIntervalInt16(a duration.Duration, b int16) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	if b == 0 {
-		colexecerror.ExpectedError(tree.ErrDivByZero)
-	}
-	r = a.Div(int64(b))
-	return r
-}
-
-func performMultIntervalInt32(a duration.Duration, b int32) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = a.Mul(int64(b))
-	return r
-}
-
-func performDivIntervalInt32(a duration.Duration, b int32) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	if b == 0 {
-		colexecerror.ExpectedError(tree.ErrDivByZero)
-	}
-	r = a.Div(int64(b))
-	return r
-}
-
-func performMultIntervalInt64(a duration.Duration, b int64) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = a.Mul(int64(b))
 	return r
 }
 
@@ -1681,18 +1666,6 @@ func performDivIntervalInt64(a duration.Duration, b int64) duration.Duration {
 	return r
 }
 
-func performMultIntervalFloat64(a duration.Duration, b float64) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = a.MulFloat(float64(b))
-	return r
-}
-
 func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1706,59 +1679,6 @@ func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration
 		colexecerror.ExpectedError(tree.ErrDivByZero)
 	}
 	r = a.DivFloat(float64(b))
-	return r
-}
-
-func performMultIntervalDecimal(a duration.Duration, b apd.Decimal) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	f, err := b.Float64()
-	if err != nil {
-		colexecerror.InternalError(err)
-	}
-	r = a.MulFloat(f)
-	return r
-}
-
-func performPlusIntervalTimestamp(a duration.Duration, b time.Time) time.Time {
-	var r time.Time
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = duration.Add(b, a)
-	return r
-}
-
-func performPlusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = a.Add(b)
-	return r
-}
-
-func performMinusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
-	var r duration.Duration
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-	r = a.Sub(b)
 	return r
 }
 
@@ -1788,136 +1708,6 @@ func performEQBoolBool(a bool, b bool) bool {
 	return r
 }
 
-func performNEBoolBool(a bool, b bool) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if !a && b {
-			cmpResult = -1
-		} else if a && !b {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTBoolBool(a bool, b bool) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if !a && b {
-			cmpResult = -1
-		} else if a && !b {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEBoolBool(a bool, b bool) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if !a && b {
-			cmpResult = -1
-		} else if a && !b {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTBoolBool(a bool, b bool) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if !a && b {
-			cmpResult = -1
-		} else if a && !b {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEBoolBool(a bool, b bool) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if !a && b {
-			cmpResult = -1
-		} else if a && !b {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -1931,96 +1721,6 @@ func performEQBytesBytes(a []byte, b []byte) bool {
 		var cmpResult int
 		cmpResult = bytes.Compare(a, b)
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEBytesBytes(a []byte, b []byte) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = bytes.Compare(a, b)
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTBytesBytes(a []byte, b []byte) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = bytes.Compare(a, b)
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEBytesBytes(a []byte, b []byte) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = bytes.Compare(a, b)
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTBytesBytes(a []byte, b []byte) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = bytes.Compare(a, b)
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEBytesBytes(a []byte, b []byte) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = bytes.Compare(a, b)
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -2050,126 +1750,6 @@ func performEQDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-func performNEDecimalInt16(a apd.Decimal, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTDecimalInt16(a apd.Decimal, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEDecimalInt16(a apd.Decimal, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTDecimalInt16(a apd.Decimal, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEDecimalInt16(a apd.Decimal, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -2194,126 +1774,6 @@ func performEQDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-func performNEDecimalInt32(a apd.Decimal, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTDecimalInt32(a apd.Decimal, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEDecimalInt32(a apd.Decimal, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTDecimalInt32(a apd.Decimal, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEDecimalInt32(a apd.Decimal, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -2333,126 +1793,6 @@ func performEQDecimalInt64(a apd.Decimal, b int64) bool {
 		}
 
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEDecimalInt64(a apd.Decimal, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTDecimalInt64(a apd.Decimal, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEDecimalInt64(a apd.Decimal, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTDecimalInt64(a apd.Decimal, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEDecimalInt64(a apd.Decimal, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -2484,136 +1824,6 @@ func performEQDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-func performNEDecimalFloat64(a apd.Decimal, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTDecimalFloat64(a apd.Decimal, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEDecimalFloat64(a apd.Decimal, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTDecimalFloat64(a apd.Decimal, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEDecimalFloat64(a apd.Decimal, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(&a, tmpDec)
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -2627,96 +1837,6 @@ func performEQDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 		var cmpResult int
 		cmpResult = tree.CompareDecimals(&a, &b)
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = tree.CompareDecimals(&a, &b)
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = tree.CompareDecimals(&a, &b)
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = tree.CompareDecimals(&a, &b)
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = tree.CompareDecimals(&a, &b)
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = tree.CompareDecimals(&a, &b)
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -2751,151 +1871,6 @@ func performEQInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-func performNEInt16Int16(a int16, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt16Int16(a int16, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt16Int16(a int16, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt16Int16(a int16, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt16Int16(a int16, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -2920,151 +1895,6 @@ func performEQInt16Int32(a int16, b int32) bool {
 		}
 
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt16Int32(a int16, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt16Int32(a int16, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt16Int32(a int16, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt16Int32(a int16, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt16Int32(a int16, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -3099,7 +1929,7 @@ func performEQInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-func performNEInt16Int64(a int16, b int64) bool {
+func performEQInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -3122,13 +1952,13 @@ func performNEInt16Int64(a int16, b int64) bool {
 			}
 		}
 
-		r = cmpResult != 0
+		r = cmpResult == 0
 	}
 
 	return r
 }
 
-func performLTInt16Int64(a int16, b int64) bool {
+func performEQInt32Int32(a int32, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -3151,13 +1981,13 @@ func performLTInt16Int64(a int16, b int64) bool {
 			}
 		}
 
-		r = cmpResult < 0
+		r = cmpResult == 0
 	}
 
 	return r
 }
 
-func performLEInt16Int64(a int16, b int64) bool {
+func performEQInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -3180,13 +2010,13 @@ func performLEInt16Int64(a int16, b int64) bool {
 			}
 		}
 
-		r = cmpResult <= 0
+		r = cmpResult == 0
 	}
 
 	return r
 }
 
-func performGTInt16Int64(a int16, b int64) bool {
+func performEQInt64Int16(a int64, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -3209,13 +2039,13 @@ func performGTInt16Int64(a int16, b int64) bool {
 			}
 		}
 
-		r = cmpResult > 0
+		r = cmpResult == 0
 	}
 
 	return r
 }
 
-func performGEInt16Int64(a int16, b int64) bool {
+func performEQInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -3238,7 +2068,36 @@ func performGEInt16Int64(a int16, b int64) bool {
 			}
 		}
 
-		r = cmpResult >= 0
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performEQInt64Int64(a int64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult == 0
 	}
 
 	return r
@@ -3281,857 +2140,6 @@ func performEQInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-func performNEInt16Float64(a int16, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt16Float64(a int16, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt16Float64(a int16, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt16Float64(a int16, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt16Float64(a int16, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt16Decimal(a int16, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt16Decimal(a int16, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt16Decimal(a int16, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt16Decimal(a int16, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt16Decimal(a int16, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt16Decimal(a int16, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt32Int16(a int32, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt32Int16(a int32, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt32Int16(a int32, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt32Int16(a int32, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt32Int16(a int32, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt32Int16(a int32, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt32Int32(a int32, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt32Int32(a int32, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt32Int32(a int32, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt32Int32(a int32, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt32Int32(a int32, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt32Int32(a int32, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt32Int64(a int32, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt32Int64(a int32, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt32Int64(a int32, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt32Int64(a int32, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt32Int64(a int32, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt32Int64(a int32, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4164,857 +2172,6 @@ func performEQInt32Float64(a int32, b float64) bool {
 		}
 
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt32Float64(a int32, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt32Float64(a int32, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt32Float64(a int32, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt32Float64(a int32, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt32Float64(a int32, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt32Decimal(a int32, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt32Decimal(a int32, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt32Decimal(a int32, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt32Decimal(a int32, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt32Decimal(a int32, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt32Decimal(a int32, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt64Int16(a int64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt64Int16(a int64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt64Int16(a int64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt64Int16(a int64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt64Int16(a int64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt64Int16(a int64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt64Int32(a int64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt64Int32(a int64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt64Int32(a int64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt64Int32(a int64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt64Int32(a int64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt64Int32(a int64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQInt64Int64(a int64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt64Int64(a int64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt64Int64(a int64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt64Int64(a int64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt64Int64(a int64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt64Int64(a int64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := int64(a), int64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else {
-				cmpResult = 0
-			}
-		}
-
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -5057,7 +2214,7 @@ func performEQInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-func performNEInt64Float64(a int64, b float64) bool {
+func performEQInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -5070,31 +2227,18 @@ func performNEInt64Float64(a int64, b float64) bool {
 		var cmpResult int
 
 		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
-		r = cmpResult != 0
+		r = cmpResult == 0
 	}
 
 	return r
 }
 
-func performLTInt64Float64(a int64, b float64) bool {
+func performEQInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -5107,136 +2251,12 @@ func performLTInt64Float64(a int64, b float64) bool {
 		var cmpResult int
 
 		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt64Float64(a int64, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt64Float64(a int64, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt64Float64(a int64, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if false {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult >= 0
+		r = cmpResult == 0
 	}
 
 	return r
@@ -5261,126 +2281,6 @@ func performEQInt64Decimal(a int64, b apd.Decimal) bool {
 		}
 
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEInt64Decimal(a int64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTInt64Decimal(a int64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEInt64Decimal(a int64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTInt64Decimal(a int64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEInt64Decimal(a int64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -5423,191 +2323,6 @@ func performEQFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-func performNEFloat64Int16(a float64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTFloat64Int16(a float64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEFloat64Int16(a float64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTFloat64Int16(a float64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEFloat64Int16(a float64, b int16) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
 func performEQFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5640,191 +2355,6 @@ func performEQFloat64Int32(a float64, b int32) bool {
 		}
 
 		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEFloat64Int32(a float64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTFloat64Int32(a float64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEFloat64Int32(a float64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTFloat64Int32(a float64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEFloat64Int32(a float64, b int32) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult >= 0
 	}
 
 	return r
@@ -5867,7 +2397,717 @@ func performEQFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-func performNEFloat64Int64(a float64, b int64) bool {
+func performEQFloat64Float64(a float64, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performEQFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performEQTimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performEQIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult == 0
+	}
+
+	return r
+}
+
+func performNEBoolBool(a bool, b bool) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEBytesBytes(a []byte, b []byte) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt16Int16(a int16, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt16Int32(a int16, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt16Int64(a int16, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt32Int16(a int32, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt32Int32(a int32, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt32Int64(a int32, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt64Int16(a int64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt64Int32(a int64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt64Int64(a int64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt16Float64(a int16, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt32Float64(a int32, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt64Float64(a int64, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEFloat64Int16(a float64, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -5904,7 +3144,7 @@ func performNEFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-func performLTFloat64Int64(a float64, b int64) bool {
+func performNEFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -5935,13 +3175,13 @@ func performLTFloat64Int64(a float64, b int64) bool {
 			}
 		}
 
-		r = cmpResult < 0
+		r = cmpResult != 0
 	}
 
 	return r
 }
 
-func performLEFloat64Int64(a float64, b int64) bool {
+func performNEFloat64Int64(a float64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
 	// "decimalScratch" local variable of type "decimalOverloadScratch".
@@ -5972,118 +3212,7 @@ func performLEFloat64Int64(a float64, b int64) bool {
 			}
 		}
 
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTFloat64Int64(a float64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
-func performGEFloat64Int64(a float64, b int64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if false {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQFloat64Float64(a float64, b float64) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			a, b := float64(a), float64(b)
-			if a < b {
-				cmpResult = -1
-			} else if a > b {
-				cmpResult = 1
-			} else if a == b {
-				cmpResult = 0
-			} else if math.IsNaN(a) {
-				if math.IsNaN(b) {
-					cmpResult = 0
-				} else {
-					cmpResult = -1
-				}
-			} else {
-				cmpResult = 1
-			}
-		}
-
-		r = cmpResult == 0
+		r = cmpResult != 0
 	}
 
 	return r
@@ -6126,6 +3255,790 @@ func performNEFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
+func performNEFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNETimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performNEIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult != 0
+	}
+
+	return r
+}
+
+func performLTBoolBool(a bool, b bool) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTBytesBytes(a []byte, b []byte) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt16Int16(a int16, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt16Int32(a int16, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt16Int64(a int16, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt32Int16(a int32, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt32Int32(a int32, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt32Int64(a int32, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt64Int16(a int64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt64Int32(a int64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt64Int64(a int64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt16Float64(a int16, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt32Float64(a int32, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt64Float64(a int64, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int16(a float64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int32(a float64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTFloat64Int64(a float64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
 func performLTFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6158,6 +4071,790 @@ func performLTFloat64Float64(a float64, b float64) bool {
 		}
 
 		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTTimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLTIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult < 0
+	}
+
+	return r
+}
+
+func performLEBoolBool(a bool, b bool) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEBytesBytes(a []byte, b []byte) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt16Int16(a int16, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt16Int32(a int16, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt16Int64(a int16, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt32Int16(a int32, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt32Int32(a int32, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt32Int64(a int32, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt64Int16(a int64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt64Int32(a int64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt64Int64(a int64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt16Float64(a int16, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt32Float64(a int32, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt64Float64(a int64, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int16(a float64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int32(a float64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEFloat64Int64(a float64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult <= 0
 	}
 
 	return r
@@ -6200,6 +4897,790 @@ func performLEFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
+func performLEFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLETimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performLEIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult <= 0
+	}
+
+	return r
+}
+
+func performGTBoolBool(a bool, b bool) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTBytesBytes(a []byte, b []byte) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt16Int16(a int16, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt16Int32(a int16, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt16Int64(a int16, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt32Int16(a int32, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt32Int32(a int32, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt32Int64(a int32, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt64Int16(a int64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt64Int32(a int64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt64Int64(a int64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt16Float64(a int16, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt32Float64(a int32, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt64Float64(a int64, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int16(a float64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int32(a float64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTFloat64Int64(a float64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
 func performGTFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6232,6 +5713,790 @@ func performGTFloat64Float64(a float64, b float64) bool {
 		}
 
 		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTFloat64Decimal(a float64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTTimestampTimestamp(a time.Time, b time.Time) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if a.Before(b) {
+			cmpResult = -1
+		} else if b.Before(a) {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGTIntervalInterval(a duration.Duration, b duration.Duration) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = a.Compare(b)
+		r = cmpResult > 0
+	}
+
+	return r
+}
+
+func performGEBoolBool(a bool, b bool) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		if !a && b {
+			cmpResult = -1
+		} else if a && !b {
+			cmpResult = 1
+		} else {
+			cmpResult = 0
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEBytesBytes(a []byte, b []byte) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = bytes.Compare(a, b)
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt16(a apd.Decimal, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt32(a apd.Decimal, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEDecimalInt64(a apd.Decimal, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(b), 0)
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEDecimalFloat64(a apd.Decimal, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			if _, err := tmpDec.SetFloat64(float64(b)); err != nil {
+				colexecerror.ExpectedError(err)
+			}
+			cmpResult = tree.CompareDecimals(&a, tmpDec)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+		cmpResult = tree.CompareDecimals(&a, &b)
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt16Int16(a int16, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt16Int32(a int16, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt16Int64(a int16, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt32Int16(a int32, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt32Int32(a int32, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt32Int64(a int32, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt64Int16(a int64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt64Int32(a int64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt64Int64(a int64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := int64(a), int64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else {
+				cmpResult = 0
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt16Float64(a int16, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt32Float64(a int32, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt64Float64(a int64, b float64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if false {
+				if math.IsNaN(b) {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt16Decimal(a int16, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt32Decimal(a int32, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEInt64Decimal(a int64, b apd.Decimal) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			tmpDec := &decimalScratch.tmpDec1
+			tmpDec.SetFinite(int64(a), 0)
+			cmpResult = tree.CompareDecimals(tmpDec, &b)
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int16(a float64, b int16) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int32(a float64, b int32) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
+	}
+
+	return r
+}
+
+func performGEFloat64Int64(a float64, b int64) bool {
+	var r bool
+	// In order to inline the templated code of overloads, we need to have a
+	// "decimalScratch" local variable of type "decimalOverloadScratch".
+	var decimalScratch decimalOverloadScratch
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = decimalScratch
+
+	{
+		var cmpResult int
+
+		{
+			a, b := float64(a), float64(b)
+			if a < b {
+				cmpResult = -1
+			} else if a > b {
+				cmpResult = 1
+			} else if a == b {
+				cmpResult = 0
+			} else if math.IsNaN(a) {
+				if false {
+					cmpResult = 0
+				} else {
+					cmpResult = -1
+				}
+			} else {
+				cmpResult = 1
+			}
+		}
+
+		r = cmpResult >= 0
 	}
 
 	return r
@@ -6274,136 +6539,6 @@ func performGEFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-func performEQFloat64Decimal(a float64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEFloat64Decimal(a float64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTFloat64Decimal(a float64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEFloat64Decimal(a float64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTFloat64Decimal(a float64, b apd.Decimal) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		{
-			tmpDec := &decimalScratch.tmpDec1
-			if _, err := tmpDec.SetFloat64(float64(a)); err != nil {
-				colexecerror.ExpectedError(err)
-			}
-			cmpResult = tree.CompareDecimals(tmpDec, &b)
-		}
-
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
 func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6430,131 +6565,6 @@ func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-func performEQTimestampTimestamp(a time.Time, b time.Time) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if a.Before(b) {
-			cmpResult = -1
-		} else if b.Before(a) {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNETimestampTimestamp(a time.Time, b time.Time) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if a.Before(b) {
-			cmpResult = -1
-		} else if b.Before(a) {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTTimestampTimestamp(a time.Time, b time.Time) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if a.Before(b) {
-			cmpResult = -1
-		} else if b.Before(a) {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLETimestampTimestamp(a time.Time, b time.Time) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if a.Before(b) {
-			cmpResult = -1
-		} else if b.Before(a) {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTTimestampTimestamp(a time.Time, b time.Time) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-
-		if a.Before(b) {
-			cmpResult = -1
-		} else if b.Before(a) {
-			cmpResult = 1
-		} else {
-			cmpResult = 0
-		}
-		r = cmpResult > 0
-	}
-
-	return r
-}
-
 func performGETimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6575,96 +6585,6 @@ func performGETimestampTimestamp(a time.Time, b time.Time) bool {
 			cmpResult = 0
 		}
 		r = cmpResult >= 0
-	}
-
-	return r
-}
-
-func performEQIntervalInterval(a duration.Duration, b duration.Duration) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = a.Compare(b)
-		r = cmpResult == 0
-	}
-
-	return r
-}
-
-func performNEIntervalInterval(a duration.Duration, b duration.Duration) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = a.Compare(b)
-		r = cmpResult != 0
-	}
-
-	return r
-}
-
-func performLTIntervalInterval(a duration.Duration, b duration.Duration) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = a.Compare(b)
-		r = cmpResult < 0
-	}
-
-	return r
-}
-
-func performLEIntervalInterval(a duration.Duration, b duration.Duration) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = a.Compare(b)
-		r = cmpResult <= 0
-	}
-
-	return r
-}
-
-func performGTIntervalInterval(a duration.Duration, b duration.Duration) bool {
-	var r bool
-	// In order to inline the templated code of overloads, we need to have a
-	// "decimalScratch" local variable of type "decimalOverloadScratch".
-	var decimalScratch decimalOverloadScratch
-	// However, the scratch is not used in all of the functions, so we add this
-	// to go around "unused" error.
-	_ = decimalScratch
-
-	{
-		var cmpResult int
-		cmpResult = a.Compare(b)
-		r = cmpResult > 0
 	}
 
 	return r

@@ -17,8 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes"
-	"github.com/cockroachdb/cockroach/pkg/col/coltypes/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -35,7 +34,7 @@ var (
 	_ = colexecerror.InternalError
 )
 
-// Enum used to represent comparison results
+// Enum used to represent comparison results.
 type comparisonResult int
 
 const (
@@ -46,7 +45,7 @@ const (
 
 func GetInProjectionOperator(
 	allocator *colmem.Allocator,
-	typ *types.T,
+	t *types.T,
 	input colexecbase.Operator,
 	colIdx int,
 	resultIdx int,
@@ -55,236 +54,290 @@ func GetInProjectionOperator(
 ) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, types.Bool, resultIdx)
 	var err error
-	switch typeconv.FromColumnType(typ) {
-	case coltypes.Bool:
-		obj := &projectInOpBool{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &projectInOpBool{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowBool(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(typ, datumTuple)
-		if err != nil {
-			return nil, err
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &projectInOpBytes{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		return obj, nil
-	case coltypes.Bytes:
-		obj := &projectInOpBytes{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &projectInOpDecimal{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(typ, datumTuple)
-		if err != nil {
-			return nil, err
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			obj := &projectInOpInt16{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
+		case 32:
+			obj := &projectInOpInt32{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
+		case -1:
+		default:
+			obj := &projectInOpInt64{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		return obj, nil
-	case coltypes.Decimal:
-		obj := &projectInOpDecimal{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &projectInOpFloat64{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(typ, datumTuple)
-		if err != nil {
-			return nil, err
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &projectInOpTimestamp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		return obj, nil
-	case coltypes.Int16:
-		obj := &projectInOpInt16{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &projectInOpInterval{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				colIdx:       colIdx,
+				outputIdx:    resultIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Int32:
-		obj := &projectInOpInt32{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Int64:
-		obj := &projectInOpInt64{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Float64:
-		obj := &projectInOpFloat64{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Timestamp:
-		obj := &projectInOpTimestamp{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Interval:
-		obj := &projectInOpInterval{
-			OneInputNode: NewOneInputNode(input),
-			allocator:    allocator,
-			colIdx:       colIdx,
-			outputIdx:    resultIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	default:
-		return nil, errors.Errorf("unhandled type: %s", typ)
 	}
+	return nil, errors.Errorf("unhandled type: %s", t.Name())
 }
 
 func GetInOperator(
-	typ *types.T, input colexecbase.Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
+	t *types.T, input colexecbase.Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
 ) (colexecbase.Operator, error) {
 	var err error
-	switch typeconv.FromColumnType(typ) {
-	case coltypes.Bool:
-		obj := &selectInOpBool{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
+	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	case types.BoolFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &selectInOpBool{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowBool(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBool(typ, datumTuple)
-		if err != nil {
-			return nil, err
+	case types.BytesFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &selectInOpBytes{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		return obj, nil
-	case coltypes.Bytes:
-		obj := &selectInOpBytes{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
+	case types.DecimalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &selectInOpDecimal{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowBytes(typ, datumTuple)
-		if err != nil {
-			return nil, err
+	case types.IntFamily:
+		switch t.Width() {
+		case 16:
+			obj := &selectInOpInt16{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
+		case 32:
+			obj := &selectInOpInt32{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
+		case -1:
+		default:
+			obj := &selectInOpInt64{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		return obj, nil
-	case coltypes.Decimal:
-		obj := &selectInOpDecimal{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
+	case types.FloatFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &selectInOpFloat64{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowDecimal(typ, datumTuple)
-		if err != nil {
-			return nil, err
+	case types.TimestampTZFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &selectInOpTimestamp{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		return obj, nil
-	case coltypes.Int16:
-		obj := &selectInOpInt16{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
+	case types.IntervalFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			obj := &selectInOpInterval{
+				OneInputNode: NewOneInputNode(input),
+				colIdx:       colIdx,
+				negate:       negate,
+			}
+			obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(t, datumTuple)
+			if err != nil {
+				return nil, err
+			}
+			return obj, nil
 		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt16(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Int32:
-		obj := &selectInOpInt32{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt32(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Int64:
-		obj := &selectInOpInt64{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInt64(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Float64:
-		obj := &selectInOpFloat64{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowFloat64(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Timestamp:
-		obj := &selectInOpTimestamp{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowTimestamp(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	case coltypes.Interval:
-		obj := &selectInOpInterval{
-			OneInputNode: NewOneInputNode(input),
-			colIdx:       colIdx,
-			negate:       negate,
-		}
-		obj.filterRow, obj.hasNulls, err = fillDatumRowInterval(typ, datumTuple)
-		if err != nil {
-			return nil, err
-		}
-		return obj, nil
-	default:
-		return nil, errors.Errorf("unhandled type: %s", typ)
 	}
+	return nil, errors.Errorf("unhandled type: %s", t.Name())
 }
 
 type selectInOpBool struct {
@@ -294,6 +347,8 @@ type selectInOpBool struct {
 	hasNulls  bool
 	negate    bool
 }
+
+var _ colexecbase.Operator = &selectInOpBool{}
 
 type projectInOpBool struct {
 	OneInputNode
@@ -307,8 +362,8 @@ type projectInOpBool struct {
 
 var _ colexecbase.Operator = &projectInOpBool{}
 
-func fillDatumRowBool(typ *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowBool(t *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []bool
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -528,6 +583,8 @@ type selectInOpBytes struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpBytes{}
+
 type projectInOpBytes struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -540,8 +597,8 @@ type projectInOpBytes struct {
 
 var _ colexecbase.Operator = &projectInOpBytes{}
 
-func fillDatumRowBytes(typ *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowBytes(t *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result [][]byte
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -761,6 +818,8 @@ type selectInOpDecimal struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpDecimal{}
+
 type projectInOpDecimal struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -773,8 +832,8 @@ type projectInOpDecimal struct {
 
 var _ colexecbase.Operator = &projectInOpDecimal{}
 
-func fillDatumRowDecimal(typ *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowDecimal(t *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []apd.Decimal
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -986,6 +1045,8 @@ type selectInOpInt16 struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpInt16{}
+
 type projectInOpInt16 struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -998,8 +1059,8 @@ type projectInOpInt16 struct {
 
 var _ colexecbase.Operator = &projectInOpInt16{}
 
-func fillDatumRowInt16(typ *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowInt16(t *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []int16
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1222,6 +1283,8 @@ type selectInOpInt32 struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpInt32{}
+
 type projectInOpInt32 struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -1234,8 +1297,8 @@ type projectInOpInt32 struct {
 
 var _ colexecbase.Operator = &projectInOpInt32{}
 
-func fillDatumRowInt32(typ *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowInt32(t *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []int32
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1458,6 +1521,8 @@ type selectInOpInt64 struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpInt64{}
+
 type projectInOpInt64 struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -1470,8 +1535,8 @@ type projectInOpInt64 struct {
 
 var _ colexecbase.Operator = &projectInOpInt64{}
 
-func fillDatumRowInt64(typ *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowInt64(t *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []int64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1694,6 +1759,8 @@ type selectInOpFloat64 struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpFloat64{}
+
 type projectInOpFloat64 struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -1706,8 +1773,8 @@ type projectInOpFloat64 struct {
 
 var _ colexecbase.Operator = &projectInOpFloat64{}
 
-func fillDatumRowFloat64(typ *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowFloat64(t *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []float64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1938,6 +2005,8 @@ type selectInOpTimestamp struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpTimestamp{}
+
 type projectInOpTimestamp struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -1950,8 +2019,8 @@ type projectInOpTimestamp struct {
 
 var _ colexecbase.Operator = &projectInOpTimestamp{}
 
-func fillDatumRowTimestamp(typ *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowTimestamp(t *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []time.Time
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -2170,6 +2239,8 @@ type selectInOpInterval struct {
 	negate    bool
 }
 
+var _ colexecbase.Operator = &selectInOpInterval{}
+
 type projectInOpInterval struct {
 	OneInputNode
 	allocator *colmem.Allocator
@@ -2182,8 +2253,8 @@ type projectInOpInterval struct {
 
 var _ colexecbase.Operator = &projectInOpInterval{}
 
-func fillDatumRowInterval(typ *types.T, datumTuple *tree.DTuple) ([]duration.Duration, bool, error) {
-	conv := getDatumToPhysicalFn(typ)
+func fillDatumRowInterval(t *types.T, datumTuple *tree.DTuple) ([]duration.Duration, bool, error) {
+	conv := getDatumToPhysicalFn(t)
 	var result []duration.Duration
 	hasNulls := false
 	for _, d := range datumTuple.D {
