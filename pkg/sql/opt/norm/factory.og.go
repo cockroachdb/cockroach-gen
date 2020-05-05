@@ -10065,16 +10065,15 @@ func (_f *Factory) ConstructEq(
 			if _variable2 != nil {
 				if _f.funcs.VarsAreSame(left, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
-						typ := _f.funcs.TypeOf(left)
 						_expr := _f.ConstructOr(
 							_f.ConstructIsNot(
 								left,
 								_f.ConstructNull(
-									typ,
+									_f.funcs.TypeOf(left),
 								),
 							),
 							_f.ConstructNull(
-								typ,
+								_f.funcs.BoolType(),
 							),
 						)
 						if _f.appliedRule != nil {
@@ -10299,16 +10298,15 @@ func (_f *Factory) ConstructLt(
 			if _variable2 != nil {
 				if _f.funcs.VarsAreSame(left, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
-						typ := _f.funcs.TypeOf(left)
 						_expr := _f.ConstructAnd(
 							_f.ConstructIs(
 								left,
 								_f.ConstructNull(
-									typ,
+									_f.funcs.TypeOf(left),
 								),
 							),
 							_f.ConstructNull(
-								typ,
+								_f.funcs.BoolType(),
 							),
 						)
 						if _f.appliedRule != nil {
@@ -10533,16 +10531,15 @@ func (_f *Factory) ConstructGt(
 			if _variable2 != nil {
 				if _f.funcs.VarsAreSame(left, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
-						typ := _f.funcs.TypeOf(left)
 						_expr := _f.ConstructAnd(
 							_f.ConstructIs(
 								left,
 								_f.ConstructNull(
-									typ,
+									_f.funcs.TypeOf(left),
 								),
 							),
 							_f.ConstructNull(
-								typ,
+								_f.funcs.BoolType(),
 							),
 						)
 						if _f.appliedRule != nil {
@@ -10767,16 +10764,15 @@ func (_f *Factory) ConstructLe(
 			if _variable2 != nil {
 				if _f.funcs.VarsAreSame(left, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
-						typ := _f.funcs.TypeOf(left)
 						_expr := _f.ConstructOr(
 							_f.ConstructIsNot(
 								left,
 								_f.ConstructNull(
-									typ,
+									_f.funcs.TypeOf(left),
 								),
 							),
 							_f.ConstructNull(
-								typ,
+								_f.funcs.BoolType(),
 							),
 						)
 						if _f.appliedRule != nil {
@@ -11001,16 +10997,15 @@ func (_f *Factory) ConstructGe(
 			if _variable2 != nil {
 				if _f.funcs.VarsAreSame(left, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
-						typ := _f.funcs.TypeOf(left)
 						_expr := _f.ConstructOr(
 							_f.ConstructIsNot(
 								left,
 								_f.ConstructNull(
-									typ,
+									_f.funcs.TypeOf(left),
 								),
 							),
 							_f.ConstructNull(
-								typ,
+								_f.funcs.BoolType(),
 							),
 						)
 						if _f.appliedRule != nil {
@@ -11151,16 +11146,15 @@ func (_f *Factory) ConstructNe(
 			if _variable2 != nil {
 				if _f.funcs.VarsAreSame(left, right) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
-						typ := _f.funcs.TypeOf(left)
 						_expr := _f.ConstructAnd(
 							_f.ConstructIs(
 								left,
 								_f.ConstructNull(
-									typ,
+									_f.funcs.TypeOf(left),
 								),
 							),
 							_f.ConstructNull(
-								typ,
+								_f.funcs.BoolType(),
 							),
 						)
 						if _f.appliedRule != nil {
