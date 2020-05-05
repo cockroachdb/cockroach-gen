@@ -23,13 +23,13 @@ import (
 
 func newSubstringOperator(
 	allocator *colmem.Allocator,
-	typs []types.T,
+	typs []*types.T,
 	argumentCols []int,
 	outputIdx int,
 	input colexecbase.Operator,
 ) colexecbase.Operator {
-	startType := &typs[argumentCols[1]]
-	lengthType := &typs[argumentCols[2]]
+	startType := typs[argumentCols[1]]
+	lengthType := typs[argumentCols[2]]
 	base := substringFunctionBase{
 		OneInputNode: NewOneInputNode(input),
 		allocator:    allocator,

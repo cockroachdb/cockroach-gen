@@ -91,7 +91,7 @@ func (v hashAggFuncs) match(
 	sel []int,
 	b coldata.Batch,
 	keyCols []uint32,
-	keyTypes []types.T,
+	keyTypes []*types.T,
 	keyCanonicalTypeFamilies []types.Family,
 	keyMapping coldata.Batch,
 	diff []bool,
@@ -1253,7 +1253,7 @@ func (v hashAggFuncs) match(
 					}
 				}
 			default:
-				colexecerror.InternalError(fmt.Sprintf("unhandled type %s", keyTypes[keyIdx].String()))
+				colexecerror.InternalError(fmt.Sprintf("unhandled type %s", keyTypes[keyIdx]))
 			}
 		}
 	}

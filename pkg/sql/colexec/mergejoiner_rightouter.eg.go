@@ -44,8 +44,8 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftType := &o.left.sourceTypes[leftColIdx]
-		rightType := &o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
 		colType := leftType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -7381,8 +7381,8 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftType := &o.left.sourceTypes[leftColIdx]
-		rightType := &o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
 		colType := leftType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -14718,8 +14718,8 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftType := &o.left.sourceTypes[leftColIdx]
-		rightType := &o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
 		colType := leftType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
@@ -22055,8 +22055,8 @@ EqLoop:
 		rightColIdx := o.right.eqCols[eqColIdx]
 		lVec := o.proberState.lBatch.ColVec(int(leftColIdx))
 		rVec := o.proberState.rBatch.ColVec(int(rightColIdx))
-		leftType := &o.left.sourceTypes[leftColIdx]
-		rightType := &o.right.sourceTypes[rightColIdx]
+		leftType := o.left.sourceTypes[leftColIdx]
+		rightType := o.right.sourceTypes[rightColIdx]
 		colType := leftType
 		// Merge joiner only supports the case when the physical types in the
 		// equality columns in both inputs are the same. If that is not the case,
