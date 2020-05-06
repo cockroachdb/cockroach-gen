@@ -1109,6 +1109,22 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PushColumnRemappingIntoValues]
+	{
+		_values, _ := input.(*memo.ValuesExpr)
+		if _values != nil {
+			if _f.funcs.CanPushColumnRemappingIntoValues(projections, passthrough, input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushColumnRemappingIntoValues) {
+					_expr := _f.funcs.PushColumnRemappingIntoValues(input, projections, passthrough).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushColumnRemappingIntoValues, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldTupleAccessIntoValues]
 	{
 		_values, _ := input.(*memo.ValuesExpr)
