@@ -788,34 +788,37 @@ func (_f *Factory) ConstructSelect(
 			for i := range filter {
 				item := &filter[i]
 				if _f.funcs.CanMapOnSetOp(item) {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoSetOp) {
-						_expr := _f.ConstructSelect(
-							_f.DynamicConstruct(
-								input.Op(),
-								_f.ConstructSelect(
-									left,
-									memo.FiltersExpr{
-										_f.ConstructFiltersItem(
-											_f.funcs.MapSetOpFilterLeft(item, colmap),
-										),
-									},
-								),
-								_f.ConstructSelect(
-									right,
-									memo.FiltersExpr{
-										_f.ConstructFiltersItem(
-											_f.funcs.MapSetOpFilterRight(item, colmap),
-										),
-									},
-								),
-								colmap,
-							).(memo.RelExpr),
-							_f.funcs.RemoveFiltersItem(filter, item),
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushFilterIntoSetOp, nil, _expr)
+					inputCols := _f.funcs.OutputCols(input)
+					if _f.funcs.IsBoundBy(item, inputCols) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushFilterIntoSetOp) {
+							_expr := _f.ConstructSelect(
+								_f.DynamicConstruct(
+									input.Op(),
+									_f.ConstructSelect(
+										left,
+										memo.FiltersExpr{
+											_f.ConstructFiltersItem(
+												_f.funcs.MapSetOpFilterLeft(item, colmap),
+											),
+										},
+									),
+									_f.ConstructSelect(
+										right,
+										memo.FiltersExpr{
+											_f.ConstructFiltersItem(
+												_f.funcs.MapSetOpFilterRight(item, colmap),
+											),
+										},
+									),
+									colmap,
+								).(memo.RelExpr),
+								_f.funcs.RemoveFiltersItem(filter, item),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushFilterIntoSetOp, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
