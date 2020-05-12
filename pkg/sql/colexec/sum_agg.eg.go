@@ -10,44 +10,53 @@
 package colexec
 
 import (
+	"unsafe"
+
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/cockroachdb/errors"
 )
 
-func newSumAgg(t *types.T) (aggregateFunc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+func newSumAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfSumDecimalAgg))
 			return &sumDecimalAgg{}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
+			allocator.AdjustMemoryUsage(int64(sizeOfSumInt16Agg))
 			return &sumInt16Agg{}, nil
 		case 32:
+			allocator.AdjustMemoryUsage(int64(sizeOfSumInt32Agg))
 			return &sumInt32Agg{}, nil
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfSumInt64Agg))
 			return &sumInt64Agg{}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfSumFloat64Agg))
 			return &sumFloat64Agg{}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfSumIntervalAgg))
 			return &sumIntervalAgg{}, nil
 		}
 	}
@@ -55,8 +64,6 @@ func newSumAgg(t *types.T) (aggregateFunc, error) {
 }
 
 type sumDecimalAgg struct {
-	done bool
-
 	groups  []bool
 	scratch struct {
 		curIdx int
@@ -75,6 +82,8 @@ type sumDecimalAgg struct {
 
 var _ aggregateFunc = &sumDecimalAgg{}
 
+const sizeOfSumDecimalAgg = unsafe.Sizeof(&sumDecimalAgg{})
+
 func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Decimal()
@@ -86,7 +95,6 @@ func (a *sumDecimalAgg) Reset() {
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *sumDecimalAgg) CurrentOutputIndex() int {
@@ -101,23 +109,7 @@ func (a *sumDecimalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should be
-		// null.
-		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(a.scratch.curIdx)
-		} else {
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
-		}
-		a.scratch.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
 	if nulls.MaybeHasNulls() {
@@ -241,13 +233,23 @@ func (a *sumDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumDecimalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// null.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+	}
+	a.scratch.curIdx++
+}
+
 func (a *sumDecimalAgg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
 type sumInt16Agg struct {
-	done bool
-
 	groups  []bool
 	scratch struct {
 		curIdx int
@@ -266,6 +268,8 @@ type sumInt16Agg struct {
 
 var _ aggregateFunc = &sumInt16Agg{}
 
+const sizeOfSumInt16Agg = unsafe.Sizeof(&sumInt16Agg{})
+
 func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int16()
@@ -277,7 +281,6 @@ func (a *sumInt16Agg) Reset() {
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *sumInt16Agg) CurrentOutputIndex() int {
@@ -292,23 +295,7 @@ func (a *sumInt16Agg) SetOutputIndex(idx int) {
 }
 
 func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should be
-		// null.
-		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(a.scratch.curIdx)
-		} else {
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
-		}
-		a.scratch.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
 	if nulls.MaybeHasNulls() {
@@ -456,13 +443,23 @@ func (a *sumInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt16Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// null.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+	}
+	a.scratch.curIdx++
+}
+
 func (a *sumInt16Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
 type sumInt32Agg struct {
-	done bool
-
 	groups  []bool
 	scratch struct {
 		curIdx int
@@ -481,6 +478,8 @@ type sumInt32Agg struct {
 
 var _ aggregateFunc = &sumInt32Agg{}
 
+const sizeOfSumInt32Agg = unsafe.Sizeof(&sumInt32Agg{})
+
 func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int32()
@@ -492,7 +491,6 @@ func (a *sumInt32Agg) Reset() {
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *sumInt32Agg) CurrentOutputIndex() int {
@@ -507,23 +505,7 @@ func (a *sumInt32Agg) SetOutputIndex(idx int) {
 }
 
 func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should be
-		// null.
-		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(a.scratch.curIdx)
-		} else {
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
-		}
-		a.scratch.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
 	if nulls.MaybeHasNulls() {
@@ -671,13 +653,23 @@ func (a *sumInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt32Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// null.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+	}
+	a.scratch.curIdx++
+}
+
 func (a *sumInt32Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
 type sumInt64Agg struct {
-	done bool
-
 	groups  []bool
 	scratch struct {
 		curIdx int
@@ -696,6 +688,8 @@ type sumInt64Agg struct {
 
 var _ aggregateFunc = &sumInt64Agg{}
 
+const sizeOfSumInt64Agg = unsafe.Sizeof(&sumInt64Agg{})
+
 func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Int64()
@@ -707,7 +701,6 @@ func (a *sumInt64Agg) Reset() {
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *sumInt64Agg) CurrentOutputIndex() int {
@@ -722,23 +715,7 @@ func (a *sumInt64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should be
-		// null.
-		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(a.scratch.curIdx)
-		} else {
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
-		}
-		a.scratch.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
 	if nulls.MaybeHasNulls() {
@@ -886,13 +863,23 @@ func (a *sumInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumInt64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// null.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+	}
+	a.scratch.curIdx++
+}
+
 func (a *sumInt64Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
 type sumFloat64Agg struct {
-	done bool
-
 	groups  []bool
 	scratch struct {
 		curIdx int
@@ -911,6 +898,8 @@ type sumFloat64Agg struct {
 
 var _ aggregateFunc = &sumFloat64Agg{}
 
+const sizeOfSumFloat64Agg = unsafe.Sizeof(&sumFloat64Agg{})
+
 func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Float64()
@@ -922,7 +911,6 @@ func (a *sumFloat64Agg) Reset() {
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *sumFloat64Agg) CurrentOutputIndex() int {
@@ -937,23 +925,7 @@ func (a *sumFloat64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should be
-		// null.
-		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(a.scratch.curIdx)
-		} else {
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
-		}
-		a.scratch.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
 	if nulls.MaybeHasNulls() {
@@ -1069,13 +1041,23 @@ func (a *sumFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (a *sumFloat64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// null.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+	}
+	a.scratch.curIdx++
+}
+
 func (a *sumFloat64Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
 type sumIntervalAgg struct {
-	done bool
-
 	groups  []bool
 	scratch struct {
 		curIdx int
@@ -1094,6 +1076,8 @@ type sumIntervalAgg struct {
 
 var _ aggregateFunc = &sumIntervalAgg{}
 
+const sizeOfSumIntervalAgg = unsafe.Sizeof(&sumIntervalAgg{})
+
 func (a *sumIntervalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.scratch.vec = v.Interval()
@@ -1105,7 +1089,6 @@ func (a *sumIntervalAgg) Reset() {
 	a.scratch.curIdx = -1
 	a.scratch.foundNonNullForCurrentGroup = false
 	a.scratch.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *sumIntervalAgg) CurrentOutputIndex() int {
@@ -1120,23 +1103,7 @@ func (a *sumIntervalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *sumIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should be
-		// null.
-		if !a.scratch.foundNonNullForCurrentGroup {
-			a.scratch.nulls.SetNull(a.scratch.curIdx)
-		} else {
-			a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
-		}
-		a.scratch.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Interval(), vec.Nulls()
 	if nulls.MaybeHasNulls() {
@@ -1250,6 +1217,18 @@ func (a *sumIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *sumIntervalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// null.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curAgg
+	}
+	a.scratch.curIdx++
 }
 
 func (a *sumIntervalAgg) HandleEmptyInputScalar() {

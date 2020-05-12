@@ -37,7 +37,7 @@ func NewConstOp(
 	outputIdx int,
 ) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, t, outputIdx)
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:

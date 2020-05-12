@@ -9,31 +9,116 @@
 
 package colexec
 
-import "github.com/cockroachdb/cockroach/pkg/col/coldata"
+import (
+	"unsafe"
 
-// newCountRowAgg creates a COUNT(*) aggregate, which counts every row in the
-// result unconditionally.
-func newCountRowAgg() *countAgg {
-	return &countAgg{countRow: true}
+	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
+)
+
+func newCountRowsAgg(allocator *colmem.Allocator) *countRowsAgg {
+	allocator.AdjustMemoryUsage(int64(sizeOfCountRowsAgg))
+	return &countRowsAgg{}
 }
 
-// newCountAgg creates a COUNT(col) aggregate, which counts every row in the
-// result where the value of col is not null.
-func newCountAgg() *countAgg {
-	return &countAgg{countRow: false}
+// countRowsAgg supports either COUNT(*) or COUNT(col) aggregate.
+type countRowsAgg struct {
+	groups []bool
+	vec    []int64
+	nulls  *coldata.Nulls
+	curIdx int
+	curAgg int64
 }
 
-// countAgg supports both the COUNT(*) and COUNT(col) aggregates, which are
-// distinguished by the countRow flag.
+var _ aggregateFunc = &countRowsAgg{}
+
+const sizeOfCountRowsAgg = unsafe.Sizeof(&countRowsAgg{})
+
+func (a *countRowsAgg) Init(groups []bool, vec coldata.Vec) {
+	a.groups = groups
+	a.vec = vec.Int64()
+	a.nulls = vec.Nulls()
+	a.Reset()
+}
+
+func (a *countRowsAgg) Reset() {
+	a.curIdx = -1
+	a.curAgg = 0
+	a.nulls.UnsetNulls()
+}
+
+func (a *countRowsAgg) CurrentOutputIndex() int {
+	return a.curIdx
+}
+
+func (a *countRowsAgg) SetOutputIndex(idx int) {
+	if a.curIdx != -1 {
+		a.curIdx = idx
+		a.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *countRowsAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	inputLen := b.Length()
+	sel := b.Selection()
+
+	{
+		if sel != nil {
+			for _, i := range sel[:inputLen] {
+				if a.groups[i] {
+					if a.curIdx != -1 {
+						a.vec[a.curIdx] = a.curAgg
+					}
+					a.curIdx++
+					a.curAgg = int64(0)
+				}
+				var y int64
+				y = int64(1)
+				a.curAgg += y
+			}
+		} else {
+			for i := range a.groups[:inputLen] {
+				if a.groups[i] {
+					if a.curIdx != -1 {
+						a.vec[a.curIdx] = a.curAgg
+					}
+					a.curIdx++
+					a.curAgg = int64(0)
+				}
+				var y int64
+				y = int64(1)
+				a.curAgg += y
+			}
+		}
+	}
+}
+
+func (a *countRowsAgg) Flush() {
+	a.vec[a.curIdx] = a.curAgg
+	a.curIdx++
+}
+
+func (a *countRowsAgg) HandleEmptyInputScalar() {
+	a.vec[0] = 0
+}
+
+func newCountAgg(allocator *colmem.Allocator) *countAgg {
+	allocator.AdjustMemoryUsage(int64(sizeOfCountAgg))
+	return &countAgg{}
+}
+
+// countAgg supports either COUNT(*) or COUNT(col) aggregate.
 type countAgg struct {
-	groups   []bool
-	vec      []int64
-	nulls    *coldata.Nulls
-	curIdx   int
-	curAgg   int64
-	done     bool
-	countRow bool
+	groups []bool
+	vec    []int64
+	nulls  *coldata.Nulls
+	curIdx int
+	curAgg int64
 }
+
+var _ aggregateFunc = &countAgg{}
+
+const sizeOfCountAgg = unsafe.Sizeof(&countAgg{})
 
 func (a *countAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -46,7 +131,6 @@ func (a *countAgg) Reset() {
 	a.curIdx = -1
 	a.curAgg = 0
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *countAgg) CurrentOutputIndex() int {
@@ -61,24 +145,14 @@ func (a *countAgg) SetOutputIndex(idx int) {
 }
 
 func (a *countAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		a.vec[a.curIdx] = a.curAgg
-		a.curIdx++
-		a.done = true
-		return
-	}
-
 	sel := b.Selection()
 
 	// If this is a COUNT(col) aggregator and there are nulls in this batch,
 	// we must check each value for nullity. Note that it is only legal to do a
 	// COUNT aggregate on a single column.
-	if !a.countRow && b.ColVec(int(inputIdxs[0])).MaybeHasNulls() {
-		nulls := b.ColVec(int(inputIdxs[0])).Nulls()
+	nulls := b.ColVec(int(inputIdxs[0])).Nulls()
+	if nulls.MaybeHasNulls() {
 		if sel != nil {
 			for _, i := range sel[:inputLen] {
 				if a.groups[i] {
@@ -141,6 +215,11 @@ func (a *countAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		}
 	}
+}
+
+func (a *countAgg) Flush() {
+	a.vec[a.curIdx] = a.curAgg
+	a.curIdx++
 }
 
 func (a *countAgg) HandleEmptyInputScalar() {

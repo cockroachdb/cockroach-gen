@@ -11,6 +11,7 @@ package colexec
 
 import (
 	"time"
+	"unsafe"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -26,51 +27,60 @@ import (
 var _ = execgen.UNSAFEGET
 
 func newAnyNotNullAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullBoolAgg))
 			return &anyNotNullBoolAgg{allocator: allocator}, nil
 		}
 	case types.BytesFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullBytesAgg))
 			return &anyNotNullBytesAgg{allocator: allocator}, nil
 		}
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullDecimalAgg))
 			return &anyNotNullDecimalAgg{allocator: allocator}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullInt16Agg))
 			return &anyNotNullInt16Agg{allocator: allocator}, nil
 		case 32:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullInt32Agg))
 			return &anyNotNullInt32Agg{allocator: allocator}, nil
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullInt64Agg))
 			return &anyNotNullInt64Agg{allocator: allocator}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullFloat64Agg))
 			return &anyNotNullFloat64Agg{allocator: allocator}, nil
 		}
 	case types.TimestampTZFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullTimestampAgg))
 			return &anyNotNullTimestampAgg{allocator: allocator}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullIntervalAgg))
 			return &anyNotNullIntervalAgg{allocator: allocator}, nil
 		}
 	}
@@ -81,7 +91,6 @@ func newAnyNotNullAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, e
 // first non-null value in the input column.
 type anyNotNullBoolAgg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []bool
@@ -90,6 +99,10 @@ type anyNotNullBoolAgg struct {
 	curAgg                      bool
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullBoolAgg{}
+
+const sizeOfAnyNotNullBoolAgg = unsafe.Sizeof(&anyNotNullBoolAgg{})
 
 func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -101,7 +114,6 @@ func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullBoolAgg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -118,22 +130,7 @@ func (a *anyNotNullBoolAgg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
 
@@ -265,6 +262,17 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullBoolAgg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullBoolAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -273,7 +281,6 @@ func (a *anyNotNullBoolAgg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullBytesAgg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         *coldata.Bytes
@@ -282,6 +289,10 @@ type anyNotNullBytesAgg struct {
 	curAgg                      []byte
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullBytesAgg{}
+
+const sizeOfAnyNotNullBytesAgg = unsafe.Sizeof(&anyNotNullBytesAgg{})
 
 func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -293,7 +304,6 @@ func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullBytesAgg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -310,22 +320,7 @@ func (a *anyNotNullBytesAgg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col.Set(a.curIdx, a.curAgg)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
 
@@ -461,6 +456,17 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullBytesAgg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col.Set(a.curIdx, a.curAgg)
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullBytesAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -469,7 +475,6 @@ func (a *anyNotNullBytesAgg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullDecimalAgg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []apd.Decimal
@@ -478,6 +483,10 @@ type anyNotNullDecimalAgg struct {
 	curAgg                      apd.Decimal
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullDecimalAgg{}
+
+const sizeOfAnyNotNullDecimalAgg = unsafe.Sizeof(&anyNotNullDecimalAgg{})
 
 func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -489,7 +498,6 @@ func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullDecimalAgg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -506,22 +514,7 @@ func (a *anyNotNullDecimalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx].Set(&a.curAgg)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
 
@@ -653,6 +646,17 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullDecimalAgg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx].Set(&a.curAgg)
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullDecimalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -661,7 +665,6 @@ func (a *anyNotNullDecimalAgg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullInt16Agg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []int16
@@ -670,6 +673,10 @@ type anyNotNullInt16Agg struct {
 	curAgg                      int16
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullInt16Agg{}
+
+const sizeOfAnyNotNullInt16Agg = unsafe.Sizeof(&anyNotNullInt16Agg{})
 
 func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -681,7 +688,6 @@ func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt16Agg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -698,22 +704,7 @@ func (a *anyNotNullInt16Agg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
 
@@ -845,6 +836,17 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullInt16Agg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullInt16Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -853,7 +855,6 @@ func (a *anyNotNullInt16Agg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullInt32Agg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []int32
@@ -862,6 +863,10 @@ type anyNotNullInt32Agg struct {
 	curAgg                      int32
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullInt32Agg{}
+
+const sizeOfAnyNotNullInt32Agg = unsafe.Sizeof(&anyNotNullInt32Agg{})
 
 func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -873,7 +878,6 @@ func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt32Agg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -890,22 +894,7 @@ func (a *anyNotNullInt32Agg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
 
@@ -1037,6 +1026,17 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullInt32Agg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullInt32Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -1045,7 +1045,6 @@ func (a *anyNotNullInt32Agg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullInt64Agg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []int64
@@ -1054,6 +1053,10 @@ type anyNotNullInt64Agg struct {
 	curAgg                      int64
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullInt64Agg{}
+
+const sizeOfAnyNotNullInt64Agg = unsafe.Sizeof(&anyNotNullInt64Agg{})
 
 func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1065,7 +1068,6 @@ func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullInt64Agg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -1082,22 +1084,7 @@ func (a *anyNotNullInt64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
 
@@ -1229,6 +1216,17 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullInt64Agg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullInt64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -1237,7 +1235,6 @@ func (a *anyNotNullInt64Agg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullFloat64Agg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []float64
@@ -1246,6 +1243,10 @@ type anyNotNullFloat64Agg struct {
 	curAgg                      float64
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullFloat64Agg{}
+
+const sizeOfAnyNotNullFloat64Agg = unsafe.Sizeof(&anyNotNullFloat64Agg{})
 
 func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1257,7 +1258,6 @@ func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullFloat64Agg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -1274,22 +1274,7 @@ func (a *anyNotNullFloat64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
 
@@ -1421,6 +1406,17 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullFloat64Agg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -1429,7 +1425,6 @@ func (a *anyNotNullFloat64Agg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullTimestampAgg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []time.Time
@@ -1438,6 +1433,10 @@ type anyNotNullTimestampAgg struct {
 	curAgg                      time.Time
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullTimestampAgg{}
+
+const sizeOfAnyNotNullTimestampAgg = unsafe.Sizeof(&anyNotNullTimestampAgg{})
 
 func (a *anyNotNullTimestampAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1449,7 +1448,6 @@ func (a *anyNotNullTimestampAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullTimestampAgg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -1466,22 +1464,7 @@ func (a *anyNotNullTimestampAgg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
 
@@ -1613,6 +1596,17 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *anyNotNullTimestampAgg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *anyNotNullTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
@@ -1621,7 +1615,6 @@ func (a *anyNotNullTimestampAgg) HandleEmptyInputScalar() {
 // first non-null value in the input column.
 type anyNotNullIntervalAgg struct {
 	allocator                   *colmem.Allocator
-	done                        bool
 	groups                      []bool
 	vec                         coldata.Vec
 	col                         []duration.Duration
@@ -1630,6 +1623,10 @@ type anyNotNullIntervalAgg struct {
 	curAgg                      duration.Duration
 	foundNonNullForCurrentGroup bool
 }
+
+var _ aggregateFunc = &anyNotNullIntervalAgg{}
+
+const sizeOfAnyNotNullIntervalAgg = unsafe.Sizeof(&anyNotNullIntervalAgg{})
 
 func (a *anyNotNullIntervalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1641,7 +1638,6 @@ func (a *anyNotNullIntervalAgg) Init(groups []bool, vec coldata.Vec) {
 
 func (a *anyNotNullIntervalAgg) Reset() {
 	a.curIdx = -1
-	a.done = false
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
 }
@@ -1658,22 +1654,7 @@ func (a *anyNotNullIntervalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// If we haven't found any non-nulls for this group so far, the output for
-		// this group should be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.col[a.curIdx] = a.curAgg
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Interval(), vec.Nulls()
 
@@ -1803,6 +1784,17 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		},
 	)
+}
+
+func (a *anyNotNullIntervalAgg) Flush() {
+	// If we haven't found any non-nulls for this group so far, the output for
+	// this group should be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
 }
 
 func (a *anyNotNullIntervalAgg) HandleEmptyInputScalar() {

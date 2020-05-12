@@ -33,7 +33,7 @@ var _ = execgen.UNSAFEGET
 func isSorterSupported(t *types.T, dir execinfrapb.Ordering_Column_Direction) bool {
 	switch dir {
 	case execinfrapb.Ordering_Column_ASC:
-		switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+		switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 		case types.BoolFamily:
 			switch t.Width() {
 			case -1:
@@ -82,7 +82,7 @@ func isSorterSupported(t *types.T, dir execinfrapb.Ordering_Column_Direction) bo
 			}
 		}
 	case execinfrapb.Ordering_Column_DESC:
-		switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+		switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 		case types.BoolFamily:
 			switch t.Width() {
 			case -1:
@@ -141,7 +141,7 @@ func newSingleSorter(
 	case true:
 		switch dir {
 		case execinfrapb.Ordering_Column_ASC:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 			case types.BoolFamily:
 				switch t.Width() {
 				case -1:
@@ -190,7 +190,7 @@ func newSingleSorter(
 				}
 			}
 		case execinfrapb.Ordering_Column_DESC:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 			case types.BoolFamily:
 				switch t.Width() {
 				case -1:
@@ -242,7 +242,7 @@ func newSingleSorter(
 	case false:
 		switch dir {
 		case execinfrapb.Ordering_Column_ASC:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 			case types.BoolFamily:
 				switch t.Width() {
 				case -1:
@@ -291,7 +291,7 @@ func newSingleSorter(
 				}
 			}
 		case execinfrapb.Ordering_Column_DESC:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 			case types.BoolFamily:
 				switch t.Width() {
 				case -1:

@@ -33891,12 +33891,12 @@ func GetProjectionRConstOperator(
 	case tree.BinaryOperator:
 		switch op {
 		case tree.Plus:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -33930,7 +33930,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -33961,7 +33961,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -33993,7 +33993,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34028,7 +34028,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.FloatFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34044,7 +34044,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34060,7 +34060,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34083,12 +34083,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.Minus:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34122,7 +34122,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34153,7 +34153,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34185,7 +34185,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34220,7 +34220,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.FloatFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34236,7 +34236,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34261,7 +34261,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34275,12 +34275,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.Mult:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34323,7 +34323,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34354,7 +34354,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34386,7 +34386,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34430,7 +34430,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.FloatFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34455,7 +34455,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34487,12 +34487,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.Div:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34526,7 +34526,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34557,7 +34557,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34589,7 +34589,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34624,7 +34624,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.FloatFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34640,7 +34640,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34666,12 +34666,12 @@ func GetProjectionRConstOperator(
 	case tree.ComparisonOperator:
 		switch op {
 		case tree.EQ:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BoolFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34687,7 +34687,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BytesFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34703,7 +34703,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34746,7 +34746,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34786,7 +34786,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34827,7 +34827,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34871,7 +34871,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -34915,7 +34915,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34931,7 +34931,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34945,12 +34945,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.NE:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BoolFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34966,7 +34966,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BytesFamily:
 						switch rightType.Width() {
 						case -1:
@@ -34982,7 +34982,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35025,7 +35025,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35065,7 +35065,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35106,7 +35106,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35150,7 +35150,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35194,7 +35194,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35210,7 +35210,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35224,12 +35224,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.LT:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BoolFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35245,7 +35245,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BytesFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35261,7 +35261,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35304,7 +35304,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35344,7 +35344,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35385,7 +35385,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35429,7 +35429,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35473,7 +35473,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35489,7 +35489,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35503,12 +35503,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.LE:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BoolFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35524,7 +35524,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BytesFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35540,7 +35540,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35583,7 +35583,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35623,7 +35623,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35664,7 +35664,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35708,7 +35708,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35752,7 +35752,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35768,7 +35768,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35782,12 +35782,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.GT:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BoolFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35803,7 +35803,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BytesFamily:
 						switch rightType.Width() {
 						case -1:
@@ -35819,7 +35819,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35862,7 +35862,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35902,7 +35902,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35943,7 +35943,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -35987,7 +35987,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -36031,7 +36031,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -36047,7 +36047,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:
@@ -36061,12 +36061,12 @@ func GetProjectionRConstOperator(
 				}
 			}
 		case tree.GE:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BoolFamily:
 						switch rightType.Width() {
 						case -1:
@@ -36082,7 +36082,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.BytesFamily:
 						switch rightType.Width() {
 						case -1:
@@ -36098,7 +36098,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -36141,7 +36141,7 @@ func GetProjectionRConstOperator(
 			case types.IntFamily:
 				switch leftType.Width() {
 				case 16:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -36181,7 +36181,7 @@ func GetProjectionRConstOperator(
 						}
 					}
 				case 32:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -36222,7 +36222,7 @@ func GetProjectionRConstOperator(
 					}
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -36266,7 +36266,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -36310,7 +36310,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.TimestampTZFamily:
 						switch rightType.Width() {
 						case -1:
@@ -36326,7 +36326,7 @@ func GetProjectionRConstOperator(
 				switch leftType.Width() {
 				case -1:
 				default:
-					switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntervalFamily:
 						switch rightType.Width() {
 						case -1:

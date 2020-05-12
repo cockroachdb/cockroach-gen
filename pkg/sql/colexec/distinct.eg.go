@@ -86,7 +86,7 @@ var _ = execgen.UNSAFEGET
 func newSingleDistinct(
 	input colexecbase.Operator, distinctColIdx int, outputCol []bool, t *types.T,
 ) (colexecbase.Operator, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
@@ -192,7 +192,7 @@ type partitioner interface {
 
 // newPartitioner returns a new partitioner on type t.
 func newPartitioner(t *types.T) (partitioner, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:

@@ -10,19 +10,22 @@
 package colexec
 
 import (
+	"unsafe"
+
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 )
 
 // Remove unused warning.
 var _ = colexecerror.InternalError
 
-func newBoolAndAgg() aggregateFunc {
+func newBoolAndAgg(allocator *colmem.Allocator) aggregateFunc {
+	allocator.AdjustMemoryUsage(int64(sizeOfBoolAndAgg))
 	return &boolAndAgg{}
 }
 
 type boolAndAgg struct {
-	done       bool
 	sawNonNull bool
 
 	groups []bool
@@ -32,6 +35,10 @@ type boolAndAgg struct {
 	curIdx int
 	curAgg bool
 }
+
+var _ aggregateFunc = &boolAndAgg{}
+
+const sizeOfBoolAndAgg = unsafe.Sizeof(&boolAndAgg{})
 
 func (b *boolAndAgg) Init(groups []bool, vec coldata.Vec) {
 	b.groups = groups
@@ -43,7 +50,6 @@ func (b *boolAndAgg) Init(groups []bool, vec coldata.Vec) {
 func (b *boolAndAgg) Reset() {
 	b.curIdx = -1
 	b.nulls.UnsetNulls()
-	b.done = false
 	// true indicates whether we are doing an AND aggregate or OR aggregate.
 	// For bool_and the true is true and for bool_or the true is false.
 	b.curAgg = true
@@ -61,20 +67,7 @@ func (b *boolAndAgg) SetOutputIndex(idx int) {
 }
 
 func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
-	if b.done {
-		return
-	}
 	inputLen := batch.Length()
-	if inputLen == 0 {
-		if !b.sawNonNull {
-			b.nulls.SetNull(b.curIdx)
-		} else {
-			b.vec[b.curIdx] = b.curAgg
-		}
-		b.curIdx++
-		b.done = true
-		return
-	}
 	vec, sel := batch.ColVec(int(inputIdxs[0])), batch.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
 	if sel != nil {
@@ -124,16 +117,25 @@ func (b *boolAndAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 	}
 }
 
+func (b *boolAndAgg) Flush() {
+	if !b.sawNonNull {
+		b.nulls.SetNull(b.curIdx)
+	} else {
+		b.vec[b.curIdx] = b.curAgg
+	}
+	b.curIdx++
+}
+
 func (b *boolAndAgg) HandleEmptyInputScalar() {
 	b.nulls.SetNull(0)
 }
 
-func newBoolOrAgg() aggregateFunc {
+func newBoolOrAgg(allocator *colmem.Allocator) aggregateFunc {
+	allocator.AdjustMemoryUsage(int64(sizeOfBoolOrAgg))
 	return &boolOrAgg{}
 }
 
 type boolOrAgg struct {
-	done       bool
 	sawNonNull bool
 
 	groups []bool
@@ -143,6 +145,10 @@ type boolOrAgg struct {
 	curIdx int
 	curAgg bool
 }
+
+var _ aggregateFunc = &boolOrAgg{}
+
+const sizeOfBoolOrAgg = unsafe.Sizeof(&boolOrAgg{})
 
 func (b *boolOrAgg) Init(groups []bool, vec coldata.Vec) {
 	b.groups = groups
@@ -154,7 +160,6 @@ func (b *boolOrAgg) Init(groups []bool, vec coldata.Vec) {
 func (b *boolOrAgg) Reset() {
 	b.curIdx = -1
 	b.nulls.UnsetNulls()
-	b.done = false
 	// false indicates whether we are doing an AND aggregate or OR aggregate.
 	// For bool_and the false is true and for bool_or the false is false.
 	b.curAgg = false
@@ -172,20 +177,7 @@ func (b *boolOrAgg) SetOutputIndex(idx int) {
 }
 
 func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
-	if b.done {
-		return
-	}
 	inputLen := batch.Length()
-	if inputLen == 0 {
-		if !b.sawNonNull {
-			b.nulls.SetNull(b.curIdx)
-		} else {
-			b.vec[b.curIdx] = b.curAgg
-		}
-		b.curIdx++
-		b.done = true
-		return
-	}
 	vec, sel := batch.ColVec(int(inputIdxs[0])), batch.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
 	if sel != nil {
@@ -233,6 +225,15 @@ func (b *boolOrAgg) Compute(batch coldata.Batch, inputIdxs []uint32) {
 
 		}
 	}
+}
+
+func (b *boolOrAgg) Flush() {
+	if !b.sawNonNull {
+		b.nulls.SetNull(b.curIdx)
+	} else {
+		b.vec[b.curIdx] = b.curAgg
+	}
+	b.curIdx++
 }
 
 func (b *boolOrAgg) HandleEmptyInputScalar() {

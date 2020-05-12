@@ -2059,12 +2059,12 @@ func GetCastOperator(
 		}, nil
 	}
 	leftType, rightType := fromType, toType
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[leftType.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 	case types.BoolFamily:
 		switch leftType.Width() {
 		case -1:
 		default:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 			case types.BoolFamily:
 				switch rightType.Width() {
 				case -1:
@@ -2118,7 +2118,7 @@ func GetCastOperator(
 		switch leftType.Width() {
 		case -1:
 		default:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 			case types.DecimalFamily:
 				switch rightType.Width() {
 				case -1:
@@ -2146,7 +2146,7 @@ func GetCastOperator(
 	case types.IntFamily:
 		switch leftType.Width() {
 		case 16:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 			case types.IntFamily:
 				switch rightType.Width() {
 				case 16:
@@ -2207,7 +2207,7 @@ func GetCastOperator(
 				}
 			}
 		case 32:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 			case types.IntFamily:
 				switch rightType.Width() {
 				case 16:
@@ -2269,7 +2269,7 @@ func GetCastOperator(
 			}
 		case -1:
 		default:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 			case types.IntFamily:
 				switch rightType.Width() {
 				case 16:
@@ -2334,7 +2334,7 @@ func GetCastOperator(
 		switch leftType.Width() {
 		case -1:
 		default:
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[rightType.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 			case types.FloatFamily:
 				switch rightType.Width() {
 				case -1:

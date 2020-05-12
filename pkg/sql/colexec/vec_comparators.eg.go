@@ -453,7 +453,7 @@ func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int
 }
 
 func GetVecComparator(t *types.T, numVecs int) vecComparator {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:

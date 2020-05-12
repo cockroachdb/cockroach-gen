@@ -42,7 +42,7 @@ func EncDatumRowsToColVec(
 	allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
-			switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 			case types.BoolFamily:
 				switch t.Width() {
 				case -1:

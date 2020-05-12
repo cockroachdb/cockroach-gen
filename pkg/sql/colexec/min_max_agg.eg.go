@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"math"
 	"time"
+	"unsafe"
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
@@ -33,51 +34,60 @@ var _ = execgen.UNSAFEGET
 var _ = colexecerror.InternalError
 
 func newMinAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminBoolAgg))
 			return &minBoolAgg{allocator: allocator}, nil
 		}
 	case types.BytesFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminBytesAgg))
 			return &minBytesAgg{allocator: allocator}, nil
 		}
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminDecimalAgg))
 			return &minDecimalAgg{allocator: allocator}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
+			allocator.AdjustMemoryUsage(int64(sizeOfminInt16Agg))
 			return &minInt16Agg{allocator: allocator}, nil
 		case 32:
+			allocator.AdjustMemoryUsage(int64(sizeOfminInt32Agg))
 			return &minInt32Agg{allocator: allocator}, nil
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminInt64Agg))
 			return &minInt64Agg{allocator: allocator}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminFloat64Agg))
 			return &minFloat64Agg{allocator: allocator}, nil
 		}
 	case types.TimestampTZFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminTimestampAgg))
 			return &minTimestampAgg{allocator: allocator}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfminIntervalAgg))
 			return &minIntervalAgg{allocator: allocator}, nil
 		}
 	}
@@ -86,7 +96,6 @@ func newMinAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
 
 type minBoolAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -106,6 +115,8 @@ type minBoolAgg struct {
 
 var _ aggregateFunc = &minBoolAgg{}
 
+const sizeOfminBoolAgg = unsafe.Sizeof(&minBoolAgg{})
+
 func (a *minBoolAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -118,7 +129,6 @@ func (a *minBoolAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minBoolAgg) CurrentOutputIndex() int {
@@ -133,28 +143,7 @@ func (a *minBoolAgg) SetOutputIndex(idx int) {
 }
 
 func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -365,13 +354,24 @@ func (a *minBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minBoolAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minBoolAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minBytesAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -391,6 +391,8 @@ type minBytesAgg struct {
 
 var _ aggregateFunc = &minBytesAgg{}
 
+const sizeOfminBytesAgg = unsafe.Sizeof(&minBytesAgg{})
+
 func (a *minBytesAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -403,7 +405,6 @@ func (a *minBytesAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minBytesAgg) CurrentOutputIndex() int {
@@ -418,28 +419,7 @@ func (a *minBytesAgg) SetOutputIndex(idx int) {
 }
 
 func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col.Set(a.curIdx, a.curAgg)
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -622,13 +602,24 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minBytesAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col.Set(a.curIdx, a.curAgg)
+	}
+	a.curIdx++
+}
+
 func (a *minBytesAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minDecimalAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -648,6 +639,8 @@ type minDecimalAgg struct {
 
 var _ aggregateFunc = &minDecimalAgg{}
 
+const sizeOfminDecimalAgg = unsafe.Sizeof(&minDecimalAgg{})
+
 func (a *minDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -660,7 +653,6 @@ func (a *minDecimalAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minDecimalAgg) CurrentOutputIndex() int {
@@ -675,28 +667,7 @@ func (a *minDecimalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx].Set(&a.curAgg)
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -875,13 +846,24 @@ func (a *minDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minDecimalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx].Set(&a.curAgg)
+	}
+	a.curIdx++
+}
+
 func (a *minDecimalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minInt16Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -901,6 +883,8 @@ type minInt16Agg struct {
 
 var _ aggregateFunc = &minInt16Agg{}
 
+const sizeOfminInt16Agg = unsafe.Sizeof(&minInt16Agg{})
+
 func (a *minInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -913,7 +897,6 @@ func (a *minInt16Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minInt16Agg) CurrentOutputIndex() int {
@@ -928,28 +911,7 @@ func (a *minInt16Agg) SetOutputIndex(idx int) {
 }
 
 func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -1172,13 +1134,24 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minInt16Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minInt16Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minInt32Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -1198,6 +1171,8 @@ type minInt32Agg struct {
 
 var _ aggregateFunc = &minInt32Agg{}
 
+const sizeOfminInt32Agg = unsafe.Sizeof(&minInt32Agg{})
+
 func (a *minInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -1210,7 +1185,6 @@ func (a *minInt32Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minInt32Agg) CurrentOutputIndex() int {
@@ -1225,28 +1199,7 @@ func (a *minInt32Agg) SetOutputIndex(idx int) {
 }
 
 func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -1469,13 +1422,24 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minInt32Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minInt32Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minInt64Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -1495,6 +1459,8 @@ type minInt64Agg struct {
 
 var _ aggregateFunc = &minInt64Agg{}
 
+const sizeOfminInt64Agg = unsafe.Sizeof(&minInt64Agg{})
+
 func (a *minInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -1507,7 +1473,6 @@ func (a *minInt64Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minInt64Agg) CurrentOutputIndex() int {
@@ -1522,28 +1487,7 @@ func (a *minInt64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -1766,13 +1710,24 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minInt64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minInt64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minFloat64Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -1792,6 +1747,8 @@ type minFloat64Agg struct {
 
 var _ aggregateFunc = &minFloat64Agg{}
 
+const sizeOfminFloat64Agg = unsafe.Sizeof(&minFloat64Agg{})
+
 func (a *minFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -1804,7 +1761,6 @@ func (a *minFloat64Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minFloat64Agg) CurrentOutputIndex() int {
@@ -1819,28 +1775,7 @@ func (a *minFloat64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -2095,13 +2030,24 @@ func (a *minFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minFloat64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minTimestampAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -2121,6 +2067,8 @@ type minTimestampAgg struct {
 
 var _ aggregateFunc = &minTimestampAgg{}
 
+const sizeOfminTimestampAgg = unsafe.Sizeof(&minTimestampAgg{})
+
 func (a *minTimestampAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -2133,7 +2081,6 @@ func (a *minTimestampAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minTimestampAgg) CurrentOutputIndex() int {
@@ -2148,28 +2095,7 @@ func (a *minTimestampAgg) SetOutputIndex(idx int) {
 }
 
 func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -2376,13 +2302,24 @@ func (a *minTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minTimestampAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type minIntervalAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -2402,6 +2339,8 @@ type minIntervalAgg struct {
 
 var _ aggregateFunc = &minIntervalAgg{}
 
+const sizeOfminIntervalAgg = unsafe.Sizeof(&minIntervalAgg{})
+
 func (a *minIntervalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -2414,7 +2353,6 @@ func (a *minIntervalAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *minIntervalAgg) CurrentOutputIndex() int {
@@ -2429,28 +2367,7 @@ func (a *minIntervalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Interval(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -2629,56 +2546,77 @@ func (a *minIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *minIntervalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *minIntervalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 func newMaxAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxBoolAgg))
 			return &maxBoolAgg{allocator: allocator}, nil
 		}
 	case types.BytesFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxBytesAgg))
 			return &maxBytesAgg{allocator: allocator}, nil
 		}
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxDecimalAgg))
 			return &maxDecimalAgg{allocator: allocator}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxInt16Agg))
 			return &maxInt16Agg{allocator: allocator}, nil
 		case 32:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxInt32Agg))
 			return &maxInt32Agg{allocator: allocator}, nil
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxInt64Agg))
 			return &maxInt64Agg{allocator: allocator}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxFloat64Agg))
 			return &maxFloat64Agg{allocator: allocator}, nil
 		}
 	case types.TimestampTZFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxTimestampAgg))
 			return &maxTimestampAgg{allocator: allocator}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
+			allocator.AdjustMemoryUsage(int64(sizeOfmaxIntervalAgg))
 			return &maxIntervalAgg{allocator: allocator}, nil
 		}
 	}
@@ -2687,7 +2625,6 @@ func newMaxAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
 
 type maxBoolAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -2707,6 +2644,8 @@ type maxBoolAgg struct {
 
 var _ aggregateFunc = &maxBoolAgg{}
 
+const sizeOfmaxBoolAgg = unsafe.Sizeof(&maxBoolAgg{})
+
 func (a *maxBoolAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -2719,7 +2658,6 @@ func (a *maxBoolAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxBoolAgg) CurrentOutputIndex() int {
@@ -2734,28 +2672,7 @@ func (a *maxBoolAgg) SetOutputIndex(idx int) {
 }
 
 func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -2966,13 +2883,24 @@ func (a *maxBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxBoolAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *maxBoolAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxBytesAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -2992,6 +2920,8 @@ type maxBytesAgg struct {
 
 var _ aggregateFunc = &maxBytesAgg{}
 
+const sizeOfmaxBytesAgg = unsafe.Sizeof(&maxBytesAgg{})
+
 func (a *maxBytesAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -3004,7 +2934,6 @@ func (a *maxBytesAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxBytesAgg) CurrentOutputIndex() int {
@@ -3019,28 +2948,7 @@ func (a *maxBytesAgg) SetOutputIndex(idx int) {
 }
 
 func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col.Set(a.curIdx, a.curAgg)
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -3223,13 +3131,24 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxBytesAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col.Set(a.curIdx, a.curAgg)
+	}
+	a.curIdx++
+}
+
 func (a *maxBytesAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxDecimalAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -3249,6 +3168,8 @@ type maxDecimalAgg struct {
 
 var _ aggregateFunc = &maxDecimalAgg{}
 
+const sizeOfmaxDecimalAgg = unsafe.Sizeof(&maxDecimalAgg{})
+
 func (a *maxDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -3261,7 +3182,6 @@ func (a *maxDecimalAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxDecimalAgg) CurrentOutputIndex() int {
@@ -3276,28 +3196,7 @@ func (a *maxDecimalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx].Set(&a.curAgg)
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -3476,13 +3375,24 @@ func (a *maxDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxDecimalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx].Set(&a.curAgg)
+	}
+	a.curIdx++
+}
+
 func (a *maxDecimalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxInt16Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -3502,6 +3412,8 @@ type maxInt16Agg struct {
 
 var _ aggregateFunc = &maxInt16Agg{}
 
+const sizeOfmaxInt16Agg = unsafe.Sizeof(&maxInt16Agg{})
+
 func (a *maxInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -3514,7 +3426,6 @@ func (a *maxInt16Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxInt16Agg) CurrentOutputIndex() int {
@@ -3529,28 +3440,7 @@ func (a *maxInt16Agg) SetOutputIndex(idx int) {
 }
 
 func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -3773,13 +3663,24 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxInt16Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *maxInt16Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxInt32Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -3799,6 +3700,8 @@ type maxInt32Agg struct {
 
 var _ aggregateFunc = &maxInt32Agg{}
 
+const sizeOfmaxInt32Agg = unsafe.Sizeof(&maxInt32Agg{})
+
 func (a *maxInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -3811,7 +3714,6 @@ func (a *maxInt32Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxInt32Agg) CurrentOutputIndex() int {
@@ -3826,28 +3728,7 @@ func (a *maxInt32Agg) SetOutputIndex(idx int) {
 }
 
 func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -4070,13 +3951,24 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxInt32Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *maxInt32Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxInt64Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -4096,6 +3988,8 @@ type maxInt64Agg struct {
 
 var _ aggregateFunc = &maxInt64Agg{}
 
+const sizeOfmaxInt64Agg = unsafe.Sizeof(&maxInt64Agg{})
+
 func (a *maxInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -4108,7 +4002,6 @@ func (a *maxInt64Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxInt64Agg) CurrentOutputIndex() int {
@@ -4123,28 +4016,7 @@ func (a *maxInt64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -4367,13 +4239,24 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxInt64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *maxInt64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxFloat64Agg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -4393,6 +4276,8 @@ type maxFloat64Agg struct {
 
 var _ aggregateFunc = &maxFloat64Agg{}
 
+const sizeOfmaxFloat64Agg = unsafe.Sizeof(&maxFloat64Agg{})
+
 func (a *maxFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -4405,7 +4290,6 @@ func (a *maxFloat64Agg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxFloat64Agg) CurrentOutputIndex() int {
@@ -4420,28 +4304,7 @@ func (a *maxFloat64Agg) SetOutputIndex(idx int) {
 }
 
 func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -4696,13 +4559,24 @@ func (a *maxFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxFloat64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *maxFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxTimestampAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -4722,6 +4596,8 @@ type maxTimestampAgg struct {
 
 var _ aggregateFunc = &maxTimestampAgg{}
 
+const sizeOfmaxTimestampAgg = unsafe.Sizeof(&maxTimestampAgg{})
+
 func (a *maxTimestampAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -4734,7 +4610,6 @@ func (a *maxTimestampAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxTimestampAgg) CurrentOutputIndex() int {
@@ -4749,28 +4624,7 @@ func (a *maxTimestampAgg) SetOutputIndex(idx int) {
 }
 
 func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -4977,13 +4831,24 @@ func (a *maxTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	)
 }
 
+func (a *maxTimestampAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
+}
+
 func (a *maxTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
 type maxIntervalAgg struct {
 	allocator *colmem.Allocator
-	done      bool
 	groups    []bool
 	curIdx    int
 	// curAgg holds the running min/max, so we can index into the slice once per
@@ -5003,6 +4868,8 @@ type maxIntervalAgg struct {
 
 var _ aggregateFunc = &maxIntervalAgg{}
 
+const sizeOfmaxIntervalAgg = unsafe.Sizeof(&maxIntervalAgg{})
+
 func (a *maxIntervalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
@@ -5015,7 +4882,6 @@ func (a *maxIntervalAgg) Reset() {
 	a.curIdx = -1
 	a.foundNonNullForCurrentGroup = false
 	a.nulls.UnsetNulls()
-	a.done = false
 }
 
 func (a *maxIntervalAgg) CurrentOutputIndex() int {
@@ -5030,28 +4896,7 @@ func (a *maxIntervalAgg) SetOutputIndex(idx int) {
 }
 
 func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
-	if a.done {
-		return
-	}
 	inputLen := b.Length()
-	if inputLen == 0 {
-		// The aggregation is finished. Flush the last value. If we haven't found
-		// any non-nulls for this group so far, the output for this group should
-		// be null.
-		if !a.foundNonNullForCurrentGroup {
-			a.nulls.SetNull(a.curIdx)
-		} else {
-			a.allocator.PerformOperation(
-				[]coldata.Vec{a.vec},
-				func() {
-					a.col[a.curIdx] = a.curAgg
-				},
-			)
-		}
-		a.curIdx++
-		a.done = true
-		return
-	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Interval(), vec.Nulls()
 	a.allocator.PerformOperation(
@@ -5228,6 +5073,18 @@ func (a *maxIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		},
 	)
+}
+
+func (a *maxIntervalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col[a.curIdx] = a.curAgg
+	}
+	a.curIdx++
 }
 
 func (a *maxIntervalAgg) HandleEmptyInputScalar() {

@@ -54,7 +54,7 @@ func GetInProjectionOperator(
 ) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, types.Bool, resultIdx)
 	var err error
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
@@ -208,7 +208,7 @@ func GetInOperator(
 	t *types.T, input colexecbase.Operator, colIdx int, datumTuple *tree.DTuple, negate bool,
 ) (colexecbase.Operator, error) {
 	var err error
-	switch typeconv.TypeFamilyToCanonicalTypeFamily[t.Family()] {
+	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
