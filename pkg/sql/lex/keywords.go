@@ -7,6 +7,7 @@ var KeywordsCategories = map[string]string{
 	"action":                    "U",
 	"add":                       "U",
 	"admin":                     "U",
+	"after":                     "U",
 	"aggregate":                 "U",
 	"all":                       "R",
 	"alter":                     "U",
@@ -21,9 +22,11 @@ var KeywordsCategories = map[string]string{
 	"asc":                       "R",
 	"asymmetric":                "R",
 	"at":                        "U",
+	"attribute":                 "U",
 	"authorization":             "U",
 	"automatic":                 "U",
 	"backup":                    "U",
+	"before":                    "U",
 	"begin":                     "U",
 	"between":                   "C",
 	"bigint":                    "C",
@@ -257,6 +260,7 @@ var KeywordsCategories = map[string]string{
 	"overlaps":                  "T",
 	"overlay":                   "C",
 	"owned":                     "U",
+	"owner":                     "U",
 	"parent":                    "U",
 	"partial":                   "U",
 	"partition":                 "U",
@@ -417,6 +421,7 @@ var KeywordNames = []string{
 	"action",
 	"add",
 	"admin",
+	"after",
 	"aggregate",
 	"all",
 	"alter",
@@ -431,9 +436,11 @@ var KeywordNames = []string{
 	"asc",
 	"asymmetric",
 	"at",
+	"attribute",
 	"authorization",
 	"automatic",
 	"backup",
+	"before",
 	"begin",
 	"between",
 	"bigint",
@@ -667,6 +674,7 @@ var KeywordNames = []string{
 	"overlaps",
 	"overlay",
 	"owned",
+	"owner",
 	"parent",
 	"partial",
 	"partition",
@@ -836,6 +844,8 @@ func GetKeywordID(k string) int32 {
 		return ADD
 	case "admin":
 		return ADMIN
+	case "after":
+		return AFTER
 	case "aggregate":
 		return AGGREGATE
 	case "all":
@@ -864,12 +874,16 @@ func GetKeywordID(k string) int32 {
 		return ASYMMETRIC
 	case "at":
 		return AT
+	case "attribute":
+		return ATTRIBUTE
 	case "authorization":
 		return AUTHORIZATION
 	case "automatic":
 		return AUTOMATIC
 	case "backup":
 		return BACKUP
+	case "before":
+		return BEFORE
 	case "begin":
 		return BEGIN
 	case "between":
@@ -1336,6 +1350,8 @@ func GetKeywordID(k string) int32 {
 		return OVERLAY
 	case "owned":
 		return OWNED
+	case "owner":
+		return OWNER
 	case "parent":
 		return PARENT
 	case "partial":

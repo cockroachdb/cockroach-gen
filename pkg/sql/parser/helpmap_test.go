@@ -13,6 +13,7 @@ var expectedHelpStrings = []string{
 	"ALTER ROLE",
 	"ALTER SEQUENCE",
 	"ALTER TABLE",
+	"ALTER TYPE",
 	"ALTER VIEW",
 	"ALTER",
 	"BACKUP",
