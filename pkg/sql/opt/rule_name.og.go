@@ -96,6 +96,7 @@ const (
 	PushAggDistinctIntoScalarGroupBy
 	PushAggFilterIntoScalarGroupBy
 	ConvertCountToCountRows
+	InlineConstVar
 	InlineProjectConstants
 	InlineSelectConstants
 	InlineJoinConstantsLeft
@@ -213,7 +214,6 @@ const (
 	PushSelectIntoJoinLeft
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
-	InlineConstVar
 	PushSelectIntoProjectSet
 	PushFilterIntoSetOp
 	EliminateUnionAllLeft
