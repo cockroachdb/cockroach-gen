@@ -1167,9 +1167,7 @@ func (_e *explorer) exploreGroupBy(
 											}
 											_e.funcs.MakeProjectFromPassthroughAggs(_root, _e.f.ConstructLimit(
 												input,
-												_e.f.ConstructConst(
-													tree.NewDInt(1),
-												),
+												_e.funcs.IntConst(tree.NewDInt(1)),
 												_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
 											), aggregations)
 											if _e.o.appliedRule != nil {
@@ -1210,9 +1208,7 @@ func (_e *explorer) exploreGroupBy(
 										}
 										_e.funcs.MakeProjectFromPassthroughAggs(_root, _e.f.ConstructLimit(
 											input,
-											_e.f.ConstructConst(
-												tree.NewDInt(1),
-											),
+											_e.funcs.IntConst(tree.NewDInt(1)),
 											_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
 										), aggregations)
 										if _e.o.appliedRule != nil {
@@ -1290,9 +1286,7 @@ func (_e *explorer) exploreScalarGroupBy(
 												),
 											},
 										),
-										_e.f.ConstructConst(
-											tree.NewDInt(1),
-										),
+										_e.funcs.IntConst(tree.NewDInt(1)),
 										_e.funcs.MakeOrderingChoiceFromColumn(agg.Op(), col),
 									),
 									Aggregations: memo.AggregationsExpr{

@@ -7043,8 +7043,11 @@ func (e *VariableExpr) DataType() *types.T {
 type ConstExpr struct {
 	Value tree.Datum
 
+	// Typ is the type of the constant. It is necessary because
+	// Value.ResolvedType() loses information in some cases.
 	Typ *types.T
-	id  opt.ScalarID
+
+	id opt.ScalarID
 }
 
 var _ opt.ScalarExpr = &ConstExpr{}
@@ -17024,13 +17027,14 @@ func (m *Memo) MemoizeVariable(
 
 func (m *Memo) MemoizeConst(
 	value tree.Datum,
+	typ *types.T,
 ) *ConstExpr {
 	const size = int64(unsafe.Sizeof(ConstExpr{}))
 	e := &ConstExpr{
 		Value: value,
+		Typ:   typ,
 		id:    m.NextID(),
 	}
-	e.Typ = InferType(m, e)
 	interned := m.interner.InternConst(e)
 	if interned == e {
 		if m.newGroupFn != nil {
@@ -22123,11 +22127,13 @@ func (in *interner) InternConst(val *ConstExpr) *ConstExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ConstOp)
 	in.hasher.HashDatum(val.Value)
+	in.hasher.HashType(val.Typ)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ConstExpr); ok {
-			if in.hasher.IsDatumEqual(val.Value, existing.Value) {
+			if in.hasher.IsDatumEqual(val.Value, existing.Value) &&
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
 		}

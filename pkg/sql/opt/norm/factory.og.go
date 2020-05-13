@@ -8055,9 +8055,7 @@ func (_f *Factory) ConstructDistinctOn(
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
 					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
 						input,
-						_f.ConstructConst(
-							tree.NewDInt(1),
-						),
+						_f.funcs.IntConst(tree.NewDInt(1)),
 						_f.funcs.GroupingInputOrdering(groupingPrivate),
 					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
 					if _f.appliedRule != nil {
@@ -8282,9 +8280,7 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
 					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
 						input,
-						_f.ConstructConst(
-							tree.NewDInt(1),
-						),
+						_f.funcs.IntConst(tree.NewDInt(1)),
 						_f.funcs.GroupingInputOrdering(groupingPrivate),
 					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
 					if _f.appliedRule != nil {
@@ -8558,7 +8554,8 @@ func (_f *Factory) ConstructLimit(
 		_offset, _ := input.(*memo.OffsetExpr)
 		if _offset != nil {
 			input := _offset.Input
-			_const, _ := _offset.Offset.(*memo.ConstExpr)
+			offsetExpr := _offset.Offset
+			_const, _ := offsetExpr.(*memo.ConstExpr)
 			if _const != nil {
 				offset := _const.Value
 				if _f.funcs.IsPositiveLimit(offset) {
@@ -8574,14 +8571,10 @@ func (_f *Factory) ConstructLimit(
 										_expr := _f.ConstructOffset(
 											_f.ConstructLimit(
 												input,
-												_f.ConstructConst(
-													_f.funcs.AddConstInts(offset, limit),
-												),
+												_f.funcs.AddConstInts(offset, limit),
 												limitOrdering,
 											),
-											_f.ConstructConst(
-												offset,
-											),
+											offsetExpr,
 											offsetOrdering,
 										)
 										if _f.appliedRule != nil {
@@ -8634,7 +8627,8 @@ func (_f *Factory) ConstructLimit(
 			right := _leftJoin.Right
 			on := _leftJoin.On
 			private := &_leftJoin.JoinPrivate
-			_const, _ := limit.(*memo.ConstExpr)
+			limitExpr := limit
+			_const, _ := limitExpr.(*memo.ConstExpr)
 			if _const != nil {
 				limit := _const.Value
 				if _f.funcs.IsPositiveLimit(limit) {
@@ -8645,18 +8639,14 @@ func (_f *Factory) ConstructLimit(
 									_f.ConstructLeftJoin(
 										_f.ConstructLimit(
 											left,
-											_f.ConstructConst(
-												limit,
-											),
+											limitExpr,
 											_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(left)),
 										),
 										right,
 										on,
 										private,
 									),
-									_f.ConstructConst(
-										limit,
-									),
+									limitExpr,
 									ordering,
 								)
 								if _f.appliedRule != nil {
@@ -9244,9 +9234,7 @@ func (_f *Factory) ConstructExists(
 						_expr := _f.ConstructExists(
 							_f.ConstructLimit(
 								input,
-								_f.ConstructConst(
-									tree.NewDInt(1),
-								),
+								_f.funcs.IntConst(tree.NewDInt(1)),
 								_f.funcs.EmptyOrdering(),
 							),
 							_f.funcs.MakeLimited(subqueryPrivate),
@@ -9306,8 +9294,9 @@ func (_f *Factory) ConstructVariable(
 // having any datum type that's legal in the expression's context.
 func (_f *Factory) ConstructConst(
 	value tree.Datum,
+	typ *types.T,
 ) opt.ScalarExpr {
-	e := _f.mem.MemoizeConst(value)
+	e := _f.mem.MemoizeConst(value, typ)
 	return _f.onConstructScalar(e)
 }
 
@@ -18459,6 +18448,7 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ConstOp:
 		return f.ConstructConst(
 			args[0].(tree.Datum),
+			args[1].(*types.T),
 		)
 	case opt.NullOp:
 		return f.ConstructNull(
