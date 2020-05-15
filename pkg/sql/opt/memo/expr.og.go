@@ -8037,6 +8037,112 @@ func (e *NotExpr) DataType() *types.T {
 	return types.Bool
 }
 
+// IsTupleNullExpr is the boolean expression with a tuple input that evaluates to
+// true if the tuple is null or all elements in the tuple are null.
+type IsTupleNullExpr struct {
+	Input opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &IsTupleNullExpr{}
+
+func (e *IsTupleNullExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *IsTupleNullExpr) Op() opt.Operator {
+	return opt.IsTupleNullOp
+}
+
+func (e *IsTupleNullExpr) ChildCount() int {
+	return 1
+}
+
+func (e *IsTupleNullExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *IsTupleNullExpr) Private() interface{} {
+	return nil
+}
+
+func (e *IsTupleNullExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IsTupleNullExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *IsTupleNullExpr) DataType() *types.T {
+	return types.Bool
+}
+
+// IsTupleNotNullExpr is the boolean expression with a tuple input that evaluates to
+// true if the tuple is not null and all elements in the tuple are not null.
+type IsTupleNotNullExpr struct {
+	Input opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &IsTupleNotNullExpr{}
+
+func (e *IsTupleNotNullExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *IsTupleNotNullExpr) Op() opt.Operator {
+	return opt.IsTupleNotNullOp
+}
+
+func (e *IsTupleNotNullExpr) ChildCount() int {
+	return 1
+}
+
+func (e *IsTupleNotNullExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *IsTupleNotNullExpr) Private() interface{} {
+	return nil
+}
+
+func (e *IsTupleNotNullExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *IsTupleNotNullExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *IsTupleNotNullExpr) DataType() *types.T {
+	return types.Bool
+}
+
 type EqExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
@@ -9063,6 +9169,8 @@ func (e *NotRegIMatchExpr) DataType() *types.T {
 	return types.Bool
 }
 
+// IsExpr maps to the IS NOT DISTINCT FROM operator which is equivalent to IS for
+// non-tuples. See IsTupleNull for the tuple-specific IS NULL operator.
 type IsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
@@ -9120,6 +9228,9 @@ func (e *IsExpr) DataType() *types.T {
 	return types.Bool
 }
 
+// IsNotExpr is the inverse of Is. It maps to the IS DISTINCT FROM operator which is
+// equivalent to IS NOT for non-tuples. See IsTupleNotNull for the
+// tuple-specific IS NOT NULL operator.
 type IsNotExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
@@ -17194,6 +17305,44 @@ func (m *Memo) MemoizeNot(
 	return interned
 }
 
+func (m *Memo) MemoizeIsTupleNull(
+	input opt.ScalarExpr,
+) *IsTupleNullExpr {
+	const size = int64(unsafe.Sizeof(IsTupleNullExpr{}))
+	e := &IsTupleNullExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	interned := m.interner.InternIsTupleNull(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeIsTupleNotNull(
+	input opt.ScalarExpr,
+) *IsTupleNotNullExpr {
+	const size = int64(unsafe.Sizeof(IsTupleNotNullExpr{}))
+	e := &IsTupleNotNullExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	interned := m.interner.InternIsTupleNotNull(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeEq(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -20518,6 +20667,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternRange(t)
 	case *NotExpr:
 		return in.InternNot(t)
+	case *IsTupleNullExpr:
+		return in.InternIsTupleNull(t)
+	case *IsTupleNotNullExpr:
+		return in.InternIsTupleNotNull(t)
 	case *EqExpr:
 		return in.InternEq(t)
 	case *LtExpr:
@@ -22445,6 +22598,42 @@ func (in *interner) InternNot(val *NotExpr) *NotExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*NotExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIsTupleNull(val *IsTupleNullExpr) *IsTupleNullExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IsTupleNullOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IsTupleNullExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternIsTupleNotNull(val *IsTupleNotNullExpr) *IsTupleNotNullExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.IsTupleNotNullOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*IsTupleNotNullExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}

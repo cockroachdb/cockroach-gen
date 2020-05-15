@@ -9811,6 +9811,90 @@ func (_f *Factory) ConstructNot(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructIsTupleNull constructs an expression for the IsTupleNull operator.
+// IsTupleNull is the boolean expression with a tuple input that evaluates to
+// true if the tuple is null or all elements in the tuple are null.
+func (_f *Factory) ConstructIsTupleNull(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldNullTupleIsTupleNull]
+	{
+		_tuple, _ := input.(*memo.TupleExpr)
+		if _tuple != nil {
+			if _f.funcs.HasAllNullElements(input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullTupleIsTupleNull) {
+					_expr := _f.ConstructTrue()
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullTupleIsTupleNull, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldNonNullTupleIsTupleNull]
+	{
+		_tuple, _ := input.(*memo.TupleExpr)
+		if _tuple != nil {
+			if _f.funcs.HasNonNullElement(input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullTupleIsTupleNull) {
+					_expr := _f.ConstructFalse()
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNonNullTupleIsTupleNull, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeIsTupleNull(input)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructIsTupleNotNull constructs an expression for the IsTupleNotNull operator.
+// IsTupleNotNull is the boolean expression with a tuple input that evaluates to
+// true if the tuple is not null and all elements in the tuple are not null.
+func (_f *Factory) ConstructIsTupleNotNull(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldNonNullTupleIsTupleNotNull]
+	{
+		_tuple, _ := input.(*memo.TupleExpr)
+		if _tuple != nil {
+			if _f.funcs.HasAllNonNullElements(input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullTupleIsTupleNotNull) {
+					_expr := _f.ConstructTrue()
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNonNullTupleIsTupleNotNull, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldNullTupleIsTupleNotNull]
+	{
+		_tuple, _ := input.(*memo.TupleExpr)
+		if _tuple != nil {
+			if _f.funcs.HasNullElement(input) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullTupleIsTupleNotNull) {
+					_expr := _f.ConstructFalse()
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldNullTupleIsTupleNotNull, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeIsTupleNotNull(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructEq constructs an expression for the Eq operator.
 func (_f *Factory) ConstructEq(
 	left opt.ScalarExpr,
@@ -12262,6 +12346,8 @@ func (_f *Factory) ConstructNotRegIMatch(
 }
 
 // ConstructIs constructs an expression for the Is operator.
+// Is maps to the IS NOT DISTINCT FROM operator which is equivalent to IS for
+// non-tuples. See IsTupleNull for the tuple-specific IS NULL operator.
 func (_f *Factory) ConstructIs(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -12406,6 +12492,9 @@ func (_f *Factory) ConstructIs(
 }
 
 // ConstructIsNot constructs an expression for the IsNot operator.
+// IsNot is the inverse of Is. It maps to the IS DISTINCT FROM operator which is
+// equivalent to IS NOT for non-tuples. See IsTupleNotNull for the
+// tuple-specific IS NOT NULL operator.
 func (_f *Factory) ConstructIsNot(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -16062,6 +16151,20 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.IsTupleNullExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructIsTupleNull(input)
+		}
+		return t
+
+	case *memo.IsTupleNotNullExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructIsTupleNotNull(input)
+		}
+		return t
+
 	case *memo.EqExpr:
 		left := replace(t.Left).(opt.ScalarExpr)
 		right := replace(t.Right).(opt.ScalarExpr)
@@ -17434,6 +17537,16 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.IsTupleNullExpr:
+		return f.ConstructIsTupleNull(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.IsTupleNotNullExpr:
+		return f.ConstructIsTupleNotNull(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.EqExpr:
 		return f.ConstructEq(
 			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
@@ -18483,6 +18596,14 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.NotOp:
 		return f.ConstructNot(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.IsTupleNullOp:
+		return f.ConstructIsTupleNull(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.IsTupleNotNullOp:
+		return f.ConstructIsTupleNotNull(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.EqOp:

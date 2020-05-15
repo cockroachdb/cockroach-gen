@@ -38,8 +38,12 @@ const (
 	FoldNullComparisonRight
 	FoldIsNull
 	FoldNonNullIsNull
+	FoldNullTupleIsTupleNull
+	FoldNonNullTupleIsTupleNull
 	FoldIsNotNull
 	FoldNonNullIsNotNull
+	FoldNonNullTupleIsTupleNotNull
+	FoldNullTupleIsTupleNotNull
 	CommuteNullIs
 	DecorrelateJoin
 	DecorrelateProjectSet
