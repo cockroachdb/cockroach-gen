@@ -10041,6 +10041,66 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [NormalizeCmpTimeZoneFunction]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestampTZ(right) {
+						ts := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestamp(ts) {
+							if !_f.funcs.IsConstValueOrTuple(ts) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunction) {
+									_expr := _f.ConstructEq(
+										ts,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunction, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunctionTZ]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestamp(right) {
+						tz := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestampTZ(tz) {
+							if !_f.funcs.IsConstValueOrTuple(tz) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunctionTZ) {
+									_expr := _f.ConstructEq(
+										tz,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunctionTZ, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -10341,6 +10401,66 @@ func (_f *Factory) ConstructLt(
 		}
 	}
 
+	// [NormalizeCmpTimeZoneFunction]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestampTZ(right) {
+						ts := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestamp(ts) {
+							if !_f.funcs.IsConstValueOrTuple(ts) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunction) {
+									_expr := _f.ConstructLt(
+										ts,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunction, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunctionTZ]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestamp(right) {
+						tz := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestampTZ(tz) {
+							if !_f.funcs.IsConstValueOrTuple(tz) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunctionTZ) {
+									_expr := _f.ConstructLt(
+										tz,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunctionTZ, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -10570,6 +10690,66 @@ func (_f *Factory) ConstructGt(
 					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunction]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestampTZ(right) {
+						ts := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestamp(ts) {
+							if !_f.funcs.IsConstValueOrTuple(ts) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunction) {
+									_expr := _f.ConstructGt(
+										ts,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunction, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunctionTZ]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestamp(right) {
+						tz := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestampTZ(tz) {
+							if !_f.funcs.IsConstValueOrTuple(tz) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunctionTZ) {
+									_expr := _f.ConstructGt(
+										tz,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunctionTZ, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -10807,6 +10987,66 @@ func (_f *Factory) ConstructLe(
 		}
 	}
 
+	// [NormalizeCmpTimeZoneFunction]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestampTZ(right) {
+						ts := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestamp(ts) {
+							if !_f.funcs.IsConstValueOrTuple(ts) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunction) {
+									_expr := _f.ConstructLe(
+										ts,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunction, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunctionTZ]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestamp(right) {
+						tz := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestampTZ(tz) {
+							if !_f.funcs.IsConstValueOrTuple(tz) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunctionTZ) {
+									_expr := _f.ConstructLe(
+										tz,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunctionTZ, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -11036,6 +11276,66 @@ func (_f *Factory) ConstructGe(
 					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunction]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestampTZ(right) {
+						ts := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestamp(ts) {
+							if !_f.funcs.IsConstValueOrTuple(ts) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunction) {
+									_expr := _f.ConstructGe(
+										ts,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunction, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [NormalizeCmpTimeZoneFunctionTZ]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "timezone") {
+				if opt.IsConstValueOp(right) {
+					if _f.funcs.IsTimestamp(right) {
+						tz := _f.funcs.SecondScalarListExpr(args)
+						if _f.funcs.IsTimestampTZ(tz) {
+							if !_f.funcs.IsConstValueOrTuple(tz) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpTimeZoneFunctionTZ) {
+									_expr := _f.ConstructGe(
+										tz,
+										_f.funcs.MakeTimeZoneFunction(_f.funcs.FirstScalarListExpr(args), right),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.NormalizeCmpTimeZoneFunctionTZ, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

@@ -45,6 +45,8 @@ const (
 	FoldNonNullTupleIsTupleNotNull
 	FoldNullTupleIsTupleNotNull
 	CommuteNullIs
+	NormalizeCmpTimeZoneFunction
+	NormalizeCmpTimeZoneFunctionTZ
 	DecorrelateJoin
 	DecorrelateProjectSet
 	TryDecorrelateSelect
