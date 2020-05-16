@@ -36,8 +36,12 @@ func (_e *explorer) exploreGroupMember(
 		return _e.exploreScalarGroupBy(state, t, ordinal)
 	case *memo.DistinctOnExpr:
 		return _e.exploreDistinctOn(state, t, ordinal)
+	case *memo.EnsureDistinctOnExpr:
+		return _e.exploreEnsureDistinctOn(state, t, ordinal)
 	case *memo.UpsertDistinctOnExpr:
 		return _e.exploreUpsertDistinctOn(state, t, ordinal)
+	case *memo.EnsureUpsertDistinctOnExpr:
+		return _e.exploreEnsureUpsertDistinctOn(state, t, ordinal)
 	case *memo.LimitExpr:
 		return _e.exploreLimit(state, t, ordinal)
 	}
@@ -1349,6 +1353,37 @@ func (_e *explorer) exploreDistinctOn(
 	return _fullyExplored
 }
 
+func (_e *explorer) exploreEnsureDistinctOn(
+	_rootState *exploreState,
+	_root *memo.EnsureDistinctOnExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingGroupBy]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			aggs := _root.Aggregations
+			private := &_root.GroupingPrivate
+			if _e.funcs.IsCanonicalGroupBy(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingGroupBy) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingGroupBy(_root, opt.EnsureDistinctOnOp, input, aggs, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
 func (_e *explorer) exploreUpsertDistinctOn(
 	_rootState *exploreState,
 	_root *memo.UpsertDistinctOnExpr,
@@ -1369,6 +1404,37 @@ func (_e *explorer) exploreUpsertDistinctOn(
 						_last = memo.LastGroupMember(_root)
 					}
 					_e.funcs.GenerateStreamingGroupBy(_root, opt.UpsertDistinctOnOp, input, aggs, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreEnsureUpsertDistinctOn(
+	_rootState *exploreState,
+	_root *memo.EnsureUpsertDistinctOnExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingGroupBy]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			aggs := _root.Aggregations
+			private := &_root.GroupingPrivate
+			if _e.funcs.IsCanonicalGroupBy(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingGroupBy) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingGroupBy(_root, opt.EnsureUpsertDistinctOnOp, input, aggs, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}

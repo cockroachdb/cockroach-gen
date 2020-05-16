@@ -3923,8 +3923,9 @@ func (g *groupByGroup) bestProps() *bestProps {
 }
 
 // GroupingPrivate is shared between the grouping-related operators: GroupBy
-// ScalarGroupBy, DistinctOn, EnsureDistinctOn, and UpsertDistinctOn. This allows
-// the operators to be treated polymorphically.
+// ScalarGroupBy, DistinctOn, EnsureDistinctOn, UpsertDistinctOn, and
+// EnsureUpsertDistinctOn. This allows the operators to be treated
+// polymorphically.
 type GroupingPrivate struct {
 	// GroupingCols partitions the GroupBy input rows into aggregation groups.
 	// All rows sharing the same values for these columns are in the same group.
@@ -3944,9 +3945,15 @@ type GroupingPrivate struct {
 	// orderings that contain grouping columns.
 	Ordering physical.OrderingChoice
 
+	// NullsAreDistinct specifies the null behavior of the grouping operator. If
+	// true, the operator considers nulls to be distinct for grouping purposes.
+	// NullsAreDistinct should only be true for UpsertDistinctOn and
+	// EnsureUpsertDistinctOn.
+	NullsAreDistinct bool
+
 	// ErrorOnDup, if non-empty, triggers an error with the given text if any
-	// aggregation group contains more than one row. This can only be true for
-	// the EnsureDistinctOn and UpsertDistinctOn operators.
+	// aggregation group contains more than one row. This can only take on a
+	// value for the EnsureDistinctOn and EnsureUpsertDistinctOn operators.
 	ErrorOnDup string
 }
 
@@ -4255,6 +4262,9 @@ func (g *distinctOnGroup) bestProps() *bestProps {
 // distinct grouping contains more than one row. Or in other words, it "ensures"
 // that the input is distinct on the grouping columns.
 //
+// EnsureDistinctOn is used when nulls are not considered distinct for grouping
+// purposes and an error should be raised when duplicates are detected.
+//
 // Rules should only "push through" or eliminate an EnsureDistinctOn if they
 // preserve the expected error behavior. For example, it would be invalid to
 // push a Select filter into an EnsureDistinctOn, as it might eliminate rows
@@ -4387,20 +4397,15 @@ func (g *ensureDistinctOnGroup) bestProps() *bestProps {
 }
 
 // UpsertDistinctOnExpr is a variation on DistinctOn that is only used with UPSERT
-// and INSERT..ON CONFLICT statements. It differs from DistinctOn in two ways:
+// and INSERT..ON CONFLICT statements. Unlike DistinctOn, UpsertDistinctOn treats
+// NULL values as not equal to one another for purposes of grouping. Two rows
+// having a NULL-valued grouping column will be placed in different groups. This
+// differs from DistinctOn behavior, where the two rows would be grouped
+// together. This behavior difference reflects SQL semantics, in which a unique
+// index key still allows multiple NULL values.
 //
-//   1. Null behavior: UpsertDistinctOn treats NULL values as not equal to one
-//      another for purposes of grouping. Two rows having a NULL-valued grouping
-//      column will be placed in different groups. This differs from DistinctOn
-//      behavior, where the two rows would be grouped together. This behavior
-//      difference reflects SQL semantics, in which a unique index key still
-//      allows multiple NULL values.
-//
-//   2. Duplicate behavior: UpsertDistinctOn raises an error if any distinct
-//      grouping contains more than one row. It has "input must be distinct"
-//      semantics rather than "make the input distinct" semantics. This is used
-//      to ensure that no row will be updated more than once.
-//
+// UpsertDistinctOn is used when nulls are considered distinct for grouping
+// purposes and duplicates should be filtered out without raising an error.
 type UpsertDistinctOnExpr struct {
 	Input        RelExpr
 	Aggregations AggregationsExpr
@@ -4525,6 +4530,147 @@ func (g *upsertDistinctOnGroup) firstExpr() RelExpr {
 }
 
 func (g *upsertDistinctOnGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// EnsureUpsertDistinctOnExpr is a variation on UpsertDistinctOn that is only used
+// with UPSERT and INSERT..ON CONFLICT statements. Like UpsertDistinctOn,
+// EnsureUpsertDistinctOn treats NULL values as not equal to one another for
+// purposes of grouping. Unlike UpsertDistinctOn, it raises an error if any
+// distinct grouping contains more than one row. Or in other words, it "ensures"
+// that the input is distinct on the grouping columns.
+//
+// EnsureUpsertDistinctOn is used when nulls are considered distinct for grouping
+// purposes and an error should be raised when duplicates are detected.
+//
+// Rules should only "push through" or eliminate an EnsureUpsertDistinctOn if
+// they preserve the expected error behavior. For example, it would be invalid to
+// push a Select filter into an EnsureUpsertDistinctOn, as it might eliminate
+// rows that would otherwise trigger the EnsureUpsertDistinctOn error.
+type EnsureUpsertDistinctOnExpr struct {
+	Input        RelExpr
+	Aggregations AggregationsExpr
+	GroupingPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &EnsureUpsertDistinctOnExpr{}
+
+func (e *EnsureUpsertDistinctOnExpr) Op() opt.Operator {
+	return opt.EnsureUpsertDistinctOnOp
+}
+
+func (e *EnsureUpsertDistinctOnExpr) ChildCount() int {
+	return 2
+}
+
+func (e *EnsureUpsertDistinctOnExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Aggregations
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *EnsureUpsertDistinctOnExpr) Private() interface{} {
+	return &e.GroupingPrivate
+}
+
+func (e *EnsureUpsertDistinctOnExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *EnsureUpsertDistinctOnExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Aggregations = *child.(*AggregationsExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *EnsureUpsertDistinctOnExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *EnsureUpsertDistinctOnExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *EnsureUpsertDistinctOnExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *EnsureUpsertDistinctOnExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *EnsureUpsertDistinctOnExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *EnsureUpsertDistinctOnExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *EnsureUpsertDistinctOnExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *EnsureUpsertDistinctOnExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *EnsureUpsertDistinctOnExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *EnsureUpsertDistinctOnExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *EnsureUpsertDistinctOnExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type ensureUpsertDistinctOnGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first EnsureUpsertDistinctOnExpr
+	best  bestProps
+}
+
+var _ exprGroup = &ensureUpsertDistinctOnGroup{}
+
+func (g *ensureUpsertDistinctOnGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *ensureUpsertDistinctOnGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *ensureUpsertDistinctOnGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *ensureUpsertDistinctOnGroup) bestProps() *bestProps {
 	return &g.best
 }
 
@@ -16648,6 +16794,32 @@ func (m *Memo) MemoizeUpsertDistinctOn(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeEnsureUpsertDistinctOn(
+	input RelExpr,
+	aggregations AggregationsExpr,
+	groupingPrivate *GroupingPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(ensureUpsertDistinctOnGroup{}))
+	grp := &ensureUpsertDistinctOnGroup{mem: m, first: EnsureUpsertDistinctOnExpr{
+		Input:           input,
+		Aggregations:    aggregations,
+		GroupingPrivate: *groupingPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternEnsureUpsertDistinctOn(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildEnsureUpsertDistinctOnProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeUnion(
 	left RelExpr,
 	right RelExpr,
@@ -20093,6 +20265,20 @@ func (m *Memo) AddUpsertDistinctOnToGroup(e *UpsertDistinctOnExpr, grp RelExpr) 
 	return interned
 }
 
+func (m *Memo) AddEnsureUpsertDistinctOnToGroup(e *EnsureUpsertDistinctOnExpr, grp RelExpr) *EnsureUpsertDistinctOnExpr {
+	const size = int64(unsafe.Sizeof(EnsureUpsertDistinctOnExpr{}))
+	interned := m.interner.InternEnsureUpsertDistinctOn(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddUnionToGroup(e *UnionExpr, grp RelExpr) *UnionExpr {
 	const size = int64(unsafe.Sizeof(UnionExpr{}))
 	interned := m.interner.InternUnion(e)
@@ -20591,6 +20777,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternEnsureDistinctOn(t)
 	case *UpsertDistinctOnExpr:
 		return in.InternUpsertDistinctOn(t)
+	case *EnsureUpsertDistinctOnExpr:
+		return in.InternEnsureUpsertDistinctOn(t)
 	case *UnionExpr:
 		return in.InternUnion(t)
 	case *IntersectExpr:
@@ -21657,6 +21845,7 @@ func (in *interner) InternGroupBy(val *GroupByExpr) *GroupByExpr {
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NullsAreDistinct)
 	in.hasher.HashString(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
@@ -21666,6 +21855,7 @@ func (in *interner) InternGroupBy(val *GroupByExpr) *GroupByExpr {
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NullsAreDistinct, existing.NullsAreDistinct) &&
 				in.hasher.IsStringEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
@@ -21683,6 +21873,7 @@ func (in *interner) InternScalarGroupBy(val *ScalarGroupByExpr) *ScalarGroupByEx
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NullsAreDistinct)
 	in.hasher.HashString(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
@@ -21692,6 +21883,7 @@ func (in *interner) InternScalarGroupBy(val *ScalarGroupByExpr) *ScalarGroupByEx
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NullsAreDistinct, existing.NullsAreDistinct) &&
 				in.hasher.IsStringEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
@@ -21709,6 +21901,7 @@ func (in *interner) InternDistinctOn(val *DistinctOnExpr) *DistinctOnExpr {
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NullsAreDistinct)
 	in.hasher.HashString(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
@@ -21718,6 +21911,7 @@ func (in *interner) InternDistinctOn(val *DistinctOnExpr) *DistinctOnExpr {
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NullsAreDistinct, existing.NullsAreDistinct) &&
 				in.hasher.IsStringEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
@@ -21735,6 +21929,7 @@ func (in *interner) InternEnsureDistinctOn(val *EnsureDistinctOnExpr) *EnsureDis
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NullsAreDistinct)
 	in.hasher.HashString(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
@@ -21744,6 +21939,7 @@ func (in *interner) InternEnsureDistinctOn(val *EnsureDistinctOnExpr) *EnsureDis
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NullsAreDistinct, existing.NullsAreDistinct) &&
 				in.hasher.IsStringEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
@@ -21761,6 +21957,7 @@ func (in *interner) InternUpsertDistinctOn(val *UpsertDistinctOnExpr) *UpsertDis
 	in.hasher.HashAggregationsExpr(val.Aggregations)
 	in.hasher.HashColSet(val.GroupingCols)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NullsAreDistinct)
 	in.hasher.HashString(val.ErrorOnDup)
 
 	in.cache.Start(in.hasher.hash)
@@ -21770,6 +21967,35 @@ func (in *interner) InternUpsertDistinctOn(val *UpsertDistinctOnExpr) *UpsertDis
 				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
 				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NullsAreDistinct, existing.NullsAreDistinct) &&
+				in.hasher.IsStringEqual(val.ErrorOnDup, existing.ErrorOnDup) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternEnsureUpsertDistinctOn(val *EnsureUpsertDistinctOnExpr) *EnsureUpsertDistinctOnExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.EnsureUpsertDistinctOnOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashAggregationsExpr(val.Aggregations)
+	in.hasher.HashColSet(val.GroupingCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashBool(val.NullsAreDistinct)
+	in.hasher.HashString(val.ErrorOnDup)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*EnsureUpsertDistinctOnExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsAggregationsExprEqual(val.Aggregations, existing.Aggregations) &&
+				in.hasher.IsColSetEqual(val.GroupingCols, existing.GroupingCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsBoolEqual(val.NullsAreDistinct, existing.NullsAreDistinct) &&
 				in.hasher.IsStringEqual(val.ErrorOnDup, existing.ErrorOnDup) {
 				return existing
 			}
@@ -25074,6 +25300,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildEnsureDistinctOnProps(t, rel)
 	case *UpsertDistinctOnExpr:
 		b.buildUpsertDistinctOnProps(t, rel)
+	case *EnsureUpsertDistinctOnExpr:
+		b.buildEnsureUpsertDistinctOnProps(t, rel)
 	case *UnionExpr:
 		b.buildUnionProps(t, rel)
 	case *IntersectExpr:

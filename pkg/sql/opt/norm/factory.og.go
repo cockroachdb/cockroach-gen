@@ -8051,25 +8051,23 @@ func (_f *Factory) ConstructDistinctOn(
 	// [EliminateDistinctNoColumns]
 	{
 		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
-			if !_f.funcs.RaisesErrorOnDup(groupingPrivate) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
-					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
-						input,
-						_f.funcs.IntConst(tree.NewDInt(1)),
-						_f.funcs.GroupingInputOrdering(groupingPrivate),
-					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateDistinctNoColumns, nil, _expr)
-					}
-					return _expr
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
+					input,
+					_f.funcs.IntConst(tree.NewDInt(1)),
+					_f.funcs.GroupingInputOrdering(groupingPrivate),
+				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctNoColumns, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
 
 	// [EliminateDistinctOnValues]
 	{
-		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(opt.DistinctOnOp)) {
+		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(groupingPrivate)) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnValues) {
 				_expr := _f.funcs.ConstructProjectionFromDistinctOn(input, _f.funcs.GroupingCols(groupingPrivate), aggregations).(memo.RelExpr)
 				if _f.appliedRule != nil {
@@ -8125,6 +8123,9 @@ func (_f *Factory) ConstructDistinctOn(
 // distinct grouping contains more than one row. Or in other words, it "ensures"
 // that the input is distinct on the grouping columns.
 //
+// EnsureDistinctOn is used when nulls are not considered distinct for grouping
+// purposes and an error should be raised when duplicates are detected.
+//
 // Rules should only "push through" or eliminate an EnsureDistinctOn if they
 // preserve the expected error behavior. For example, it would be invalid to
 // push a Select filter into an EnsureDistinctOn, as it might eliminate rows
@@ -8176,17 +8177,15 @@ func (_f *Factory) ConstructEnsureDistinctOn(
 	// [EliminateEnsureDistinctNoColumns]
 	{
 		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
-			if _f.funcs.RaisesErrorOnDup(groupingPrivate) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEnsureDistinctNoColumns) {
-					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
-						input,
-						_f.funcs.ErrorOnDup(groupingPrivate),
-					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateEnsureDistinctNoColumns, nil, _expr)
-					}
-					return _expr
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEnsureDistinctNoColumns) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
+					input,
+					_f.funcs.ErrorOnDup(groupingPrivate),
+				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateEnsureDistinctNoColumns, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
@@ -8215,20 +8214,15 @@ func (_f *Factory) ConstructEnsureDistinctOn(
 
 // ConstructUpsertDistinctOn constructs an expression for the UpsertDistinctOn operator.
 // UpsertDistinctOn is a variation on DistinctOn that is only used with UPSERT
-// and INSERT..ON CONFLICT statements. It differs from DistinctOn in two ways:
+// and INSERT..ON CONFLICT statements. Unlike DistinctOn, UpsertDistinctOn treats
+// NULL values as not equal to one another for purposes of grouping. Two rows
+// having a NULL-valued grouping column will be placed in different groups. This
+// differs from DistinctOn behavior, where the two rows would be grouped
+// together. This behavior difference reflects SQL semantics, in which a unique
+// index key still allows multiple NULL values.
 //
-//   1. Null behavior: UpsertDistinctOn treats NULL values as not equal to one
-//      another for purposes of grouping. Two rows having a NULL-valued grouping
-//      column will be placed in different groups. This differs from DistinctOn
-//      behavior, where the two rows would be grouped together. This behavior
-//      difference reflects SQL semantics, in which a unique index key still
-//      allows multiple NULL values.
-//
-//   2. Duplicate behavior: UpsertDistinctOn raises an error if any distinct
-//      grouping contains more than one row. It has "input must be distinct"
-//      semantics rather than "make the input distinct" semantics. This is used
-//      to ensure that no row will be updated more than once.
-//
+// UpsertDistinctOn is used when nulls are considered distinct for grouping
+// purposes and duplicates should be filtered out without raising an error.
 func (_f *Factory) ConstructUpsertDistinctOn(
 	input memo.RelExpr,
 	aggregations memo.AggregationsExpr,
@@ -8276,43 +8270,23 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 	// [EliminateDistinctNoColumns]
 	{
 		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
-			if !_f.funcs.RaisesErrorOnDup(groupingPrivate) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
-					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
-						input,
-						_f.funcs.IntConst(tree.NewDInt(1)),
-						_f.funcs.GroupingInputOrdering(groupingPrivate),
-					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateDistinctNoColumns, nil, _expr)
-					}
-					return _expr
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctNoColumns) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructLimit(
+					input,
+					_f.funcs.IntConst(tree.NewDInt(1)),
+					_f.funcs.GroupingInputOrdering(groupingPrivate),
+				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctNoColumns, nil, _expr)
 				}
-			}
-		}
-	}
-
-	// [EliminateEnsureDistinctNoColumns]
-	{
-		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
-			if _f.funcs.RaisesErrorOnDup(groupingPrivate) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEnsureDistinctNoColumns) {
-					_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
-						input,
-						_f.funcs.ErrorOnDup(groupingPrivate),
-					), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateEnsureDistinctNoColumns, nil, _expr)
-					}
-					return _expr
-				}
+				return _expr
 			}
 		}
 	}
 
 	// [EliminateDistinctOnValues]
 	{
-		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(opt.UpsertDistinctOnOp)) {
+		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(groupingPrivate)) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnValues) {
 				_expr := _f.funcs.ConstructProjectionFromDistinctOn(input, _f.funcs.GroupingCols(groupingPrivate), aggregations).(memo.RelExpr)
 				if _f.appliedRule != nil {
@@ -8324,6 +8298,98 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 	}
 
 	e := _f.mem.MemoizeUpsertDistinctOn(input, aggregations, groupingPrivate)
+	return _f.onConstructRelational(e)
+}
+
+// ConstructEnsureUpsertDistinctOn constructs an expression for the EnsureUpsertDistinctOn operator.
+// EnsureUpsertDistinctOn is a variation on UpsertDistinctOn that is only used
+// with UPSERT and INSERT..ON CONFLICT statements. Like UpsertDistinctOn,
+// EnsureUpsertDistinctOn treats NULL values as not equal to one another for
+// purposes of grouping. Unlike UpsertDistinctOn, it raises an error if any
+// distinct grouping contains more than one row. Or in other words, it "ensures"
+// that the input is distinct on the grouping columns.
+//
+// EnsureUpsertDistinctOn is used when nulls are considered distinct for grouping
+// purposes and an error should be raised when duplicates are detected.
+//
+// Rules should only "push through" or eliminate an EnsureUpsertDistinctOn if
+// they preserve the expected error behavior. For example, it would be invalid to
+// push a Select filter into an EnsureUpsertDistinctOn, as it might eliminate
+// rows that would otherwise trigger the EnsureUpsertDistinctOn error.
+func (_f *Factory) ConstructEnsureUpsertDistinctOn(
+	input memo.RelExpr,
+	aggregations memo.AggregationsExpr,
+	groupingPrivate *memo.GroupingPrivate,
+) memo.RelExpr {
+	// [EliminateGroupByProject]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
+					_expr := _f.ConstructEnsureUpsertDistinctOn(
+						innerInput,
+						aggregations,
+						groupingPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [ReduceNotNullGroupingCols]
+	{
+		redundantCols := _f.funcs.IntersectionCols(_f.funcs.RedundantCols(input, _f.funcs.GroupingCols(groupingPrivate)), _f.funcs.NotNullCols(input))
+		if !_f.funcs.ColsAreEmpty(redundantCols) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ReduceNotNullGroupingCols) {
+				_expr := _f.ConstructEnsureUpsertDistinctOn(
+					input,
+					_f.funcs.AppendAggCols(aggregations, opt.ConstAggOp, redundantCols),
+					_f.funcs.RemoveGroupingCols(groupingPrivate, redundantCols),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ReduceNotNullGroupingCols, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateEnsureDistinctNoColumns]
+	{
+		if _f.funcs.HasNoGroupingCols(groupingPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateEnsureDistinctNoColumns) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(_f.ConstructMax1Row(
+					input,
+					_f.funcs.ErrorOnDup(groupingPrivate),
+				), _f.funcs.MakeEmptyColSet(), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateEnsureDistinctNoColumns, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateDistinctOnValues]
+	{
+		if _f.funcs.AreValuesDistinct(input, _f.funcs.GroupingCols(groupingPrivate), _f.funcs.NullsAreDistinct(groupingPrivate)) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctOnValues) {
+				_expr := _f.funcs.ConstructProjectionFromDistinctOn(input, _f.funcs.GroupingCols(groupingPrivate), aggregations).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctOnValues, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeEnsureUpsertDistinctOn(input, aggregations, groupingPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -16234,6 +16300,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.EnsureUpsertDistinctOnExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		aggregations, aggregationsChanged := f.replaceAggregationsExpr(t.Aggregations, replace)
+		if input != t.Input || aggregationsChanged {
+			return f.ConstructEnsureUpsertDistinctOn(input, aggregations, &t.GroupingPrivate)
+		}
+		return t
+
 	case *memo.UnionExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
@@ -17671,6 +17745,13 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.GroupingPrivate,
 		)
 
+	case *memo.EnsureUpsertDistinctOnExpr:
+		return f.ConstructEnsureUpsertDistinctOn(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultAggregationsExpr(t.Aggregations, replace),
+			&t.GroupingPrivate,
+		)
+
 	case *memo.UnionExpr:
 		return f.ConstructUnion(
 			f.invokeReplace(t.Left, replace).(memo.RelExpr),
@@ -18745,6 +18826,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.UpsertDistinctOnOp:
 		return f.ConstructUpsertDistinctOn(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.AggregationsExpr),
+			args[2].(*memo.GroupingPrivate),
+		)
+	case opt.EnsureUpsertDistinctOnOp:
+		return f.ConstructEnsureUpsertDistinctOn(
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.AggregationsExpr),
 			args[2].(*memo.GroupingPrivate),
