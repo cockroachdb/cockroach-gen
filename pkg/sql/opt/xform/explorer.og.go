@@ -1475,7 +1475,7 @@ func (_e *explorer) exploreLimit(
 						_const, _ := _root.Limit.(*memo.ConstExpr)
 						if _const != nil {
 							limit := _const.Value
-							if _e.funcs.IsPositiveLimit(limit) {
+							if _e.funcs.IsPositiveInt(limit) {
 								ordering := _root.Ordering
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLimitedScans) {
 									var _last memo.RelExpr
@@ -1516,7 +1516,7 @@ func (_e *explorer) exploreLimit(
 					_const, _ := _root.Limit.(*memo.ConstExpr)
 					if _const != nil {
 						limit := _const.Value
-						if _e.funcs.IsPositiveLimit(limit) {
+						if _e.funcs.IsPositiveInt(limit) {
 							ordering := _root.Ordering
 							if _e.funcs.CanLimitConstrainedScan(scanPrivate, ordering) {
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoConstrainedScan) {
@@ -1576,7 +1576,7 @@ func (_e *explorer) exploreLimit(
 							_const, _ := _root.Limit.(*memo.ConstExpr)
 							if _const != nil {
 								limit := _const.Value
-								if _e.funcs.IsPositiveLimit(limit) {
+								if _e.funcs.IsPositiveInt(limit) {
 									ordering := _root.Ordering
 									if _e.funcs.CanLimitConstrainedScan(scanPrivate, ordering) {
 										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoIndexJoin) {

@@ -8624,12 +8624,12 @@ func (_f *Factory) ConstructLimit(
 			_const, _ := offsetExpr.(*memo.ConstExpr)
 			if _const != nil {
 				offset := _const.Value
-				if _f.funcs.IsPositiveLimit(offset) {
+				if _f.funcs.IsPositiveInt(offset) {
 					offsetOrdering := _offset.Ordering
 					_const2, _ := limit.(*memo.ConstExpr)
 					if _const2 != nil {
 						limit := _const2.Value
-						if _f.funcs.IsPositiveLimit(limit) {
+						if _f.funcs.IsPositiveInt(limit) {
 							limitOrdering := ordering
 							if _f.funcs.IsSameOrdering(offsetOrdering, limitOrdering) {
 								if _f.funcs.CanAddConstInts(limit, offset) {
@@ -8697,7 +8697,7 @@ func (_f *Factory) ConstructLimit(
 			_const, _ := limitExpr.(*memo.ConstExpr)
 			if _const != nil {
 				limit := _const.Value
-				if _f.funcs.IsPositiveLimit(limit) {
+				if _f.funcs.IsPositiveInt(limit) {
 					if !_f.funcs.LimitGeMaxRows(limit, left) {
 						if _f.funcs.HasColsInOrdering(left, ordering) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoLeftJoin) {
@@ -9324,7 +9324,7 @@ func (_f *Factory) ConstructExists(
 				_const, _ := _limit.Limit.(*memo.ConstExpr)
 				if _const != nil {
 					limit := _const.Value
-					if _f.funcs.IsPositiveLimit(limit) {
+					if _f.funcs.IsPositiveInt(limit) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateExistsLimit) {
 							_expr := _f.ConstructExists(
 								input,
@@ -13997,7 +13997,7 @@ func (_f *Factory) ConstructMinus(
 
 	// [FoldMinusZero]
 	{
-		if _f.funcs.IsAdditive(left) {
+		if _f.funcs.IsAdditiveType(_f.funcs.TypeOf(left)) {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
 				if _f.funcs.EqualsNumber(_const.Value, 0) {
