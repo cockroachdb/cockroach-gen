@@ -15664,6 +15664,29 @@ func (_f *Factory) ConstructFirstAgg(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructPercentileDisc constructs an expression for the PercentileDisc operator.
+// PercentileDisc returns a value such that N% of values are below it
+// in a given window. Ignores nulls in the input.
+func (_f *Factory) ConstructPercentileDisc(
+	fraction opt.ScalarExpr,
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizePercentileDisc(fraction, input)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructPercentileCont constructs an expression for the PercentileCont operator.
+// PercentileCont returns a value such that N% of values are below it
+// in a given window, interpolating values if needed. Ignores nulls in the
+// input.
+func (_f *Factory) ConstructPercentileCont(
+	fraction opt.ScalarExpr,
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizePercentileCont(fraction, input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructAggDistinct constructs an expression for the AggDistinct operator.
 // AggDistinct is used as a modifier that wraps an aggregate function. It causes
 // the respective aggregation to only process each distinct value once.
@@ -17170,6 +17193,22 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.PercentileDiscExpr:
+		fraction := replace(t.Fraction).(opt.ScalarExpr)
+		input := replace(t.Input).(opt.ScalarExpr)
+		if fraction != t.Fraction || input != t.Input {
+			return f.ConstructPercentileDisc(fraction, input)
+		}
+		return t
+
+	case *memo.PercentileContExpr:
+		fraction := replace(t.Fraction).(opt.ScalarExpr)
+		input := replace(t.Input).(opt.ScalarExpr)
+		if fraction != t.Fraction || input != t.Input {
+			return f.ConstructPercentileCont(fraction, input)
+		}
+		return t
+
 	case *memo.AggDistinctExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -18402,6 +18441,18 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.PercentileDiscExpr:
+		return f.ConstructPercentileDisc(
+			f.invokeReplace(t.Fraction, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.PercentileContExpr:
+		return f.ConstructPercentileCont(
+			f.invokeReplace(t.Fraction, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.AggDistinctExpr:
 		return f.ConstructAggDistinct(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -19384,6 +19435,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.FirstAggOp:
 		return f.ConstructFirstAgg(
 			args[0].(opt.ScalarExpr),
+		)
+	case opt.PercentileDiscOp:
+		return f.ConstructPercentileDisc(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.PercentileContOp:
+		return f.ConstructPercentileCont(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
 		)
 	case opt.AggDistinctOp:
 		return f.ConstructAggDistinct(

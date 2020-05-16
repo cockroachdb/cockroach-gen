@@ -13030,6 +13030,127 @@ func (e *FirstAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
+// PercentileDiscExpr returns a value such that N% of values are below it
+// in a given window. Ignores nulls in the input.
+type PercentileDiscExpr struct {
+	Fraction opt.ScalarExpr
+	Input    opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &PercentileDiscExpr{}
+
+func (e *PercentileDiscExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *PercentileDiscExpr) Op() opt.Operator {
+	return opt.PercentileDiscOp
+}
+
+func (e *PercentileDiscExpr) ChildCount() int {
+	return 2
+}
+
+func (e *PercentileDiscExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Fraction
+	case 1:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *PercentileDiscExpr) Private() interface{} {
+	return nil
+}
+
+func (e *PercentileDiscExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *PercentileDiscExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Fraction = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *PercentileDiscExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// PercentileContExpr returns a value such that N% of values are below it
+// in a given window, interpolating values if needed. Ignores nulls in the
+// input.
+type PercentileContExpr struct {
+	Fraction opt.ScalarExpr
+	Input    opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &PercentileContExpr{}
+
+func (e *PercentileContExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *PercentileContExpr) Op() opt.Operator {
+	return opt.PercentileContOp
+}
+
+func (e *PercentileContExpr) ChildCount() int {
+	return 2
+}
+
+func (e *PercentileContExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Fraction
+	case 1:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *PercentileContExpr) Private() interface{} {
+	return nil
+}
+
+func (e *PercentileContExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *PercentileContExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Fraction = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *PercentileContExpr) DataType() *types.T {
+	return e.Typ
+}
+
 // AggDistinctExpr is used as a modifier that wraps an aggregate function. It causes
 // the respective aggregation to only process each distinct value once.
 type AggDistinctExpr struct {
@@ -19266,6 +19387,50 @@ func (m *Memo) MemoizeFirstAgg(
 	return interned
 }
 
+func (m *Memo) MemoizePercentileDisc(
+	fraction opt.ScalarExpr,
+	input opt.ScalarExpr,
+) *PercentileDiscExpr {
+	const size = int64(unsafe.Sizeof(PercentileDiscExpr{}))
+	e := &PercentileDiscExpr{
+		Fraction: fraction,
+		Input:    input,
+		id:       m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternPercentileDisc(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizePercentileCont(
+	fraction opt.ScalarExpr,
+	input opt.ScalarExpr,
+) *PercentileContExpr {
+	const size = int64(unsafe.Sizeof(PercentileContExpr{}))
+	e := &PercentileContExpr{
+		Fraction: fraction,
+		Input:    input,
+		id:       m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternPercentileCont(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeAggDistinct(
 	input opt.ScalarExpr,
 ) *AggDistinctExpr {
@@ -21027,6 +21192,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAnyNotNullAgg(t)
 	case *FirstAggExpr:
 		return in.InternFirstAgg(t)
+	case *PercentileDiscExpr:
+		return in.InternPercentileDisc(t)
+	case *PercentileContExpr:
+		return in.InternPercentileCont(t)
 	case *AggDistinctExpr:
 		return in.InternAggDistinct(t)
 	case *AggFilterExpr:
@@ -24500,6 +24669,46 @@ func (in *interner) InternFirstAgg(val *FirstAggExpr) *FirstAggExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FirstAggExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPercentileDisc(val *PercentileDiscExpr) *PercentileDiscExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PercentileDiscOp)
+	in.hasher.HashScalarExpr(val.Fraction)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PercentileDiscExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Fraction, existing.Fraction) &&
+				in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPercentileCont(val *PercentileContExpr) *PercentileContExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PercentileContOp)
+	in.hasher.HashScalarExpr(val.Fraction)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PercentileContExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Fraction, existing.Fraction) &&
+				in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}
 		}
