@@ -7659,21 +7659,18 @@ func (_f *Factory) ConstructGroupBy(
 			item := &aggregations[i]
 			_count, _ := item.Agg.(*memo.CountExpr)
 			if _count != nil {
-				_variable, _ := _count.Input.(*memo.VariableExpr)
-				if _variable != nil {
-					inputColID := _variable.Col
-					if _f.funcs.IsColNotNull(inputColID, input) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.ConvertCountToCountRows) {
-							_expr := _f.ConstructGroupBy(
-								input,
-								_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructCountRows()),
-								groupingPrivate,
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.ConvertCountToCountRows, nil, _expr)
-							}
-							return _expr
+				arg := _count.Input
+				if _f.funcs.ExprIsNeverNull(arg, _f.funcs.NotNullCols(input)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.ConvertCountToCountRows) {
+						_expr := _f.ConstructGroupBy(
+							input,
+							_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructCountRows()),
+							groupingPrivate,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.ConvertCountToCountRows, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
@@ -7891,21 +7888,18 @@ func (_f *Factory) ConstructScalarGroupBy(
 			item := &aggregations[i]
 			_count, _ := item.Agg.(*memo.CountExpr)
 			if _count != nil {
-				_variable, _ := _count.Input.(*memo.VariableExpr)
-				if _variable != nil {
-					inputColID := _variable.Col
-					if _f.funcs.IsColNotNull(inputColID, input) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.ConvertCountToCountRows) {
-							_expr := _f.ConstructScalarGroupBy(
-								input,
-								_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructCountRows()),
-								groupingPrivate,
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.ConvertCountToCountRows, nil, _expr)
-							}
-							return _expr
+				arg := _count.Input
+				if _f.funcs.ExprIsNeverNull(arg, _f.funcs.NotNullCols(input)) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.ConvertCountToCountRows) {
+						_expr := _f.ConstructScalarGroupBy(
+							input,
+							_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructCountRows()),
+							groupingPrivate,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.ConvertCountToCountRows, nil, _expr)
 						}
+						return _expr
 					}
 				}
 			}
