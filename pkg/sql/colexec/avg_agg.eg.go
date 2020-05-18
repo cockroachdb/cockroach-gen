@@ -22,21 +22,21 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-func newAvgAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+func newAvgAggAlloc(
+	allocator *colmem.Allocator, t *types.T, allocSize int64,
+) (aggregateFuncAlloc, error) {
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAvgDecimalAgg))
-			return &avgDecimalAgg{}, nil
+			return &avgDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAvgFloat64Agg))
-			return &avgFloat64Agg{}, nil
+			return &avgFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported avg agg type %s", t.Name())
@@ -65,7 +65,7 @@ type avgDecimalAgg struct {
 
 var _ aggregateFunc = &avgDecimalAgg{}
 
-const sizeOfAvgDecimalAgg = unsafe.Sizeof(&avgDecimalAgg{})
+const sizeOfAvgDecimalAgg = int64(unsafe.Sizeof(avgDecimalAgg{}))
 
 func (a *avgDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -262,6 +262,24 @@ func (a *avgDecimalAgg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
+type avgDecimalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []avgDecimalAgg
+}
+
+var _ aggregateFuncAlloc = &avgDecimalAggAlloc{}
+
+func (a *avgDecimalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAvgDecimalAgg * a.allocSize)
+		a.aggFuncs = make([]avgDecimalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type avgFloat64Agg struct {
 	groups  []bool
 	scratch struct {
@@ -285,7 +303,7 @@ type avgFloat64Agg struct {
 
 var _ aggregateFunc = &avgFloat64Agg{}
 
-const sizeOfAvgFloat64Agg = unsafe.Sizeof(&avgFloat64Agg{})
+const sizeOfAvgFloat64Agg = int64(unsafe.Sizeof(avgFloat64Agg{}))
 
 func (a *avgFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -452,4 +470,22 @@ func (a *avgFloat64Agg) Flush() {
 
 func (a *avgFloat64Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
+}
+
+type avgFloat64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []avgFloat64Agg
+}
+
+var _ aggregateFuncAlloc = &avgFloat64AggAlloc{}
+
+func (a *avgFloat64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAvgFloat64Agg * a.allocSize)
+		a.aggFuncs = make([]avgFloat64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }

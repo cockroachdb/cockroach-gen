@@ -16,9 +16,8 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 )
 
-func newCountRowsAgg(allocator *colmem.Allocator) *countRowsAgg {
-	allocator.AdjustMemoryUsage(int64(sizeOfCountRowsAgg))
-	return &countRowsAgg{}
+func newCountRowsAggAlloc(allocator *colmem.Allocator, allocSize int64) aggregateFuncAlloc {
+	return &countRowsAggAlloc{allocator: allocator, allocSize: allocSize}
 }
 
 // countRowsAgg supports either COUNT(*) or COUNT(col) aggregate.
@@ -32,7 +31,7 @@ type countRowsAgg struct {
 
 var _ aggregateFunc = &countRowsAgg{}
 
-const sizeOfCountRowsAgg = unsafe.Sizeof(&countRowsAgg{})
+const sizeOfCountRowsAgg = int64(unsafe.Sizeof(countRowsAgg{}))
 
 func (a *countRowsAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -102,9 +101,26 @@ func (a *countRowsAgg) HandleEmptyInputScalar() {
 	a.vec[0] = 0
 }
 
-func newCountAgg(allocator *colmem.Allocator) *countAgg {
-	allocator.AdjustMemoryUsage(int64(sizeOfCountAgg))
-	return &countAgg{}
+type countRowsAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []countRowsAgg
+}
+
+var _ aggregateFuncAlloc = &countRowsAggAlloc{}
+
+func (a *countRowsAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfCountRowsAgg * a.allocSize)
+		a.aggFuncs = make([]countRowsAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+func newCountAggAlloc(allocator *colmem.Allocator, allocSize int64) aggregateFuncAlloc {
+	return &countAggAlloc{allocator: allocator, allocSize: allocSize}
 }
 
 // countAgg supports either COUNT(*) or COUNT(col) aggregate.
@@ -118,7 +134,7 @@ type countAgg struct {
 
 var _ aggregateFunc = &countAgg{}
 
-const sizeOfCountAgg = unsafe.Sizeof(&countAgg{})
+const sizeOfCountAgg = int64(unsafe.Sizeof(countAgg{}))
 
 func (a *countAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -224,4 +240,22 @@ func (a *countAgg) Flush() {
 
 func (a *countAgg) HandleEmptyInputScalar() {
 	a.vec[0] = 0
+}
+
+type countAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []countAgg
+}
+
+var _ aggregateFuncAlloc = &countAggAlloc{}
+
+func (a *countAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfCountAgg * a.allocSize)
+		a.aggFuncs = make([]countAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }

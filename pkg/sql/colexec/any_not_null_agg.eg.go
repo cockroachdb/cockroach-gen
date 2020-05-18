@@ -26,62 +26,55 @@ import (
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
-func newAnyNotNullAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+func newAnyNotNullAggAlloc(
+	allocator *colmem.Allocator, t *types.T, allocSize int64,
+) (aggregateFuncAlloc, error) {
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullBoolAgg))
-			return &anyNotNullBoolAgg{allocator: allocator}, nil
+			return &anyNotNullBoolAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.BytesFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullBytesAgg))
-			return &anyNotNullBytesAgg{allocator: allocator}, nil
+			return &anyNotNullBytesAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullDecimalAgg))
-			return &anyNotNullDecimalAgg{allocator: allocator}, nil
+			return &anyNotNullDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullInt16Agg))
-			return &anyNotNullInt16Agg{allocator: allocator}, nil
+			return &anyNotNullInt16AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case 32:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullInt32Agg))
-			return &anyNotNullInt32Agg{allocator: allocator}, nil
+			return &anyNotNullInt32AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullInt64Agg))
-			return &anyNotNullInt64Agg{allocator: allocator}, nil
+			return &anyNotNullInt64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullFloat64Agg))
-			return &anyNotNullFloat64Agg{allocator: allocator}, nil
+			return &anyNotNullFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.TimestampTZFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullTimestampAgg))
-			return &anyNotNullTimestampAgg{allocator: allocator}, nil
+			return &anyNotNullTimestampAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfAnyNotNullIntervalAgg))
-			return &anyNotNullIntervalAgg{allocator: allocator}, nil
+			return &anyNotNullIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported any not null agg type %s", t.Name())
@@ -102,7 +95,7 @@ type anyNotNullBoolAgg struct {
 
 var _ aggregateFunc = &anyNotNullBoolAgg{}
 
-const sizeOfAnyNotNullBoolAgg = unsafe.Sizeof(&anyNotNullBoolAgg{})
+const sizeOfAnyNotNullBoolAgg = int64(unsafe.Sizeof(anyNotNullBoolAgg{}))
 
 func (a *anyNotNullBoolAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -277,6 +270,25 @@ func (a *anyNotNullBoolAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullBoolAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullBoolAgg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullBoolAggAlloc{}
+
+func (a *anyNotNullBoolAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullBoolAgg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullBoolAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullBytesAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullBytesAgg struct {
@@ -292,7 +304,7 @@ type anyNotNullBytesAgg struct {
 
 var _ aggregateFunc = &anyNotNullBytesAgg{}
 
-const sizeOfAnyNotNullBytesAgg = unsafe.Sizeof(&anyNotNullBytesAgg{})
+const sizeOfAnyNotNullBytesAgg = int64(unsafe.Sizeof(anyNotNullBytesAgg{}))
 
 func (a *anyNotNullBytesAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -471,6 +483,25 @@ func (a *anyNotNullBytesAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullBytesAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullBytesAgg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullBytesAggAlloc{}
+
+func (a *anyNotNullBytesAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullBytesAgg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullBytesAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullDecimalAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullDecimalAgg struct {
@@ -486,7 +517,7 @@ type anyNotNullDecimalAgg struct {
 
 var _ aggregateFunc = &anyNotNullDecimalAgg{}
 
-const sizeOfAnyNotNullDecimalAgg = unsafe.Sizeof(&anyNotNullDecimalAgg{})
+const sizeOfAnyNotNullDecimalAgg = int64(unsafe.Sizeof(anyNotNullDecimalAgg{}))
 
 func (a *anyNotNullDecimalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -661,6 +692,25 @@ func (a *anyNotNullDecimalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullDecimalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullDecimalAgg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullDecimalAggAlloc{}
+
+func (a *anyNotNullDecimalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullDecimalAgg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullDecimalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullInt16Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt16Agg struct {
@@ -676,7 +726,7 @@ type anyNotNullInt16Agg struct {
 
 var _ aggregateFunc = &anyNotNullInt16Agg{}
 
-const sizeOfAnyNotNullInt16Agg = unsafe.Sizeof(&anyNotNullInt16Agg{})
+const sizeOfAnyNotNullInt16Agg = int64(unsafe.Sizeof(anyNotNullInt16Agg{}))
 
 func (a *anyNotNullInt16Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -851,6 +901,25 @@ func (a *anyNotNullInt16Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullInt16AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullInt16Agg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullInt16AggAlloc{}
+
+func (a *anyNotNullInt16AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullInt16Agg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullInt16Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullInt32Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt32Agg struct {
@@ -866,7 +935,7 @@ type anyNotNullInt32Agg struct {
 
 var _ aggregateFunc = &anyNotNullInt32Agg{}
 
-const sizeOfAnyNotNullInt32Agg = unsafe.Sizeof(&anyNotNullInt32Agg{})
+const sizeOfAnyNotNullInt32Agg = int64(unsafe.Sizeof(anyNotNullInt32Agg{}))
 
 func (a *anyNotNullInt32Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1041,6 +1110,25 @@ func (a *anyNotNullInt32Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullInt32AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullInt32Agg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullInt32AggAlloc{}
+
+func (a *anyNotNullInt32AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullInt32Agg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullInt32Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullInt64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullInt64Agg struct {
@@ -1056,7 +1144,7 @@ type anyNotNullInt64Agg struct {
 
 var _ aggregateFunc = &anyNotNullInt64Agg{}
 
-const sizeOfAnyNotNullInt64Agg = unsafe.Sizeof(&anyNotNullInt64Agg{})
+const sizeOfAnyNotNullInt64Agg = int64(unsafe.Sizeof(anyNotNullInt64Agg{}))
 
 func (a *anyNotNullInt64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1231,6 +1319,25 @@ func (a *anyNotNullInt64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullInt64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullInt64Agg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullInt64AggAlloc{}
+
+func (a *anyNotNullInt64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullInt64Agg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullInt64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullFloat64Agg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullFloat64Agg struct {
@@ -1246,7 +1353,7 @@ type anyNotNullFloat64Agg struct {
 
 var _ aggregateFunc = &anyNotNullFloat64Agg{}
 
-const sizeOfAnyNotNullFloat64Agg = unsafe.Sizeof(&anyNotNullFloat64Agg{})
+const sizeOfAnyNotNullFloat64Agg = int64(unsafe.Sizeof(anyNotNullFloat64Agg{}))
 
 func (a *anyNotNullFloat64Agg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1421,6 +1528,25 @@ func (a *anyNotNullFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullFloat64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullFloat64Agg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullFloat64AggAlloc{}
+
+func (a *anyNotNullFloat64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullFloat64Agg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullFloat64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullTimestampAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullTimestampAgg struct {
@@ -1436,7 +1562,7 @@ type anyNotNullTimestampAgg struct {
 
 var _ aggregateFunc = &anyNotNullTimestampAgg{}
 
-const sizeOfAnyNotNullTimestampAgg = unsafe.Sizeof(&anyNotNullTimestampAgg{})
+const sizeOfAnyNotNullTimestampAgg = int64(unsafe.Sizeof(anyNotNullTimestampAgg{}))
 
 func (a *anyNotNullTimestampAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1611,6 +1737,25 @@ func (a *anyNotNullTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type anyNotNullTimestampAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullTimestampAgg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullTimestampAggAlloc{}
+
+func (a *anyNotNullTimestampAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullTimestampAgg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullTimestampAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 // anyNotNullIntervalAgg implements the ANY_NOT_NULL aggregate, returning the
 // first non-null value in the input column.
 type anyNotNullIntervalAgg struct {
@@ -1626,7 +1771,7 @@ type anyNotNullIntervalAgg struct {
 
 var _ aggregateFunc = &anyNotNullIntervalAgg{}
 
-const sizeOfAnyNotNullIntervalAgg = unsafe.Sizeof(&anyNotNullIntervalAgg{})
+const sizeOfAnyNotNullIntervalAgg = int64(unsafe.Sizeof(anyNotNullIntervalAgg{}))
 
 func (a *anyNotNullIntervalAgg) Init(groups []bool, vec coldata.Vec) {
 	a.groups = groups
@@ -1799,4 +1944,23 @@ func (a *anyNotNullIntervalAgg) Flush() {
 
 func (a *anyNotNullIntervalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
+}
+
+type anyNotNullIntervalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []anyNotNullIntervalAgg
+}
+
+var _ aggregateFuncAlloc = &anyNotNullIntervalAggAlloc{}
+
+func (a *anyNotNullIntervalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAnyNotNullIntervalAgg * a.allocSize)
+		a.aggFuncs = make([]anyNotNullIntervalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }

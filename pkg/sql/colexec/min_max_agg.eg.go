@@ -33,62 +33,55 @@ var _ = execgen.UNSAFEGET
 // Remove unused warning.
 var _ = colexecerror.InternalError
 
-func newMinAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+func newMinAggAlloc(
+	allocator *colmem.Allocator, t *types.T, allocSize int64,
+) (aggregateFuncAlloc, error) {
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminBoolAgg))
-			return &minBoolAgg{allocator: allocator}, nil
+			return &minBoolAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.BytesFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminBytesAgg))
-			return &minBytesAgg{allocator: allocator}, nil
+			return &minBytesAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminDecimalAgg))
-			return &minDecimalAgg{allocator: allocator}, nil
+			return &minDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
-			allocator.AdjustMemoryUsage(int64(sizeOfminInt16Agg))
-			return &minInt16Agg{allocator: allocator}, nil
+			return &minInt16AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case 32:
-			allocator.AdjustMemoryUsage(int64(sizeOfminInt32Agg))
-			return &minInt32Agg{allocator: allocator}, nil
+			return &minInt32AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminInt64Agg))
-			return &minInt64Agg{allocator: allocator}, nil
+			return &minInt64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminFloat64Agg))
-			return &minFloat64Agg{allocator: allocator}, nil
+			return &minFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.TimestampTZFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminTimestampAgg))
-			return &minTimestampAgg{allocator: allocator}, nil
+			return &minTimestampAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfminIntervalAgg))
-			return &minIntervalAgg{allocator: allocator}, nil
+			return &minIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported min agg type %s", t.Name())
@@ -115,7 +108,7 @@ type minBoolAgg struct {
 
 var _ aggregateFunc = &minBoolAgg{}
 
-const sizeOfminBoolAgg = unsafe.Sizeof(&minBoolAgg{})
+const sizeOfminBoolAgg = int64(unsafe.Sizeof(minBoolAgg{}))
 
 func (a *minBoolAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -370,6 +363,25 @@ func (a *minBoolAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minBoolAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minBoolAgg
+}
+
+var _ aggregateFuncAlloc = &minBoolAggAlloc{}
+
+func (a *minBoolAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminBoolAgg * a.allocSize)
+		a.aggFuncs = make([]minBoolAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minBytesAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -391,7 +403,7 @@ type minBytesAgg struct {
 
 var _ aggregateFunc = &minBytesAgg{}
 
-const sizeOfminBytesAgg = unsafe.Sizeof(&minBytesAgg{})
+const sizeOfminBytesAgg = int64(unsafe.Sizeof(minBytesAgg{}))
 
 func (a *minBytesAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -618,6 +630,25 @@ func (a *minBytesAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minBytesAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minBytesAgg
+}
+
+var _ aggregateFuncAlloc = &minBytesAggAlloc{}
+
+func (a *minBytesAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminBytesAgg * a.allocSize)
+		a.aggFuncs = make([]minBytesAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minDecimalAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -639,7 +670,7 @@ type minDecimalAgg struct {
 
 var _ aggregateFunc = &minDecimalAgg{}
 
-const sizeOfminDecimalAgg = unsafe.Sizeof(&minDecimalAgg{})
+const sizeOfminDecimalAgg = int64(unsafe.Sizeof(minDecimalAgg{}))
 
 func (a *minDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -862,6 +893,25 @@ func (a *minDecimalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minDecimalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minDecimalAgg
+}
+
+var _ aggregateFuncAlloc = &minDecimalAggAlloc{}
+
+func (a *minDecimalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminDecimalAgg * a.allocSize)
+		a.aggFuncs = make([]minDecimalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minInt16Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -883,7 +933,7 @@ type minInt16Agg struct {
 
 var _ aggregateFunc = &minInt16Agg{}
 
-const sizeOfminInt16Agg = unsafe.Sizeof(&minInt16Agg{})
+const sizeOfminInt16Agg = int64(unsafe.Sizeof(minInt16Agg{}))
 
 func (a *minInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -1150,6 +1200,25 @@ func (a *minInt16Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minInt16AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minInt16Agg
+}
+
+var _ aggregateFuncAlloc = &minInt16AggAlloc{}
+
+func (a *minInt16AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminInt16Agg * a.allocSize)
+		a.aggFuncs = make([]minInt16Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minInt32Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -1171,7 +1240,7 @@ type minInt32Agg struct {
 
 var _ aggregateFunc = &minInt32Agg{}
 
-const sizeOfminInt32Agg = unsafe.Sizeof(&minInt32Agg{})
+const sizeOfminInt32Agg = int64(unsafe.Sizeof(minInt32Agg{}))
 
 func (a *minInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -1438,6 +1507,25 @@ func (a *minInt32Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minInt32AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minInt32Agg
+}
+
+var _ aggregateFuncAlloc = &minInt32AggAlloc{}
+
+func (a *minInt32AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminInt32Agg * a.allocSize)
+		a.aggFuncs = make([]minInt32Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minInt64Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -1459,7 +1547,7 @@ type minInt64Agg struct {
 
 var _ aggregateFunc = &minInt64Agg{}
 
-const sizeOfminInt64Agg = unsafe.Sizeof(&minInt64Agg{})
+const sizeOfminInt64Agg = int64(unsafe.Sizeof(minInt64Agg{}))
 
 func (a *minInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -1726,6 +1814,25 @@ func (a *minInt64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minInt64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minInt64Agg
+}
+
+var _ aggregateFuncAlloc = &minInt64AggAlloc{}
+
+func (a *minInt64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminInt64Agg * a.allocSize)
+		a.aggFuncs = make([]minInt64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minFloat64Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -1747,7 +1854,7 @@ type minFloat64Agg struct {
 
 var _ aggregateFunc = &minFloat64Agg{}
 
-const sizeOfminFloat64Agg = unsafe.Sizeof(&minFloat64Agg{})
+const sizeOfminFloat64Agg = int64(unsafe.Sizeof(minFloat64Agg{}))
 
 func (a *minFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -2046,6 +2153,25 @@ func (a *minFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minFloat64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minFloat64Agg
+}
+
+var _ aggregateFuncAlloc = &minFloat64AggAlloc{}
+
+func (a *minFloat64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminFloat64Agg * a.allocSize)
+		a.aggFuncs = make([]minFloat64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minTimestampAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -2067,7 +2193,7 @@ type minTimestampAgg struct {
 
 var _ aggregateFunc = &minTimestampAgg{}
 
-const sizeOfminTimestampAgg = unsafe.Sizeof(&minTimestampAgg{})
+const sizeOfminTimestampAgg = int64(unsafe.Sizeof(minTimestampAgg{}))
 
 func (a *minTimestampAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -2318,6 +2444,25 @@ func (a *minTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type minTimestampAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minTimestampAgg
+}
+
+var _ aggregateFuncAlloc = &minTimestampAggAlloc{}
+
+func (a *minTimestampAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminTimestampAgg * a.allocSize)
+		a.aggFuncs = make([]minTimestampAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type minIntervalAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -2339,7 +2484,7 @@ type minIntervalAgg struct {
 
 var _ aggregateFunc = &minIntervalAgg{}
 
-const sizeOfminIntervalAgg = unsafe.Sizeof(&minIntervalAgg{})
+const sizeOfminIntervalAgg = int64(unsafe.Sizeof(minIntervalAgg{}))
 
 func (a *minIntervalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -2562,62 +2707,74 @@ func (a *minIntervalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
-func newMaxAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+type minIntervalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minIntervalAgg
+}
+
+var _ aggregateFuncAlloc = &minIntervalAggAlloc{}
+
+func (a *minIntervalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminIntervalAgg * a.allocSize)
+		a.aggFuncs = make([]minIntervalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+func newMaxAggAlloc(
+	allocator *colmem.Allocator, t *types.T, allocSize int64,
+) (aggregateFuncAlloc, error) {
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxBoolAgg))
-			return &maxBoolAgg{allocator: allocator}, nil
+			return &maxBoolAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.BytesFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxBytesAgg))
-			return &maxBytesAgg{allocator: allocator}, nil
+			return &maxBytesAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxDecimalAgg))
-			return &maxDecimalAgg{allocator: allocator}, nil
+			return &maxDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxInt16Agg))
-			return &maxInt16Agg{allocator: allocator}, nil
+			return &maxInt16AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case 32:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxInt32Agg))
-			return &maxInt32Agg{allocator: allocator}, nil
+			return &maxInt32AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxInt64Agg))
-			return &maxInt64Agg{allocator: allocator}, nil
+			return &maxInt64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxFloat64Agg))
-			return &maxFloat64Agg{allocator: allocator}, nil
+			return &maxFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.TimestampTZFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxTimestampAgg))
-			return &maxTimestampAgg{allocator: allocator}, nil
+			return &maxTimestampAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfmaxIntervalAgg))
-			return &maxIntervalAgg{allocator: allocator}, nil
+			return &maxIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported max agg type %s", t.Name())
@@ -2644,7 +2801,7 @@ type maxBoolAgg struct {
 
 var _ aggregateFunc = &maxBoolAgg{}
 
-const sizeOfmaxBoolAgg = unsafe.Sizeof(&maxBoolAgg{})
+const sizeOfmaxBoolAgg = int64(unsafe.Sizeof(maxBoolAgg{}))
 
 func (a *maxBoolAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -2899,6 +3056,25 @@ func (a *maxBoolAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxBoolAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxBoolAgg
+}
+
+var _ aggregateFuncAlloc = &maxBoolAggAlloc{}
+
+func (a *maxBoolAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxBoolAgg * a.allocSize)
+		a.aggFuncs = make([]maxBoolAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxBytesAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -2920,7 +3096,7 @@ type maxBytesAgg struct {
 
 var _ aggregateFunc = &maxBytesAgg{}
 
-const sizeOfmaxBytesAgg = unsafe.Sizeof(&maxBytesAgg{})
+const sizeOfmaxBytesAgg = int64(unsafe.Sizeof(maxBytesAgg{}))
 
 func (a *maxBytesAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -3147,6 +3323,25 @@ func (a *maxBytesAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxBytesAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxBytesAgg
+}
+
+var _ aggregateFuncAlloc = &maxBytesAggAlloc{}
+
+func (a *maxBytesAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxBytesAgg * a.allocSize)
+		a.aggFuncs = make([]maxBytesAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxDecimalAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -3168,7 +3363,7 @@ type maxDecimalAgg struct {
 
 var _ aggregateFunc = &maxDecimalAgg{}
 
-const sizeOfmaxDecimalAgg = unsafe.Sizeof(&maxDecimalAgg{})
+const sizeOfmaxDecimalAgg = int64(unsafe.Sizeof(maxDecimalAgg{}))
 
 func (a *maxDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -3391,6 +3586,25 @@ func (a *maxDecimalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxDecimalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxDecimalAgg
+}
+
+var _ aggregateFuncAlloc = &maxDecimalAggAlloc{}
+
+func (a *maxDecimalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxDecimalAgg * a.allocSize)
+		a.aggFuncs = make([]maxDecimalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxInt16Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -3412,7 +3626,7 @@ type maxInt16Agg struct {
 
 var _ aggregateFunc = &maxInt16Agg{}
 
-const sizeOfmaxInt16Agg = unsafe.Sizeof(&maxInt16Agg{})
+const sizeOfmaxInt16Agg = int64(unsafe.Sizeof(maxInt16Agg{}))
 
 func (a *maxInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -3679,6 +3893,25 @@ func (a *maxInt16Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxInt16AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxInt16Agg
+}
+
+var _ aggregateFuncAlloc = &maxInt16AggAlloc{}
+
+func (a *maxInt16AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxInt16Agg * a.allocSize)
+		a.aggFuncs = make([]maxInt16Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxInt32Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -3700,7 +3933,7 @@ type maxInt32Agg struct {
 
 var _ aggregateFunc = &maxInt32Agg{}
 
-const sizeOfmaxInt32Agg = unsafe.Sizeof(&maxInt32Agg{})
+const sizeOfmaxInt32Agg = int64(unsafe.Sizeof(maxInt32Agg{}))
 
 func (a *maxInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -3967,6 +4200,25 @@ func (a *maxInt32Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxInt32AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxInt32Agg
+}
+
+var _ aggregateFuncAlloc = &maxInt32AggAlloc{}
+
+func (a *maxInt32AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxInt32Agg * a.allocSize)
+		a.aggFuncs = make([]maxInt32Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxInt64Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -3988,7 +4240,7 @@ type maxInt64Agg struct {
 
 var _ aggregateFunc = &maxInt64Agg{}
 
-const sizeOfmaxInt64Agg = unsafe.Sizeof(&maxInt64Agg{})
+const sizeOfmaxInt64Agg = int64(unsafe.Sizeof(maxInt64Agg{}))
 
 func (a *maxInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -4255,6 +4507,25 @@ func (a *maxInt64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxInt64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxInt64Agg
+}
+
+var _ aggregateFuncAlloc = &maxInt64AggAlloc{}
+
+func (a *maxInt64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxInt64Agg * a.allocSize)
+		a.aggFuncs = make([]maxInt64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxFloat64Agg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -4276,7 +4547,7 @@ type maxFloat64Agg struct {
 
 var _ aggregateFunc = &maxFloat64Agg{}
 
-const sizeOfmaxFloat64Agg = unsafe.Sizeof(&maxFloat64Agg{})
+const sizeOfmaxFloat64Agg = int64(unsafe.Sizeof(maxFloat64Agg{}))
 
 func (a *maxFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -4575,6 +4846,25 @@ func (a *maxFloat64Agg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxFloat64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxFloat64Agg
+}
+
+var _ aggregateFuncAlloc = &maxFloat64AggAlloc{}
+
+func (a *maxFloat64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxFloat64Agg * a.allocSize)
+		a.aggFuncs = make([]maxFloat64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxTimestampAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -4596,7 +4886,7 @@ type maxTimestampAgg struct {
 
 var _ aggregateFunc = &maxTimestampAgg{}
 
-const sizeOfmaxTimestampAgg = unsafe.Sizeof(&maxTimestampAgg{})
+const sizeOfmaxTimestampAgg = int64(unsafe.Sizeof(maxTimestampAgg{}))
 
 func (a *maxTimestampAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -4847,6 +5137,25 @@ func (a *maxTimestampAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
 }
 
+type maxTimestampAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxTimestampAgg
+}
+
+var _ aggregateFuncAlloc = &maxTimestampAggAlloc{}
+
+func (a *maxTimestampAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxTimestampAgg * a.allocSize)
+		a.aggFuncs = make([]maxTimestampAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type maxIntervalAgg struct {
 	allocator *colmem.Allocator
 	groups    []bool
@@ -4868,7 +5177,7 @@ type maxIntervalAgg struct {
 
 var _ aggregateFunc = &maxIntervalAgg{}
 
-const sizeOfmaxIntervalAgg = unsafe.Sizeof(&maxIntervalAgg{})
+const sizeOfmaxIntervalAgg = int64(unsafe.Sizeof(maxIntervalAgg{}))
 
 func (a *maxIntervalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -5089,4 +5398,23 @@ func (a *maxIntervalAgg) Flush() {
 
 func (a *maxIntervalAgg) HandleEmptyInputScalar() {
 	a.nulls.SetNull(0)
+}
+
+type maxIntervalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxIntervalAgg
+}
+
+var _ aggregateFuncAlloc = &maxIntervalAggAlloc{}
+
+func (a *maxIntervalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxIntervalAgg * a.allocSize)
+		a.aggFuncs = make([]maxIntervalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }

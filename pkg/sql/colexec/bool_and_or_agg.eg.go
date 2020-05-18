@@ -20,9 +20,8 @@ import (
 // Remove unused warning.
 var _ = colexecerror.InternalError
 
-func newBoolAndAgg(allocator *colmem.Allocator) aggregateFunc {
-	allocator.AdjustMemoryUsage(int64(sizeOfBoolAndAgg))
-	return &boolAndAgg{}
+func newBoolAndAggAlloc(allocator *colmem.Allocator, allocSize int64) aggregateFuncAlloc {
+	return &boolAndAggAlloc{allocator: allocator, allocSize: allocSize}
 }
 
 type boolAndAgg struct {
@@ -38,7 +37,7 @@ type boolAndAgg struct {
 
 var _ aggregateFunc = &boolAndAgg{}
 
-const sizeOfBoolAndAgg = unsafe.Sizeof(&boolAndAgg{})
+const sizeOfBoolAndAgg = int64(unsafe.Sizeof(boolAndAgg{}))
 
 func (b *boolAndAgg) Init(groups []bool, vec coldata.Vec) {
 	b.groups = groups
@@ -130,9 +129,26 @@ func (b *boolAndAgg) HandleEmptyInputScalar() {
 	b.nulls.SetNull(0)
 }
 
-func newBoolOrAgg(allocator *colmem.Allocator) aggregateFunc {
-	allocator.AdjustMemoryUsage(int64(sizeOfBoolOrAgg))
-	return &boolOrAgg{}
+type boolAndAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []boolAndAgg
+}
+
+var _ aggregateFuncAlloc = &boolAndAggAlloc{}
+
+func (a *boolAndAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfBoolAndAgg * a.allocSize)
+		a.aggFuncs = make([]boolAndAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+func newBoolOrAggAlloc(allocator *colmem.Allocator, allocSize int64) aggregateFuncAlloc {
+	return &boolOrAggAlloc{allocator: allocator, allocSize: allocSize}
 }
 
 type boolOrAgg struct {
@@ -148,7 +164,7 @@ type boolOrAgg struct {
 
 var _ aggregateFunc = &boolOrAgg{}
 
-const sizeOfBoolOrAgg = unsafe.Sizeof(&boolOrAgg{})
+const sizeOfBoolOrAgg = int64(unsafe.Sizeof(boolOrAgg{}))
 
 func (b *boolOrAgg) Init(groups []bool, vec coldata.Vec) {
 	b.groups = groups
@@ -238,4 +254,22 @@ func (b *boolOrAgg) Flush() {
 
 func (b *boolOrAgg) HandleEmptyInputScalar() {
 	b.nulls.SetNull(0)
+}
+
+type boolOrAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []boolOrAgg
+}
+
+var _ aggregateFuncAlloc = &boolOrAggAlloc{}
+
+func (a *boolOrAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfBoolOrAgg * a.allocSize)
+		a.aggFuncs = make([]boolOrAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }

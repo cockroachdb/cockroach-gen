@@ -23,41 +23,37 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-func newSumAgg(allocator *colmem.Allocator, t *types.T) (aggregateFunc, error) {
+func newSumAggAlloc(
+	allocator *colmem.Allocator, t *types.T, allocSize int64,
+) (aggregateFuncAlloc, error) {
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.DecimalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfSumDecimalAgg))
-			return &sumDecimalAgg{}, nil
+			return &sumDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntFamily:
 		switch t.Width() {
 		case 16:
-			allocator.AdjustMemoryUsage(int64(sizeOfSumInt16Agg))
-			return &sumInt16Agg{}, nil
+			return &sumInt16AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case 32:
-			allocator.AdjustMemoryUsage(int64(sizeOfSumInt32Agg))
-			return &sumInt32Agg{}, nil
+			return &sumInt32AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfSumInt64Agg))
-			return &sumInt64Agg{}, nil
+			return &sumInt64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.FloatFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfSumFloat64Agg))
-			return &sumFloat64Agg{}, nil
+			return &sumFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	case types.IntervalFamily:
 		switch t.Width() {
 		case -1:
 		default:
-			allocator.AdjustMemoryUsage(int64(sizeOfSumIntervalAgg))
-			return &sumIntervalAgg{}, nil
+			return &sumIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported sum agg type %s", t)
@@ -82,7 +78,7 @@ type sumDecimalAgg struct {
 
 var _ aggregateFunc = &sumDecimalAgg{}
 
-const sizeOfSumDecimalAgg = unsafe.Sizeof(&sumDecimalAgg{})
+const sizeOfSumDecimalAgg = int64(unsafe.Sizeof(sumDecimalAgg{}))
 
 func (a *sumDecimalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -249,6 +245,24 @@ func (a *sumDecimalAgg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
+type sumDecimalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []sumDecimalAgg
+}
+
+var _ aggregateFuncAlloc = &sumDecimalAggAlloc{}
+
+func (a *sumDecimalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfSumDecimalAgg * a.allocSize)
+		a.aggFuncs = make([]sumDecimalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type sumInt16Agg struct {
 	groups  []bool
 	scratch struct {
@@ -268,7 +282,7 @@ type sumInt16Agg struct {
 
 var _ aggregateFunc = &sumInt16Agg{}
 
-const sizeOfSumInt16Agg = unsafe.Sizeof(&sumInt16Agg{})
+const sizeOfSumInt16Agg = int64(unsafe.Sizeof(sumInt16Agg{}))
 
 func (a *sumInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -459,6 +473,24 @@ func (a *sumInt16Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
+type sumInt16AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []sumInt16Agg
+}
+
+var _ aggregateFuncAlloc = &sumInt16AggAlloc{}
+
+func (a *sumInt16AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfSumInt16Agg * a.allocSize)
+		a.aggFuncs = make([]sumInt16Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type sumInt32Agg struct {
 	groups  []bool
 	scratch struct {
@@ -478,7 +510,7 @@ type sumInt32Agg struct {
 
 var _ aggregateFunc = &sumInt32Agg{}
 
-const sizeOfSumInt32Agg = unsafe.Sizeof(&sumInt32Agg{})
+const sizeOfSumInt32Agg = int64(unsafe.Sizeof(sumInt32Agg{}))
 
 func (a *sumInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -669,6 +701,24 @@ func (a *sumInt32Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
+type sumInt32AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []sumInt32Agg
+}
+
+var _ aggregateFuncAlloc = &sumInt32AggAlloc{}
+
+func (a *sumInt32AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfSumInt32Agg * a.allocSize)
+		a.aggFuncs = make([]sumInt32Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type sumInt64Agg struct {
 	groups  []bool
 	scratch struct {
@@ -688,7 +738,7 @@ type sumInt64Agg struct {
 
 var _ aggregateFunc = &sumInt64Agg{}
 
-const sizeOfSumInt64Agg = unsafe.Sizeof(&sumInt64Agg{})
+const sizeOfSumInt64Agg = int64(unsafe.Sizeof(sumInt64Agg{}))
 
 func (a *sumInt64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -879,6 +929,24 @@ func (a *sumInt64Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
+type sumInt64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []sumInt64Agg
+}
+
+var _ aggregateFuncAlloc = &sumInt64AggAlloc{}
+
+func (a *sumInt64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfSumInt64Agg * a.allocSize)
+		a.aggFuncs = make([]sumInt64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type sumFloat64Agg struct {
 	groups  []bool
 	scratch struct {
@@ -898,7 +966,7 @@ type sumFloat64Agg struct {
 
 var _ aggregateFunc = &sumFloat64Agg{}
 
-const sizeOfSumFloat64Agg = unsafe.Sizeof(&sumFloat64Agg{})
+const sizeOfSumFloat64Agg = int64(unsafe.Sizeof(sumFloat64Agg{}))
 
 func (a *sumFloat64Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -1057,6 +1125,24 @@ func (a *sumFloat64Agg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
 }
 
+type sumFloat64AggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []sumFloat64Agg
+}
+
+var _ aggregateFuncAlloc = &sumFloat64AggAlloc{}
+
+func (a *sumFloat64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfSumFloat64Agg * a.allocSize)
+		a.aggFuncs = make([]sumFloat64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 type sumIntervalAgg struct {
 	groups  []bool
 	scratch struct {
@@ -1076,7 +1162,7 @@ type sumIntervalAgg struct {
 
 var _ aggregateFunc = &sumIntervalAgg{}
 
-const sizeOfSumIntervalAgg = unsafe.Sizeof(&sumIntervalAgg{})
+const sizeOfSumIntervalAgg = int64(unsafe.Sizeof(sumIntervalAgg{}))
 
 func (a *sumIntervalAgg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
@@ -1233,4 +1319,22 @@ func (a *sumIntervalAgg) Flush() {
 
 func (a *sumIntervalAgg) HandleEmptyInputScalar() {
 	a.scratch.nulls.SetNull(0)
+}
+
+type sumIntervalAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []sumIntervalAgg
+}
+
+var _ aggregateFuncAlloc = &sumIntervalAggAlloc{}
+
+func (a *sumIntervalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfSumIntervalAgg * a.allocSize)
+		a.aggFuncs = make([]sumIntervalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }
