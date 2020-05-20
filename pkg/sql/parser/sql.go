@@ -22952,13 +22952,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 //line sql-gen.y:7661
 		{
-			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoFigure(), geopb.DefaultGeometrySRID)
+			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoFigure(), 0)
 		}
 	case 1331:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 //line sql-gen.y:7665
 		{
-			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoFigure(), geopb.DefaultGeographySRID)
+			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoFigure(), 0)
 		}
 	case 1332:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
