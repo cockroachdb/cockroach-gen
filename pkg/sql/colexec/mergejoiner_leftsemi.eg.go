@@ -18,6 +18,8 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
@@ -1544,6 +1546,150 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+
+									curLIdx++
+									continue
+								}
+								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -2853,6 +2999,141 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+
+									curLIdx++
+									continue
+								}
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -4266,6 +4547,141 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -5494,6 +5910,132 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -7065,6 +7607,150 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+
+									curLIdx++
+									continue
+								}
+								if rVec.Nulls().NullAt(curRIdx) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -8374,6 +9060,141 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+
+									curLIdx++
+									continue
+								}
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -9787,6 +10608,141 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if rVec.Nulls().NullAt(curRIdx) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -11015,6 +11971,132 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+
+								lSelIdx := lSel[curLIdx]
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := lSel[curLIdx]
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -12586,6 +13668,150 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(curLIdx) {
+
+									curLIdx++
+									continue
+								}
+								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -13895,6 +15121,141 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(curLIdx) {
+
+									curLIdx++
+									continue
+								}
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -15308,6 +16669,141 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -16536,6 +18032,132 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := rSel[curRIdx]
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := rSel[curRIdx]
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -18107,6 +19729,150 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(curLIdx) {
+
+									curLIdx++
+									continue
+								}
+								if rVec.Nulls().NullAt(curRIdx) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -19416,6 +21182,141 @@ EqLoop:
 											{
 												var cmpResult int
 												cmpResult = newRVal.Compare(rVal)
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if lVec.Nulls().NullAt(curLIdx) {
+
+									curLIdx++
+									continue
+								}
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											if lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
 												match = cmpResult == 0
 											}
 
@@ -20829,6 +22730,141 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+								if rVec.Nulls().NullAt(curRIdx) {
+
+									curRIdx++
+									continue
+								}
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											if rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -22108,6 +24144,132 @@ EqLoop:
 							o.proberState.rIdx = curRIdx
 						}
 					}
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch colType.Width() {
+					case -1:
+					default:
+						lKeys := lVec.Datum()
+						rKeys := rVec.Datum()
+						var lGroup, rGroup group
+						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
+							curLIdx := lGroup.rowStartIdx
+							curRIdx := rGroup.rowStartIdx
+							curLLength := lGroup.rowEndIdx
+							curRLength := rGroup.rowEndIdx
+							areGroupsProcessed := false
+
+							// Expand or filter each group based on the current equality column.
+							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+
+								lSelIdx := curLIdx
+								lVal := lKeys.Get(lSelIdx)
+								rSelIdx := curRIdx
+								rVal := rKeys.Get(rSelIdx)
+
+								var (
+									cmp   int
+									match bool
+								)
+
+								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								if cmp == 0 {
+									// Find the length of the groups on each side.
+									lGroupLength, rGroupLength := 1, 1
+									lComplete, rComplete := false, false
+									beginLIdx, beginRIdx := curLIdx, curRIdx
+
+									// Find the length of the group on the left.
+									if curLLength == 0 {
+										lGroupLength, lComplete = 0, true
+									} else {
+										curLIdx++
+										for curLIdx < curLLength {
+											lSelIdx := curLIdx
+											newLVal := lKeys.Get(lSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												lComplete = true
+												break
+											}
+											lGroupLength++
+											curLIdx++
+										}
+									}
+
+									// Find the length of the group on the right.
+									if curRLength == 0 {
+										rGroupLength, rComplete = 0, true
+									} else {
+										curRIdx++
+										for curRIdx < curRLength {
+											rSelIdx := curRIdx
+											newRVal := rKeys.Get(rSelIdx)
+
+											{
+												var cmpResult int
+
+												cmpResult = newRVal.(*coldataext.Datum).CompareDatum(rKeys, rVal)
+
+												match = cmpResult == 0
+											}
+
+											if !match {
+												rComplete = true
+												break
+											}
+											rGroupLength++
+											curRIdx++
+										}
+									}
+
+									// Last equality column and either group is incomplete. Save state
+									// and have it handled in the next iteration.
+									if eqColIdx == len(o.left.eqCols)-1 && (!lComplete || !rComplete) {
+										o.appendToBufferedGroup(ctx, &o.left, o.proberState.lBatch, lSel, beginLIdx, lGroupLength)
+										o.proberState.lIdx = lGroupLength + beginLIdx
+										o.appendToBufferedGroup(ctx, &o.right, o.proberState.rBatch, rSel, beginRIdx, rGroupLength)
+										o.proberState.rIdx = rGroupLength + beginRIdx
+
+										o.groups.finishedCol()
+										break EqLoop
+									}
+
+									if eqColIdx < len(o.left.eqCols)-1 {
+										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
+									} else {
+										o.groups.addLeftSemiGroup(beginLIdx, lGroupLength)
+									}
+								} else { // mismatch
+									// The line below is a compact form of the following:
+									//   incrementLeft :=
+									//    (cmp < 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC) ||
+									//	  (cmp > 0 && o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_DESC).
+									incrementLeft := cmp < 0 == (o.left.directions[eqColIdx] == execinfrapb.Ordering_Column_ASC)
+									if incrementLeft {
+										curLIdx++
+
+									} else {
+										curRIdx++
+
+									}
+								}
+							}
+
+							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
+							// last elements processed in their respective batches.
+							o.proberState.lIdx = curLIdx
+							o.proberState.rIdx = curRIdx
+						}
+					}
 				default:
 					colexecerror.InternalError(fmt.Sprintf("unhandled type %s", colType))
 				}
@@ -22713,6 +24875,68 @@ func (o *mergeJoinLeftSemiOp) buildLeftGroupsFromBatch(
 								}
 								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+								var val interface{}
+								var srcStartIdx int
+
+								// Loop over every group.
+								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+									// Otherwise continue where we left off.
+									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+									}
+									// Loop over every row in the group.
+									for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+										// Repeat each row numRepeats times.
+										srcStartIdx = o.builderState.left.curSrcStartIdx
+										srcStartIdx = sel[srcStartIdx]
+
+										repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+										toAppend := repeatsLeft
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											if src.Nulls().NullAt(srcStartIdx) {
+												out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+												outStartIdx += toAppend
+											} else {
+												val = srcCol.Get(srcStartIdx)
+												for i := 0; i < toAppend; i++ {
+													outCol.Set(outStartIdx, val)
+													outStartIdx++
+												}
+											}
+										}
+
+										if toAppend < repeatsLeft {
+											// We didn't materialize all the rows in the group so save state and
+											// move to the next column.
+											o.builderState.left.numRepeatsIdx += toAppend
+											if colIdx == len(input.sourceTypes)-1 {
+												return
+											}
+											o.builderState.left.setBuilderColumnState(initialBuilderState)
+											continue LeftColLoop
+										}
+
+										o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+									}
+									o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+							}
 						default:
 							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 						}
@@ -23220,6 +25444,65 @@ func (o *mergeJoinLeftSemiOp) buildLeftGroupsFromBatch(
 												val = srcCol[srcStartIdx]
 												for i := 0; i < toAppend; i++ {
 													outCol[outStartIdx] = val
+													outStartIdx++
+												}
+											}
+										}
+
+										if toAppend < repeatsLeft {
+											// We didn't materialize all the rows in the group so save state and
+											// move to the next column.
+											o.builderState.left.numRepeatsIdx += toAppend
+											if colIdx == len(input.sourceTypes)-1 {
+												return
+											}
+											o.builderState.left.setBuilderColumnState(initialBuilderState)
+											continue LeftColLoop
+										}
+
+										o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+									}
+									o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+								var val interface{}
+								var srcStartIdx int
+
+								// Loop over every group.
+								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+									// Otherwise continue where we left off.
+									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+									}
+									// Loop over every row in the group.
+									for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+										// Repeat each row numRepeats times.
+										srcStartIdx = o.builderState.left.curSrcStartIdx
+										srcStartIdx = sel[srcStartIdx]
+
+										repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+										toAppend := repeatsLeft
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											{
+												val = srcCol.Get(srcStartIdx)
+												for i := 0; i < toAppend; i++ {
+													outCol.Set(outStartIdx, val)
 													outStartIdx++
 												}
 											}
@@ -23791,6 +26074,67 @@ func (o *mergeJoinLeftSemiOp) buildLeftGroupsFromBatch(
 								}
 								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+								var val interface{}
+								var srcStartIdx int
+
+								// Loop over every group.
+								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+									// Otherwise continue where we left off.
+									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+									}
+									// Loop over every row in the group.
+									for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+										// Repeat each row numRepeats times.
+										srcStartIdx = o.builderState.left.curSrcStartIdx
+
+										repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+										toAppend := repeatsLeft
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											if src.Nulls().NullAt(srcStartIdx) {
+												out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+												outStartIdx += toAppend
+											} else {
+												val = srcCol.Get(srcStartIdx)
+												for i := 0; i < toAppend; i++ {
+													outCol.Set(outStartIdx, val)
+													outStartIdx++
+												}
+											}
+										}
+
+										if toAppend < repeatsLeft {
+											// We didn't materialize all the rows in the group so save state and
+											// move to the next column.
+											o.builderState.left.numRepeatsIdx += toAppend
+											if colIdx == len(input.sourceTypes)-1 {
+												return
+											}
+											o.builderState.left.setBuilderColumnState(initialBuilderState)
+											continue LeftColLoop
+										}
+
+										o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+									}
+									o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+							}
 						default:
 							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 						}
@@ -24311,6 +26655,64 @@ func (o *mergeJoinLeftSemiOp) buildLeftGroupsFromBatch(
 								}
 								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
 							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+								var val interface{}
+								var srcStartIdx int
+
+								// Loop over every group.
+								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
+									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
+									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
+									// Otherwise continue where we left off.
+									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+										o.builderState.left.curSrcStartIdx = leftGroup.rowStartIdx
+									}
+									// Loop over every row in the group.
+									for ; o.builderState.left.curSrcStartIdx < leftGroup.rowEndIdx; o.builderState.left.curSrcStartIdx++ {
+										// Repeat each row numRepeats times.
+										srcStartIdx = o.builderState.left.curSrcStartIdx
+
+										repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+										toAppend := repeatsLeft
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											{
+												val = srcCol.Get(srcStartIdx)
+												for i := 0; i < toAppend; i++ {
+													outCol.Set(outStartIdx, val)
+													outStartIdx++
+												}
+											}
+										}
+
+										if toAppend < repeatsLeft {
+											// We didn't materialize all the rows in the group so save state and
+											// move to the next column.
+											o.builderState.left.numRepeatsIdx += toAppend
+											if colIdx == len(input.sourceTypes)-1 {
+												return
+											}
+											o.builderState.left.setBuilderColumnState(initialBuilderState)
+											continue LeftColLoop
+										}
+
+										o.builderState.left.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+									}
+									o.builderState.left.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+								}
+								o.builderState.left.groupsIdx = zeroMJCPGroupsIdx
+							}
 						default:
 							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 						}
@@ -24771,6 +27173,55 @@ func (o *mergeJoinLeftSemiOp) buildLeftBufferedGroup(
 									val = srcCol[srcStartIdx]
 									for i := 0; i < toAppend; i++ {
 										outCol[outStartIdx] = val
+										outStartIdx++
+									}
+								}
+
+								if toAppend < repeatsLeft {
+									// We didn't materialize all the rows in the current batch, so
+									// we move to the next column.
+									if colIdx == len(input.sourceTypes)-1 {
+										// This is the last column, so we update the builder state
+										// and exit.
+										o.builderState.left.numRepeatsIdx += toAppend
+										return
+									}
+									// We need to start building the next column
+									// with the same initial builder state as the
+									// current column.
+									o.builderState.left.setBuilderColumnState(initialBuilderState)
+									continue LeftColLoop
+								}
+								// We fully processed the current row, and before moving on to the
+								// next one, we need to reset numRepeatsIdx (so that the next row
+								// would be repeated leftGroup.numRepeats times).
+								o.builderState.left.numRepeatsIdx = 0
+							}
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch input.sourceTypes[colIdx].Width() {
+						case -1:
+						default:
+							srcCol := src.Datum()
+							outCol := out.Datum()
+							var val interface{}
+							// Loop over every row in the group.
+							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
+								// Repeat each row numRepeats times.
+								srcStartIdx := o.builderState.left.curSrcStartIdx
+								repeatsLeft := leftGroup.numRepeats - o.builderState.left.numRepeatsIdx
+								toAppend := repeatsLeft
+								if outStartIdx+toAppend > o.outputBatchSize {
+									toAppend = o.outputBatchSize - outStartIdx
+								}
+
+								if src.Nulls().NullAt(srcStartIdx) {
+									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
+									outStartIdx += toAppend
+								} else {
+									val = srcCol.Get(srcStartIdx)
+									for i := 0; i < toAppend; i++ {
+										outCol.Set(outStartIdx, val)
 										outStartIdx++
 									}
 								}
@@ -25478,6 +27929,74 @@ func (o *mergeJoinLeftSemiOp) buildRightGroupsFromBatch(
 								}
 								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+
+								// Loop over every group.
+								for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+									rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+									// Repeat every group numRepeats times.
+									for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+										if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+											o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+										}
+										toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											// Optimization in the case that group length is 1, use assign
+											// instead of copy.
+											if toAppend == 1 {
+												if src.Nulls().NullAt(sel[o.builderState.right.curSrcStartIdx]) {
+													out.Nulls().SetNull(outStartIdx)
+												} else {
+													v := srcCol.Get(sel[o.builderState.right.curSrcStartIdx])
+													outCol.Set(outStartIdx, v)
+												}
+											} else {
+												out.Copy(
+													coldata.CopySliceArgs{
+														SliceArgs: coldata.SliceArgs{
+															Src:         src,
+															Sel:         sel,
+															DestIdx:     outStartIdx,
+															SrcStartIdx: o.builderState.right.curSrcStartIdx,
+															SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+														},
+													},
+												)
+											}
+										}
+
+										outStartIdx += toAppend
+
+										// If we haven't materialized all the rows from the group, then we are
+										// done with the current column.
+										if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+											// If it's the last column, save state and return.
+											if colIdx == len(input.sourceTypes)-1 {
+												o.builderState.right.curSrcStartIdx += toAppend
+												return
+											}
+											// Otherwise, reset to the initial state and begin the next column.
+											o.builderState.right.setBuilderColumnState(initialBuilderState)
+											continue RightColLoop
+										}
+										o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+									}
+									o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+							}
 						default:
 							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 						}
@@ -26034,6 +28553,72 @@ func (o *mergeJoinLeftSemiOp) buildRightGroupsFromBatch(
 												{
 													v := srcCol[sel[o.builderState.right.curSrcStartIdx]]
 													outCol[outStartIdx] = v
+												}
+											} else {
+												out.Copy(
+													coldata.CopySliceArgs{
+														SliceArgs: coldata.SliceArgs{
+															Src:         src,
+															Sel:         sel,
+															DestIdx:     outStartIdx,
+															SrcStartIdx: o.builderState.right.curSrcStartIdx,
+															SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+														},
+													},
+												)
+											}
+										}
+
+										outStartIdx += toAppend
+
+										// If we haven't materialized all the rows from the group, then we are
+										// done with the current column.
+										if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+											// If it's the last column, save state and return.
+											if colIdx == len(input.sourceTypes)-1 {
+												o.builderState.right.curSrcStartIdx += toAppend
+												return
+											}
+											// Otherwise, reset to the initial state and begin the next column.
+											o.builderState.right.setBuilderColumnState(initialBuilderState)
+											continue RightColLoop
+										}
+										o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+									}
+									o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+
+								// Loop over every group.
+								for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+									rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+									// Repeat every group numRepeats times.
+									for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+										if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+											o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+										}
+										toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											// Optimization in the case that group length is 1, use assign
+											// instead of copy.
+											if toAppend == 1 {
+												{
+													v := srcCol.Get(sel[o.builderState.right.curSrcStartIdx])
+													outCol.Set(outStartIdx, v)
 												}
 											} else {
 												out.Copy(
@@ -26682,6 +29267,74 @@ func (o *mergeJoinLeftSemiOp) buildRightGroupsFromBatch(
 								}
 								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+
+								// Loop over every group.
+								for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+									rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+									// Repeat every group numRepeats times.
+									for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+										if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+											o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+										}
+										toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											// Optimization in the case that group length is 1, use assign
+											// instead of copy.
+											if toAppend == 1 {
+												if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+													out.Nulls().SetNull(outStartIdx)
+												} else {
+													v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+													outCol.Set(outStartIdx, v)
+												}
+											} else {
+												out.Copy(
+													coldata.CopySliceArgs{
+														SliceArgs: coldata.SliceArgs{
+															Src:         src,
+															Sel:         sel,
+															DestIdx:     outStartIdx,
+															SrcStartIdx: o.builderState.right.curSrcStartIdx,
+															SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+														},
+													},
+												)
+											}
+										}
+
+										outStartIdx += toAppend
+
+										// If we haven't materialized all the rows from the group, then we are
+										// done with the current column.
+										if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+											// If it's the last column, save state and return.
+											if colIdx == len(input.sourceTypes)-1 {
+												o.builderState.right.curSrcStartIdx += toAppend
+												return
+											}
+											// Otherwise, reset to the initial state and begin the next column.
+											o.builderState.right.setBuilderColumnState(initialBuilderState)
+											continue RightColLoop
+										}
+										o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+									}
+									o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+							}
 						default:
 							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 						}
@@ -27274,6 +29927,72 @@ func (o *mergeJoinLeftSemiOp) buildRightGroupsFromBatch(
 								}
 								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
 							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								var srcCol coldata.DatumVec
+								if src != nil {
+									srcCol = src.Datum()
+								}
+								outCol := out.Datum()
+
+								// Loop over every group.
+								for ; o.builderState.right.groupsIdx < len(rightGroups); o.builderState.right.groupsIdx++ {
+									rightGroup := &rightGroups[o.builderState.right.groupsIdx]
+									// Repeat every group numRepeats times.
+									for ; o.builderState.right.numRepeatsIdx < rightGroup.numRepeats; o.builderState.right.numRepeatsIdx++ {
+										if o.builderState.right.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
+											o.builderState.right.curSrcStartIdx = rightGroup.rowStartIdx
+										}
+										toAppend := rightGroup.rowEndIdx - o.builderState.right.curSrcStartIdx
+										if outStartIdx+toAppend > outputBatchSize {
+											toAppend = outputBatchSize - outStartIdx
+										}
+
+										{
+											// Optimization in the case that group length is 1, use assign
+											// instead of copy.
+											if toAppend == 1 {
+												{
+													v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+													outCol.Set(outStartIdx, v)
+												}
+											} else {
+												out.Copy(
+													coldata.CopySliceArgs{
+														SliceArgs: coldata.SliceArgs{
+															Src:         src,
+															Sel:         sel,
+															DestIdx:     outStartIdx,
+															SrcStartIdx: o.builderState.right.curSrcStartIdx,
+															SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+														},
+													},
+												)
+											}
+										}
+
+										outStartIdx += toAppend
+
+										// If we haven't materialized all the rows from the group, then we are
+										// done with the current column.
+										if toAppend < rightGroup.rowEndIdx-o.builderState.right.curSrcStartIdx {
+											// If it's the last column, save state and return.
+											if colIdx == len(input.sourceTypes)-1 {
+												o.builderState.right.curSrcStartIdx += toAppend
+												return
+											}
+											// Otherwise, reset to the initial state and begin the next column.
+											o.builderState.right.setBuilderColumnState(initialBuilderState)
+											continue RightColLoop
+										}
+										o.builderState.right.curSrcStartIdx = zeroMJCPCurSrcStartIdx
+									}
+									o.builderState.right.numRepeatsIdx = zeroMJCPNumRepeatsIdx
+								}
+								o.builderState.right.groupsIdx = zeroMJCPGroupsIdx
+							}
 						default:
 							colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 						}
@@ -27569,6 +30288,35 @@ func (o *mergeJoinLeftSemiOp) buildRightBufferedGroup(
 									} else {
 										v := srcCol[o.builderState.right.curSrcStartIdx]
 										outCol[outStartIdx] = v
+									}
+								} else {
+									out.Copy(
+										coldata.CopySliceArgs{
+											SliceArgs: coldata.SliceArgs{
+												Src:         src,
+												DestIdx:     outStartIdx,
+												SrcStartIdx: o.builderState.right.curSrcStartIdx,
+												SrcEndIdx:   o.builderState.right.curSrcStartIdx + toAppend,
+											},
+										},
+									)
+								}
+							}
+						case typeconv.DatumVecCanonicalTypeFamily:
+							switch input.sourceTypes[colIdx].Width() {
+							case -1:
+							default:
+								srcCol := src.Datum()
+								outCol := out.Datum()
+
+								// Optimization in the case that group length is 1, use assign
+								// instead of copy.
+								if toAppend == 1 {
+									if src.Nulls().NullAt(o.builderState.right.curSrcStartIdx) {
+										out.Nulls().SetNull(outStartIdx)
+									} else {
+										v := srcCol.Get(o.builderState.right.curSrcStartIdx)
+										outCol.Set(outStartIdx, v)
 									}
 								} else {
 									out.Copy(

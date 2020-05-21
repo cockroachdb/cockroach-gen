@@ -17,8 +17,11 @@ import (
 	"unsafe"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
+	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
 
@@ -36,6 +39,7 @@ func rehash(
 	sel []int,
 	cancelChecker CancelChecker,
 	decimalScratch decimalOverloadScratch,
+	datumAlloc *sqlbase.DatumAlloc,
 ) {
 	switch col.CanonicalTypeFamily() {
 	case types.BoolFamily:
@@ -817,6 +821,87 @@ func rehash(
 						p = memhash64(noescape(unsafe.Pointer(&months)), p)
 						p = memhash64(noescape(unsafe.Pointer(&days)), p)
 						p = memhash64(noescape(unsafe.Pointer(&nanos)), p)
+
+						buckets[i] = uint64(p)
+					}
+				}
+			}
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch col.Type().Width() {
+		case -1:
+		default:
+			keys, nulls := col.Datum(), col.Nulls()
+			if col.MaybeHasNulls() {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
+						b := v.(*coldataext.Datum).Hash(datumAlloc)
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys.Get(nKeys - 1)
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						if nulls.NullAt(selIdx) {
+							continue
+						}
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
+						b := v.(*coldataext.Datum).Hash(datumAlloc)
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+
+						buckets[i] = uint64(p)
+					}
+				}
+			} else {
+				if sel != nil {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = sel[nKeys-1]
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = sel[i]
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
+						b := v.(*coldataext.Datum).Hash(datumAlloc)
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
+
+						buckets[i] = uint64(p)
+					}
+				} else {
+					// Early bounds checks.
+					_ = buckets[nKeys-1]
+					_ = keys.Get(nKeys - 1)
+					var selIdx int
+					for i := 0; i < nKeys; i++ {
+						cancelChecker.check(ctx)
+						selIdx = i
+						v := keys.Get(selIdx)
+						p := uintptr(buckets[i])
+						b := v.(*coldataext.Datum).Hash(datumAlloc)
+						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+						p = memhash(unsafe.Pointer(sh.Data), p, uintptr(len(b)))
 
 						buckets[i] = uint64(p)
 					}

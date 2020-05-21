@@ -17,6 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -452,6 +453,45 @@ func (c *IntervalVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int
 	}
 }
 
+type DatumVecComparator struct {
+	vecs  []coldata.DatumVec
+	nulls []*coldata.Nulls
+}
+
+func (c *DatumVecComparator) compare(vecIdx1, vecIdx2 int, valIdx1, valIdx2 int) int {
+	n1 := c.nulls[vecIdx1].MaybeHasNulls() && c.nulls[vecIdx1].NullAt(valIdx1)
+	n2 := c.nulls[vecIdx2].MaybeHasNulls() && c.nulls[vecIdx2].NullAt(valIdx2)
+	if n1 && n2 {
+		return 0
+	} else if n1 {
+		return -1
+	} else if n2 {
+		return 1
+	}
+	left := c.vecs[vecIdx1].Get(valIdx1)
+	right := c.vecs[vecIdx2].Get(valIdx2)
+	var cmp int
+
+	cmp = left.(*coldataext.Datum).CompareDatum(c.vecs[vecIdx1], right)
+
+	return cmp
+}
+
+func (c *DatumVecComparator) setVec(idx int, vec coldata.Vec) {
+	c.vecs[idx] = vec.Datum()
+	c.nulls[idx] = vec.Nulls()
+}
+
+func (c *DatumVecComparator) set(srcVecIdx, dstVecIdx int, srcIdx, dstIdx int) {
+	if c.nulls[srcVecIdx].MaybeHasNulls() && c.nulls[srcVecIdx].NullAt(srcIdx) {
+		c.nulls[dstVecIdx].SetNull(dstIdx)
+	} else {
+		c.nulls[dstVecIdx].UnsetNull(dstIdx)
+		v := c.vecs[srcVecIdx].Get(srcIdx)
+		c.vecs[dstVecIdx].Set(dstIdx, v)
+	}
+}
+
 func GetVecComparator(t *types.T, numVecs int) vecComparator {
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
 	case types.BoolFamily:
@@ -524,6 +564,15 @@ func GetVecComparator(t *types.T, numVecs int) vecComparator {
 		default:
 			return &IntervalVecComparator{
 				vecs:  make([][]duration.Duration, numVecs),
+				nulls: make([]*coldata.Nulls, numVecs),
+			}
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &DatumVecComparator{
+				vecs:  make([]coldata.DatumVec, numVecs),
 				nulls: make([]*coldata.Nulls, numVecs),
 			}
 		}

@@ -14,6 +14,8 @@ import (
 	"math"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -15265,6 +15267,455 @@ func (ht *hashTable) checkCol(
 											{
 												var cmpResult int
 												cmpResult = probeVal.Compare(buildVal)
+												unique = cmpResult != 0
+											}
+
+											ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch probeVec.Type().Width() {
+		case -1:
+		default:
+			switch buildVec.CanonicalTypeFamily() {
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch buildVec.Type().Width() {
+				case -1:
+				default:
+					probeKeys := probeVec.Datum()
+					buildKeys := buildVec.Datum()
+					if probeSel != nil {
+						if probeVec.MaybeHasNulls() {
+							if buildVec.MaybeHasNulls() {
+								if ht.allowNullEquality {
+									var (
+										probeIdx, buildIdx       int
+										probeIsNull, buildIsNull bool
+									)
+									// Early bounds check.
+									_ = ht.probeScratch.toCheck[nToCheck-1]
+									for i := uint64(0); i < nToCheck; i++ {
+										// keyID of 0 is reserved to represent the end of the next chain.
+										toCheck := ht.probeScratch.toCheck[i]
+										keyID := ht.probeScratch.groupID[toCheck]
+										if keyID != 0 {
+											// the build table key (calculated using keys[keyID - 1] = key) is
+											// compared to the corresponding probe table to determine if a match is
+											// found.
+											probeIdx = probeSel[toCheck]
+											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
+											buildIdx = int(keyID - 1)
+											buildIsNull = buildVec.Nulls().NullAt(buildIdx)
+											if probeIsNull && buildIsNull {
+												// Both values are NULLs, and since we're allowing null equality, we
+												// proceed to the next value to check.
+												continue
+											} else if probeIsNull {
+												// Only probing value is NULL, so it is different from the build value
+												// (which is non-NULL). We mark it as "different" and proceed to the
+												// next value to check. This behavior is special in case of allowing
+												// null equality because we don't want to reset the groupID of the
+												// current probing tuple.
+												ht.probeScratch.differs[toCheck] = true
+												continue
+											}
+											if probeIsNull {
+												ht.probeScratch.groupID[toCheck] = 0
+											} else if buildIsNull {
+												ht.probeScratch.differs[toCheck] = true
+											} else {
+												probeVal := probeKeys.Get(probeIdx)
+												buildVal := buildKeys.Get(buildIdx)
+												var unique bool
+
+												{
+													var cmpResult int
+
+													cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+													unique = cmpResult != 0
+												}
+
+												ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+											}
+										}
+									}
+								} else {
+									var (
+										probeIdx, buildIdx       int
+										probeIsNull, buildIsNull bool
+									)
+									// Early bounds check.
+									_ = ht.probeScratch.toCheck[nToCheck-1]
+									for i := uint64(0); i < nToCheck; i++ {
+										// keyID of 0 is reserved to represent the end of the next chain.
+										toCheck := ht.probeScratch.toCheck[i]
+										keyID := ht.probeScratch.groupID[toCheck]
+										if keyID != 0 {
+											// the build table key (calculated using keys[keyID - 1] = key) is
+											// compared to the corresponding probe table to determine if a match is
+											// found.
+											probeIdx = probeSel[toCheck]
+											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
+											buildIdx = int(keyID - 1)
+											buildIsNull = buildVec.Nulls().NullAt(buildIdx)
+											if probeIsNull {
+												ht.probeScratch.groupID[toCheck] = 0
+											} else if buildIsNull {
+												ht.probeScratch.differs[toCheck] = true
+											} else {
+												probeVal := probeKeys.Get(probeIdx)
+												buildVal := buildKeys.Get(buildIdx)
+												var unique bool
+
+												{
+													var cmpResult int
+
+													cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+													unique = cmpResult != 0
+												}
+
+												ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+											}
+										}
+									}
+								}
+							} else {
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
+								// Early bounds check.
+								_ = ht.probeScratch.toCheck[nToCheck-1]
+								for i := uint64(0); i < nToCheck; i++ {
+									// keyID of 0 is reserved to represent the end of the next chain.
+									toCheck := ht.probeScratch.toCheck[i]
+									keyID := ht.probeScratch.groupID[toCheck]
+									if keyID != 0 {
+										// the build table key (calculated using keys[keyID - 1] = key) is
+										// compared to the corresponding probe table to determine if a match is
+										// found.
+										probeIdx = probeSel[toCheck]
+										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
+										buildIdx = int(keyID - 1)
+										if probeIsNull {
+											ht.probeScratch.groupID[toCheck] = 0
+										} else if buildIsNull {
+											ht.probeScratch.differs[toCheck] = true
+										} else {
+											probeVal := probeKeys.Get(probeIdx)
+											buildVal := buildKeys.Get(buildIdx)
+											var unique bool
+
+											{
+												var cmpResult int
+
+												cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+												unique = cmpResult != 0
+											}
+
+											ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+										}
+									}
+								}
+							}
+						} else {
+							if buildVec.MaybeHasNulls() {
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
+								// Early bounds check.
+								_ = ht.probeScratch.toCheck[nToCheck-1]
+								for i := uint64(0); i < nToCheck; i++ {
+									// keyID of 0 is reserved to represent the end of the next chain.
+									toCheck := ht.probeScratch.toCheck[i]
+									keyID := ht.probeScratch.groupID[toCheck]
+									if keyID != 0 {
+										// the build table key (calculated using keys[keyID - 1] = key) is
+										// compared to the corresponding probe table to determine if a match is
+										// found.
+										probeIdx = probeSel[toCheck]
+										buildIdx = int(keyID - 1)
+										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
+										if probeIsNull {
+											ht.probeScratch.groupID[toCheck] = 0
+										} else if buildIsNull {
+											ht.probeScratch.differs[toCheck] = true
+										} else {
+											probeVal := probeKeys.Get(probeIdx)
+											buildVal := buildKeys.Get(buildIdx)
+											var unique bool
+
+											{
+												var cmpResult int
+
+												cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+												unique = cmpResult != 0
+											}
+
+											ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+										}
+									}
+								}
+							} else {
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
+								// Early bounds check.
+								_ = ht.probeScratch.toCheck[nToCheck-1]
+								for i := uint64(0); i < nToCheck; i++ {
+									// keyID of 0 is reserved to represent the end of the next chain.
+									toCheck := ht.probeScratch.toCheck[i]
+									keyID := ht.probeScratch.groupID[toCheck]
+									if keyID != 0 {
+										// the build table key (calculated using keys[keyID - 1] = key) is
+										// compared to the corresponding probe table to determine if a match is
+										// found.
+										probeIdx = probeSel[toCheck]
+										buildIdx = int(keyID - 1)
+										if probeIsNull {
+											ht.probeScratch.groupID[toCheck] = 0
+										} else if buildIsNull {
+											ht.probeScratch.differs[toCheck] = true
+										} else {
+											probeVal := probeKeys.Get(probeIdx)
+											buildVal := buildKeys.Get(buildIdx)
+											var unique bool
+
+											{
+												var cmpResult int
+
+												cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+												unique = cmpResult != 0
+											}
+
+											ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+										}
+									}
+								}
+							}
+						}
+					} else {
+						if probeVec.MaybeHasNulls() {
+							if buildVec.MaybeHasNulls() {
+								if ht.allowNullEquality {
+									var (
+										probeIdx, buildIdx       int
+										probeIsNull, buildIsNull bool
+									)
+									// Early bounds check.
+									_ = ht.probeScratch.toCheck[nToCheck-1]
+									for i := uint64(0); i < nToCheck; i++ {
+										// keyID of 0 is reserved to represent the end of the next chain.
+										toCheck := ht.probeScratch.toCheck[i]
+										keyID := ht.probeScratch.groupID[toCheck]
+										if keyID != 0 {
+											// the build table key (calculated using keys[keyID - 1] = key) is
+											// compared to the corresponding probe table to determine if a match is
+											// found.
+											probeIdx = int(toCheck)
+											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
+											buildIdx = int(keyID - 1)
+											buildIsNull = buildVec.Nulls().NullAt(buildIdx)
+											if probeIsNull && buildIsNull {
+												// Both values are NULLs, and since we're allowing null equality, we
+												// proceed to the next value to check.
+												continue
+											} else if probeIsNull {
+												// Only probing value is NULL, so it is different from the build value
+												// (which is non-NULL). We mark it as "different" and proceed to the
+												// next value to check. This behavior is special in case of allowing
+												// null equality because we don't want to reset the groupID of the
+												// current probing tuple.
+												ht.probeScratch.differs[toCheck] = true
+												continue
+											}
+											if probeIsNull {
+												ht.probeScratch.groupID[toCheck] = 0
+											} else if buildIsNull {
+												ht.probeScratch.differs[toCheck] = true
+											} else {
+												probeVal := probeKeys.Get(probeIdx)
+												buildVal := buildKeys.Get(buildIdx)
+												var unique bool
+
+												{
+													var cmpResult int
+
+													cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+													unique = cmpResult != 0
+												}
+
+												ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+											}
+										}
+									}
+								} else {
+									var (
+										probeIdx, buildIdx       int
+										probeIsNull, buildIsNull bool
+									)
+									// Early bounds check.
+									_ = ht.probeScratch.toCheck[nToCheck-1]
+									for i := uint64(0); i < nToCheck; i++ {
+										// keyID of 0 is reserved to represent the end of the next chain.
+										toCheck := ht.probeScratch.toCheck[i]
+										keyID := ht.probeScratch.groupID[toCheck]
+										if keyID != 0 {
+											// the build table key (calculated using keys[keyID - 1] = key) is
+											// compared to the corresponding probe table to determine if a match is
+											// found.
+											probeIdx = int(toCheck)
+											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
+											buildIdx = int(keyID - 1)
+											buildIsNull = buildVec.Nulls().NullAt(buildIdx)
+											if probeIsNull {
+												ht.probeScratch.groupID[toCheck] = 0
+											} else if buildIsNull {
+												ht.probeScratch.differs[toCheck] = true
+											} else {
+												probeVal := probeKeys.Get(probeIdx)
+												buildVal := buildKeys.Get(buildIdx)
+												var unique bool
+
+												{
+													var cmpResult int
+
+													cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+													unique = cmpResult != 0
+												}
+
+												ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+											}
+										}
+									}
+								}
+							} else {
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
+								// Early bounds check.
+								_ = ht.probeScratch.toCheck[nToCheck-1]
+								for i := uint64(0); i < nToCheck; i++ {
+									// keyID of 0 is reserved to represent the end of the next chain.
+									toCheck := ht.probeScratch.toCheck[i]
+									keyID := ht.probeScratch.groupID[toCheck]
+									if keyID != 0 {
+										// the build table key (calculated using keys[keyID - 1] = key) is
+										// compared to the corresponding probe table to determine if a match is
+										// found.
+										probeIdx = int(toCheck)
+										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
+										buildIdx = int(keyID - 1)
+										if probeIsNull {
+											ht.probeScratch.groupID[toCheck] = 0
+										} else if buildIsNull {
+											ht.probeScratch.differs[toCheck] = true
+										} else {
+											probeVal := probeKeys.Get(probeIdx)
+											buildVal := buildKeys.Get(buildIdx)
+											var unique bool
+
+											{
+												var cmpResult int
+
+												cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+												unique = cmpResult != 0
+											}
+
+											ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+										}
+									}
+								}
+							}
+						} else {
+							if buildVec.MaybeHasNulls() {
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
+								// Early bounds check.
+								_ = ht.probeScratch.toCheck[nToCheck-1]
+								for i := uint64(0); i < nToCheck; i++ {
+									// keyID of 0 is reserved to represent the end of the next chain.
+									toCheck := ht.probeScratch.toCheck[i]
+									keyID := ht.probeScratch.groupID[toCheck]
+									if keyID != 0 {
+										// the build table key (calculated using keys[keyID - 1] = key) is
+										// compared to the corresponding probe table to determine if a match is
+										// found.
+										probeIdx = int(toCheck)
+										buildIdx = int(keyID - 1)
+										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
+										if probeIsNull {
+											ht.probeScratch.groupID[toCheck] = 0
+										} else if buildIsNull {
+											ht.probeScratch.differs[toCheck] = true
+										} else {
+											probeVal := probeKeys.Get(probeIdx)
+											buildVal := buildKeys.Get(buildIdx)
+											var unique bool
+
+											{
+												var cmpResult int
+
+												cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
+												unique = cmpResult != 0
+											}
+
+											ht.probeScratch.differs[toCheck] = ht.probeScratch.differs[toCheck] || unique
+										}
+									}
+								}
+							} else {
+								var (
+									probeIdx, buildIdx       int
+									probeIsNull, buildIsNull bool
+								)
+								// Early bounds check.
+								_ = ht.probeScratch.toCheck[nToCheck-1]
+								for i := uint64(0); i < nToCheck; i++ {
+									// keyID of 0 is reserved to represent the end of the next chain.
+									toCheck := ht.probeScratch.toCheck[i]
+									keyID := ht.probeScratch.groupID[toCheck]
+									if keyID != 0 {
+										// the build table key (calculated using keys[keyID - 1] = key) is
+										// compared to the corresponding probe table to determine if a match is
+										// found.
+										probeIdx = int(toCheck)
+										buildIdx = int(keyID - 1)
+										if probeIsNull {
+											ht.probeScratch.groupID[toCheck] = 0
+										} else if buildIsNull {
+											ht.probeScratch.differs[toCheck] = true
+										} else {
+											probeVal := probeKeys.Get(probeIdx)
+											buildVal := buildKeys.Get(buildIdx)
+											var unique bool
+
+											{
+												var cmpResult int
+
+												cmpResult = probeVal.(*coldataext.Datum).CompareDatum(probeKeys, buildVal)
+
 												unique = cmpResult != 0
 											}
 

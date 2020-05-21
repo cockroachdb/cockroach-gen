@@ -17,6 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -82,6 +83,12 @@ func newMinAggAlloc(
 		case -1:
 		default:
 			return &minIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &minDatumAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported min agg type %s", t.Name())
@@ -2726,6 +2733,277 @@ func (a *minIntervalAggAlloc) newAggFunc() aggregateFunc {
 	return f
 }
 
+type minDatumAgg struct {
+	allocator *colmem.Allocator
+	groups    []bool
+	curIdx    int
+	// curAgg holds the running min/max, so we can index into the slice once per
+	// group, instead of on each iteration.
+	// NOTE: if foundNonNullForCurrentGroup is false, curAgg is undefined.
+	curAgg interface{}
+	// col points to the output vector we are updating.
+	col coldata.DatumVec
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
+	// nulls points to the output null vector that we are updating.
+	nulls *coldata.Nulls
+	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+	// for the group that is currently being aggregated.
+	foundNonNullForCurrentGroup bool
+}
+
+var _ aggregateFunc = &minDatumAgg{}
+
+const sizeOfminDatumAgg = int64(unsafe.Sizeof(minDatumAgg{}))
+
+func (a *minDatumAgg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.vec = v
+	a.col = v.Datum()
+	a.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *minDatumAgg) Reset() {
+	a.curIdx = -1
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
+}
+
+func (a *minDatumAgg) CurrentOutputIndex() int {
+	return a.curIdx
+}
+
+func (a *minDatumAgg) SetOutputIndex(idx int) {
+	if a.curIdx != -1 {
+		a.curIdx = idx
+		a.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *minDatumAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	inputLen := b.Length()
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Datum(), vec.Nulls()
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = nulls.NullAt(i)
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col.Slice(0, inputLen)
+					for i := 0; i < inputLen; i++ {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = nulls.NullAt(i)
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col.Slice(0, inputLen)
+					for i := 0; i < inputLen; i++ {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult < 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+	)
+}
+
+func (a *minDatumAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col.Set(a.curIdx, a.curAgg)
+	}
+	a.curIdx++
+}
+
+func (a *minDatumAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
+type minDatumAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []minDatumAgg
+}
+
+var _ aggregateFuncAlloc = &minDatumAggAlloc{}
+
+func (a *minDatumAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfminDatumAgg * a.allocSize)
+		a.aggFuncs = make([]minDatumAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
 func newMaxAggAlloc(
 	allocator *colmem.Allocator, t *types.T, allocSize int64,
 ) (aggregateFuncAlloc, error) {
@@ -2775,6 +3053,12 @@ func newMaxAggAlloc(
 		case -1:
 		default:
 			return &maxIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &maxDatumAggAlloc{allocator: allocator, allocSize: allocSize}, nil
 		}
 	}
 	return nil, errors.Errorf("unsupported max agg type %s", t.Name())
@@ -5412,6 +5696,277 @@ func (a *maxIntervalAggAlloc) newAggFunc() aggregateFunc {
 	if len(a.aggFuncs) == 0 {
 		a.allocator.AdjustMemoryUsage(sizeOfmaxIntervalAgg * a.allocSize)
 		a.aggFuncs = make([]maxIntervalAgg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	f.allocator = a.allocator
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+type maxDatumAgg struct {
+	allocator *colmem.Allocator
+	groups    []bool
+	curIdx    int
+	// curAgg holds the running min/max, so we can index into the slice once per
+	// group, instead of on each iteration.
+	// NOTE: if foundNonNullForCurrentGroup is false, curAgg is undefined.
+	curAgg interface{}
+	// col points to the output vector we are updating.
+	col coldata.DatumVec
+	// vec is the same as col before conversion from coldata.Vec.
+	vec coldata.Vec
+	// nulls points to the output null vector that we are updating.
+	nulls *coldata.Nulls
+	// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+	// for the group that is currently being aggregated.
+	foundNonNullForCurrentGroup bool
+}
+
+var _ aggregateFunc = &maxDatumAgg{}
+
+const sizeOfmaxDatumAgg = int64(unsafe.Sizeof(maxDatumAgg{}))
+
+func (a *maxDatumAgg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.vec = v
+	a.col = v.Datum()
+	a.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *maxDatumAgg) Reset() {
+	a.curIdx = -1
+	a.foundNonNullForCurrentGroup = false
+	a.nulls.UnsetNulls()
+}
+
+func (a *maxDatumAgg) CurrentOutputIndex() int {
+	return a.curIdx
+}
+
+func (a *maxDatumAgg) SetOutputIndex(idx int) {
+	if a.curIdx != -1 {
+		a.curIdx = idx
+		a.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *maxDatumAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	inputLen := b.Length()
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Datum(), vec.Nulls()
+	a.allocator.PerformOperation(
+		[]coldata.Vec{a.vec},
+		func() {
+			if nulls.MaybeHasNulls() {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = nulls.NullAt(i)
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col.Slice(0, inputLen)
+					for i := 0; i < inputLen; i++ {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = nulls.NullAt(i)
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if sel != nil {
+					sel = sel[:inputLen]
+					for _, i := range sel {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				} else {
+					col = col.Slice(0, inputLen)
+					for i := 0; i < inputLen; i++ {
+
+						if a.groups[i] {
+							// If we encounter a new group, and we haven't found any non-nulls for the
+							// current group, the output for this group should be null. If a.curIdx is
+							// negative, it means that this is the first group.
+							if a.curIdx >= 0 {
+								if !a.foundNonNullForCurrentGroup {
+									a.nulls.SetNull(a.curIdx)
+								} else {
+									a.col.Set(a.curIdx, a.curAgg)
+								}
+							}
+							a.curIdx++
+							a.foundNonNullForCurrentGroup = false
+						}
+						var isNull bool
+						isNull = false
+						if !isNull {
+							if !a.foundNonNullForCurrentGroup {
+								val := col.Get(i)
+								a.curAgg = val
+								a.foundNonNullForCurrentGroup = true
+							} else {
+								var cmp bool
+								candidate := col.Get(i)
+
+								{
+									var cmpResult int
+
+									cmpResult = candidate.(*coldataext.Datum).CompareDatum(col, a.curAgg)
+
+									cmp = cmpResult > 0
+								}
+
+								if cmp {
+									a.curAgg = candidate
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+	)
+}
+
+func (a *maxDatumAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should
+	// be null.
+	if !a.foundNonNullForCurrentGroup {
+		a.nulls.SetNull(a.curIdx)
+	} else {
+		a.col.Set(a.curIdx, a.curAgg)
+	}
+	a.curIdx++
+}
+
+func (a *maxDatumAgg) HandleEmptyInputScalar() {
+	a.nulls.SetNull(0)
+}
+
+type maxDatumAggAlloc struct {
+	allocator *colmem.Allocator
+	allocSize int64
+	aggFuncs  []maxDatumAgg
+}
+
+var _ aggregateFuncAlloc = &maxDatumAggAlloc{}
+
+func (a *maxDatumAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfmaxDatumAgg * a.allocSize)
+		a.aggFuncs = make([]maxDatumAgg, a.allocSize)
 	}
 	f := &a.aggFuncs[0]
 	f.allocator = a.allocator

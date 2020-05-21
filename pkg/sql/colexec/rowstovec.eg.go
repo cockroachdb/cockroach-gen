@@ -287,6 +287,34 @@ func EncDatumRowsToColVec(
 						}
 					}
 				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch t.Width() {
+				case -1:
+				default:
+					col := vec.Datum()
+					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					var v interface{}
+					for i := range rows {
+						row := rows[i]
+						if row[columnIdx].Datum == nil {
+							if err = row[columnIdx].EnsureDecoded(t, alloc); err != nil {
+								return
+							}
+						}
+						datum := row[columnIdx].Datum
+						if datum == tree.DNull {
+							vec.Nulls().SetNull(i)
+						} else {
+							v, err = datumToPhysicalFn(datum)
+							if err != nil {
+								return
+							}
+
+							castV := v.(interface{})
+							col.Set(i, castV)
+						}
+					}
+				}
 			default:
 				colexecerror.InternalError(fmt.Sprintf("unsupported type %s", t))
 			}

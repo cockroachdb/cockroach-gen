@@ -15,6 +15,8 @@ import (
 	"math"
 
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -1243,6 +1245,111 @@ func (v hashAggFuncs) match(
 								{
 									var cmpResult int
 									cmpResult = lhsVal.Compare(rhsVal)
+									cmp = cmpResult != 0
+								}
+
+								diff[selIdx] = diff[selIdx] || cmp
+							}
+
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch keyTypes[keyIdx].Width() {
+				case -1:
+				default:
+					lhsCol := lhs.Datum()
+					rhsCol := rhs.Datum()
+					if lhsHasNull {
+						lhsNull := lhs.Nulls().NullAt(v.keyIdx)
+						if rhsHasNull {
+							lhsVal := lhsCol.Get(aggKeyIdx)
+
+							for selIdx, rowIdx := range sel {
+								rhsNull := rhs.Nulls().NullAt(rowIdx)
+								if lhsNull && rhsNull {
+									// Both values are NULLs, and we do not consider them different.
+									continue
+								} else if lhsNull || rhsNull {
+									diff[selIdx] = true
+									continue
+								}
+
+								rhsVal := rhsCol.Get(rowIdx)
+
+								var cmp bool
+
+								{
+									var cmpResult int
+
+									cmpResult = lhsVal.(*coldataext.Datum).CompareDatum(lhsCol, rhsVal)
+
+									cmp = cmpResult != 0
+								}
+
+								diff[selIdx] = diff[selIdx] || cmp
+							}
+
+						} else {
+							lhsVal := lhsCol.Get(aggKeyIdx)
+
+							for selIdx, rowIdx := range sel {
+								if lhsNull {
+									diff[selIdx] = true
+									continue
+								}
+
+								rhsVal := rhsCol.Get(rowIdx)
+
+								var cmp bool
+
+								{
+									var cmpResult int
+
+									cmpResult = lhsVal.(*coldataext.Datum).CompareDatum(lhsCol, rhsVal)
+
+									cmp = cmpResult != 0
+								}
+
+								diff[selIdx] = diff[selIdx] || cmp
+							}
+
+						}
+					} else {
+						if rhsHasNull {
+							lhsVal := lhsCol.Get(aggKeyIdx)
+
+							for selIdx, rowIdx := range sel {
+
+								rhsVal := rhsCol.Get(rowIdx)
+
+								var cmp bool
+
+								{
+									var cmpResult int
+
+									cmpResult = lhsVal.(*coldataext.Datum).CompareDatum(lhsCol, rhsVal)
+
+									cmp = cmpResult != 0
+								}
+
+								diff[selIdx] = diff[selIdx] || cmp
+							}
+
+						} else {
+							lhsVal := lhsCol.Get(aggKeyIdx)
+
+							for selIdx, rowIdx := range sel {
+
+								rhsVal := rhsCol.Get(rowIdx)
+
+								var cmp bool
+
+								{
+									var cmpResult int
+
+									cmpResult = lhsVal.(*coldataext.Datum).CompareDatum(lhsCol, rhsVal)
+
 									cmp = cmpResult != 0
 								}
 

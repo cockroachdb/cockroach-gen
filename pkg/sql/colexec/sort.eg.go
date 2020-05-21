@@ -18,6 +18,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -80,6 +81,12 @@ func isSorterSupported(t *types.T, dir execinfrapb.Ordering_Column_Direction) bo
 			default:
 				return true
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch t.Width() {
+			case -1:
+			default:
+				return true
+			}
 		}
 	case execinfrapb.Ordering_Column_DESC:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
@@ -124,6 +131,12 @@ func isSorterSupported(t *types.T, dir execinfrapb.Ordering_Column_Direction) bo
 				return true
 			}
 		case types.IntervalFamily:
+			switch t.Width() {
+			case -1:
+			default:
+				return true
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
 			switch t.Width() {
 			case -1:
 			default:
@@ -188,6 +201,12 @@ func newSingleSorter(
 				default:
 					return &sortIntervalAscWithNullsOp{}
 				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch t.Width() {
+				case -1:
+				default:
+					return &sortDatumAscWithNullsOp{}
+				}
 			}
 		case execinfrapb.Ordering_Column_DESC:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
@@ -236,6 +255,12 @@ func newSingleSorter(
 				case -1:
 				default:
 					return &sortIntervalDescWithNullsOp{}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch t.Width() {
+				case -1:
+				default:
+					return &sortDatumDescWithNullsOp{}
 				}
 			}
 		}
@@ -289,6 +314,12 @@ func newSingleSorter(
 				default:
 					return &sortIntervalAscOp{}
 				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch t.Width() {
+				case -1:
+				default:
+					return &sortDatumAscOp{}
+				}
 			}
 		case execinfrapb.Ordering_Column_DESC:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
@@ -337,6 +368,12 @@ func newSingleSorter(
 				case -1:
 				default:
 					return &sortIntervalDescOp{}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch t.Width() {
+				case -1:
+				default:
+					return &sortDatumDescOp{}
 				}
 			}
 		}
@@ -1043,6 +1080,78 @@ func (s *sortIntervalAscWithNullsOp) Len() int {
 	return len(s.order)
 }
 
+type sortDatumAscWithNullsOp struct {
+	sortCol       coldata.DatumVec
+	nulls         *coldata.Nulls
+	order         []int
+	cancelChecker CancelChecker
+}
+
+func (s *sortDatumAscWithNullsOp) init(col coldata.Vec, order []int) {
+	s.sortCol = col.Datum()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortDatumAscWithNullsOp) sort(ctx context.Context) {
+	n := s.sortCol.Len()
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortDatumAscWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
+	if len(partitions) < 1 {
+		colexecerror.InternalError(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd int
+		if i == len(partitions)-1 {
+			partitionEnd = len(order)
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := partitionEnd - partitionStart
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortDatumAscWithNullsOp) Less(i, j int) bool {
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
+	// If ascending, nulls always sort first, so we encode that logic here.
+	if n1 && n2 {
+		return false
+	} else if n1 {
+		return true
+	} else if n2 {
+		return false
+	}
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
+
+	{
+		var cmpResult int
+
+		cmpResult = arg1.(*coldataext.Datum).CompareDatum(s.sortCol, arg2)
+
+		lt = cmpResult < 0
+	}
+
+	return lt
+}
+
+func (s *sortDatumAscWithNullsOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortDatumAscWithNullsOp) Len() int {
+	return len(s.order)
+}
+
 type sortBoolDescWithNullsOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
@@ -1740,6 +1849,78 @@ func (s *sortIntervalDescWithNullsOp) Len() int {
 	return len(s.order)
 }
 
+type sortDatumDescWithNullsOp struct {
+	sortCol       coldata.DatumVec
+	nulls         *coldata.Nulls
+	order         []int
+	cancelChecker CancelChecker
+}
+
+func (s *sortDatumDescWithNullsOp) init(col coldata.Vec, order []int) {
+	s.sortCol = col.Datum()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortDatumDescWithNullsOp) sort(ctx context.Context) {
+	n := s.sortCol.Len()
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortDatumDescWithNullsOp) sortPartitions(ctx context.Context, partitions []int) {
+	if len(partitions) < 1 {
+		colexecerror.InternalError(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd int
+		if i == len(partitions)-1 {
+			partitionEnd = len(order)
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := partitionEnd - partitionStart
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortDatumDescWithNullsOp) Less(i, j int) bool {
+	n1 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[i])
+	n2 := s.nulls.MaybeHasNulls() && s.nulls.NullAt(s.order[j])
+	// If descending, nulls always sort last, so we encode that logic here.
+	if n1 && n2 {
+		return false
+	} else if n1 {
+		return false
+	} else if n2 {
+		return true
+	}
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
+
+	{
+		var cmpResult int
+
+		cmpResult = arg1.(*coldataext.Datum).CompareDatum(s.sortCol, arg2)
+
+		lt = cmpResult > 0
+	}
+
+	return lt
+}
+
+func (s *sortDatumDescWithNullsOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortDatumDescWithNullsOp) Len() int {
+	return len(s.order)
+}
+
 type sortBoolAscOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
@@ -2347,6 +2528,68 @@ func (s *sortIntervalAscOp) Len() int {
 	return len(s.order)
 }
 
+type sortDatumAscOp struct {
+	sortCol       coldata.DatumVec
+	nulls         *coldata.Nulls
+	order         []int
+	cancelChecker CancelChecker
+}
+
+func (s *sortDatumAscOp) init(col coldata.Vec, order []int) {
+	s.sortCol = col.Datum()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortDatumAscOp) sort(ctx context.Context) {
+	n := s.sortCol.Len()
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortDatumAscOp) sortPartitions(ctx context.Context, partitions []int) {
+	if len(partitions) < 1 {
+		colexecerror.InternalError(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd int
+		if i == len(partitions)-1 {
+			partitionEnd = len(order)
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := partitionEnd - partitionStart
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortDatumAscOp) Less(i, j int) bool {
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
+
+	{
+		var cmpResult int
+
+		cmpResult = arg1.(*coldataext.Datum).CompareDatum(s.sortCol, arg2)
+
+		lt = cmpResult < 0
+	}
+
+	return lt
+}
+
+func (s *sortDatumAscOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortDatumAscOp) Len() int {
+	return len(s.order)
+}
+
 type sortBoolDescOp struct {
 	sortCol       []bool
 	nulls         *coldata.Nulls
@@ -2951,5 +3194,67 @@ func (s *sortIntervalDescOp) Swap(i, j int) {
 }
 
 func (s *sortIntervalDescOp) Len() int {
+	return len(s.order)
+}
+
+type sortDatumDescOp struct {
+	sortCol       coldata.DatumVec
+	nulls         *coldata.Nulls
+	order         []int
+	cancelChecker CancelChecker
+}
+
+func (s *sortDatumDescOp) init(col coldata.Vec, order []int) {
+	s.sortCol = col.Datum()
+	s.nulls = col.Nulls()
+	s.order = order
+}
+
+func (s *sortDatumDescOp) sort(ctx context.Context) {
+	n := s.sortCol.Len()
+	s.quickSort(ctx, 0, n, maxDepth(n))
+}
+
+func (s *sortDatumDescOp) sortPartitions(ctx context.Context, partitions []int) {
+	if len(partitions) < 1 {
+		colexecerror.InternalError(fmt.Sprintf("invalid partitions list %v", partitions))
+	}
+	order := s.order
+	for i, partitionStart := range partitions {
+		var partitionEnd int
+		if i == len(partitions)-1 {
+			partitionEnd = len(order)
+		} else {
+			partitionEnd = partitions[i+1]
+		}
+		s.order = order[partitionStart:partitionEnd]
+		n := partitionEnd - partitionStart
+		s.quickSort(ctx, 0, n, maxDepth(n))
+	}
+}
+
+func (s *sortDatumDescOp) Less(i, j int) bool {
+	var lt bool
+	// We always indirect via the order vector.
+	arg1 := s.sortCol.Get(s.order[i])
+	arg2 := s.sortCol.Get(s.order[j])
+
+	{
+		var cmpResult int
+
+		cmpResult = arg1.(*coldataext.Datum).CompareDatum(s.sortCol, arg2)
+
+		lt = cmpResult > 0
+	}
+
+	return lt
+}
+
+func (s *sortDatumDescOp) Swap(i, j int) {
+	// We don't physically swap the column - we merely edit the order vector.
+	s.order[i], s.order[j] = s.order[j], s.order[i]
+}
+
+func (s *sortDatumDescOp) Len() int {
 	return len(s.order)
 }

@@ -17,6 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
@@ -9454,6 +9455,264 @@ func (p *selEQIntervalIntervalOp) Init() {
 	p.input.Init()
 }
 
+type selEQDatumDatumConstOp struct {
+	selConstOpBase
+	constArg interface{}
+}
+
+func (p *selEQDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Datum()
+		var idx int
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selEQDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type selEQDatumDatumOp struct {
+	selOpBase
+}
+
+func (p *selEQDatumDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Datum()
+		col2 := vec2.Datum()
+		n := batch.Length()
+
+		var idx int
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult == 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selEQDatumDatumOp) Init() {
+	p.input.Init()
+}
+
 type selNEBoolBoolConstOp struct {
 	selConstOpBase
 	constArg bool
@@ -18859,6 +19118,264 @@ func (p *selNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p *selNEIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selNEDatumDatumConstOp struct {
+	selConstOpBase
+	constArg interface{}
+}
+
+func (p *selNEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Datum()
+		var idx int
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selNEDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type selNEDatumDatumOp struct {
+	selOpBase
+}
+
+func (p *selNEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Datum()
+		col2 := vec2.Datum()
+		n := batch.Length()
+
+		var idx int
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult != 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selNEDatumDatumOp) Init() {
 	p.input.Init()
 }
 
@@ -28270,6 +28787,264 @@ func (p *selLTIntervalIntervalOp) Init() {
 	p.input.Init()
 }
 
+type selLTDatumDatumConstOp struct {
+	selConstOpBase
+	constArg interface{}
+}
+
+func (p *selLTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Datum()
+		var idx int
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLTDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type selLTDatumDatumOp struct {
+	selOpBase
+}
+
+func (p *selLTDatumDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Datum()
+		col2 := vec2.Datum()
+		n := batch.Length()
+
+		var idx int
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult < 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLTDatumDatumOp) Init() {
+	p.input.Init()
+}
+
 type selLEBoolBoolConstOp struct {
 	selConstOpBase
 	constArg bool
@@ -37675,6 +38450,264 @@ func (p *selLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p *selLEIntervalIntervalOp) Init() {
+	p.input.Init()
+}
+
+type selLEDatumDatumConstOp struct {
+	selConstOpBase
+	constArg interface{}
+}
+
+func (p *selLEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Datum()
+		var idx int
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLEDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type selLEDatumDatumOp struct {
+	selOpBase
+}
+
+func (p *selLEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Datum()
+		col2 := vec2.Datum()
+		n := batch.Length()
+
+		var idx int
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult <= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selLEDatumDatumOp) Init() {
 	p.input.Init()
 }
 
@@ -47086,6 +48119,264 @@ func (p *selGTIntervalIntervalOp) Init() {
 	p.input.Init()
 }
 
+type selGTDatumDatumConstOp struct {
+	selConstOpBase
+	constArg interface{}
+}
+
+func (p *selGTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Datum()
+		var idx int
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGTDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type selGTDatumDatumOp struct {
+	selOpBase
+}
+
+func (p *selGTDatumDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Datum()
+		col2 := vec2.Datum()
+		n := batch.Length()
+
+		var idx int
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult > 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGTDatumDatumOp) Init() {
+	p.input.Init()
+}
+
 type selGEBoolBoolConstOp struct {
 	selConstOpBase
 	constArg bool
@@ -56494,6 +57785,264 @@ func (p *selGEIntervalIntervalOp) Init() {
 	p.input.Init()
 }
 
+type selGEDatumDatumConstOp struct {
+	selConstOpBase
+	constArg interface{}
+}
+
+func (p *selGEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec := batch.ColVec(p.colIdx)
+		col := vec.Datum()
+		var idx int
+		n := batch.Length()
+		if vec.MaybeHasNulls() {
+			nulls := vec.Nulls()
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGEDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type selGEDatumDatumOp struct {
+	selOpBase
+}
+
+func (p *selGEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the selection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	var isNull bool
+	for {
+		batch := p.input.Next(ctx)
+		if batch.Length() == 0 {
+			return batch
+		}
+
+		vec1 := batch.ColVec(p.col1Idx)
+		vec2 := batch.ColVec(p.col2Idx)
+		col1 := vec1.Datum()
+		col2 := vec2.Datum()
+		n := batch.Length()
+
+		var idx int
+		if vec1.MaybeHasNulls() || vec2.MaybeHasNulls() {
+			nulls := vec1.Nulls().Or(vec2.Nulls())
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = nulls.NullAt(i)
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		} else {
+			if sel := batch.Selection(); sel != nil {
+				sel = sel[:n]
+				for _, i := range sel {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			} else {
+				batch.SetSelection(true)
+				sel := batch.Selection()
+				col1 = col1.Slice(0, n)
+				col1Len := col1.Len()
+				col2 = col2.Slice(0, col1Len)
+				for i := 0; i < n; i++ {
+					var cmp bool
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg1.(*coldataext.Datum).CompareDatum(col1, arg2)
+
+						cmp = cmpResult >= 0
+					}
+
+					isNull = false
+					if cmp && !isNull {
+						sel[idx] = i
+						idx++
+					}
+				}
+			}
+		}
+		if idx > 0 {
+			batch.SetLength(idx)
+			return batch
+		}
+	}
+}
+
+func (p *selGEDatumDatumOp) Init() {
+	p.input.Init()
+}
+
 // GetSelectionConstOperator returns the appropriate constant selection operator
 // for the given left and right column types and comparison.
 func GetSelectionConstOperator(
@@ -56704,6 +58253,19 @@ func GetSelectionConstOperator(
 					}
 				}
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(constType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch constType.Width() {
+					case -1:
+					default:
+						return &selEQDatumDatumConstOp{selConstOpBase: selConstOpBase, constArg: c.(interface{})}, nil
+					}
+				}
+			}
 		}
 	case tree.NE:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -56893,6 +58455,19 @@ func GetSelectionConstOperator(
 					case -1:
 					default:
 						return &selNEIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+					}
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(constType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch constType.Width() {
+					case -1:
+					default:
+						return &selNEDatumDatumConstOp{selConstOpBase: selConstOpBase, constArg: c.(interface{})}, nil
 					}
 				}
 			}
@@ -57088,6 +58663,19 @@ func GetSelectionConstOperator(
 					}
 				}
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(constType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch constType.Width() {
+					case -1:
+					default:
+						return &selLTDatumDatumConstOp{selConstOpBase: selConstOpBase, constArg: c.(interface{})}, nil
+					}
+				}
+			}
 		}
 	case tree.LE:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -57277,6 +58865,19 @@ func GetSelectionConstOperator(
 					case -1:
 					default:
 						return &selLEIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+					}
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(constType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch constType.Width() {
+					case -1:
+					default:
+						return &selLEDatumDatumConstOp{selConstOpBase: selConstOpBase, constArg: c.(interface{})}, nil
 					}
 				}
 			}
@@ -57472,6 +59073,19 @@ func GetSelectionConstOperator(
 					}
 				}
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(constType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch constType.Width() {
+					case -1:
+					default:
+						return &selGTDatumDatumConstOp{selConstOpBase: selConstOpBase, constArg: c.(interface{})}, nil
+					}
+				}
+			}
 		}
 	case tree.GE:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -57661,6 +59275,19 @@ func GetSelectionConstOperator(
 					case -1:
 					default:
 						return &selGEIntervalIntervalConstOp{selConstOpBase: selConstOpBase, constArg: c.(duration.Duration)}, nil
+					}
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(constType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch constType.Width() {
+					case -1:
+					default:
+						return &selGEDatumDatumConstOp{selConstOpBase: selConstOpBase, constArg: c.(interface{})}, nil
 					}
 				}
 			}
@@ -57876,6 +59503,19 @@ func GetSelectionOperator(
 					}
 				}
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch rightType.Width() {
+					case -1:
+					default:
+						return &selEQDatumDatumOp{selOpBase: selOpBase}, nil
+					}
+				}
+			}
 		}
 	case tree.NE:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -58065,6 +59705,19 @@ func GetSelectionOperator(
 					case -1:
 					default:
 						return &selNEIntervalIntervalOp{selOpBase: selOpBase}, nil
+					}
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch rightType.Width() {
+					case -1:
+					default:
+						return &selNEDatumDatumOp{selOpBase: selOpBase}, nil
 					}
 				}
 			}
@@ -58260,6 +59913,19 @@ func GetSelectionOperator(
 					}
 				}
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch rightType.Width() {
+					case -1:
+					default:
+						return &selLTDatumDatumOp{selOpBase: selOpBase}, nil
+					}
+				}
+			}
 		}
 	case tree.LE:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -58449,6 +60115,19 @@ func GetSelectionOperator(
 					case -1:
 					default:
 						return &selLEIntervalIntervalOp{selOpBase: selOpBase}, nil
+					}
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch rightType.Width() {
+					case -1:
+					default:
+						return &selLEDatumDatumOp{selOpBase: selOpBase}, nil
 					}
 				}
 			}
@@ -58644,6 +60323,19 @@ func GetSelectionOperator(
 					}
 				}
 			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch rightType.Width() {
+					case -1:
+					default:
+						return &selGTDatumDatumOp{selOpBase: selOpBase}, nil
+					}
+				}
+			}
 		}
 	case tree.GE:
 		switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -58833,6 +60525,19 @@ func GetSelectionOperator(
 					case -1:
 					default:
 						return &selGEIntervalIntervalOp{selOpBase: selOpBase}, nil
+					}
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch leftType.Width() {
+			case -1:
+			default:
+				switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+				case typeconv.DatumVecCanonicalTypeFamily:
+					switch rightType.Width() {
+					case -1:
+					default:
+						return &selGEDatumDatumOp{selOpBase: selOpBase}, nil
 					}
 				}
 			}

@@ -129,6 +129,17 @@ func NewConstOp(
 				constVal:     constVal.(duration.Duration),
 			}, nil
 		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			return &constDatumOp{
+				OneInputNode: NewOneInputNode(input),
+				allocator:    allocator,
+				outputIdx:    outputIdx,
+				constVal:     constVal.(interface{}),
+			}, nil
+		}
 	}
 	return nil, errors.Errorf("unsupported const type %s", t.Name())
 }
@@ -522,22 +533,63 @@ func (c constIntervalOp) Next(ctx context.Context) coldata.Batch {
 	return batch
 }
 
+type constDatumOp struct {
+	OneInputNode
+
+	allocator *colmem.Allocator
+	outputIdx int
+	constVal  interface{}
+}
+
+func (c constDatumOp) Init() {
+	c.input.Init()
+}
+
+func (c constDatumOp) Next(ctx context.Context) coldata.Batch {
+	batch := c.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(c.outputIdx)
+	col := vec.Datum()
+	if vec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		vec.Nulls().UnsetNulls()
+	}
+	c.allocator.PerformOperation(
+		[]coldata.Vec{vec},
+		func() {
+			if sel := batch.Selection(); sel != nil {
+				for _, i := range sel[:n] {
+					col.Set(i, c.constVal)
+				}
+			} else {
+				col = col.Slice(0, n)
+				for i := 0; i < n; i++ {
+					col.Set(i, c.constVal)
+				}
+			}
+		},
+	)
+	return batch
+}
+
 // NewConstNullOp creates a new operator that produces a constant (untyped) NULL
 // value at index outputIdx.
 func NewConstNullOp(
-	allocator *colmem.Allocator, input colexecbase.Operator, outputIdx int, typ *types.T,
+	allocator *colmem.Allocator, input colexecbase.Operator, outputIdx int,
 ) colexecbase.Operator {
-	input = newVectorTypeEnforcer(allocator, input, typ, outputIdx)
+	input = newVectorTypeEnforcer(allocator, input, types.Unknown, outputIdx)
 	return &constNullOp{
 		OneInputNode: NewOneInputNode(input),
-		allocator:    allocator,
 		outputIdx:    outputIdx,
 	}
 }
 
 type constNullOp struct {
 	OneInputNode
-	allocator *colmem.Allocator
 	outputIdx int
 }
 
@@ -554,19 +606,6 @@ func (c constNullOp) Next(ctx context.Context) coldata.Batch {
 		return coldata.ZeroBatch
 	}
 
-	col := batch.ColVec(c.outputIdx)
-	nulls := col.Nulls()
-	if col.MaybeHasNulls() {
-		// We need to make sure that there are no left over null values in the
-		// output vector.
-		nulls.UnsetNulls()
-	}
-	if sel := batch.Selection(); sel != nil {
-		for _, i := range sel[:n] {
-			nulls.SetNull(i)
-		}
-	} else {
-		nulls.SetNulls()
-	}
+	batch.ColVec(c.outputIdx).Nulls().SetNulls()
 	return batch
 }

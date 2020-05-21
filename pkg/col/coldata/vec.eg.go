@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
@@ -247,6 +248,29 @@ func (m *memColumn) Append(args SliceArgs) {
 				for _, selIdx := range sel {
 					val := fromCol[selIdx]
 					toCol = append(toCol, val)
+				}
+			}
+			m.nulls.set(args)
+			m.col = toCol
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch m.t.Width() {
+		case -1:
+		default:
+			fromCol := args.Src.Datum()
+			toCol := m.Datum()
+			// NOTE: it is unfortunate that we always append whole slice without paying
+			// attention to whether the values are NULL. However, if we do start paying
+			// attention, the performance suffers dramatically, so we choose to copy
+			// over "actual" as well as "garbage" values.
+			if args.Sel == nil {
+				toCol.AppendSlice(fromCol, args.DestIdx, args.SrcStartIdx, args.SrcEndIdx)
+			} else {
+				sel := args.Sel[args.SrcStartIdx:args.SrcEndIdx]
+				toCol = toCol.Slice(0, args.DestIdx)
+				for _, selIdx := range sel {
+					val := fromCol.Get(selIdx)
+					toCol.AppendVal(val)
 				}
 			}
 			m.nulls.set(args)
@@ -770,6 +794,62 @@ func (m *memColumn) Copy(args CopySliceArgs) {
 			copy(toCol[args.DestIdx:], fromCol[args.SrcStartIdx:args.SrcEndIdx])
 			m.nulls.set(args.SliceArgs)
 		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch m.t.Width() {
+		case -1:
+		default:
+			fromCol := args.Src.Datum()
+			toCol := m.Datum()
+			if args.Sel != nil {
+				sel := args.Sel
+				if args.SelOnDest {
+					if args.Src.MaybeHasNulls() {
+						nulls := args.Src.Nulls()
+						for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+							if nulls.NullAt(selIdx) {
+								// Remove an unused warning in some cases.
+								_ = i
+								m.nulls.SetNull(selIdx)
+							} else {
+								v := fromCol.Get(selIdx)
+								m.nulls.UnsetNull(selIdx)
+								toCol.Set(selIdx, v)
+							}
+						}
+						return
+					}
+					// No Nulls.
+					for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						selIdx := sel[args.SrcStartIdx+i]
+						v := fromCol.Get(selIdx)
+						toCol.Set(selIdx, v)
+					}
+				} else {
+					if args.Src.MaybeHasNulls() {
+						nulls := args.Src.Nulls()
+						for i, selIdx := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+							if nulls.NullAt(selIdx) {
+								m.nulls.SetNull(i + args.DestIdx)
+							} else {
+								v := fromCol.Get(selIdx)
+								toCol.Set(i+args.DestIdx, v)
+							}
+						}
+						return
+					}
+					// No Nulls.
+					for i := range sel[args.SrcStartIdx:args.SrcEndIdx] {
+						selIdx := sel[args.SrcStartIdx+i]
+						v := fromCol.Get(selIdx)
+						toCol.Set(i+args.DestIdx, v)
+					}
+				}
+				return
+			}
+			// No Sel.
+			toCol.CopySlice(fromCol, args.DestIdx, args.SrcStartIdx, args.SrcEndIdx)
+			m.nulls.set(args.SliceArgs)
+		}
 	default:
 		panic(fmt.Sprintf("unhandled type %s", m.t))
 	}
@@ -877,6 +957,18 @@ func (m *memColumn) Window(start int, end int) Vec {
 				nulls:               m.nulls.Slice(start, end),
 			}
 		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch m.t.Width() {
+		case -1:
+		default:
+			col := m.Datum()
+			return &memColumn{
+				t:                   m.t,
+				canonicalTypeFamily: m.canonicalTypeFamily,
+				col:                 col.Slice(start, end),
+				nulls:               m.nulls.Slice(start, end),
+			}
+		}
 	}
 	panic(fmt.Sprintf("unhandled type %s", m.t))
 }
@@ -949,6 +1041,14 @@ func SetValueAt(v Vec, elem interface{}, rowIdx int) {
 			newVal := elem.(duration.Duration)
 			target[rowIdx] = newVal
 		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			target := v.Datum()
+			newVal := elem.(interface{})
+			target.Set(rowIdx, newVal)
+		}
 	default:
 		panic(fmt.Sprintf("unhandled type %s", t))
 	}
@@ -1013,6 +1113,13 @@ func GetValueAt(v Vec, rowIdx int) interface{} {
 		default:
 			target := v.Interval()
 			return target[rowIdx]
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch t.Width() {
+		case -1:
+		default:
+			target := v.Datum()
+			return target.Get(rowIdx)
 		}
 	}
 	panic(fmt.Sprintf("unhandled type %s", t))

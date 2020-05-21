@@ -17,6 +17,8 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
+	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -389,6 +391,40 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 				{
 					var cmpResult int
 					cmpResult = prevVal.Compare(curVal)
+					match = cmpResult == 0
+				}
+
+				if !match {
+					return true
+				}
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch input.sourceTypes[colIdx].Width() {
+			case -1:
+			default:
+				// We perform this null check on every equality column of the first
+				// buffered tuple regardless of the join type since it is done only once
+				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// right side being an input) this check will always return false since
+				// nulls couldn't be buffered up though.
+				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+					return true
+				}
+				bufferedCol := bufferedGroup.firstTuple[colIdx].Datum()
+				prevVal := bufferedCol.Get(0)
+				var curVal interface{}
+				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
+					return true
+				}
+				col := batch.ColVec(int(colIdx)).Datum()
+				curVal = col.Get(tupleToLookAtIdx)
+				var match bool
+
+				{
+					var cmpResult int
+
+					cmpResult = prevVal.(*coldataext.Datum).CompareDatum(bufferedCol, curVal)
+
 					match = cmpResult == 0
 				}
 

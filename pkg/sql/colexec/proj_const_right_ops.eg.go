@@ -17,6 +17,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
@@ -13214,6 +13215,115 @@ func (p projEQIntervalIntervalConstOp) Init() {
 	p.input.Init()
 }
 
+type projEQDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projEQDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult == 0
+					}
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult == 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult == 0
+				}
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult == 0
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projEQDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
 type projNEBoolBoolConstOp struct {
 	projConstOpBase
 	constArg bool
@@ -17340,6 +17450,115 @@ func (p projNEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projNEIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type projNEDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projNEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult != 0
+					}
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult != 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult != 0
+				}
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult != 0
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projNEDatumDatumConstOp) Init() {
 	p.input.Init()
 }
 
@@ -21472,6 +21691,115 @@ func (p projLTIntervalIntervalConstOp) Init() {
 	p.input.Init()
 }
 
+type projLTDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projLTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult < 0
+					}
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult < 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult < 0
+				}
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult < 0
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLTDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
 type projLEBoolBoolConstOp struct {
 	projConstOpBase
 	constArg bool
@@ -25598,6 +25926,115 @@ func (p projLEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projLEIntervalIntervalConstOp) Init() {
+	p.input.Init()
+}
+
+type projLEDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projLEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult <= 0
+					}
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult <= 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult <= 0
+				}
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult <= 0
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLEDatumDatumConstOp) Init() {
 	p.input.Init()
 }
 
@@ -29730,6 +30167,115 @@ func (p projGTIntervalIntervalConstOp) Init() {
 	p.input.Init()
 }
 
+type projGTDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projGTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult > 0
+					}
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult > 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult > 0
+				}
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult > 0
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projGTDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
 type projGEBoolBoolConstOp struct {
 	projConstOpBase
 	constArg bool
@@ -33859,6 +34405,115 @@ func (p projGEIntervalIntervalConstOp) Init() {
 	p.input.Init()
 }
 
+type projGEDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projGEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `decimalScratch` local variable of type `decimalOverloadScratch`.
+	decimalScratch := p.decimalScratch
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = decimalScratch
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Bool()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult >= 0
+					}
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					{
+						var cmpResult int
+
+						cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+						projCol[i] = cmpResult >= 0
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult >= 0
+				}
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol[n-1]
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				{
+					var cmpResult int
+
+					cmpResult = arg.(*coldataext.Datum).CompareDatum(col, p.constArg)
+
+					projCol[i] = cmpResult >= 0
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projGEDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
 // GetProjectionRConstOperator returns the appropriate constant
 // projection operator for the given left and right column types and operation.
 func GetProjectionRConstOperator(
@@ -34943,6 +35598,22 @@ func GetProjectionRConstOperator(
 						}
 					}
 				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projEQDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
 			}
 		case tree.NE:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -35218,6 +35889,22 @@ func GetProjectionRConstOperator(
 							return &projNEIntervalIntervalConstOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projNEDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
 							}, nil
 						}
 					}
@@ -35501,6 +36188,22 @@ func GetProjectionRConstOperator(
 						}
 					}
 				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projLTDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
 			}
 		case tree.LE:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -35776,6 +36479,22 @@ func GetProjectionRConstOperator(
 							return &projLEIntervalIntervalConstOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projLEDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
 							}, nil
 						}
 					}
@@ -36059,6 +36778,22 @@ func GetProjectionRConstOperator(
 						}
 					}
 				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projGTDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
 			}
 		case tree.GE:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
@@ -36334,6 +37069,22 @@ func GetProjectionRConstOperator(
 							return &projGEIntervalIntervalConstOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projGEDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
 							}, nil
 						}
 					}

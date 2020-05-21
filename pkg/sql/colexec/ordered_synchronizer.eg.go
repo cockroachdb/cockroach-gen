@@ -66,6 +66,7 @@ type OrderedSynchronizer struct {
 	outFloat64Cols   [][]float64
 	outTimestampCols [][]time.Time
 	outIntervalCols  [][]duration.Duration
+	outDatumCols     []coldata.DatumVec
 	// outColsMap contains the positions of the corresponding vectors in the
 	// slice for the same types. For example, if we have an output batch with
 	// types = [Int64, Int64, Bool, Bytes, Bool, Int64], then outColsMap will be
@@ -218,6 +219,15 @@ func (o *OrderedSynchronizer) Next(ctx context.Context) coldata.Batch {
 							v := srcCol[srcRowIdx]
 							outCol[outputIdx] = v
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch o.typs[i].Width() {
+						case -1:
+						default:
+							srcCol := vec.Datum()
+							outCol := o.outDatumCols[o.outColsMap[i]]
+							v := srcCol.Get(srcRowIdx)
+							outCol.Set(outputIdx, v)
+						}
 					default:
 						colexecerror.InternalError(fmt.Sprintf("unhandled type %s", o.typs[i].String()))
 					}
@@ -309,6 +319,13 @@ func (o *OrderedSynchronizer) Init() {
 			default:
 				o.outColsMap[i] = len(o.outIntervalCols)
 				o.outIntervalCols = append(o.outIntervalCols, outVec.Interval())
+			}
+		case typeconv.DatumVecCanonicalTypeFamily:
+			switch o.typs[i].Width() {
+			case -1:
+			default:
+				o.outColsMap[i] = len(o.outDatumCols)
+				o.outDatumCols = append(o.outDatumCols, outVec.Datum())
 			}
 		default:
 			colexecerror.InternalError(fmt.Sprintf("unhandled type %s", o.typs[i]))
