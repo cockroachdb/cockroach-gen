@@ -117,17 +117,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -137,54 +144,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -205,22 +219,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -241,9 +252,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -277,10 +288,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -316,7 +328,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -333,17 +345,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -353,46 +372,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -405,22 +432,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -433,9 +457,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -469,10 +493,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -500,7 +525,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -517,17 +542,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -537,46 +569,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -589,22 +629,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -617,9 +654,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -653,10 +690,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -684,7 +722,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -700,17 +738,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -720,57 +765,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -794,22 +846,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -833,9 +882,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -869,10 +918,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -911,7 +961,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -924,17 +974,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -944,57 +1001,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -1018,22 +1082,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -1057,9 +1118,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -1093,10 +1154,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -1135,7 +1197,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -1149,17 +1211,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -1169,57 +1238,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -1243,22 +1319,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -1282,9 +1355,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -1318,10 +1391,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -1360,7 +1434,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -1377,17 +1451,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -1397,65 +1478,72 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -1487,22 +1575,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -1534,9 +1619,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -1570,10 +1655,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -1620,7 +1706,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -1637,17 +1723,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -1657,53 +1750,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -1723,22 +1824,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -1758,9 +1856,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -1794,10 +1892,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -1832,7 +1931,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -1849,17 +1948,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -1869,46 +1975,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -1921,22 +2035,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -1949,9 +2060,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -1985,10 +2096,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -2016,7 +2128,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -2033,17 +2145,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -2053,48 +2172,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -2109,22 +2235,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -2139,9 +2262,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -2175,10 +2298,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -2208,7 +2332,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -2231,17 +2355,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -2251,49 +2382,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -2314,18 +2451,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -2346,9 +2480,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -2382,10 +2516,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -2421,7 +2556,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -2438,17 +2573,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -2458,41 +2600,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -2505,18 +2654,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -2529,9 +2675,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -2565,10 +2711,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -2596,7 +2743,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -2613,17 +2760,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -2633,41 +2787,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -2680,18 +2841,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -2704,9 +2862,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -2740,10 +2898,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -2771,7 +2930,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -2787,17 +2946,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -2807,52 +2973,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -2876,18 +3048,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -2911,9 +3080,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -2947,10 +3116,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -2989,7 +3159,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -3002,17 +3172,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -3022,52 +3199,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -3091,18 +3274,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -3126,9 +3306,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -3162,10 +3342,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -3204,7 +3385,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -3218,17 +3399,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -3238,52 +3426,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -3307,18 +3501,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -3342,9 +3533,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -3378,10 +3569,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -3420,7 +3612,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -3437,17 +3629,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -3457,60 +3656,66 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -3542,18 +3747,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -3585,9 +3787,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -3621,10 +3823,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -3671,7 +3874,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -3688,17 +3891,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -3708,48 +3918,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -3769,18 +3986,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -3800,9 +4014,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -3836,10 +4050,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -3874,7 +4089,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -3891,17 +4106,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -3911,41 +4133,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -3958,18 +4187,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -3982,9 +4208,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -4018,10 +4244,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -4049,7 +4276,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -4066,17 +4293,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -4086,43 +4320,49 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -4137,18 +4377,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -4163,9 +4400,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -4199,10 +4436,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -4232,7 +4470,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -4257,17 +4495,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -4277,44 +4522,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -4335,22 +4586,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -4371,9 +4619,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -4407,7 +4655,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -4443,7 +4692,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -4460,17 +4709,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -4480,36 +4736,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -4522,22 +4785,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -4550,9 +4810,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -4586,7 +4846,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -4614,7 +4875,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -4631,17 +4892,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -4651,36 +4919,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -4693,22 +4968,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -4721,9 +4993,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -4757,7 +5029,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -4785,7 +5058,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -4801,17 +5074,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -4821,47 +5101,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -4885,22 +5171,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -4924,9 +5207,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -4960,7 +5243,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -4999,7 +5283,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -5012,17 +5296,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -5032,47 +5323,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -5096,22 +5393,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -5135,9 +5429,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -5171,7 +5465,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -5210,7 +5505,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -5224,17 +5519,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -5244,47 +5546,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -5308,22 +5616,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -5347,9 +5652,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -5383,7 +5688,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -5422,7 +5728,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -5439,17 +5745,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -5459,55 +5772,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -5539,22 +5858,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -5586,9 +5902,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -5622,7 +5938,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -5669,7 +5986,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -5686,17 +6003,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -5706,43 +6030,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -5762,22 +6093,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -5797,9 +6125,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -5833,7 +6161,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -5868,7 +6197,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -5885,17 +6214,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -5905,36 +6241,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -5947,22 +6290,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -5975,9 +6315,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -6011,7 +6351,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -6039,7 +6380,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -6056,17 +6397,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -6076,38 +6424,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -6122,22 +6476,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -6152,9 +6503,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -6188,7 +6539,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -6218,7 +6570,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -6241,17 +6593,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -6261,39 +6620,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -6314,18 +6678,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -6346,9 +6707,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -6382,7 +6743,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -6418,7 +6780,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -6435,17 +6797,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -6455,31 +6824,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+								{
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -6492,18 +6867,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -6516,9 +6888,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -6552,7 +6924,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -6580,7 +6953,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -6597,17 +6970,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -6617,31 +6997,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+								{
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -6654,18 +7040,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -6678,9 +7061,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -6714,7 +7097,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -6742,7 +7126,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -6758,17 +7142,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -6778,42 +7169,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -6837,18 +7233,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -6872,9 +7265,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -6908,7 +7301,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -6947,7 +7341,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -6960,17 +7354,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -6980,42 +7381,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -7039,18 +7445,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -7074,9 +7477,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -7110,7 +7513,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -7149,7 +7553,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -7163,17 +7567,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -7183,42 +7594,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -7242,18 +7658,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -7277,9 +7690,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -7313,7 +7726,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -7352,7 +7766,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -7369,17 +7783,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -7389,50 +7810,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -7464,18 +7890,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -7507,9 +7930,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -7543,7 +7966,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -7590,7 +8014,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -7607,17 +8031,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -7627,38 +8058,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -7678,18 +8115,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -7709,9 +8143,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -7745,7 +8179,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -7780,7 +8215,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -7797,17 +8232,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -7817,31 +8259,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+								{
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -7854,18 +8302,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -7878,9 +8323,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -7914,7 +8359,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -7942,7 +8388,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -7959,17 +8405,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -7979,33 +8432,38 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -8020,18 +8478,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -8046,9 +8501,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -8082,7 +8537,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -8112,7 +8568,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -8214,17 +8670,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -8234,54 +8697,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -8302,22 +8772,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -8338,9 +8805,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -8374,10 +8841,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -8413,7 +8881,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -8430,17 +8898,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -8450,46 +8925,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -8502,22 +8985,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -8530,9 +9010,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -8566,10 +9046,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -8597,7 +9078,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -8614,17 +9095,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -8634,46 +9122,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -8686,22 +9182,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -8714,9 +9207,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -8750,10 +9243,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -8781,7 +9275,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -8797,17 +9291,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -8817,57 +9318,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -8891,22 +9399,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -8930,9 +9435,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -8966,10 +9471,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -9008,7 +9514,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -9021,17 +9527,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -9041,57 +9554,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -9115,22 +9635,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -9154,9 +9671,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -9190,10 +9707,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -9232,7 +9750,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -9246,17 +9764,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -9266,57 +9791,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -9340,22 +9872,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -9379,9 +9908,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -9415,10 +9944,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -9457,7 +9987,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -9474,17 +10004,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -9494,65 +10031,72 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -9584,22 +10128,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -9631,9 +10172,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -9667,10 +10208,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -9717,7 +10259,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -9734,17 +10276,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -9754,53 +10303,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -9820,22 +10377,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -9855,9 +10409,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -9891,10 +10445,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -9929,7 +10484,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -9946,17 +10501,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -9966,46 +10528,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -10018,22 +10588,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -10046,9 +10613,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -10082,10 +10649,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -10113,7 +10681,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -10130,17 +10698,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -10150,48 +10725,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -10206,22 +10788,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -10236,9 +10815,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -10272,10 +10851,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -10305,7 +10885,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -10328,17 +10908,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -10348,49 +10935,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -10411,18 +11004,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -10443,9 +11033,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -10479,10 +11069,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -10518,7 +11109,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -10535,17 +11126,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -10555,41 +11153,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -10602,18 +11207,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -10626,9 +11228,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -10662,10 +11264,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -10693,7 +11296,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -10710,17 +11313,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -10730,41 +11340,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -10777,18 +11394,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -10801,9 +11415,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -10837,10 +11451,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -10868,7 +11483,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -10884,17 +11499,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -10904,52 +11526,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -10973,18 +11601,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -11008,9 +11633,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -11044,10 +11669,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -11086,7 +11712,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -11099,17 +11725,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -11119,52 +11752,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -11188,18 +11827,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -11223,9 +11859,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -11259,10 +11895,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -11301,7 +11938,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -11315,17 +11952,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -11335,52 +11979,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -11404,18 +12054,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -11439,9 +12086,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -11475,10 +12122,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -11517,7 +12165,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -11534,17 +12182,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -11554,60 +12209,66 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -11639,18 +12300,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -11682,9 +12340,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -11718,10 +12376,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -11768,7 +12427,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -11785,17 +12444,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -11805,48 +12471,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -11866,18 +12539,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -11897,9 +12567,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -11933,10 +12603,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -11971,7 +12642,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -11988,17 +12659,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -12008,41 +12686,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -12055,18 +12740,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -12079,9 +12761,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -12115,10 +12797,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -12146,7 +12829,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -12163,17 +12846,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -12183,43 +12873,49 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(lSel[curLIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
 											}
-											lSelIdx := lSel[curLIdx]
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -12234,18 +12930,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -12260,9 +12953,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -12296,10 +12989,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												break
 											}
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -12329,7 +13023,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -12354,17 +13048,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -12374,44 +13075,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -12432,22 +13139,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -12468,9 +13172,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -12504,7 +13208,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -12540,7 +13245,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -12557,17 +13262,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -12577,36 +13289,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -12619,22 +13338,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -12647,9 +13363,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -12683,7 +13399,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -12711,7 +13428,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -12728,17 +13445,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -12748,36 +13472,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -12790,22 +13521,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -12818,9 +13546,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -12854,7 +13582,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -12882,7 +13611,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -12898,17 +13627,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -12918,47 +13654,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -12982,22 +13724,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -13021,9 +13760,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -13057,7 +13796,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -13096,7 +13836,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -13109,17 +13849,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -13129,47 +13876,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -13193,22 +13946,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -13232,9 +13982,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -13268,7 +14018,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -13307,7 +14058,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -13321,17 +14072,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -13341,47 +14099,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -13405,22 +14169,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -13444,9 +14205,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -13480,7 +14241,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -13519,7 +14281,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -13536,17 +14298,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -13556,55 +14325,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -13636,22 +14411,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -13683,9 +14455,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -13719,7 +14491,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -13766,7 +14539,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -13783,17 +14556,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -13803,43 +14583,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -13859,22 +14646,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -13894,9 +14678,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -13930,7 +14714,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -13965,7 +14750,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -13982,17 +14767,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -14002,36 +14794,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -14044,22 +14843,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -14072,9 +14868,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -14108,7 +14904,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -14136,7 +14933,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -14153,17 +14950,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -14173,38 +14977,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -14219,22 +15029,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -14249,9 +15056,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -14285,7 +15092,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -14315,7 +15123,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -14338,17 +15146,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -14358,39 +15173,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -14411,18 +15231,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -14443,9 +15260,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -14479,7 +15296,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -14515,7 +15333,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -14532,17 +15350,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -14552,31 +15377,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+								{
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -14589,18 +15420,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -14613,9 +15441,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -14649,7 +15477,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -14677,7 +15506,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -14694,17 +15523,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -14714,31 +15550,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+								{
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -14751,18 +15593,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -14775,9 +15614,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -14811,7 +15650,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -14839,7 +15679,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -14855,17 +15695,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -14875,42 +15722,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -14934,18 +15786,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -14969,9 +15818,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -15005,7 +15854,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -15044,7 +15894,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -15057,17 +15907,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -15077,42 +15934,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -15136,18 +15998,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -15171,9 +16030,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -15207,7 +16066,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -15246,7 +16106,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -15260,17 +16120,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -15280,42 +16147,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -15339,18 +16211,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -15374,9 +16243,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -15410,7 +16279,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -15449,7 +16319,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -15466,17 +16336,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -15486,50 +16363,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -15561,18 +16443,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -15604,9 +16483,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -15640,7 +16519,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -15687,7 +16567,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -15704,17 +16584,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -15724,38 +16611,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -15775,18 +16668,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -15806,9 +16696,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -15842,7 +16732,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -15877,7 +16768,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -15894,17 +16785,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -15914,31 +16812,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+								{
+
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -15951,18 +16855,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -15975,9 +16876,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -16011,7 +16912,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys[lSelIdx]
 
@@ -16039,7 +16941,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -16056,17 +16958,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -16076,33 +16985,38 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := lSel[curLIdx]
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									lSelIdx = lSel[curLIdx]
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := lSel[curLIdx]
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -16117,18 +17031,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -16143,9 +17054,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -16179,7 +17090,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = lSel[curLIdx]
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -16209,7 +17121,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -16311,17 +17223,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -16331,54 +17250,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -16399,22 +17325,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -16435,9 +17358,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -16471,10 +17394,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -16510,7 +17434,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -16527,17 +17451,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -16547,46 +17478,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -16599,22 +17538,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -16627,9 +17563,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -16663,10 +17599,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -16694,7 +17631,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -16711,17 +17648,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -16731,46 +17675,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -16783,22 +17735,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -16811,9 +17760,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -16847,10 +17796,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -16878,7 +17828,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -16894,17 +17844,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -16914,57 +17871,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -16988,22 +17952,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -17027,9 +17988,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -17063,10 +18024,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -17105,7 +18067,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -17118,17 +18080,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -17138,57 +18107,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -17212,22 +18188,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -17251,9 +18224,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -17287,10 +18260,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -17329,7 +18303,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -17343,17 +18317,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -17363,57 +18344,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -17437,22 +18425,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -17476,9 +18461,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -17512,10 +18497,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -17554,7 +18540,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -17571,17 +18557,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -17591,65 +18584,72 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -17681,22 +18681,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -17728,9 +18725,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -17764,10 +18761,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -17814,7 +18812,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -17831,17 +18829,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -17851,53 +18856,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -17917,22 +18930,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -17952,9 +18962,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -17988,10 +18998,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -18026,7 +19037,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -18043,17 +19054,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -18063,46 +19081,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -18115,22 +19141,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -18143,9 +19166,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -18179,10 +19202,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -18210,7 +19234,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -18227,17 +19251,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -18247,48 +19278,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -18303,22 +19341,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -18333,9 +19368,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -18369,10 +19404,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -18402,7 +19438,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -18425,17 +19461,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -18445,49 +19488,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -18508,18 +19557,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -18540,9 +19586,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -18576,10 +19622,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -18615,7 +19662,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -18632,17 +19679,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -18652,41 +19706,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -18699,18 +19760,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -18723,9 +19781,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -18759,10 +19817,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -18790,7 +19849,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -18807,17 +19866,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -18827,41 +19893,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -18874,18 +19947,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -18898,9 +19968,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -18934,10 +20004,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -18965,7 +20036,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -18981,17 +20052,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -19001,52 +20079,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -19070,18 +20154,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -19105,9 +20186,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -19141,10 +20222,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -19183,7 +20265,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -19196,17 +20278,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -19216,52 +20305,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -19285,18 +20380,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -19320,9 +20412,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -19356,10 +20448,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -19398,7 +20491,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -19412,17 +20505,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -19432,52 +20532,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -19501,18 +20607,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -19536,9 +20639,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -19572,10 +20675,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -19614,7 +20718,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -19631,17 +20735,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -19651,60 +20762,66 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -19736,18 +20853,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -19779,9 +20893,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -19815,10 +20929,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -19865,7 +20980,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -19882,17 +20997,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -19902,48 +21024,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -19963,18 +21092,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -19994,9 +21120,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -20030,10 +21156,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -20068,7 +21195,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -20085,17 +21212,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -20105,41 +21239,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -20152,18 +21293,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -20176,9 +21314,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -20212,10 +21350,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -20243,7 +21382,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -20260,17 +21399,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -20280,43 +21426,49 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -20331,18 +21483,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -20357,9 +21506,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -20393,10 +21542,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -20426,7 +21576,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -20451,17 +21601,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -20471,44 +21628,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -20529,22 +21692,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -20565,9 +21725,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -20601,7 +21761,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -20637,7 +21798,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -20654,17 +21815,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -20674,36 +21842,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -20716,22 +21891,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -20744,9 +21916,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -20780,7 +21952,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -20808,7 +21981,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -20825,17 +21998,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -20845,36 +22025,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -20887,22 +22074,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -20915,9 +22099,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -20951,7 +22135,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -20979,7 +22164,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -20995,17 +22180,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -21015,47 +22207,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -21079,22 +22277,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -21118,9 +22313,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -21154,7 +22349,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -21193,7 +22389,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -21206,17 +22402,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -21226,47 +22429,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -21290,22 +22499,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -21329,9 +22535,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -21365,7 +22571,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -21404,7 +22611,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -21418,17 +22625,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -21438,47 +22652,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -21502,22 +22722,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -21541,9 +22758,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -21577,7 +22794,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -21616,7 +22834,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -21633,17 +22851,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -21653,55 +22878,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -21733,22 +22964,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -21780,9 +23008,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -21816,7 +23044,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -21863,7 +23092,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -21880,17 +23109,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -21900,43 +23136,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -21956,22 +23199,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -21991,9 +23231,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -22027,7 +23267,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -22062,7 +23303,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -22079,17 +23320,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -22099,36 +23347,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -22141,22 +23396,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -22169,9 +23421,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -22205,7 +23457,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -22233,7 +23486,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -22250,17 +23503,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -22270,38 +23530,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(rSel[curRIdx]) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -22316,22 +23582,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
 											}
-											rSelIdx := rSel[curRIdx]
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -22346,9 +23609,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -22382,7 +23645,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -22412,7 +23676,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -22435,17 +23699,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -22455,39 +23726,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -22508,18 +23784,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -22540,9 +23813,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -22576,7 +23849,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -22612,7 +23886,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -22629,17 +23903,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -22649,31 +23930,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+								{
+
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -22686,18 +23973,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -22710,9 +23994,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -22746,7 +24030,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -22774,7 +24059,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -22791,17 +24076,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -22811,31 +24103,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+								{
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -22848,18 +24146,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -22872,9 +24167,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -22908,7 +24203,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -22936,7 +24232,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -22952,17 +24248,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -22972,42 +24275,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -23031,18 +24339,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -23066,9 +24371,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -23102,7 +24407,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -23141,7 +24447,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -23154,17 +24460,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -23174,42 +24487,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -23233,18 +24551,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -23268,9 +24583,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -23304,7 +24619,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -23343,7 +24659,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -23357,17 +24673,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -23377,42 +24700,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -23436,18 +24764,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -23471,9 +24796,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -23507,7 +24832,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -23546,7 +24872,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -23563,17 +24889,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -23583,50 +24916,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -23658,18 +24996,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -23701,9 +25036,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -23737,7 +25072,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -23784,7 +25120,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -23801,17 +25137,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -23821,38 +25164,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -23872,18 +25221,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -23903,9 +25249,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -23939,7 +25285,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -23974,7 +25321,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -23991,17 +25338,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -24011,31 +25365,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+								{
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -24048,18 +25408,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -24072,9 +25429,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -24108,7 +25465,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -24136,7 +25494,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -24153,17 +25511,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -24173,33 +25538,38 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := rSel[curRIdx]
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = rSel[curRIdx]
+									rVal = rKeys.Get(rSelIdx)
+
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -24214,18 +25584,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := rSel[curRIdx]
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = rSel[curRIdx]
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -24240,9 +25607,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -24276,7 +25643,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -24306,7 +25674,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -24408,17 +25776,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -24428,54 +25803,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -24496,22 +25878,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -24532,9 +25911,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -24568,10 +25947,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -24607,7 +25987,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -24624,17 +26004,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -24644,46 +26031,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -24696,22 +26091,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -24724,9 +26116,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -24760,10 +26152,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -24791,7 +26184,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -24808,17 +26201,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -24828,46 +26228,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -24880,22 +26288,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -24908,9 +26313,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -24944,10 +26349,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -24975,7 +26381,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -24991,17 +26397,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -25011,57 +26424,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -25085,22 +26505,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -25124,9 +26541,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -25160,10 +26577,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -25202,7 +26620,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -25215,17 +26633,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -25235,57 +26660,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -25309,22 +26741,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -25348,9 +26777,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -25384,10 +26813,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -25426,7 +26856,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -25440,17 +26870,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -25460,57 +26897,64 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -25534,22 +26978,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -25573,9 +27014,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -25609,10 +27050,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -25651,7 +27093,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -25668,17 +27110,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -25688,65 +27137,72 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -25778,22 +27234,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -25825,9 +27278,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -25861,10 +27314,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -25911,7 +27365,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -25928,17 +27382,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -25948,53 +27409,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -26014,22 +27483,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -26049,9 +27515,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -26085,10 +27551,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -26123,7 +27590,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -26140,17 +27607,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -26160,46 +27634,54 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -26212,22 +27694,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -26240,9 +27719,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -26276,10 +27755,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -26307,7 +27787,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -26324,17 +27804,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -26344,48 +27831,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
-								if rVec.Nulls().NullAt(curRIdx) {
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -26400,22 +27894,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -26430,9 +27921,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -26466,10 +27957,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -26499,7 +27991,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -26522,17 +28014,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -26542,49 +28041,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -26605,18 +28110,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -26637,9 +28139,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -26673,10 +28175,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -26712,7 +28215,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -26729,17 +28232,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -26749,41 +28259,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -26796,18 +28313,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -26820,9 +28334,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -26856,10 +28370,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -26887,7 +28402,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -26904,17 +28419,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -26924,41 +28446,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -26971,18 +28500,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -26995,9 +28521,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -27031,10 +28557,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -27062,7 +28589,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -27078,17 +28605,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -27098,52 +28632,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -27167,18 +28707,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -27202,9 +28739,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -27238,10 +28775,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -27280,7 +28818,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -27293,17 +28831,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -27313,52 +28858,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -27382,18 +28933,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -27417,9 +28965,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -27453,10 +29001,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -27495,7 +29044,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -27509,17 +29058,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -27529,52 +29085,58 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -27598,18 +29160,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -27633,9 +29192,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -27669,10 +29228,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -27711,7 +29271,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -27728,17 +29288,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -27748,60 +29315,66 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -27833,18 +29406,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -27876,9 +29446,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -27912,10 +29482,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -27962,7 +29533,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -27979,17 +29550,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -27999,48 +29577,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -28060,18 +29645,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -28091,9 +29673,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -28127,10 +29709,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -28165,7 +29748,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -28182,17 +29765,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -28202,41 +29792,48 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -28249,18 +29846,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -28273,9 +29867,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -28309,10 +29903,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -28340,7 +29935,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -28357,17 +29952,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -28377,43 +29979,49 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if lVec.Nulls().NullAt(curLIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								lNull := lVec.Nulls().NullAt(curLIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if lNull {
 
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
+									for curLIdx < curLEndIdx {
+										{
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
 											}
-											lSelIdx := curLIdx
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -28428,18 +30036,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -28454,9 +30059,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -28490,10 +30095,11 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
 											if lVec.Nulls().NullAt(curLIdx) {
 												break
 											}
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -28523,7 +30129,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -28548,17 +30154,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -28568,44 +30181,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -28626,22 +30245,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -28662,9 +30278,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -28698,7 +30314,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -28734,7 +30351,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -28751,17 +30368,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -28771,36 +30395,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -28813,22 +30444,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -28841,9 +30469,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -28877,7 +30505,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -28905,7 +30534,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -28922,17 +30551,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -28942,36 +30578,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -28984,22 +30627,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -29012,9 +30652,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -29048,7 +30688,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -29076,7 +30717,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -29092,17 +30733,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -29112,47 +30760,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -29176,22 +30830,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -29215,9 +30866,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -29251,7 +30902,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -29290,7 +30942,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -29303,17 +30955,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -29323,47 +30982,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -29387,22 +31052,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -29426,9 +31088,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -29462,7 +31124,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -29501,7 +31164,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -29515,17 +31178,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -29535,47 +31205,53 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -29599,22 +31275,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -29638,9 +31311,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -29674,7 +31347,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -29713,7 +31387,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -29730,17 +31404,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -29750,55 +31431,61 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
-
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -29830,22 +31517,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -29877,9 +31561,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -29913,7 +31597,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -29960,7 +31645,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -29977,17 +31662,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -29997,43 +31689,50 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -30053,22 +31752,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -30088,9 +31784,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -30124,7 +31820,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -30159,7 +31856,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -30176,17 +31873,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -30196,36 +31900,43 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -30238,22 +31949,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -30266,9 +31974,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -30302,7 +32010,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -30330,7 +32039,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -30347,17 +32056,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -30367,38 +32083,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
-								if rVec.Nulls().NullAt(curRIdx) {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
+								rNull := rVec.Nulls().NullAt(curRIdx)
+
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
+								if rNull {
 
 									curRIdx++
 									continue
 								}
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								{
 
-								var (
-									cmp   int
-									match bool
-								)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -30413,22 +32135,19 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
+									for curRIdx < curREndIdx {
+										{
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
 											}
-											rSelIdx := curRIdx
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -30443,9 +32162,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -30479,7 +32198,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -30509,7 +32229,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -30532,17 +32252,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bool()
 						rKeys := rVec.Bool()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       bool
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -30552,39 +32279,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if !lVal && rVal {
-									cmp = -1
-								} else if lVal && !rVal {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									if !lVal && rVal {
+										cmp = -1
+									} else if lVal && !rVal {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -30605,18 +32337,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -30637,9 +32366,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -30673,7 +32402,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -30709,7 +32439,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -30726,17 +32456,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Bytes()
 						rKeys := rVec.Bytes()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       []byte
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -30746,31 +32483,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = bytes.Compare(lVal, rVal)
+								{
+
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+									cmp = bytes.Compare(lVal, rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -30783,18 +32526,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -30807,9 +32547,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -30843,7 +32583,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -30871,7 +32612,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -30888,17 +32629,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Decimal()
 						rKeys := rVec.Decimal()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       apd.Decimal
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -30908,31 +32656,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = tree.CompareDecimals(&lVal, &rVal)
+								{
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = tree.CompareDecimals(&lVal, &rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -30945,18 +32699,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -30969,9 +32720,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -31005,7 +32756,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -31033,7 +32785,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -31049,17 +32801,24 @@ EqLoop:
 					case 16:
 						lKeys := lVec.Int16()
 						rKeys := rVec.Int16()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int16
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -31069,42 +32828,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -31128,18 +32892,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -31163,9 +32924,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -31199,7 +32960,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -31238,7 +33000,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -31251,17 +33013,24 @@ EqLoop:
 					case 32:
 						lKeys := lVec.Int32()
 						rKeys := rVec.Int32()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int32
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -31271,42 +33040,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -31330,18 +33104,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -31365,9 +33136,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -31401,7 +33172,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -31440,7 +33212,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -31454,17 +33226,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Int64()
 						rKeys := rVec.Int64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       int64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -31474,42 +33253,47 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := int64(lVal), int64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else {
-										cmp = 0
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := int64(lVal), int64(rVal)
+										if a < b {
+											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -31533,18 +33317,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -31568,9 +33349,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -31604,7 +33385,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -31643,7 +33425,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -31660,17 +33442,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Float64()
 						rKeys := rVec.Float64()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       float64
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -31680,50 +33469,55 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
-
-								var (
-									cmp   int
-									match bool
-								)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
 								{
-									a, b := float64(lVal), float64(rVal)
-									if a < b {
-										cmp = -1
-									} else if a > b {
-										cmp = 1
-									} else if a == b {
-										cmp = 0
-									} else if math.IsNaN(a) {
-										if math.IsNaN(b) {
-											cmp = 0
-										} else {
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									{
+										a, b := float64(lVal), float64(rVal)
+										if a < b {
 											cmp = -1
+										} else if a > b {
+											cmp = 1
+										} else if a == b {
+											cmp = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmp = 0
+											} else {
+												cmp = -1
+											}
+										} else {
+											cmp = 1
 										}
-									} else {
-										cmp = 1
 									}
+
 								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -31755,18 +33549,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -31798,9 +33589,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -31834,7 +33625,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -31881,7 +33673,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -31898,17 +33690,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Timestamp()
 						rKeys := rVec.Timestamp()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       time.Time
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -31918,38 +33717,44 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								if lVal.Before(rVal) {
-									cmp = -1
-								} else if rVal.Before(lVal) {
-									cmp = 1
-								} else {
-									cmp = 0
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+
+									if lVal.Before(rVal) {
+										cmp = -1
+									} else if rVal.Before(lVal) {
+										cmp = 1
+									} else {
+										cmp = 0
+									}
+
 								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -31969,18 +33774,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -32000,9 +33802,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -32036,7 +33838,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -32071,7 +33874,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -32088,17 +33891,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Interval()
 						rKeys := rVec.Interval()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       duration.Duration
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -32108,31 +33918,37 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys[lSelIdx]
-								rSelIdx := curRIdx
-								rVal := rKeys[rSelIdx]
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
-								cmp = lVal.Compare(rVal)
+								{
+
+									lSelIdx = curLIdx
+									lVal = lKeys[lSelIdx]
+									rSelIdx = curRIdx
+									rVal = rKeys[rSelIdx]
+									cmp = lVal.Compare(rVal)
+
+								}
+
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
 											{
@@ -32145,18 +33961,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys[rSelIdx]
 
 											{
@@ -32169,9 +33982,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -32205,7 +34018,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys[lSelIdx]
 
@@ -32233,7 +34047,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -32250,17 +34064,24 @@ EqLoop:
 					default:
 						lKeys := lVec.Datum()
 						rKeys := rVec.Datum()
-						var lGroup, rGroup group
+						var (
+							lGroup, rGroup   group
+							cmp              int
+							match            bool
+							lVal, rVal       interface{}
+							lSelIdx, rSelIdx int
+						)
+
 						for o.groups.nextGroupInCol(&lGroup, &rGroup) {
 							curLIdx := lGroup.rowStartIdx
 							curRIdx := rGroup.rowStartIdx
-							curLLength := lGroup.rowEndIdx
-							curRLength := rGroup.rowEndIdx
+							curLEndIdx := lGroup.rowEndIdx
+							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
 							if lGroup.unmatched {
-								if curLIdx+1 != curLLength {
-									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLLength-curLIdx))
+								if curLIdx+1 != curLEndIdx {
+									colexecerror.InternalError(fmt.Sprintf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
 								}
 								// The row already does not have a match, so we don't need to do any
 								// additional processing.
@@ -32270,33 +34091,38 @@ EqLoop:
 							}
 
 							// Expand or filter each group based on the current equality column.
-							for curLIdx < curLLength && curRIdx < curRLength && !areGroupsProcessed {
+							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
+								cmp = 0
 
-								lSelIdx := curLIdx
-								lVal := lKeys.Get(lSelIdx)
-								rSelIdx := curRIdx
-								rVal := rKeys.Get(rSelIdx)
+								// TODO(yuzefovich): we can advance both sides if both are
+								// NULL.
 
-								var (
-									cmp   int
-									match bool
-								)
+								{
 
-								cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+									lSelIdx = curLIdx
+									lVal = lKeys.Get(lSelIdx)
+									rSelIdx = curRIdx
+									rVal = rKeys.Get(rSelIdx)
+
+									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+
+								}
 
 								if cmp == 0 {
 									// Find the length of the groups on each side.
 									lGroupLength, rGroupLength := 1, 1
-									lComplete, rComplete := false, false
+									// If a group ends before the end of the probing batch,
+									// then we know it is complete.
+									lComplete := curLEndIdx < o.proberState.lLength
+									rComplete := curREndIdx < o.proberState.rLength
 									beginLIdx, beginRIdx := curLIdx, curRIdx
+									curLIdx++
+									curRIdx++
 
 									// Find the length of the group on the left.
-									if curLLength == 0 {
-										lGroupLength, lComplete = 0, true
-									} else {
-										curLIdx++
-										for curLIdx < curLLength {
-											lSelIdx := curLIdx
+									for curLIdx < curLEndIdx {
+										{
+											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
 											{
@@ -32311,18 +34137,15 @@ EqLoop:
 												lComplete = true
 												break
 											}
-											lGroupLength++
-											curLIdx++
 										}
+										lGroupLength++
+										curLIdx++
 									}
 
 									// Find the length of the group on the right.
-									if curRLength == 0 {
-										rGroupLength, rComplete = 0, true
-									} else {
-										curRIdx++
-										for curRIdx < curRLength {
-											rSelIdx := curRIdx
+									for curRIdx < curREndIdx {
+										{
+											rSelIdx = curRIdx
 											newRVal := rKeys.Get(rSelIdx)
 
 											{
@@ -32337,9 +34160,9 @@ EqLoop:
 												rComplete = true
 												break
 											}
-											rGroupLength++
-											curRIdx++
 										}
+										rGroupLength++
+										curRIdx++
 									}
 
 									// Last equality column and either group is incomplete. Save state
@@ -32373,7 +34196,8 @@ EqLoop:
 										// All the rows on the left within the current group will not get a match on
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLLength {
+										for curLIdx < curLEndIdx {
+
 											lSelIdx = curLIdx
 											newLVal := lKeys.Get(lSelIdx)
 
@@ -32403,7 +34227,7 @@ EqLoop:
 								// extended into the next batch, and we need to process it right now. Any
 								// unprocessed row in the left group will not get a match, so each one of
 								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLLength {
+								for curLIdx < curLEndIdx {
 									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 								}
@@ -34873,10 +36697,16 @@ func (o *mergeJoinLeftOuterOp) buildLeftGroupsFromBatch(
 // builds the output columns corresponding to the left input based on the
 // buffered group. The goal is to repeat each row from the left buffered group
 // leftGroup.numRepeats times.
-// Note that all other fields of leftGroup are ignored because, by definition,
-// all rows in the buffered group are part of leftGroup (i.e. we don't need to
-// look at rowStartIdx and rowEndIdx). Also, all rows in the buffered group do
-// have a match, so the group can neither be "nullGroup" nor "unmatched".
+// Note that for non-set operation joins all other fields of leftGroup are
+// ignored because, by definition, all rows in the buffered group are part of
+// leftGroup (i.e. we don't need to look at rowStartIdx and rowEndIdx). Also,
+// all rows in the buffered group do have a match, so the group can neither be
+// "nullGroup" nor "unmatched".
+// This function does pay attention to rowEndIdx field for set operation joins:
+// only the first rowEndIdx will be output. For performance reasons we choose
+// to output the first rows (for both INTERSECT ALL and EXCEPT ALL joins we
+// need to output exactly rowEndIdx different rows from the left, but the
+// choice of rows can be arbitrary).
 func (o *mergeJoinLeftOuterOp) buildLeftBufferedGroup(
 	ctx context.Context,
 	leftGroup group,
@@ -34901,7 +36731,6 @@ func (o *mergeJoinLeftOuterOp) buildLeftBufferedGroup(
 		func() {
 			batchLength := currentBatch.Length()
 			for batchLength > 0 {
-				var updatedDestStartIdx int
 				// Loop over every column.
 			LeftColLoop:
 				for colIdx := range input.sourceTypes {
@@ -35394,13 +37223,15 @@ func (o *mergeJoinLeftOuterOp) buildLeftBufferedGroup(
 					default:
 						colexecerror.InternalError(fmt.Sprintf("unhandled type %s", input.sourceTypes[colIdx].String()))
 					}
-					updatedDestStartIdx = outStartIdx
-					o.builderState.left.setBuilderColumnState(initialBuilderState)
+					if colIdx == len(input.sourceTypes)-1 {
+						// We have appended some tuples into the output batch from the current
+						// batch (the latter is now fully processed), so we need to adjust
+						// destStartIdx accordingly for the next batch.
+						destStartIdx = outStartIdx
+					} else {
+						o.builderState.left.setBuilderColumnState(initialBuilderState)
+					}
 				}
-				// We have appended some tuples into the output batch from the current
-				// batch (the latter is now fully processed), so we need to adjust
-				// destStartIdx accordingly for the next batch.
-				destStartIdx = updatedDestStartIdx
 				// We have processed all tuples in the current batch from the
 				// buffered group, so we need to dequeue the next one.
 				o.unlimitedAllocator.ReleaseBatch(currentBatch)
@@ -38620,11 +40451,11 @@ func (o *mergeJoinLeftOuterOp) probe(ctx context.Context) {
 // buffered group.
 func (o *mergeJoinLeftOuterOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
 	lGroupEndIdx := o.proberState.lBufferedGroup.numTuples
+	rGroupEndIdx := o.proberState.rBufferedGroup.numTuples
 	// The capacity of builder state lGroups and rGroups is always at least 1
 	// given the init.
 	o.builderState.lGroups = o.builderState.lGroups[:1]
 	o.builderState.rGroups = o.builderState.rGroups[:1]
-	rGroupEndIdx := o.proberState.rBufferedGroup.numTuples
 	o.builderState.lGroups[0] = group{
 		rowStartIdx: 0,
 		rowEndIdx:   lGroupEndIdx,
@@ -38677,6 +40508,8 @@ func (o *mergeJoinLeftOuterOp) exhaustLeftSource(ctx context.Context) {
 // the right source. It should only be called when the left source has been
 // exhausted.
 func (o *mergeJoinLeftOuterOp) exhaustRightSource() {
+	// Remaining tuples from the right source do not have a match, so they are
+	// ignored in all joins except for RIGHT OUTER and FULL OUTER.
 }
 
 // calculateOutputCount uses the toBuild field of each group and the output

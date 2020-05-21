@@ -92,7 +92,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 	} else {
 		if sel != nil {
 			switch hj.spec.joinType {
-			case sqlbase.JoinType_LEFT_ANTI:
+			case sqlbase.LeftAntiJoin, sqlbase.ExceptAllJoin:
 				// Early bounds checks.
 				_ = hj.ht.probeScratch.headID[batchSize-1]
 				_ = sel[batchSize-1]
@@ -128,7 +128,7 @@ func (hj *hashJoiner) collect(batch coldata.Batch, batchSize int, sel []int) int
 			}
 		} else {
 			switch hj.spec.joinType {
-			case sqlbase.JoinType_LEFT_ANTI:
+			case sqlbase.LeftAntiJoin, sqlbase.ExceptAllJoin:
 				// Early bounds checks.
 				_ = hj.ht.probeScratch.headID[batchSize-1]
 				for i := int(0); i < batchSize; i++ {
@@ -212,7 +212,7 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 	} else {
 		if sel != nil {
 			switch hj.spec.joinType {
-			case sqlbase.JoinType_LEFT_ANTI:
+			case sqlbase.LeftAntiJoin, sqlbase.ExceptAllJoin:
 				// Early bounds checks.
 				_ = hj.ht.probeScratch.headID[batchSize-1]
 				_ = sel[batchSize-1]
@@ -242,7 +242,7 @@ func (hj *hashJoiner) distinctCollect(batch coldata.Batch, batchSize int, sel []
 			}
 		} else {
 			switch hj.spec.joinType {
-			case sqlbase.JoinType_LEFT_ANTI:
+			case sqlbase.LeftAntiJoin, sqlbase.ExceptAllJoin:
 				// Early bounds checks.
 				_ = hj.ht.probeScratch.headID[batchSize-1]
 				for i := int(0); i < batchSize; i++ {

@@ -13,9 +13,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
-	"time"
 
-	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
@@ -23,7 +21,6 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
-	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
 // Remove unused warning.
@@ -57,20 +54,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Bool()
 				prevVal := bufferedCol[0]
-				var curVal bool
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Bool()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -97,20 +99,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Bytes()
 				prevVal := bufferedCol.Get(0)
-				var curVal []byte
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Bytes()
-				curVal = col.Get(tupleToLookAtIdx)
+				curVal := col.Get(tupleToLookAtIdx)
 				var match bool
 
 				{
@@ -129,20 +136,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Decimal()
 				prevVal := bufferedCol[0]
-				var curVal apd.Decimal
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Decimal()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -160,20 +172,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			case 16:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Int16()
 				prevVal := bufferedCol[0]
-				var curVal int16
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Int16()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -199,20 +216,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			case 32:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Int32()
 				prevVal := bufferedCol[0]
-				var curVal int32
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Int32()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -239,20 +261,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Int64()
 				prevVal := bufferedCol[0]
-				var curVal int64
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Int64()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -282,20 +309,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Float64()
 				prevVal := bufferedCol[0]
-				var curVal float64
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Float64()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -333,20 +365,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Timestamp()
 				prevVal := bufferedCol[0]
-				var curVal time.Time
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Timestamp()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -372,20 +409,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Interval()
 				prevVal := bufferedCol[0]
-				var curVal duration.Duration
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Interval()
-				curVal = col[tupleToLookAtIdx]
+				curVal := col[tupleToLookAtIdx]
 				var match bool
 
 				{
@@ -404,20 +446,25 @@ func (o *mergeJoinBase) isBufferedGroupFinished(
 			default:
 				// We perform this null check on every equality column of the first
 				// buffered tuple regardless of the join type since it is done only once
-				// per batch. In some cases (like INNER JOIN, or LEFT OUTER JOIN with the
+				// per batch. In some cases (like INNER join, or LEFT OUTER join with the
 				// right side being an input) this check will always return false since
 				// nulls couldn't be buffered up though.
-				if bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0) {
+				// TODO(yuzefovich): consider templating this.
+				bufferedNull := bufferedGroup.firstTuple[colIdx].MaybeHasNulls() && bufferedGroup.firstTuple[colIdx].Nulls().NullAt(0)
+				incomingNull := batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx)
+				if o.joinType.IsSetOpJoin() {
+					if bufferedNull && incomingNull {
+						// We have a NULL match, so move onto the next column.
+						continue
+					}
+				}
+				if bufferedNull || incomingNull {
 					return true
 				}
 				bufferedCol := bufferedGroup.firstTuple[colIdx].Datum()
 				prevVal := bufferedCol.Get(0)
-				var curVal interface{}
-				if batch.ColVec(int(colIdx)).MaybeHasNulls() && batch.ColVec(int(colIdx)).Nulls().NullAt(tupleToLookAtIdx) {
-					return true
-				}
 				col := batch.ColVec(int(colIdx)).Datum()
-				curVal = col.Get(tupleToLookAtIdx)
+				curVal := col.Get(tupleToLookAtIdx)
 				var match bool
 
 				{

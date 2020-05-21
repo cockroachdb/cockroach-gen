@@ -31,13 +31,13 @@ import (
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
-type mergeJoinLeftAntiOp struct {
+type mergeJoinExceptAllOp struct {
 	*mergeJoinBase
 }
 
-var _ InternalMemoryOperator = &mergeJoinLeftAntiOp{}
+var _ InternalMemoryOperator = &mergeJoinExceptAllOp{}
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSeltrueRSeltrue(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) probeBodyLSeltrueRSeltrue(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -149,35 +149,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -193,7 +196,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -226,7 +234,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -272,8 +285,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -288,29 +305,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -376,28 +402,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -413,7 +442,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -438,7 +472,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -476,8 +515,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -492,21 +535,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -572,28 +624,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -609,7 +664,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -634,7 +694,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -672,8 +737,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -688,21 +757,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -767,38 +845,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -814,7 +895,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -850,7 +936,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -899,8 +990,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -915,32 +1010,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -1002,38 +1106,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -1049,7 +1156,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -1085,7 +1197,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -1134,8 +1251,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1150,32 +1271,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -1238,38 +1368,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -1285,7 +1418,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -1321,7 +1459,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -1370,8 +1513,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1386,32 +1533,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -1477,46 +1633,49 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -1532,7 +1691,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -1576,7 +1740,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -1633,8 +1802,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1649,40 +1822,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -1748,35 +1930,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -1792,7 +1977,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -1824,7 +2014,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -1869,8 +2064,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1885,28 +2084,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -1972,28 +2180,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -2009,7 +2220,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -2034,7 +2250,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -2072,8 +2293,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2088,21 +2313,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -2168,29 +2402,32 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -2206,7 +2443,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -2233,7 +2475,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -2273,8 +2520,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2289,23 +2540,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -2376,30 +2636,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -2490,8 +2749,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2506,29 +2769,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -2593,23 +2865,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -2684,8 +2955,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2700,21 +2975,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -2779,23 +3063,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -2870,8 +3153,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2886,21 +3173,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -2964,33 +3260,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -3087,8 +3382,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3103,32 +3402,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -3189,33 +3497,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -3312,8 +3619,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3328,32 +3639,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -3415,33 +3735,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -3538,8 +3857,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3554,32 +3877,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -3644,41 +3976,40 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -3791,8 +4122,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3807,40 +4142,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -3905,30 +4249,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -4017,8 +4360,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4033,28 +4380,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -4119,23 +4475,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -4210,8 +4565,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4226,21 +4585,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -4305,24 +4673,23 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -4401,8 +4768,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4417,23 +4788,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -4506,29 +4886,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -4619,8 +4997,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4719,22 +5101,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -4809,8 +5189,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4901,22 +5285,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -4991,8 +5373,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5082,32 +5468,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -5204,8 +5588,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5303,32 +5691,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -5425,8 +5811,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5525,32 +5915,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -5647,8 +6035,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5750,40 +6142,38 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -5896,8 +6286,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6007,29 +6401,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -6118,8 +6510,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6217,22 +6613,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -6307,8 +6701,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6399,23 +6797,21 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -6494,8 +6890,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6593,9 +6993,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -6697,8 +7094,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6796,9 +7197,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -6877,8 +7275,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6968,9 +7370,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -7049,8 +7448,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7138,9 +7541,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -7252,8 +7652,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7350,9 +7754,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -7463,8 +7864,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7562,9 +7967,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -7675,8 +8077,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7776,9 +8182,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -7914,8 +8317,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8024,9 +8431,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -8126,8 +8530,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8224,9 +8632,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -8305,8 +8710,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8396,9 +8805,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -8482,8 +8888,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8550,7 +8960,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSeltrueRSelfalse(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) probeBodyLSeltrueRSelfalse(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -8662,35 +9072,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -8706,7 +9119,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -8739,7 +9157,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -8785,8 +9208,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8801,29 +9228,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -8889,28 +9325,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -8926,7 +9365,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -8951,7 +9395,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -8989,8 +9438,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9005,21 +9458,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -9085,28 +9547,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -9122,7 +9587,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -9147,7 +9617,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -9185,8 +9660,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9201,21 +9680,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -9280,38 +9768,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -9327,7 +9818,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -9363,7 +9859,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -9412,8 +9913,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9428,32 +9933,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -9515,38 +10029,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -9562,7 +10079,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -9598,7 +10120,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -9647,8 +10174,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9663,32 +10194,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -9751,38 +10291,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -9798,7 +10341,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -9834,7 +10382,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -9883,8 +10436,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9899,32 +10456,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -9990,46 +10556,49 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -10045,7 +10614,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -10089,7 +10663,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -10146,8 +10725,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10162,40 +10745,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -10261,35 +10853,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -10305,7 +10900,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -10337,7 +10937,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -10382,8 +10987,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10398,28 +11007,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -10485,28 +11103,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -10522,7 +11143,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -10547,7 +11173,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -10585,8 +11216,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10601,21 +11236,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -10681,29 +11325,32 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -10719,7 +11366,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(lSel[curLIdx]) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(lSel[curLIdx]) {
 												lComplete = true
 												break
@@ -10746,7 +11398,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -10786,8 +11443,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10802,23 +11463,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -10889,30 +11559,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -11003,8 +11672,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11019,29 +11692,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -11106,23 +11788,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -11197,8 +11878,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11213,21 +11898,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -11292,23 +11986,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -11383,8 +12076,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11399,21 +12096,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -11477,33 +12183,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -11600,8 +12305,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11616,32 +12325,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -11702,33 +12420,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -11825,8 +12542,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11841,32 +12562,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -11928,33 +12658,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -12051,8 +12780,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12067,32 +12800,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -12157,41 +12899,40 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -12304,8 +13045,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12320,40 +13065,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -12418,30 +13172,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -12530,8 +13283,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12546,28 +13303,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -12632,23 +13398,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -12723,8 +13488,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12739,21 +13508,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -12818,24 +13596,23 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(lSel[curLIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -12914,8 +13691,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12930,23 +13711,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
+											newLValNull := lVec.Nulls().NullAt(lSel[curLIdx])
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = lSel[curLIdx]
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -13019,29 +13809,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -13132,8 +13920,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13232,22 +14024,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -13322,8 +14112,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13414,22 +14208,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -13504,8 +14296,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13595,32 +14391,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -13717,8 +14511,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13816,32 +14614,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -13938,8 +14734,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14038,32 +14838,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -14160,8 +14958,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14263,40 +15065,38 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -14409,8 +15209,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14520,29 +15324,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -14631,8 +15433,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14730,22 +15536,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -14820,8 +15624,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14912,23 +15720,21 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = lSel[curLIdx]
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = lSel[curLIdx]
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -15007,8 +15813,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15106,9 +15916,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -15210,8 +16017,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15309,9 +16120,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -15390,8 +16198,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15481,9 +16293,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -15562,8 +16371,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15651,9 +16464,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -15765,8 +16575,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15863,9 +16677,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -15976,8 +16787,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16075,9 +16890,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -16188,8 +17000,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16289,9 +17105,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -16427,8 +17240,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16537,9 +17354,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -16639,8 +17453,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16737,9 +17555,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -16818,8 +17633,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16909,9 +17728,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = lSel[curLIdx]
@@ -16995,8 +17811,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17063,7 +17883,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSelfalseRSeltrue(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) probeBodyLSelfalseRSeltrue(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -17175,35 +17995,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -17219,7 +18042,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -17252,7 +18080,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -17298,8 +18131,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17314,29 +18151,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -17402,28 +18248,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -17439,7 +18288,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -17464,7 +18318,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -17502,8 +18361,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17518,21 +18381,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -17598,28 +18470,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -17635,7 +18510,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -17660,7 +18540,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -17698,8 +18583,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17714,21 +18603,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -17793,38 +18691,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -17840,7 +18741,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -17876,7 +18782,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -17925,8 +18836,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17941,32 +18856,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -18028,38 +18952,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -18075,7 +19002,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -18111,7 +19043,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -18160,8 +19097,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18176,32 +19117,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -18264,38 +19214,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -18311,7 +19264,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -18347,7 +19305,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -18396,8 +19359,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18412,32 +19379,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -18503,46 +19479,49 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -18558,7 +19537,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -18602,7 +19586,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -18659,8 +19648,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18675,40 +19668,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -18774,35 +19776,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -18818,7 +19823,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -18850,7 +19860,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -18895,8 +19910,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18911,28 +19930,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -18998,28 +20026,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -19035,7 +20066,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -19060,7 +20096,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -19098,8 +20139,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19114,21 +20159,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -19194,29 +20248,32 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -19232,7 +20289,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -19259,7 +20321,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(rSel[curRIdx]) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(rSel[curRIdx]) {
 												rComplete = true
 												break
@@ -19299,8 +20366,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19315,23 +20386,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -19402,30 +20482,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -19516,8 +20595,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19532,29 +20615,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -19619,23 +20711,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -19710,8 +20801,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19726,21 +20821,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -19805,23 +20909,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -19896,8 +20999,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19912,21 +21019,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -19990,33 +21106,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -20113,8 +21228,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20129,32 +21248,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -20215,33 +21343,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -20338,8 +21465,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20354,32 +21485,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -20441,33 +21581,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -20564,8 +21703,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20580,32 +21723,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -20670,41 +21822,40 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -20817,8 +21968,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20833,40 +21988,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -20931,30 +22095,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -21043,8 +22206,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21059,28 +22226,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -21145,23 +22321,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -21236,8 +22411,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21252,21 +22431,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -21331,24 +22519,23 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -21427,8 +22614,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21443,23 +22634,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -21532,29 +22732,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -21645,8 +22843,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21745,22 +22947,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -21835,8 +23035,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21927,22 +23131,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -22017,8 +23219,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22108,32 +23314,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -22230,8 +23434,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22329,32 +23537,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -22451,8 +23657,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22551,32 +23761,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -22673,8 +23881,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22776,40 +23988,38 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -22922,8 +24132,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23033,29 +24247,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -23144,8 +24356,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23243,22 +24459,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -23333,8 +24547,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23425,23 +24643,21 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(rSel[curRIdx])
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = rSel[curRIdx]
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = rSel[curRIdx]
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -23520,8 +24736,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23619,9 +24839,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -23723,8 +24940,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23822,9 +25043,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -23903,8 +25121,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23994,9 +25216,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -24075,8 +25294,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24164,9 +25387,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -24278,8 +25498,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24376,9 +25600,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -24489,8 +25710,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24588,9 +25813,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -24701,8 +25923,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24802,9 +26028,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -24940,8 +26163,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25050,9 +26277,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -25152,8 +26376,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25250,9 +26478,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -25331,8 +26556,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25422,9 +26651,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -25508,8 +26734,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25576,7 +26806,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSelfalseRSelfalse(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) probeBodyLSelfalseRSelfalse(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -25688,35 +26918,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -25732,7 +26965,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -25765,7 +27003,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -25811,8 +27054,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25827,29 +27074,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -25915,28 +27171,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -25952,7 +27211,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -25977,7 +27241,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -26015,8 +27284,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26031,21 +27304,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -26111,28 +27393,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -26148,7 +27433,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -26173,7 +27463,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -26211,8 +27506,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26227,21 +27526,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -26306,38 +27614,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -26353,7 +27664,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -26389,7 +27705,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -26438,8 +27759,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26454,32 +27779,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -26541,38 +27875,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -26588,7 +27925,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -26624,7 +27966,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -26673,8 +28020,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26689,32 +28040,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -26777,38 +28137,41 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -26824,7 +28187,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -26860,7 +28228,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -26909,8 +28282,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26925,32 +28302,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -27016,46 +28402,49 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -27071,7 +28460,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -27115,7 +28509,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -27172,8 +28571,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27188,40 +28591,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -27287,35 +28699,38 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -27331,7 +28746,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -27363,7 +28783,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -27408,8 +28833,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27424,28 +28853,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -27511,28 +28949,31 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -27548,7 +28989,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -27573,7 +29019,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -27611,8 +29062,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27627,21 +29082,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -27707,29 +29171,32 @@ EqLoop:
 								lNull := lVec.Nulls().NullAt(curLIdx)
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
+								var nullMatch bool
+								_ = nullMatch
+								// If we have a NULL match, it will take precedence over
+								// cmp value set above.
+								nullMatch = lNull && rNull
 
-								{
+								if nullMatch {
+									// We have a null match, so two values are equal.
+									cmp = 0
+								} else {
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -27745,7 +29212,12 @@ EqLoop:
 
 									// Find the length of the group on the left.
 									for curLIdx < curLEndIdx {
-										{
+										if nullMatch {
+											if !lVec.Nulls().NullAt(curLIdx) {
+												lComplete = true
+												break
+											}
+										} else {
 											if lVec.Nulls().NullAt(curLIdx) {
 												lComplete = true
 												break
@@ -27772,7 +29244,12 @@ EqLoop:
 
 									// Find the length of the group on the right.
 									for curRIdx < curREndIdx {
-										{
+										if nullMatch {
+											if !rVec.Nulls().NullAt(curRIdx) {
+												rComplete = true
+												break
+											}
+										} else {
 											if rVec.Nulls().NullAt(curRIdx) {
 												rComplete = true
 												break
@@ -27812,8 +29289,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27828,23 +29309,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -27915,30 +29405,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -28029,8 +29518,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28045,29 +29538,38 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if !newLVal && lVal {
+														cmpResult = -1
+													} else if newLVal && !lVal {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -28132,23 +29634,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -28223,8 +29724,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28239,21 +29744,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = bytes.Compare(newLVal, lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -28318,23 +29832,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -28409,8 +29922,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28425,21 +29942,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = tree.CompareDecimals(&newLVal, &lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -28503,33 +30029,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -28626,8 +30151,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28642,32 +30171,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -28728,33 +30266,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -28851,8 +30388,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28867,32 +30408,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -28954,33 +30504,32 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -29077,8 +30626,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29093,32 +30646,41 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
+													var cmpResult int
+
+													{
+														a, b := int64(newLVal), int64(lVal)
+														if a < b {
+															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else {
+															cmpResult = 0
+														}
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -29183,41 +30745,40 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -29330,8 +30891,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29346,40 +30911,49 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
-
-											{
-												var cmpResult int
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
 												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
+													var cmpResult int
+
+													{
+														a, b := float64(newLVal), float64(lVal)
+														if a < b {
 															cmpResult = -1
+														} else if a > b {
+															cmpResult = 1
+														} else if a == b {
+															cmpResult = 0
+														} else if math.IsNaN(a) {
+															if math.IsNaN(b) {
+																cmpResult = 0
+															} else {
+																cmpResult = -1
+															}
+														} else {
+															cmpResult = 1
 														}
-													} else {
-														cmpResult = 1
 													}
+
+													match = cmpResult == 0
 												}
 
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -29444,30 +31018,29 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -29556,8 +31129,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29572,28 +31149,37 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
+													if newLVal.Before(lVal) {
+														cmpResult = -1
+													} else if lVal.Before(newLVal) {
+														cmpResult = 1
+													} else {
+														cmpResult = 0
+													}
+													match = cmpResult == 0
 												}
-												match = cmpResult == 0
-											}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -29658,23 +31244,22 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -29749,8 +31334,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29765,21 +31354,30 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys[lSelIdx]
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys[lSelIdx]
 
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
+												{
+													var cmpResult int
+													cmpResult = newLVal.Compare(lVal)
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -29844,24 +31442,23 @@ EqLoop:
 								cmp = 0
 								lNull := lVec.Nulls().NullAt(curLIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if lNull {
-
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-									continue
+									cmp = -1
 								}
+								var nullMatch bool
+								_ = nullMatch
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -29940,8 +31537,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29956,23 +31557,32 @@ EqLoop:
 										// the right, so we're adding each of them as a left unmatched group.
 										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
 										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
+											newLValNull := lVec.Nulls().NullAt(curLIdx)
+											if lNull != newLValNull {
+												// We have a null mismatch, so we've reached the end of the current
+												// group on the left.
 												break
+											} else if newLValNull && lNull {
+												nullMatch = true
+											} else {
+												nullMatch = false
 											}
 
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
+											if !nullMatch {
+												lSelIdx = curLIdx
+												newLVal := lKeys.Get(lSelIdx)
 
-											{
-												var cmpResult int
+												{
+													var cmpResult int
 
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
+													cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
 
-												match = cmpResult == 0
-											}
+													match = cmpResult == 0
+												}
 
-											if !match {
-												break
+												if !match {
+													break
+												}
 											}
 											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 											curLIdx++
@@ -30045,29 +31655,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if !lVal && rVal {
-										cmp = -1
-									} else if lVal && !rVal {
-										cmp = 1
-									} else {
-										cmp = 0
+										if !lVal && rVal {
+											cmp = -1
+										} else if lVal && !rVal {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -30158,8 +31766,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30258,22 +31870,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
-									cmp = bytes.Compare(lVal, rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
+										cmp = bytes.Compare(lVal, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -30348,8 +31958,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30440,22 +32054,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = tree.CompareDecimals(&lVal, &rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = tree.CompareDecimals(&lVal, &rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -30530,8 +32142,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30621,32 +32237,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -30743,8 +32357,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30842,32 +32460,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -30964,8 +32580,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31064,32 +32684,30 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := int64(lVal), int64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else {
-											cmp = 0
+										{
+											a, b := int64(lVal), int64(rVal)
+											if a < b {
+												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else {
+												cmp = 0
+											}
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -31186,8 +32804,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31289,40 +32911,38 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									{
-										a, b := float64(lVal), float64(rVal)
-										if a < b {
-											cmp = -1
-										} else if a > b {
-											cmp = 1
-										} else if a == b {
-											cmp = 0
-										} else if math.IsNaN(a) {
-											if math.IsNaN(b) {
-												cmp = 0
-											} else {
+										{
+											a, b := float64(lVal), float64(rVal)
+											if a < b {
 												cmp = -1
+											} else if a > b {
+												cmp = 1
+											} else if a == b {
+												cmp = 0
+											} else if math.IsNaN(a) {
+												if math.IsNaN(b) {
+													cmp = 0
+												} else {
+													cmp = -1
+												}
+											} else {
+												cmp = 1
 											}
-										} else {
-											cmp = 1
 										}
-									}
 
+									}
 								}
 
 								if cmp == 0 {
@@ -31435,8 +33055,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31546,29 +33170,27 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
 
-									if lVal.Before(rVal) {
-										cmp = -1
-									} else if rVal.Before(lVal) {
-										cmp = 1
-									} else {
-										cmp = 0
+										if lVal.Before(rVal) {
+											cmp = -1
+										} else if rVal.Before(lVal) {
+											cmp = 1
+										} else {
+											cmp = 0
+										}
+
 									}
-
 								}
 
 								if cmp == 0 {
@@ -31657,8 +33279,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31756,22 +33382,20 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys[lSelIdx]
-									rSelIdx = curRIdx
-									rVal = rKeys[rSelIdx]
-									cmp = lVal.Compare(rVal)
+										lSelIdx = curLIdx
+										lVal = lKeys[lSelIdx]
+										rSelIdx = curRIdx
+										rVal = rKeys[rSelIdx]
+										cmp = lVal.Compare(rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -31846,8 +33470,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31938,23 +33566,21 @@ EqLoop:
 								cmp = 0
 								rNull := rVec.Nulls().NullAt(curRIdx)
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 								if rNull {
-
-									curRIdx++
-									continue
+									cmp = 1
 								}
 
 								{
+									if cmp == 0 {
 
-									lSelIdx = curLIdx
-									lVal = lKeys.Get(lSelIdx)
-									rSelIdx = curRIdx
-									rVal = rKeys.Get(rSelIdx)
+										lSelIdx = curLIdx
+										lVal = lKeys.Get(lSelIdx)
+										rSelIdx = curRIdx
+										rVal = rKeys.Get(rSelIdx)
 
-									cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
+										cmp = lVal.(*coldataext.Datum).CompareDatum(lKeys, rVal)
 
+									}
 								}
 
 								if cmp == 0 {
@@ -32033,8 +33659,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32132,9 +33762,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -32236,8 +33863,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32335,9 +33966,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -32416,8 +34044,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32507,9 +34139,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -32588,8 +34217,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32677,9 +34310,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -32791,8 +34421,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32889,9 +34523,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -33002,8 +34633,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33101,9 +34736,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -33214,8 +34846,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33315,9 +34951,6 @@ EqLoop:
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
-
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
 
 								{
 
@@ -33453,8 +35086,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33563,9 +35200,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -33665,8 +35299,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33763,9 +35401,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -33844,8 +35479,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33935,9 +35574,6 @@ EqLoop:
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
 
-								// TODO(yuzefovich): we can advance both sides if both are
-								// NULL.
-
 								{
 
 									lSelIdx = curLIdx
@@ -34021,8 +35657,12 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										// For EXCEPT ALL join we add (lGroupLength - rGroupLength) number
+										// (if positive) of unmatched left groups.
+										for leftUnmatchedTupleIdx := beginLIdx + rGroupLength; leftUnmatchedTupleIdx < beginLIdx+lGroupLength; leftUnmatchedTupleIdx++ {
+											// Right index here doesn't matter.
+											o.groups.addLeftUnmatchedGroup(leftUnmatchedTupleIdx, beginRIdx)
+										}
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -34110,7 +35750,7 @@ EqLoop:
 // group is repeated numRepeats times, instead of a simple copy of the group as
 // a whole.
 // SIDE EFFECTS: writes into o.output.
-func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
+func (o *mergeJoinExceptAllOp) buildLeftGroupsFromBatch(
 	leftGroups []group, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	sel := batch.Selection()
@@ -36667,7 +38307,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 // to output the first rows (for both INTERSECT ALL and EXCEPT ALL joins we
 // need to output exactly rowEndIdx different rows from the left, but the
 // choice of rows can be arbitrary).
-func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
+func (o *mergeJoinExceptAllOp) buildLeftBufferedGroup(
 	ctx context.Context,
 	leftGroup group,
 	input *mergeJoinInput,
@@ -36705,7 +38345,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Bool()
 							outCol := out.Bool()
 							var val bool
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -36714,6 +38355,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -36733,6 +38384,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -36754,7 +38409,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Bytes()
 							outCol := out.Bytes()
 							var val []byte
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -36763,6 +38419,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -36782,6 +38448,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -36803,7 +38473,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Decimal()
 							outCol := out.Decimal()
 							var val apd.Decimal
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -36812,6 +38483,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -36831,6 +38512,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -36851,7 +38536,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Int16()
 							outCol := out.Int16()
 							var val int16
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -36860,6 +38546,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -36879,6 +38575,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -36896,7 +38596,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Int32()
 							outCol := out.Int32()
 							var val int32
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -36905,6 +38606,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -36924,6 +38635,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -36942,7 +38657,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Int64()
 							outCol := out.Int64()
 							var val int64
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -36951,6 +38667,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -36970,6 +38696,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -36991,7 +38721,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Float64()
 							outCol := out.Float64()
 							var val float64
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -37000,6 +38731,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -37019,6 +38760,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -37040,7 +38785,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Timestamp()
 							outCol := out.Timestamp()
 							var val time.Time
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -37049,6 +38795,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -37068,6 +38824,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -37089,7 +38849,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Interval()
 							outCol := out.Interval()
 							var val duration.Duration
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -37098,6 +38859,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -37117,6 +38888,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -37138,7 +38913,8 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 							srcCol := src.Datum()
 							outCol := out.Datum()
 							var val interface{}
-							// Loop over every row in the group.
+							// Loop over every row in the group until we hit
+							// rowEndIdx number of rows.
 							for ; o.builderState.left.curSrcStartIdx < batchLength; o.builderState.left.curSrcStartIdx++ {
 								// Repeat each row numRepeats times.
 								srcStartIdx := o.builderState.left.curSrcStartIdx
@@ -37147,6 +38923,16 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 								if outStartIdx+toAppend > o.outputBatchSize {
 									toAppend = o.outputBatchSize - outStartIdx
 								}
+
+								if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+									// We have fully materialized first rowEndIdx
+									// rows in the current column, so we need to
+									// either transition to the next column or exit.
+									// We can accomplish this by setting toAppend
+									// to 0.
+									toAppend = 0
+								}
+								o.builderState.left.setOpLeftSrcIdx += toAppend
 
 								if src.Nulls().NullAt(srcStartIdx) {
 									out.Nulls().SetNullRange(outStartIdx, outStartIdx+toAppend)
@@ -37166,6 +38952,10 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 										// This is the last column, so we update the builder state
 										// and exit.
 										o.builderState.left.numRepeatsIdx += toAppend
+										if o.builderState.left.setOpLeftSrcIdx == leftGroup.rowEndIdx {
+											o.builderState.lBufferedGroupBatch = nil
+											o.builderState.left.reset()
+										}
 										return
 									}
 									// We need to start building the next column
@@ -37236,7 +39026,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 // Note: this is different from buildLeftGroupsFromBatch in that each group is
 // not expanded but directly copied numRepeats times.
 // SIDE EFFECTS: writes into o.output.
-func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
+func (o *mergeJoinExceptAllOp) buildRightGroupsFromBatch(
 	rightGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	initialBuilderState := o.builderState.right
@@ -39948,7 +41738,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 // all rows in the buffered group are part of rightGroup (i.e. we don't need to
 // look at rowStartIdx and rowEndIdx). Also, all rows in the buffered group do
 // have a match, so the group can neither be "nullGroup" nor "unmatched".
-func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
+func (o *mergeJoinExceptAllOp) buildRightBufferedGroup(
 	ctx context.Context,
 	rightGroup group,
 	colOffset int,
@@ -40308,7 +42098,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 // and set the correct cardinality.
 // Note that in this phase, we do this for every group, except the last group
 // in the batch.
-func (o *mergeJoinLeftAntiOp) probe(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) probe(ctx context.Context) {
 	o.groups.reset(o.proberState.lIdx, o.proberState.lLength, o.proberState.rIdx, o.proberState.rLength)
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
@@ -40329,10 +42119,26 @@ func (o *mergeJoinLeftAntiOp) probe(ctx context.Context) {
 
 // setBuilderSourceToBufferedGroup sets up the builder state to use the
 // buffered group.
-func (o *mergeJoinLeftAntiOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
-	// All tuples in the buffered group have matches, so they are not output in
-	// case of LEFT ANTI join.
-	o.builderState.lGroups = o.builderState.lGroups[:0]
+func (o *mergeJoinExceptAllOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
+	lGroupEndIdx := o.proberState.lBufferedGroup.numTuples
+	rGroupEndIdx := o.proberState.rBufferedGroup.numTuples
+	// The capacity of builder state lGroups and rGroups is always at least 1
+	// given the init.
+	o.builderState.lGroups = o.builderState.lGroups[:1]
+	o.builderState.rGroups = o.builderState.rGroups[:1]
+	// For EXCEPT ALL join we add (lGroupEndIdx - rGroupEndIdx) number
+	// (if positive) of unmatched rows.
+	if lGroupEndIdx > rGroupEndIdx {
+		o.builderState.lGroups[0] = group{
+			rowStartIdx: 0,
+			rowEndIdx:   lGroupEndIdx - rGroupEndIdx,
+			numRepeats:  1,
+			toBuild:     lGroupEndIdx - rGroupEndIdx,
+			unmatched:   true,
+		}
+	} else {
+		o.builderState.lGroups = o.builderState.lGroups[:0]
+	}
 
 	o.builderState.buildFrom = mjBuildFromBufferedGroup
 
@@ -40346,7 +42152,7 @@ func (o *mergeJoinLeftAntiOp) setBuilderSourceToBufferedGroup(ctx context.Contex
 // exhaustLeftSource sets up the builder to process any remaining tuples from
 // the left source. It should only be called when the right source has been
 // exhausted.
-func (o *mergeJoinLeftAntiOp) exhaustLeftSource(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) exhaustLeftSource(ctx context.Context) {
 	// The capacity of builder state lGroups and rGroups is always at least 1
 	// given the init.
 	o.builderState.lGroups = o.builderState.lGroups[:1]
@@ -40364,7 +42170,7 @@ func (o *mergeJoinLeftAntiOp) exhaustLeftSource(ctx context.Context) {
 // exhaustRightSource sets up the builder to process any remaining tuples from
 // the right source. It should only be called when the left source has been
 // exhausted.
-func (o *mergeJoinLeftAntiOp) exhaustRightSource() {
+func (o *mergeJoinExceptAllOp) exhaustRightSource() {
 	// Remaining tuples from the right source do not have a match, so they are
 	// ignored in all joins except for RIGHT OUTER and FULL OUTER.
 }
@@ -40373,7 +42179,7 @@ func (o *mergeJoinLeftAntiOp) exhaustRightSource() {
 // batch size to determine the output count. Note that as soon as a group is
 // materialized partially or fully to output, its toBuild field is updated
 // accordingly.
-func (o *mergeJoinLeftAntiOp) calculateOutputCount(groups []group) int {
+func (o *mergeJoinExceptAllOp) calculateOutputCount(groups []group) int {
 	count := o.builderState.outCount
 
 	for i := 0; i < len(groups); i++ {
@@ -40396,7 +42202,7 @@ func (o *mergeJoinLeftAntiOp) calculateOutputCount(groups []group) int {
 }
 
 // build creates the cross product, and writes it to the output member.
-func (o *mergeJoinLeftAntiOp) build(ctx context.Context) {
+func (o *mergeJoinExceptAllOp) build(ctx context.Context) {
 	outStartIdx := o.builderState.outCount
 	o.builderState.outCount = o.calculateOutputCount(o.builderState.lGroups)
 	if o.output.Width() != 0 && o.builderState.outCount > outStartIdx {
@@ -40416,7 +42222,7 @@ func (o *mergeJoinLeftAntiOp) build(ctx context.Context) {
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) Next(ctx context.Context) coldata.Batch {
+func (o *mergeJoinExceptAllOp) Next(ctx context.Context) coldata.Batch {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	o.output.ResetInternalBatch()

@@ -26,10 +26,10 @@ import (
 var _ = execgen.UNSAFEGET
 
 // checkCol determines if the current key column in the groupID buckets matches
-// the specified equality column key. If there is a match, then the key is added
-// to differs. If the bucket has reached the end, the key is rejected. If the
-// hashTable disallows null equality, then if any element in the key is null,
-// there is no match.
+// the specified equality column key. If there is no match, then the key is
+// added to differs. If the bucket has reached the end, the key is rejected. If
+// the hashTable disallows null equality, then if any element in the key is
+// null, there is no match.
 func (ht *hashTable) checkCol(
 	probeVec, buildVec coldata.Vec, keyColIdx int, nToCheck uint64, probeSel []int,
 ) {
@@ -66,6 +66,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -125,6 +126,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -172,6 +174,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -219,6 +222,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -264,6 +268,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -313,6 +318,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -372,6 +378,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -419,6 +426,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -466,6 +474,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -511,6 +520,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -575,6 +585,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -626,6 +637,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -665,6 +677,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -704,6 +717,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -741,6 +755,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -782,6 +797,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -833,6 +849,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -872,6 +889,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -911,6 +929,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -948,6 +967,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -1003,6 +1023,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1060,6 +1081,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1105,6 +1127,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -1150,6 +1173,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -1193,6 +1217,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -1240,6 +1265,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1297,6 +1323,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1342,6 +1369,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -1387,6 +1415,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -1430,6 +1459,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -1481,6 +1511,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1538,6 +1569,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1583,6 +1615,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -1628,6 +1661,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -1671,6 +1705,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -1718,6 +1753,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1775,6 +1811,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -1820,6 +1857,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -1865,6 +1903,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -1908,6 +1947,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -1960,6 +2000,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2017,6 +2058,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2062,6 +2104,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -2107,6 +2150,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -2150,6 +2194,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -2197,6 +2242,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2254,6 +2300,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2299,6 +2346,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -2344,6 +2392,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -2387,6 +2436,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -2442,6 +2492,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2501,6 +2552,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2548,6 +2600,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -2595,6 +2648,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -2640,6 +2694,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -2689,6 +2744,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2748,6 +2804,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2795,6 +2852,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -2842,6 +2900,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -2887,6 +2946,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -2944,6 +3004,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -2995,6 +3056,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3034,6 +3096,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -3073,6 +3136,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -3110,6 +3174,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -3151,6 +3216,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3202,6 +3268,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3241,6 +3308,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -3280,6 +3348,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -3317,6 +3386,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -3371,6 +3441,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3433,6 +3504,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3483,6 +3555,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -3533,6 +3606,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -3581,6 +3655,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -3633,6 +3708,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3695,6 +3771,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3745,6 +3822,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -3795,6 +3873,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -3843,6 +3922,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -3899,6 +3979,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -3961,6 +4042,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4011,6 +4093,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -4061,6 +4144,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -4109,6 +4193,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -4161,6 +4246,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4223,6 +4309,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4273,6 +4360,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -4323,6 +4411,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -4371,6 +4460,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -4428,6 +4518,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4490,6 +4581,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4540,6 +4632,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -4590,6 +4683,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -4638,6 +4732,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -4690,6 +4785,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4752,6 +4848,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -4802,6 +4899,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -4852,6 +4950,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -4900,6 +4999,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -4960,6 +5060,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5030,6 +5131,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5088,6 +5190,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -5146,6 +5249,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -5202,6 +5306,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -5262,6 +5367,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5332,6 +5438,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5390,6 +5497,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -5448,6 +5556,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -5504,6 +5613,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -5572,6 +5682,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5629,6 +5740,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5674,6 +5786,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -5719,6 +5832,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -5762,6 +5876,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -5809,6 +5924,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5866,6 +5982,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -5911,6 +6028,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -5956,6 +6074,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -5999,6 +6118,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -6056,6 +6176,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6118,6 +6239,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6168,6 +6290,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -6218,6 +6341,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -6266,6 +6390,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -6318,6 +6443,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6380,6 +6506,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6430,6 +6557,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -6480,6 +6608,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -6528,6 +6657,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -6584,6 +6714,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6646,6 +6777,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6696,6 +6828,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -6746,6 +6879,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -6794,6 +6928,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -6846,6 +6981,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6908,6 +7044,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -6958,6 +7095,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -7008,6 +7146,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -7056,6 +7195,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -7113,6 +7253,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -7175,6 +7316,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -7225,6 +7367,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -7275,6 +7418,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -7323,6 +7467,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -7375,6 +7520,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -7437,6 +7583,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -7487,6 +7634,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -7537,6 +7685,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -7585,6 +7734,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -7645,6 +7795,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -7715,6 +7866,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -7773,6 +7925,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -7831,6 +7984,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -7887,6 +8041,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -7947,6 +8102,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8017,6 +8173,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8075,6 +8232,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -8133,6 +8291,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -8189,6 +8348,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -8257,6 +8417,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8314,6 +8475,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8359,6 +8521,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -8404,6 +8567,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -8447,6 +8611,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -8494,6 +8659,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8551,6 +8717,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8596,6 +8763,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -8641,6 +8809,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -8684,6 +8853,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -8742,6 +8912,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8804,6 +8975,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -8854,6 +9026,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -8904,6 +9077,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -8952,6 +9126,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -9004,6 +9179,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9066,6 +9242,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9116,6 +9293,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -9166,6 +9344,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -9214,6 +9393,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -9270,6 +9450,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9332,6 +9513,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9382,6 +9564,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -9432,6 +9615,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -9480,6 +9664,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -9532,6 +9717,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9594,6 +9780,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9644,6 +9831,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -9694,6 +9882,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -9742,6 +9931,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -9799,6 +9989,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9861,6 +10052,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -9911,6 +10103,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -9961,6 +10154,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -10009,6 +10203,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -10061,6 +10256,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -10123,6 +10319,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -10173,6 +10370,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -10223,6 +10421,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -10271,6 +10470,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -10331,6 +10531,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -10401,6 +10602,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -10459,6 +10661,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -10517,6 +10720,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -10573,6 +10777,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -10633,6 +10838,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -10703,6 +10909,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -10761,6 +10968,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -10819,6 +11027,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -10875,6 +11084,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -10943,6 +11153,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11000,6 +11211,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11045,6 +11257,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -11090,6 +11303,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -11133,6 +11347,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -11180,6 +11395,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11237,6 +11453,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11282,6 +11499,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -11327,6 +11545,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -11370,6 +11589,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -11431,6 +11651,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11501,6 +11722,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11559,6 +11781,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -11617,6 +11840,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -11673,6 +11897,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -11733,6 +11958,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11803,6 +12029,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -11861,6 +12088,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -11919,6 +12147,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -11975,6 +12204,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -12039,6 +12269,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -12109,6 +12340,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -12167,6 +12399,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -12225,6 +12458,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -12281,6 +12515,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -12341,6 +12576,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -12411,6 +12647,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -12469,6 +12706,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -12527,6 +12765,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -12583,6 +12822,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -12648,6 +12888,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -12718,6 +12959,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -12776,6 +13018,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -12834,6 +13077,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -12890,6 +13134,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -12950,6 +13195,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13020,6 +13266,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13078,6 +13325,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -13136,6 +13384,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -13192,6 +13441,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -13260,6 +13510,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13330,6 +13581,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13388,6 +13640,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -13446,6 +13699,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -13502,6 +13756,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -13562,6 +13817,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13632,6 +13888,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13690,6 +13947,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -13748,6 +14006,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -13804,6 +14063,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -13872,6 +14132,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13931,6 +14192,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -13978,6 +14240,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -14025,6 +14288,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -14070,6 +14334,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -14119,6 +14384,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14178,6 +14444,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14225,6 +14492,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -14272,6 +14540,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -14317,6 +14586,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -14381,6 +14651,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14439,6 +14710,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14485,6 +14757,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -14531,6 +14804,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -14575,6 +14849,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -14623,6 +14898,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14681,6 +14957,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14727,6 +15004,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -14773,6 +15051,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -14817,6 +15096,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -14880,6 +15160,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14931,6 +15212,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -14970,6 +15252,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -15009,6 +15292,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -15046,6 +15330,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -15087,6 +15372,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -15138,6 +15424,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -15177,6 +15464,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -15216,6 +15504,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -15253,6 +15542,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -15309,6 +15599,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -15362,6 +15653,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = probeSel[toCheck]
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -15403,6 +15695,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -15444,6 +15737,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -15483,6 +15777,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = probeSel[toCheck]
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -15526,6 +15821,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -15579,6 +15875,7 @@ func (ht *hashTable) checkCol(
 											// the build table key (calculated using keys[keyID - 1] = key) is
 											// compared to the corresponding probe table to determine if a match is
 											// found.
+
 											probeIdx = int(toCheck)
 											probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 											buildIdx = int(keyID - 1)
@@ -15620,6 +15917,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										probeIsNull = probeVec.Nulls().NullAt(probeIdx)
 										buildIdx = int(keyID - 1)
@@ -15661,6 +15959,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										buildIsNull = buildVec.Nulls().NullAt(buildIdx)
@@ -15700,6 +15999,7 @@ func (ht *hashTable) checkCol(
 										// the build table key (calculated using keys[keyID - 1] = key) is
 										// compared to the corresponding probe table to determine if a match is
 										// found.
+
 										probeIdx = int(toCheck)
 										buildIdx = int(keyID - 1)
 										if probeIsNull {
@@ -15730,50 +16030,4 @@ func (ht *hashTable) checkCol(
 			}
 		}
 	}
-}
-
-// check performs an equality check between the current key in the groupID bucket
-// and the probe key at that index. If there is a match, the hashTable's same
-// array is updated to lazily populate the linked list of identical build
-// table keys. The visited flag for corresponding build table key is also set. A
-// key is removed from toCheck if it has already been visited in a previous
-// probe, or the bucket has reached the end (key not found in build table). The
-// new length of toCheck is returned by this function.
-func (ht *hashTable) check(
-	probeVecs []coldata.Vec, buildKeyCols []uint32, nToCheck uint64, probeSel []int,
-) uint64 {
-	ht.checkCols(probeVecs, ht.vals.ColVecs(), buildKeyCols, nToCheck, probeSel)
-	nDiffers := uint64(0)
-	for _, toCheck := range ht.probeScratch.toCheck[:nToCheck] {
-		if !ht.probeScratch.differs[toCheck] {
-			// If the current key matches with the probe key, we want to update headID
-			// with the current key if it has not been set yet.
-			keyID := ht.probeScratch.groupID[toCheck]
-			if ht.probeScratch.headID[toCheck] == 0 {
-				ht.probeScratch.headID[toCheck] = keyID
-			}
-			firstID := ht.probeScratch.headID[toCheck]
-			if !ht.visited[keyID] {
-				// We can then add this keyID into the same array at the end of the
-				// corresponding linked list and mark this ID as visited. Since there
-				// can be multiple keys that match this probe key, we want to mark
-				// differs at this position to be true. This way, the prober will
-				// continue probing for this key until it reaches the end of the next
-				// chain.
-				ht.probeScratch.differs[toCheck] = true
-				ht.visited[keyID] = true
-				if firstID != keyID {
-					ht.same[keyID] = ht.same[firstID]
-					ht.same[firstID] = keyID
-				}
-			}
-		}
-		if ht.probeScratch.differs[toCheck] {
-			// Continue probing in this next chain for the probe key.
-			ht.probeScratch.differs[toCheck] = false
-			ht.probeScratch.toCheck[nDiffers] = toCheck
-			nDiffers++
-		}
-	}
-	return nDiffers
 }
