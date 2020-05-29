@@ -3015,16 +3015,14 @@ func (_f *Factory) ConstructLeftJoin(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		if len(on) != 0 {
-			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on, private).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
-					}
-					return _expr
+		if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+			private := joinPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+				_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinOp, left, right, on, private).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
@@ -3688,37 +3686,33 @@ func (_f *Factory) ConstructFullJoin(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		if len(on) != 0 {
-			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_expr := _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on, private).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
-					}
-					return _expr
+		if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+			private := joinPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+				_expr := _f.funcs.ConstructNonLeftJoin(opt.FullJoinOp, left, right, on, private).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
 
 	// [SimplifyRightJoinWithFilters]
 	{
-		if len(on) != 0 {
-			if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
-					_expr := _f.ConstructLeftJoin(
-						left,
-						right,
-						on,
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
-					}
-					return _expr
+		if _f.funcs.JoinFiltersMatchAllLeftRows(right, left, on) {
+			private := joinPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyRightJoinWithFilters) {
+				_expr := _f.ConstructLeftJoin(
+					left,
+					right,
+					on,
+					private,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyRightJoinWithFilters, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
@@ -6391,16 +6385,14 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [SimplifyLeftJoinWithFilters]
 	{
-		if len(on) != 0 {
-			if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
-					_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on, private).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
-					}
-					return _expr
+		if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+			private := joinPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyLeftJoinWithFilters) {
+				_expr := _f.funcs.ConstructNonLeftJoin(opt.LeftJoinApplyOp, left, right, on, private).(memo.RelExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyLeftJoinWithFilters, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
