@@ -32,6 +32,131 @@ import (
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
+type projPlusBoolConstDatumOp struct {
+	projConstOpBase
+	constArg bool
+}
+
+func (p projPlusBoolConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusBoolConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projPlusDecimalConstInt16Op struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -39,11 +164,11 @@ type projPlusDecimalConstInt16Op struct {
 
 func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -70,7 +195,7 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -89,7 +214,7 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -109,7 +234,7 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -125,7 +250,7 @@ func (p projPlusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -152,11 +277,11 @@ type projPlusDecimalConstInt32Op struct {
 
 func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -183,7 +308,7 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -202,7 +327,7 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -222,7 +347,7 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -238,7 +363,7 @@ func (p projPlusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -265,11 +390,11 @@ type projPlusDecimalConstInt64Op struct {
 
 func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -296,7 +421,7 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -315,7 +440,7 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -335,7 +460,7 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -351,7 +476,7 @@ func (p projPlusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Add(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -378,11 +503,11 @@ type projPlusDecimalConstDecimalOp struct {
 
 func (p projPlusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -456,6 +581,131 @@ func (p projPlusDecimalConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusDecimalConstDatumOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projPlusDecimalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDecimalConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projPlusInt16ConstInt16Op struct {
 	projConstOpBase
 	constArg int16
@@ -463,11 +713,11 @@ type projPlusInt16ConstInt16Op struct {
 
 func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -572,11 +822,11 @@ type projPlusInt16ConstInt32Op struct {
 
 func (p projPlusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -681,11 +931,11 @@ type projPlusInt16ConstInt64Op struct {
 
 func (p projPlusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -790,11 +1040,11 @@ type projPlusInt16ConstDecimalOp struct {
 
 func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -820,7 +1070,7 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -841,7 +1091,7 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -863,7 +1113,7 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -881,7 +1131,7 @@ func (p projPlusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -904,6 +1154,131 @@ func (p projPlusInt16ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusInt16ConstDatumOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projPlusInt16ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusInt16ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projPlusInt32ConstInt16Op struct {
 	projConstOpBase
 	constArg int32
@@ -911,11 +1286,11 @@ type projPlusInt32ConstInt16Op struct {
 
 func (p projPlusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1020,11 +1395,11 @@ type projPlusInt32ConstInt32Op struct {
 
 func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1129,11 +1504,11 @@ type projPlusInt32ConstInt64Op struct {
 
 func (p projPlusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1238,11 +1613,11 @@ type projPlusInt32ConstDecimalOp struct {
 
 func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1268,7 +1643,7 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1289,7 +1664,7 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1311,7 +1686,7 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1329,7 +1704,7 @@ func (p projPlusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1352,6 +1727,131 @@ func (p projPlusInt32ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusInt32ConstDatumOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projPlusInt32ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusInt32ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projPlusInt64ConstInt16Op struct {
 	projConstOpBase
 	constArg int64
@@ -1359,11 +1859,11 @@ type projPlusInt64ConstInt16Op struct {
 
 func (p projPlusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1468,11 +1968,11 @@ type projPlusInt64ConstInt32Op struct {
 
 func (p projPlusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1577,11 +2077,11 @@ type projPlusInt64ConstInt64Op struct {
 
 func (p projPlusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1686,11 +2186,11 @@ type projPlusInt64ConstDecimalOp struct {
 
 func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1716,7 +2216,7 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1737,7 +2237,7 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1759,7 +2259,7 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1777,7 +2277,7 @@ func (p projPlusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &arg)
@@ -1800,6 +2300,131 @@ func (p projPlusInt64ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusInt64ConstDatumOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projPlusInt64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusInt64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projPlusFloat64ConstFloat64Op struct {
 	projConstOpBase
 	constArg float64
@@ -1807,11 +2432,11 @@ type projPlusFloat64ConstFloat64Op struct {
 
 func (p projPlusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1877,6 +2502,131 @@ func (p projPlusFloat64ConstFloat64Op) Init() {
 	p.input.Init()
 }
 
+type projPlusFloat64ConstDatumOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projPlusFloat64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusFloat64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projPlusTimestampConstIntervalOp struct {
 	projConstOpBase
 	constArg time.Time
@@ -1884,11 +2634,11 @@ type projPlusTimestampConstIntervalOp struct {
 
 func (p projPlusTimestampConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -1961,11 +2711,11 @@ type projPlusIntervalConstTimestampOp struct {
 
 func (p projPlusIntervalConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2038,11 +2788,11 @@ type projPlusIntervalConstIntervalOp struct {
 
 func (p projPlusIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2108,6 +2858,1176 @@ func (p projPlusIntervalConstIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusIntervalConstDatumOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projPlusIntervalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusIntervalConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstDatumOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstBoolOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []bool
+	col = vec.Bool()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstBoolOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstIntervalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []duration.Duration
+	col = vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstIntervalOp) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstInt16Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstInt32Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstInt64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstFloat64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []float64
+	col = vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projPlusDatumConstDecimalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projPlusDatumConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusBoolConstDatumOp struct {
+	projConstOpBase
+	constArg bool
+}
+
+func (p projMinusBoolConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusBoolConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMinusDecimalConstInt16Op struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -2115,11 +4035,11 @@ type projMinusDecimalConstInt16Op struct {
 
 func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2146,7 +4066,7 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -2165,7 +4085,7 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -2185,7 +4105,7 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -2201,7 +4121,7 @@ func (p projMinusDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -2228,11 +4148,11 @@ type projMinusDecimalConstInt32Op struct {
 
 func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2259,7 +4179,7 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -2278,7 +4198,7 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -2298,7 +4218,7 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -2314,7 +4234,7 @@ func (p projMinusDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -2341,11 +4261,11 @@ type projMinusDecimalConstInt64Op struct {
 
 func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2372,7 +4292,7 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -2391,7 +4311,7 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -2411,7 +4331,7 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -2427,7 +4347,7 @@ func (p projMinusDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Sub(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -2454,11 +4374,11 @@ type projMinusDecimalConstDecimalOp struct {
 
 func (p projMinusDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2532,6 +4452,131 @@ func (p projMinusDecimalConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMinusDecimalConstDatumOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projMinusDecimalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDecimalConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMinusInt16ConstInt16Op struct {
 	projConstOpBase
 	constArg int16
@@ -2539,11 +4584,11 @@ type projMinusInt16ConstInt16Op struct {
 
 func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2648,11 +4693,11 @@ type projMinusInt16ConstInt32Op struct {
 
 func (p projMinusInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2757,11 +4802,11 @@ type projMinusInt16ConstInt64Op struct {
 
 func (p projMinusInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2866,11 +4911,11 @@ type projMinusInt16ConstDecimalOp struct {
 
 func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -2896,7 +4941,7 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -2917,7 +4962,7 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -2939,7 +4984,7 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -2957,7 +5002,7 @@ func (p projMinusInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -2980,6 +5025,131 @@ func (p projMinusInt16ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMinusInt16ConstDatumOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projMinusInt16ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusInt16ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMinusInt32ConstInt16Op struct {
 	projConstOpBase
 	constArg int32
@@ -2987,11 +5157,11 @@ type projMinusInt32ConstInt16Op struct {
 
 func (p projMinusInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3096,11 +5266,11 @@ type projMinusInt32ConstInt32Op struct {
 
 func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3205,11 +5375,11 @@ type projMinusInt32ConstInt64Op struct {
 
 func (p projMinusInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3314,11 +5484,11 @@ type projMinusInt32ConstDecimalOp struct {
 
 func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3344,7 +5514,7 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3365,7 +5535,7 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3387,7 +5557,7 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3405,7 +5575,7 @@ func (p projMinusInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3428,6 +5598,131 @@ func (p projMinusInt32ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMinusInt32ConstDatumOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projMinusInt32ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusInt32ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMinusInt64ConstInt16Op struct {
 	projConstOpBase
 	constArg int64
@@ -3435,11 +5730,11 @@ type projMinusInt64ConstInt16Op struct {
 
 func (p projMinusInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3544,11 +5839,11 @@ type projMinusInt64ConstInt32Op struct {
 
 func (p projMinusInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3653,11 +5948,11 @@ type projMinusInt64ConstInt64Op struct {
 
 func (p projMinusInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3762,11 +6057,11 @@ type projMinusInt64ConstDecimalOp struct {
 
 func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3792,7 +6087,7 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3813,7 +6108,7 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3835,7 +6130,7 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3853,7 +6148,7 @@ func (p projMinusInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &arg)
@@ -3876,6 +6171,131 @@ func (p projMinusInt64ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMinusInt64ConstDatumOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projMinusInt64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusInt64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMinusFloat64ConstFloat64Op struct {
 	projConstOpBase
 	constArg float64
@@ -3883,11 +6303,11 @@ type projMinusFloat64ConstFloat64Op struct {
 
 func (p projMinusFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -3953,6 +6373,131 @@ func (p projMinusFloat64ConstFloat64Op) Init() {
 	p.input.Init()
 }
 
+type projMinusFloat64ConstDatumOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projMinusFloat64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusFloat64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMinusTimestampConstTimestampOp struct {
 	projConstOpBase
 	constArg time.Time
@@ -3960,11 +6505,11 @@ type projMinusTimestampConstTimestampOp struct {
 
 func (p projMinusTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4049,11 +6594,11 @@ type projMinusTimestampConstIntervalOp struct {
 
 func (p projMinusTimestampConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4126,11 +6671,11 @@ type projMinusIntervalConstIntervalOp struct {
 
 func (p projMinusIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4196,6 +6741,1176 @@ func (p projMinusIntervalConstIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projMinusIntervalConstDatumOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMinusIntervalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusIntervalConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstDatumOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstBoolOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []bool
+	col = vec.Bool()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstBoolOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstIntervalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []duration.Duration
+	col = vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstIntervalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstInt16Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstInt32Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstInt64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstFloat64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []float64
+	col = vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumConstDecimalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMinusDatumConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultBoolConstDatumOp struct {
+	projConstOpBase
+	constArg bool
+}
+
+func (p projMultBoolConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultBoolConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMultDecimalConstInt16Op struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -4203,11 +7918,11 @@ type projMultDecimalConstInt16Op struct {
 
 func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4234,7 +7949,7 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -4253,7 +7968,7 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -4273,7 +7988,7 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -4289,7 +8004,7 @@ func (p projMultDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -4316,11 +8031,11 @@ type projMultDecimalConstInt32Op struct {
 
 func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4347,7 +8062,7 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -4366,7 +8081,7 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -4386,7 +8101,7 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -4402,7 +8117,7 @@ func (p projMultDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -4429,11 +8144,11 @@ type projMultDecimalConstInt64Op struct {
 
 func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4460,7 +8175,7 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -4479,7 +8194,7 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 					{
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -4499,7 +8214,7 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -4515,7 +8230,7 @@ func (p projMultDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 
 				{
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.ExactCtx.Mul(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -4542,11 +8257,11 @@ type projMultDecimalConstDecimalOp struct {
 
 func (p projMultDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4627,11 +8342,11 @@ type projMultDecimalConstIntervalOp struct {
 
 func (p projMultDecimalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4717,6 +8432,131 @@ func (p projMultDecimalConstIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projMultDecimalConstDatumOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projMultDecimalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDecimalConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMultInt16ConstInt16Op struct {
 	projConstOpBase
 	constArg int16
@@ -4724,11 +8564,11 @@ type projMultInt16ConstInt16Op struct {
 
 func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4861,11 +8701,11 @@ type projMultInt16ConstInt32Op struct {
 
 func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -4998,11 +8838,11 @@ type projMultInt16ConstInt64Op struct {
 
 func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5135,11 +8975,11 @@ type projMultInt16ConstDecimalOp struct {
 
 func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5165,7 +9005,7 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5186,7 +9026,7 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5208,7 +9048,7 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5226,7 +9066,7 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5249,6 +9089,131 @@ func (p projMultInt16ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMultInt16ConstDatumOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projMultInt16ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt16ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMultInt32ConstInt16Op struct {
 	projConstOpBase
 	constArg int32
@@ -5256,11 +9221,11 @@ type projMultInt32ConstInt16Op struct {
 
 func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5393,11 +9358,11 @@ type projMultInt32ConstInt32Op struct {
 
 func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5530,11 +9495,11 @@ type projMultInt32ConstInt64Op struct {
 
 func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5667,11 +9632,11 @@ type projMultInt32ConstDecimalOp struct {
 
 func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5697,7 +9662,7 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5718,7 +9683,7 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5740,7 +9705,7 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5758,7 +9723,7 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -5781,6 +9746,131 @@ func (p projMultInt32ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMultInt32ConstDatumOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projMultInt32ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt32ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMultInt64ConstInt16Op struct {
 	projConstOpBase
 	constArg int64
@@ -5788,11 +9878,11 @@ type projMultInt64ConstInt16Op struct {
 
 func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -5925,11 +10015,11 @@ type projMultInt64ConstInt32Op struct {
 
 func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6062,11 +10152,11 @@ type projMultInt64ConstInt64Op struct {
 
 func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6199,11 +10289,11 @@ type projMultInt64ConstDecimalOp struct {
 
 func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6229,7 +10319,7 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -6250,7 +10340,7 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -6272,7 +10362,7 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -6290,7 +10380,7 @@ func (p projMultInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &arg)
@@ -6320,11 +10410,11 @@ type projMultInt64ConstIntervalOp struct {
 
 func (p projMultInt64ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6390,6 +10480,131 @@ func (p projMultInt64ConstIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projMultInt64ConstDatumOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projMultInt64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMultFloat64ConstFloat64Op struct {
 	projConstOpBase
 	constArg float64
@@ -6397,11 +10612,11 @@ type projMultFloat64ConstFloat64Op struct {
 
 func (p projMultFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6474,11 +10689,11 @@ type projMultFloat64ConstIntervalOp struct {
 
 func (p projMultFloat64ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6544,6 +10759,131 @@ func (p projMultFloat64ConstIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projMultFloat64ConstDatumOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projMultFloat64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultFloat64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projMultIntervalConstInt64Op struct {
 	projConstOpBase
 	constArg duration.Duration
@@ -6551,11 +10891,11 @@ type projMultIntervalConstInt64Op struct {
 
 func (p projMultIntervalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6628,11 +10968,11 @@ type projMultIntervalConstFloat64Op struct {
 
 func (p projMultIntervalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6705,11 +11045,11 @@ type projMultIntervalConstDecimalOp struct {
 
 func (p projMultIntervalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6795,6 +11135,1176 @@ func (p projMultIntervalConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projMultIntervalConstDatumOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultIntervalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstDatumOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstBoolOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []bool
+	col = vec.Bool()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstBoolOp) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstIntervalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []duration.Duration
+	col = vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstIntervalOp) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstInt16Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstInt32Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstInt64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstFloat64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []float64
+	col = vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projMultDatumConstDecimalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projMultDatumConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projDivBoolConstDatumOp struct {
+	projConstOpBase
+	constArg bool
+}
+
+func (p projDivBoolConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DBool(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DBool(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivBoolConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projDivDecimalConstInt16Op struct {
 	projConstOpBase
 	constArg apd.Decimal
@@ -6802,11 +12312,11 @@ type projDivDecimalConstInt16Op struct {
 
 func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6837,7 +12347,7 @@ func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -6860,7 +12370,7 @@ func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -6884,7 +12394,7 @@ func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -6904,7 +12414,7 @@ func (p projDivDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -6931,11 +12441,11 @@ type projDivDecimalConstInt32Op struct {
 
 func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -6966,7 +12476,7 @@ func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -6989,7 +12499,7 @@ func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -7013,7 +12523,7 @@ func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -7033,7 +12543,7 @@ func (p projDivDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -7060,11 +12570,11 @@ type projDivDecimalConstInt64Op struct {
 
 func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7095,7 +12605,7 @@ func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -7118,7 +12628,7 @@ func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 							colexecerror.ExpectedError(err)
@@ -7142,7 +12652,7 @@ func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -7162,7 +12672,7 @@ func (p projDivDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], &p.constArg, tmpDec); err != nil {
 						colexecerror.ExpectedError(err)
@@ -7189,11 +12699,11 @@ type projDivDecimalConstDecimalOp struct {
 
 func (p projDivDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7299,6 +12809,131 @@ func (p projDivDecimalConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projDivDecimalConstDatumOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projDivDecimalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DDecimal{Decimal: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDecimalConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projDivInt16ConstInt16Op struct {
 	projConstOpBase
 	constArg int16
@@ -7306,11 +12941,11 @@ type projDivInt16ConstInt16Op struct {
 
 func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7339,7 +12974,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						if arg == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(p.constArg), 0)
 						rightTmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7361,7 +12996,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						if arg == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(p.constArg), 0)
 						rightTmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7384,7 +13019,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					if arg == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(p.constArg), 0)
 					rightTmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7403,7 +13038,7 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					if arg == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(p.constArg), 0)
 					rightTmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7431,11 +13066,11 @@ type projDivInt16ConstInt32Op struct {
 
 func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7464,7 +13099,7 @@ func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7486,7 +13121,7 @@ func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7509,7 +13144,7 @@ func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7528,7 +13163,7 @@ func (p projDivInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7556,11 +13191,11 @@ type projDivInt16ConstInt64Op struct {
 
 func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7589,7 +13224,7 @@ func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7611,7 +13246,7 @@ func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7634,7 +13269,7 @@ func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7653,7 +13288,7 @@ func (p projDivInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7681,11 +13316,11 @@ type projDivInt16ConstDecimalOp struct {
 
 func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7711,7 +13346,7 @@ func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -7735,7 +13370,7 @@ func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -7760,7 +13395,7 @@ func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -7781,7 +13416,7 @@ func (p projDivInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -7807,6 +13442,131 @@ func (p projDivInt16ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projDivInt16ConstDatumOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projDivInt16ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivInt16ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projDivInt32ConstInt16Op struct {
 	projConstOpBase
 	constArg int32
@@ -7814,11 +13574,11 @@ type projDivInt32ConstInt16Op struct {
 
 func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7847,7 +13607,7 @@ func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7869,7 +13629,7 @@ func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7892,7 +13652,7 @@ func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7911,7 +13671,7 @@ func (p projDivInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7939,11 +13699,11 @@ type projDivInt32ConstInt32Op struct {
 
 func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -7972,7 +13732,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						if arg == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(p.constArg), 0)
 						rightTmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -7994,7 +13754,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						if arg == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(p.constArg), 0)
 						rightTmpDec.SetFinite(int64(arg), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8017,7 +13777,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					if arg == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(p.constArg), 0)
 					rightTmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8036,7 +13796,7 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					if arg == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(p.constArg), 0)
 					rightTmpDec.SetFinite(int64(arg), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8064,11 +13824,11 @@ type projDivInt32ConstInt64Op struct {
 
 func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8097,7 +13857,7 @@ func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8119,7 +13879,7 @@ func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8142,7 +13902,7 @@ func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8161,7 +13921,7 @@ func (p projDivInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8189,11 +13949,11 @@ type projDivInt32ConstDecimalOp struct {
 
 func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8219,7 +13979,7 @@ func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8243,7 +14003,7 @@ func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8268,7 +14028,7 @@ func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8289,7 +14049,7 @@ func (p projDivInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8315,6 +14075,131 @@ func (p projDivInt32ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projDivInt32ConstDatumOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projDivInt32ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivInt32ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projDivInt64ConstInt16Op struct {
 	projConstOpBase
 	constArg int64
@@ -8322,11 +14207,11 @@ type projDivInt64ConstInt16Op struct {
 
 func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8355,7 +14240,7 @@ func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8377,7 +14262,7 @@ func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8400,7 +14285,7 @@ func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8419,7 +14304,7 @@ func (p projDivInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8447,11 +14332,11 @@ type projDivInt64ConstInt32Op struct {
 
 func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8480,7 +14365,7 @@ func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8502,7 +14387,7 @@ func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8525,7 +14410,7 @@ func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8544,7 +14429,7 @@ func (p projDivInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8572,11 +14457,11 @@ type projDivInt64ConstInt64Op struct {
 
 func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8605,7 +14490,7 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8627,7 +14512,7 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 						leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 						rightTmpDec.SetFinite(int64(int64(arg)), 0)
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8650,7 +14535,7 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8669,7 +14554,7 @@ func (p projDivInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					leftTmpDec, rightTmpDec := &decimalScratch.tmpDec1, &decimalScratch.tmpDec2
+					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
 					leftTmpDec.SetFinite(int64(int64(p.constArg)), 0)
 					rightTmpDec.SetFinite(int64(int64(arg)), 0)
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
@@ -8697,11 +14582,11 @@ type projDivInt64ConstDecimalOp struct {
 
 func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8727,7 +14612,7 @@ func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8751,7 +14636,7 @@ func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 
 						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8776,7 +14661,7 @@ func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8797,7 +14682,7 @@ func (p projDivInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &decimalScratch.tmpDec1
+					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(p.constArg), 0)
 
 					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &arg)
@@ -8823,6 +14708,131 @@ func (p projDivInt64ConstDecimalOp) Init() {
 	p.input.Init()
 }
 
+type projDivInt64ConstDatumOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projDivInt64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInt(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInt(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivInt64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projDivFloat64ConstFloat64Op struct {
 	projConstOpBase
 	constArg float64
@@ -8830,11 +14840,11 @@ type projDivFloat64ConstFloat64Op struct {
 
 func (p projDivFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -8900,6 +14910,131 @@ func (p projDivFloat64ConstFloat64Op) Init() {
 	p.input.Init()
 }
 
+type projDivFloat64ConstDatumOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projDivFloat64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DFloat(p.constArg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DFloat(p.constArg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivFloat64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
 type projDivIntervalConstInt64Op struct {
 	projConstOpBase
 	constArg duration.Duration
@@ -8907,11 +15042,11 @@ type projDivIntervalConstInt64Op struct {
 
 func (p projDivIntervalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9000,11 +15135,11 @@ type projDivIntervalConstFloat64Op struct {
 
 func (p projDivIntervalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9086,6 +15221,1051 @@ func (p projDivIntervalConstFloat64Op) Init() {
 	p.input.Init()
 }
 
+type projDivIntervalConstDatumOp struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projDivIntervalConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+					_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_convertedNativeElem := tree.DInterval{Duration: p.constArg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_nonDatumArgAsColdataExtDatum := &coldataext.Datum{Datum: _nonDatumArgAsDatum}
+
+				_res, err := _nonDatumArgAsColdataExtDatum.BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivIntervalConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstDatumOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, arg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstBoolOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstBoolOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []bool
+	col = vec.Bool()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DBool(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DBool(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstBoolOp) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstIntervalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []duration.Duration
+	col = vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInterval{Duration: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInterval{Duration: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstIntervalOp) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstInt16Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstInt32Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstInt64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstFloat64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstFloat64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []float64
+	col = vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DFloat(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DFloat(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstFloat64Op) Init() {
+	p.input.Init()
+}
+
+type projDivDatumConstDecimalOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projDivDatumConstDecimalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DDecimal{Decimal: arg}
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DDecimal{Decimal: arg}
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumConstDecimalOp) Init() {
+	p.input.Init()
+}
+
 type projEQBoolConstBoolOp struct {
 	projConstOpBase
 	constArg bool
@@ -9093,11 +16273,11 @@ type projEQBoolConstBoolOp struct {
 
 func (p projEQBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9226,11 +16406,11 @@ type projEQBytesConstBytesOp struct {
 
 func (p projEQBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9331,11 +16511,11 @@ type projEQDecimalConstInt16Op struct {
 
 func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9364,7 +16544,7 @@ func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -9386,7 +16566,7 @@ func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -9409,7 +16589,7 @@ func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -9428,7 +16608,7 @@ func (p projEQDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -9456,11 +16636,11 @@ type projEQDecimalConstInt32Op struct {
 
 func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9489,7 +16669,7 @@ func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -9511,7 +16691,7 @@ func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -9534,7 +16714,7 @@ func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -9553,7 +16733,7 @@ func (p projEQDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -9581,11 +16761,11 @@ type projEQDecimalConstInt64Op struct {
 
 func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9614,7 +16794,7 @@ func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -9636,7 +16816,7 @@ func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -9659,7 +16839,7 @@ func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -9678,7 +16858,7 @@ func (p projEQDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -9706,11 +16886,11 @@ type projEQDecimalConstFloat64Op struct {
 
 func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9739,7 +16919,7 @@ func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -9763,7 +16943,7 @@ func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -9788,7 +16968,7 @@ func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -9809,7 +16989,7 @@ func (p projEQDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -9839,11 +17019,11 @@ type projEQDecimalConstDecimalOp struct {
 
 func (p projEQDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -9940,11 +17120,11 @@ type projEQInt16ConstInt16Op struct {
 
 func (p projEQInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10085,11 +17265,11 @@ type projEQInt16ConstInt32Op struct {
 
 func (p projEQInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10230,11 +17410,11 @@ type projEQInt16ConstInt64Op struct {
 
 func (p projEQInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10375,11 +17555,11 @@ type projEQInt16ConstFloat64Op struct {
 
 func (p projEQInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10552,11 +17732,11 @@ type projEQInt16ConstDecimalOp struct {
 
 func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10585,7 +17765,7 @@ func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -10607,7 +17787,7 @@ func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -10630,7 +17810,7 @@ func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -10649,7 +17829,7 @@ func (p projEQInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -10677,11 +17857,11 @@ type projEQInt32ConstInt16Op struct {
 
 func (p projEQInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10822,11 +18002,11 @@ type projEQInt32ConstInt32Op struct {
 
 func (p projEQInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -10967,11 +18147,11 @@ type projEQInt32ConstInt64Op struct {
 
 func (p projEQInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11112,11 +18292,11 @@ type projEQInt32ConstFloat64Op struct {
 
 func (p projEQInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11289,11 +18469,11 @@ type projEQInt32ConstDecimalOp struct {
 
 func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11322,7 +18502,7 @@ func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -11344,7 +18524,7 @@ func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -11367,7 +18547,7 @@ func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -11386,7 +18566,7 @@ func (p projEQInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -11414,11 +18594,11 @@ type projEQInt64ConstInt16Op struct {
 
 func (p projEQInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11559,11 +18739,11 @@ type projEQInt64ConstInt32Op struct {
 
 func (p projEQInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11704,11 +18884,11 @@ type projEQInt64ConstInt64Op struct {
 
 func (p projEQInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -11849,11 +19029,11 @@ type projEQInt64ConstFloat64Op struct {
 
 func (p projEQInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12026,11 +19206,11 @@ type projEQInt64ConstDecimalOp struct {
 
 func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12059,7 +19239,7 @@ func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -12081,7 +19261,7 @@ func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -12104,7 +19284,7 @@ func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -12123,7 +19303,7 @@ func (p projEQInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -12151,11 +19331,11 @@ type projEQFloat64ConstInt16Op struct {
 
 func (p projEQFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12328,11 +19508,11 @@ type projEQFloat64ConstInt32Op struct {
 
 func (p projEQFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12505,11 +19685,11 @@ type projEQFloat64ConstInt64Op struct {
 
 func (p projEQFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12682,11 +19862,11 @@ type projEQFloat64ConstFloat64Op struct {
 
 func (p projEQFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12859,11 +20039,11 @@ type projEQFloat64ConstDecimalOp struct {
 
 func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -12892,7 +20072,7 @@ func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -12916,7 +20096,7 @@ func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -12941,7 +20121,7 @@ func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -12962,7 +20142,7 @@ func (p projEQFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -12992,11 +20172,11 @@ type projEQTimestampConstTimestampOp struct {
 
 func (p projEQTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13121,11 +20301,11 @@ type projEQIntervalConstIntervalOp struct {
 
 func (p projEQIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13222,11 +20402,11 @@ type projEQDatumConstDatumOp struct {
 
 func (p projEQDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13331,11 +20511,11 @@ type projNEBoolConstBoolOp struct {
 
 func (p projNEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13464,11 +20644,11 @@ type projNEBytesConstBytesOp struct {
 
 func (p projNEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13569,11 +20749,11 @@ type projNEDecimalConstInt16Op struct {
 
 func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13602,7 +20782,7 @@ func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -13624,7 +20804,7 @@ func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -13647,7 +20827,7 @@ func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -13666,7 +20846,7 @@ func (p projNEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -13694,11 +20874,11 @@ type projNEDecimalConstInt32Op struct {
 
 func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13727,7 +20907,7 @@ func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -13749,7 +20929,7 @@ func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -13772,7 +20952,7 @@ func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -13791,7 +20971,7 @@ func (p projNEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -13819,11 +20999,11 @@ type projNEDecimalConstInt64Op struct {
 
 func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13852,7 +21032,7 @@ func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -13874,7 +21054,7 @@ func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -13897,7 +21077,7 @@ func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -13916,7 +21096,7 @@ func (p projNEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -13944,11 +21124,11 @@ type projNEDecimalConstFloat64Op struct {
 
 func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -13977,7 +21157,7 @@ func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -14001,7 +21181,7 @@ func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -14026,7 +21206,7 @@ func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -14047,7 +21227,7 @@ func (p projNEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -14077,11 +21257,11 @@ type projNEDecimalConstDecimalOp struct {
 
 func (p projNEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14178,11 +21358,11 @@ type projNEInt16ConstInt16Op struct {
 
 func (p projNEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14323,11 +21503,11 @@ type projNEInt16ConstInt32Op struct {
 
 func (p projNEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14468,11 +21648,11 @@ type projNEInt16ConstInt64Op struct {
 
 func (p projNEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14613,11 +21793,11 @@ type projNEInt16ConstFloat64Op struct {
 
 func (p projNEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14790,11 +21970,11 @@ type projNEInt16ConstDecimalOp struct {
 
 func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -14823,7 +22003,7 @@ func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -14845,7 +22025,7 @@ func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -14868,7 +22048,7 @@ func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -14887,7 +22067,7 @@ func (p projNEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -14915,11 +22095,11 @@ type projNEInt32ConstInt16Op struct {
 
 func (p projNEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15060,11 +22240,11 @@ type projNEInt32ConstInt32Op struct {
 
 func (p projNEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15205,11 +22385,11 @@ type projNEInt32ConstInt64Op struct {
 
 func (p projNEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15350,11 +22530,11 @@ type projNEInt32ConstFloat64Op struct {
 
 func (p projNEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15527,11 +22707,11 @@ type projNEInt32ConstDecimalOp struct {
 
 func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15560,7 +22740,7 @@ func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -15582,7 +22762,7 @@ func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -15605,7 +22785,7 @@ func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -15624,7 +22804,7 @@ func (p projNEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -15652,11 +22832,11 @@ type projNEInt64ConstInt16Op struct {
 
 func (p projNEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15797,11 +22977,11 @@ type projNEInt64ConstInt32Op struct {
 
 func (p projNEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -15942,11 +23122,11 @@ type projNEInt64ConstInt64Op struct {
 
 func (p projNEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16087,11 +23267,11 @@ type projNEInt64ConstFloat64Op struct {
 
 func (p projNEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16264,11 +23444,11 @@ type projNEInt64ConstDecimalOp struct {
 
 func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16297,7 +23477,7 @@ func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -16319,7 +23499,7 @@ func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -16342,7 +23522,7 @@ func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -16361,7 +23541,7 @@ func (p projNEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -16389,11 +23569,11 @@ type projNEFloat64ConstInt16Op struct {
 
 func (p projNEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16566,11 +23746,11 @@ type projNEFloat64ConstInt32Op struct {
 
 func (p projNEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16743,11 +23923,11 @@ type projNEFloat64ConstInt64Op struct {
 
 func (p projNEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -16920,11 +24100,11 @@ type projNEFloat64ConstFloat64Op struct {
 
 func (p projNEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17097,11 +24277,11 @@ type projNEFloat64ConstDecimalOp struct {
 
 func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17130,7 +24310,7 @@ func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -17154,7 +24334,7 @@ func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -17179,7 +24359,7 @@ func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -17200,7 +24380,7 @@ func (p projNEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -17230,11 +24410,11 @@ type projNETimestampConstTimestampOp struct {
 
 func (p projNETimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17359,11 +24539,11 @@ type projNEIntervalConstIntervalOp struct {
 
 func (p projNEIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17460,11 +24640,11 @@ type projNEDatumConstDatumOp struct {
 
 func (p projNEDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17569,11 +24749,11 @@ type projLTBoolConstBoolOp struct {
 
 func (p projLTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17702,11 +24882,11 @@ type projLTBytesConstBytesOp struct {
 
 func (p projLTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17807,11 +24987,11 @@ type projLTDecimalConstInt16Op struct {
 
 func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17840,7 +25020,7 @@ func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -17862,7 +25042,7 @@ func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -17885,7 +25065,7 @@ func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -17904,7 +25084,7 @@ func (p projLTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -17932,11 +25112,11 @@ type projLTDecimalConstInt32Op struct {
 
 func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -17965,7 +25145,7 @@ func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -17987,7 +25167,7 @@ func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -18010,7 +25190,7 @@ func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -18029,7 +25209,7 @@ func (p projLTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -18057,11 +25237,11 @@ type projLTDecimalConstInt64Op struct {
 
 func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18090,7 +25270,7 @@ func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -18112,7 +25292,7 @@ func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -18135,7 +25315,7 @@ func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -18154,7 +25334,7 @@ func (p projLTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -18182,11 +25362,11 @@ type projLTDecimalConstFloat64Op struct {
 
 func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18215,7 +25395,7 @@ func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -18239,7 +25419,7 @@ func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -18264,7 +25444,7 @@ func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -18285,7 +25465,7 @@ func (p projLTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -18315,11 +25495,11 @@ type projLTDecimalConstDecimalOp struct {
 
 func (p projLTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18416,11 +25596,11 @@ type projLTInt16ConstInt16Op struct {
 
 func (p projLTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18561,11 +25741,11 @@ type projLTInt16ConstInt32Op struct {
 
 func (p projLTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18706,11 +25886,11 @@ type projLTInt16ConstInt64Op struct {
 
 func (p projLTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -18851,11 +26031,11 @@ type projLTInt16ConstFloat64Op struct {
 
 func (p projLTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19028,11 +26208,11 @@ type projLTInt16ConstDecimalOp struct {
 
 func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19061,7 +26241,7 @@ func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -19083,7 +26263,7 @@ func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -19106,7 +26286,7 @@ func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -19125,7 +26305,7 @@ func (p projLTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -19153,11 +26333,11 @@ type projLTInt32ConstInt16Op struct {
 
 func (p projLTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19298,11 +26478,11 @@ type projLTInt32ConstInt32Op struct {
 
 func (p projLTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19443,11 +26623,11 @@ type projLTInt32ConstInt64Op struct {
 
 func (p projLTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19588,11 +26768,11 @@ type projLTInt32ConstFloat64Op struct {
 
 func (p projLTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19765,11 +26945,11 @@ type projLTInt32ConstDecimalOp struct {
 
 func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -19798,7 +26978,7 @@ func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -19820,7 +27000,7 @@ func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -19843,7 +27023,7 @@ func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -19862,7 +27042,7 @@ func (p projLTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -19890,11 +27070,11 @@ type projLTInt64ConstInt16Op struct {
 
 func (p projLTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20035,11 +27215,11 @@ type projLTInt64ConstInt32Op struct {
 
 func (p projLTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20180,11 +27360,11 @@ type projLTInt64ConstInt64Op struct {
 
 func (p projLTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20325,11 +27505,11 @@ type projLTInt64ConstFloat64Op struct {
 
 func (p projLTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20502,11 +27682,11 @@ type projLTInt64ConstDecimalOp struct {
 
 func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20535,7 +27715,7 @@ func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -20557,7 +27737,7 @@ func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -20580,7 +27760,7 @@ func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -20599,7 +27779,7 @@ func (p projLTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -20627,11 +27807,11 @@ type projLTFloat64ConstInt16Op struct {
 
 func (p projLTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20804,11 +27984,11 @@ type projLTFloat64ConstInt32Op struct {
 
 func (p projLTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -20981,11 +28161,11 @@ type projLTFloat64ConstInt64Op struct {
 
 func (p projLTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21158,11 +28338,11 @@ type projLTFloat64ConstFloat64Op struct {
 
 func (p projLTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21335,11 +28515,11 @@ type projLTFloat64ConstDecimalOp struct {
 
 func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21368,7 +28548,7 @@ func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -21392,7 +28572,7 @@ func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -21417,7 +28597,7 @@ func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -21438,7 +28618,7 @@ func (p projLTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -21468,11 +28648,11 @@ type projLTTimestampConstTimestampOp struct {
 
 func (p projLTTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21597,11 +28777,11 @@ type projLTIntervalConstIntervalOp struct {
 
 func (p projLTIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21698,11 +28878,11 @@ type projLTDatumConstDatumOp struct {
 
 func (p projLTDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21807,11 +28987,11 @@ type projLEBoolConstBoolOp struct {
 
 func (p projLEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -21940,11 +29120,11 @@ type projLEBytesConstBytesOp struct {
 
 func (p projLEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22045,11 +29225,11 @@ type projLEDecimalConstInt16Op struct {
 
 func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22078,7 +29258,7 @@ func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -22100,7 +29280,7 @@ func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -22123,7 +29303,7 @@ func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -22142,7 +29322,7 @@ func (p projLEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -22170,11 +29350,11 @@ type projLEDecimalConstInt32Op struct {
 
 func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22203,7 +29383,7 @@ func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -22225,7 +29405,7 @@ func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -22248,7 +29428,7 @@ func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -22267,7 +29447,7 @@ func (p projLEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -22295,11 +29475,11 @@ type projLEDecimalConstInt64Op struct {
 
 func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22328,7 +29508,7 @@ func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -22350,7 +29530,7 @@ func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -22373,7 +29553,7 @@ func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -22392,7 +29572,7 @@ func (p projLEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -22420,11 +29600,11 @@ type projLEDecimalConstFloat64Op struct {
 
 func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22453,7 +29633,7 @@ func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -22477,7 +29657,7 @@ func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -22502,7 +29682,7 @@ func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -22523,7 +29703,7 @@ func (p projLEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -22553,11 +29733,11 @@ type projLEDecimalConstDecimalOp struct {
 
 func (p projLEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22654,11 +29834,11 @@ type projLEInt16ConstInt16Op struct {
 
 func (p projLEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22799,11 +29979,11 @@ type projLEInt16ConstInt32Op struct {
 
 func (p projLEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -22944,11 +30124,11 @@ type projLEInt16ConstInt64Op struct {
 
 func (p projLEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23089,11 +30269,11 @@ type projLEInt16ConstFloat64Op struct {
 
 func (p projLEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23266,11 +30446,11 @@ type projLEInt16ConstDecimalOp struct {
 
 func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23299,7 +30479,7 @@ func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -23321,7 +30501,7 @@ func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -23344,7 +30524,7 @@ func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -23363,7 +30543,7 @@ func (p projLEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -23391,11 +30571,11 @@ type projLEInt32ConstInt16Op struct {
 
 func (p projLEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23536,11 +30716,11 @@ type projLEInt32ConstInt32Op struct {
 
 func (p projLEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23681,11 +30861,11 @@ type projLEInt32ConstInt64Op struct {
 
 func (p projLEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -23826,11 +31006,11 @@ type projLEInt32ConstFloat64Op struct {
 
 func (p projLEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24003,11 +31183,11 @@ type projLEInt32ConstDecimalOp struct {
 
 func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24036,7 +31216,7 @@ func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -24058,7 +31238,7 @@ func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -24081,7 +31261,7 @@ func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -24100,7 +31280,7 @@ func (p projLEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -24128,11 +31308,11 @@ type projLEInt64ConstInt16Op struct {
 
 func (p projLEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24273,11 +31453,11 @@ type projLEInt64ConstInt32Op struct {
 
 func (p projLEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24418,11 +31598,11 @@ type projLEInt64ConstInt64Op struct {
 
 func (p projLEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24563,11 +31743,11 @@ type projLEInt64ConstFloat64Op struct {
 
 func (p projLEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24740,11 +31920,11 @@ type projLEInt64ConstDecimalOp struct {
 
 func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -24773,7 +31953,7 @@ func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -24795,7 +31975,7 @@ func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -24818,7 +31998,7 @@ func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -24837,7 +32017,7 @@ func (p projLEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -24865,11 +32045,11 @@ type projLEFloat64ConstInt16Op struct {
 
 func (p projLEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25042,11 +32222,11 @@ type projLEFloat64ConstInt32Op struct {
 
 func (p projLEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25219,11 +32399,11 @@ type projLEFloat64ConstInt64Op struct {
 
 func (p projLEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25396,11 +32576,11 @@ type projLEFloat64ConstFloat64Op struct {
 
 func (p projLEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25573,11 +32753,11 @@ type projLEFloat64ConstDecimalOp struct {
 
 func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25606,7 +32786,7 @@ func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -25630,7 +32810,7 @@ func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -25655,7 +32835,7 @@ func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -25676,7 +32856,7 @@ func (p projLEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -25706,11 +32886,11 @@ type projLETimestampConstTimestampOp struct {
 
 func (p projLETimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25835,11 +33015,11 @@ type projLEIntervalConstIntervalOp struct {
 
 func (p projLEIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -25936,11 +33116,11 @@ type projLEDatumConstDatumOp struct {
 
 func (p projLEDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26045,11 +33225,11 @@ type projGTBoolConstBoolOp struct {
 
 func (p projGTBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26178,11 +33358,11 @@ type projGTBytesConstBytesOp struct {
 
 func (p projGTBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26283,11 +33463,11 @@ type projGTDecimalConstInt16Op struct {
 
 func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26316,7 +33496,7 @@ func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -26338,7 +33518,7 @@ func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -26361,7 +33541,7 @@ func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -26380,7 +33560,7 @@ func (p projGTDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -26408,11 +33588,11 @@ type projGTDecimalConstInt32Op struct {
 
 func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26441,7 +33621,7 @@ func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -26463,7 +33643,7 @@ func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -26486,7 +33666,7 @@ func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -26505,7 +33685,7 @@ func (p projGTDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -26533,11 +33713,11 @@ type projGTDecimalConstInt64Op struct {
 
 func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26566,7 +33746,7 @@ func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -26588,7 +33768,7 @@ func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -26611,7 +33791,7 @@ func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -26630,7 +33810,7 @@ func (p projGTDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -26658,11 +33838,11 @@ type projGTDecimalConstFloat64Op struct {
 
 func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26691,7 +33871,7 @@ func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -26715,7 +33895,7 @@ func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -26740,7 +33920,7 @@ func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -26761,7 +33941,7 @@ func (p projGTDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -26791,11 +33971,11 @@ type projGTDecimalConstDecimalOp struct {
 
 func (p projGTDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -26892,11 +34072,11 @@ type projGTInt16ConstInt16Op struct {
 
 func (p projGTInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27037,11 +34217,11 @@ type projGTInt16ConstInt32Op struct {
 
 func (p projGTInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27182,11 +34362,11 @@ type projGTInt16ConstInt64Op struct {
 
 func (p projGTInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27327,11 +34507,11 @@ type projGTInt16ConstFloat64Op struct {
 
 func (p projGTInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27504,11 +34684,11 @@ type projGTInt16ConstDecimalOp struct {
 
 func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27537,7 +34717,7 @@ func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -27559,7 +34739,7 @@ func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -27582,7 +34762,7 @@ func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -27601,7 +34781,7 @@ func (p projGTInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -27629,11 +34809,11 @@ type projGTInt32ConstInt16Op struct {
 
 func (p projGTInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27774,11 +34954,11 @@ type projGTInt32ConstInt32Op struct {
 
 func (p projGTInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -27919,11 +35099,11 @@ type projGTInt32ConstInt64Op struct {
 
 func (p projGTInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28064,11 +35244,11 @@ type projGTInt32ConstFloat64Op struct {
 
 func (p projGTInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28241,11 +35421,11 @@ type projGTInt32ConstDecimalOp struct {
 
 func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28274,7 +35454,7 @@ func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -28296,7 +35476,7 @@ func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -28319,7 +35499,7 @@ func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -28338,7 +35518,7 @@ func (p projGTInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -28366,11 +35546,11 @@ type projGTInt64ConstInt16Op struct {
 
 func (p projGTInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28511,11 +35691,11 @@ type projGTInt64ConstInt32Op struct {
 
 func (p projGTInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28656,11 +35836,11 @@ type projGTInt64ConstInt64Op struct {
 
 func (p projGTInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28801,11 +35981,11 @@ type projGTInt64ConstFloat64Op struct {
 
 func (p projGTInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -28978,11 +36158,11 @@ type projGTInt64ConstDecimalOp struct {
 
 func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29011,7 +36191,7 @@ func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -29033,7 +36213,7 @@ func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -29056,7 +36236,7 @@ func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -29075,7 +36255,7 @@ func (p projGTInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -29103,11 +36283,11 @@ type projGTFloat64ConstInt16Op struct {
 
 func (p projGTFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29280,11 +36460,11 @@ type projGTFloat64ConstInt32Op struct {
 
 func (p projGTFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29457,11 +36637,11 @@ type projGTFloat64ConstInt64Op struct {
 
 func (p projGTFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29634,11 +36814,11 @@ type projGTFloat64ConstFloat64Op struct {
 
 func (p projGTFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29811,11 +36991,11 @@ type projGTFloat64ConstDecimalOp struct {
 
 func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -29844,7 +37024,7 @@ func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -29868,7 +37048,7 @@ func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -29893,7 +37073,7 @@ func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -29914,7 +37094,7 @@ func (p projGTFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -29944,11 +37124,11 @@ type projGTTimestampConstTimestampOp struct {
 
 func (p projGTTimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30073,11 +37253,11 @@ type projGTIntervalConstIntervalOp struct {
 
 func (p projGTIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30174,11 +37354,11 @@ type projGTDatumConstDatumOp struct {
 
 func (p projGTDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30283,11 +37463,11 @@ type projGEBoolConstBoolOp struct {
 
 func (p projGEBoolConstBoolOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30416,11 +37596,11 @@ type projGEBytesConstBytesOp struct {
 
 func (p projGEBytesConstBytesOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30521,11 +37701,11 @@ type projGEDecimalConstInt16Op struct {
 
 func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30554,7 +37734,7 @@ func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -30576,7 +37756,7 @@ func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -30599,7 +37779,7 @@ func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -30618,7 +37798,7 @@ func (p projGEDecimalConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -30646,11 +37826,11 @@ type projGEDecimalConstInt32Op struct {
 
 func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30679,7 +37859,7 @@ func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -30701,7 +37881,7 @@ func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -30724,7 +37904,7 @@ func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -30743,7 +37923,7 @@ func (p projGEDecimalConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -30771,11 +37951,11 @@ type projGEDecimalConstInt64Op struct {
 
 func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30804,7 +37984,7 @@ func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -30826,7 +38006,7 @@ func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(arg), 0)
 							cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 						}
@@ -30849,7 +38029,7 @@ func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -30868,7 +38048,7 @@ func (p projGEDecimalConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
 						cmpResult = tree.CompareDecimals(&p.constArg, tmpDec)
 					}
@@ -30896,11 +38076,11 @@ type projGEDecimalConstFloat64Op struct {
 
 func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -30929,7 +38109,7 @@ func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -30953,7 +38133,7 @@ func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -30978,7 +38158,7 @@ func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -30999,7 +38179,7 @@ func (p projGEDecimalConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(arg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -31029,11 +38209,11 @@ type projGEDecimalConstDecimalOp struct {
 
 func (p projGEDecimalConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31130,11 +38310,11 @@ type projGEInt16ConstInt16Op struct {
 
 func (p projGEInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31275,11 +38455,11 @@ type projGEInt16ConstInt32Op struct {
 
 func (p projGEInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31420,11 +38600,11 @@ type projGEInt16ConstInt64Op struct {
 
 func (p projGEInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31565,11 +38745,11 @@ type projGEInt16ConstFloat64Op struct {
 
 func (p projGEInt16ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31742,11 +38922,11 @@ type projGEInt16ConstDecimalOp struct {
 
 func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -31775,7 +38955,7 @@ func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -31797,7 +38977,7 @@ func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -31820,7 +39000,7 @@ func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -31839,7 +39019,7 @@ func (p projGEInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -31867,11 +39047,11 @@ type projGEInt32ConstInt16Op struct {
 
 func (p projGEInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32012,11 +39192,11 @@ type projGEInt32ConstInt32Op struct {
 
 func (p projGEInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32157,11 +39337,11 @@ type projGEInt32ConstInt64Op struct {
 
 func (p projGEInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32302,11 +39482,11 @@ type projGEInt32ConstFloat64Op struct {
 
 func (p projGEInt32ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32479,11 +39659,11 @@ type projGEInt32ConstDecimalOp struct {
 
 func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32512,7 +39692,7 @@ func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -32534,7 +39714,7 @@ func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -32557,7 +39737,7 @@ func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -32576,7 +39756,7 @@ func (p projGEInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -32604,11 +39784,11 @@ type projGEInt64ConstInt16Op struct {
 
 func (p projGEInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32749,11 +39929,11 @@ type projGEInt64ConstInt32Op struct {
 
 func (p projGEInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -32894,11 +40074,11 @@ type projGEInt64ConstInt64Op struct {
 
 func (p projGEInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33039,11 +40219,11 @@ type projGEInt64ConstFloat64Op struct {
 
 func (p projGEInt64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33216,11 +40396,11 @@ type projGEInt64ConstDecimalOp struct {
 
 func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33249,7 +40429,7 @@ func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -33271,7 +40451,7 @@ func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							tmpDec.SetFinite(int64(p.constArg), 0)
 							cmpResult = tree.CompareDecimals(tmpDec, &arg)
 						}
@@ -33294,7 +40474,7 @@ func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -33313,7 +40493,7 @@ func (p projGEInt64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(p.constArg), 0)
 						cmpResult = tree.CompareDecimals(tmpDec, &arg)
 					}
@@ -33341,11 +40521,11 @@ type projGEFloat64ConstInt16Op struct {
 
 func (p projGEFloat64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33518,11 +40698,11 @@ type projGEFloat64ConstInt32Op struct {
 
 func (p projGEFloat64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33695,11 +40875,11 @@ type projGEFloat64ConstInt64Op struct {
 
 func (p projGEFloat64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -33872,11 +41052,11 @@ type projGEFloat64ConstFloat64Op struct {
 
 func (p projGEFloat64ConstFloat64Op) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34049,11 +41229,11 @@ type projGEFloat64ConstDecimalOp struct {
 
 func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34082,7 +41262,7 @@ func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -34106,7 +41286,7 @@ func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 						var cmpResult int
 
 						{
-							tmpDec := &decimalScratch.tmpDec1
+							tmpDec := &_overloadHelper.tmpDec1
 							if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 								colexecerror.ExpectedError(err)
 							}
@@ -34131,7 +41311,7 @@ func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -34152,7 +41332,7 @@ func (p projGEFloat64ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 					var cmpResult int
 
 					{
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						if _, err := tmpDec.SetFloat64(float64(p.constArg)); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -34182,11 +41362,11 @@ type projGETimestampConstTimestampOp struct {
 
 func (p projGETimestampConstTimestampOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34311,11 +41491,11 @@ type projGEIntervalConstIntervalOp struct {
 
 func (p projGEIntervalConstIntervalOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34412,11 +41592,11 @@ type projGEDatumConstDatumOp struct {
 
 func (p projGEDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := p.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
 	// However, the scratch is not used in all of the projection operators, so
 	// we add this to go around "unused" error.
-	_ = decimalScratch
+	_ = _overloadHelper
 	batch := p.input.Next(ctx)
 	n := batch.Length()
 	if n == 0 {
@@ -34526,13 +41706,15 @@ func GetProjectionLConstOperator(
 	colIdx int,
 	constArg tree.Datum,
 	outputIdx int,
+	overloadHelper overloadHelper,
 ) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, outputType, outputIdx)
 	projConstOpBase := projConstOpBase{
-		OneInputNode: NewOneInputNode(input),
-		allocator:    allocator,
-		colIdx:       colIdx,
-		outputIdx:    outputIdx,
+		OneInputNode:   NewOneInputNode(input),
+		allocator:      allocator,
+		colIdx:         colIdx,
+		outputIdx:      outputIdx,
+		overloadHelper: overloadHelper,
 	}
 	var (
 		c   interface{}
@@ -34547,6 +41729,22 @@ func GetProjectionLConstOperator(
 		switch op {
 		case tree.Plus:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.BoolFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusBoolConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(bool),
+							}, nil
+						}
+					}
+				}
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
@@ -34576,6 +41774,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projPlusDecimalConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDecimalConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(apd.Decimal),
 							}, nil
@@ -34614,6 +41821,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int16),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusInt16ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
 					}
 				case 32:
 					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
@@ -34641,6 +41857,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projPlusInt32ConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusInt32ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(int32),
 							}, nil
@@ -34677,6 +41902,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int64),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusInt64ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
 					}
 				}
 			case types.FloatFamily:
@@ -34689,6 +41923,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projPlusFloat64ConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(float64),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusFloat64ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(float64),
 							}, nil
@@ -34734,11 +41977,107 @@ func GetProjectionLConstOperator(
 								constArg:        c.(duration.Duration),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusIntervalConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDatumConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.BoolFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDatumConstBoolOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntervalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDatumConstIntervalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projPlusDatumConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case 32:
+							return &projPlusDatumConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case -1:
+						default:
+							return &projPlusDatumConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.FloatFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDatumConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDatumConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
 					}
 				}
 			}
 		case tree.Minus:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.BoolFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusBoolConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(bool),
+							}, nil
+						}
+					}
+				}
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
@@ -34768,6 +42107,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projMinusDecimalConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDecimalConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(apd.Decimal),
 							}, nil
@@ -34806,6 +42154,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int16),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusInt16ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
 					}
 				case 32:
 					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
@@ -34833,6 +42190,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projMinusInt32ConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusInt32ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(int32),
 							}, nil
@@ -34869,6 +42235,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int64),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusInt64ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
 					}
 				}
 			case types.FloatFamily:
@@ -34881,6 +42256,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projMinusFloat64ConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(float64),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusFloat64ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(float64),
 							}, nil
@@ -34926,11 +42310,107 @@ func GetProjectionLConstOperator(
 								constArg:        c.(duration.Duration),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusIntervalConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDatumConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.BoolFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDatumConstBoolOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntervalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDatumConstIntervalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projMinusDatumConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case 32:
+							return &projMinusDatumConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case -1:
+						default:
+							return &projMinusDatumConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.FloatFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDatumConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDatumConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
 					}
 				}
 			}
 		case tree.Mult:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.BoolFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultBoolConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(bool),
+							}, nil
+						}
+					}
+				}
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
@@ -34973,6 +42453,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(apd.Decimal),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDecimalConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
 					}
 				}
 			case types.IntFamily:
@@ -35007,6 +42496,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int16),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultInt16ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
 					}
 				case 32:
 					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
@@ -35034,6 +42532,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projMultInt32ConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultInt32ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(int32),
 							}, nil
@@ -35079,6 +42586,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int64),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultInt64ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
 					}
 				}
 			case types.FloatFamily:
@@ -35100,6 +42616,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projMultFloat64ConstIntervalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(float64),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultFloat64ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(float64),
 							}, nil
@@ -35138,11 +42663,107 @@ func GetProjectionLConstOperator(
 								constArg:        c.(duration.Duration),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultIntervalConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDatumConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.BoolFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDatumConstBoolOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntervalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDatumConstIntervalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projMultDatumConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case 32:
+							return &projMultDatumConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case -1:
+						default:
+							return &projMultDatumConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.FloatFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDatumConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDatumConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
 					}
 				}
 			}
 		case tree.Div:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.BoolFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivBoolConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(bool),
+							}, nil
+						}
+					}
+				}
 			case types.DecimalFamily:
 				switch leftType.Width() {
 				case -1:
@@ -35172,6 +42793,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projDivDecimalConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDecimalConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(apd.Decimal),
 							}, nil
@@ -35210,6 +42840,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int16),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivInt16ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
 					}
 				case 32:
 					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
@@ -35237,6 +42876,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projDivInt32ConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivInt32ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(int32),
 							}, nil
@@ -35273,6 +42921,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int64),
 							}, nil
 						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivInt64ConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
 					}
 				}
 			case types.FloatFamily:
@@ -35285,6 +42942,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projDivFloat64ConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(float64),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivFloat64ConstDatumOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(float64),
 							}, nil
@@ -35312,6 +42978,86 @@ func GetProjectionLConstOperator(
 							return &projDivIntervalConstFloat64Op{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivIntervalConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(duration.Duration),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDatumConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.BoolFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDatumConstBoolOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntervalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDatumConstIntervalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projDivDatumConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case 32:
+							return &projDivDatumConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case -1:
+						default:
+							return &projDivDatumConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.FloatFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDatumConstFloat64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDatumConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
 							}, nil
 						}
 					}

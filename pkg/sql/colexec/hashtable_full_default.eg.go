@@ -34,8 +34,8 @@ func (ht *hashTable) checkCol(
 	probeVec, buildVec coldata.Vec, keyColIdx int, nToCheck uint64, probeSel []int,
 ) {
 	// In order to inline the templated code of overloads, we need to have a
-	// `decimalScratch` local variable of type `decimalOverloadScratch`.
-	decimalScratch := ht.decimalScratch
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := ht.overloadHelper
 	switch probeVec.CanonicalTypeFamily() {
 	case types.BoolFamily:
 		switch probeVec.Type().Width() {
@@ -1054,7 +1054,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1099,7 +1099,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1144,7 +1144,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1190,7 +1190,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1233,7 +1233,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1296,7 +1296,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1341,7 +1341,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1386,7 +1386,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1432,7 +1432,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1475,7 +1475,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1542,7 +1542,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1587,7 +1587,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1632,7 +1632,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1678,7 +1678,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1721,7 +1721,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1784,7 +1784,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1829,7 +1829,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -1874,7 +1874,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1920,7 +1920,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -1963,7 +1963,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2031,7 +2031,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -2076,7 +2076,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -2121,7 +2121,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2167,7 +2167,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2210,7 +2210,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2273,7 +2273,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -2318,7 +2318,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(buildVal), 0)
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
@@ -2363,7 +2363,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2409,7 +2409,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2452,7 +2452,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(buildVal), 0)
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
@@ -2523,7 +2523,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -2570,7 +2570,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -2617,7 +2617,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -2665,7 +2665,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -2710,7 +2710,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -2775,7 +2775,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -2822,7 +2822,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -2869,7 +2869,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -2917,7 +2917,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -2962,7 +2962,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(buildVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -5713,7 +5713,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -5758,7 +5758,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -5803,7 +5803,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -5849,7 +5849,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -5892,7 +5892,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -5955,7 +5955,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -6000,7 +6000,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -6045,7 +6045,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -6091,7 +6091,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -6134,7 +6134,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -8448,7 +8448,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -8493,7 +8493,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -8538,7 +8538,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -8584,7 +8584,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -8627,7 +8627,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -8690,7 +8690,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -8735,7 +8735,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -8780,7 +8780,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -8826,7 +8826,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -8869,7 +8869,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -11184,7 +11184,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -11229,7 +11229,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -11274,7 +11274,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -11320,7 +11320,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -11363,7 +11363,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -11426,7 +11426,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -11471,7 +11471,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														tmpDec.SetFinite(int64(probeVal), 0)
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
@@ -11516,7 +11516,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -11562,7 +11562,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -11605,7 +11605,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													tmpDec.SetFinite(int64(probeVal), 0)
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
@@ -14163,7 +14163,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -14210,7 +14210,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -14257,7 +14257,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -14305,7 +14305,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -14350,7 +14350,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -14415,7 +14415,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -14462,7 +14462,7 @@ func (ht *hashTable) checkCol(
 													var cmpResult int
 
 													{
-														tmpDec := &decimalScratch.tmpDec1
+														tmpDec := &_overloadHelper.tmpDec1
 														if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 															colexecerror.ExpectedError(err)
 														}
@@ -14509,7 +14509,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -14557,7 +14557,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}
@@ -14602,7 +14602,7 @@ func (ht *hashTable) checkCol(
 												var cmpResult int
 
 												{
-													tmpDec := &decimalScratch.tmpDec1
+													tmpDec := &_overloadHelper.tmpDec1
 													if _, err := tmpDec.SetFloat64(float64(probeVal)); err != nil {
 														colexecerror.ExpectedError(err)
 													}

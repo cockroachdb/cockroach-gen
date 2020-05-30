@@ -38,9 +38,12 @@ func rehash(
 	nKeys int,
 	sel []int,
 	cancelChecker CancelChecker,
-	decimalScratch decimalOverloadScratch,
+	overloadHelper overloadHelper,
 	datumAlloc *sqlbase.DatumAlloc,
 ) {
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	_overloadHelper := overloadHelper
 	switch col.CanonicalTypeFamily() {
 	case types.BoolFamily:
 		switch col.Type().Width() {
@@ -238,7 +241,7 @@ func rehash(
 
 						// In order for equal decimals to hash to the same value we need to
 						// remove the trailing zeroes if there are any.
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.Reduce(&v)
 						b := []byte(tmpDec.String())
 						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
@@ -262,7 +265,7 @@ func rehash(
 
 						// In order for equal decimals to hash to the same value we need to
 						// remove the trailing zeroes if there are any.
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.Reduce(&v)
 						b := []byte(tmpDec.String())
 						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
@@ -285,7 +288,7 @@ func rehash(
 
 						// In order for equal decimals to hash to the same value we need to
 						// remove the trailing zeroes if there are any.
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.Reduce(&v)
 						b := []byte(tmpDec.String())
 						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
@@ -306,7 +309,7 @@ func rehash(
 
 						// In order for equal decimals to hash to the same value we need to
 						// remove the trailing zeroes if there are any.
-						tmpDec := &decimalScratch.tmpDec1
+						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.Reduce(&v)
 						b := []byte(tmpDec.String())
 						sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
