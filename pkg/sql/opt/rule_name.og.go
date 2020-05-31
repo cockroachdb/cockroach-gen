@@ -118,10 +118,8 @@ const (
 	MapEqualityIntoJoinLeftAndRight
 	PushFilterIntoJoinLeft
 	PushFilterIntoJoinRight
-	SimplifyLeftJoinWithoutFilters
-	SimplifyRightJoinWithoutFilters
-	SimplifyLeftJoinWithFilters
-	SimplifyRightJoinWithFilters
+	SimplifyLeftJoin
+	SimplifyRightJoin
 	EliminateSemiJoin
 	SimplifyZeroCardinalitySemiJoin
 	EliminateAntiJoin
