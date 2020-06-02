@@ -90,8 +90,10 @@ const (
 	FoldFunction
 	FoldEqualsAnyNull
 	ConvertGroupByToDistinct
-	EliminateDistinct
 	EliminateGroupByProject
+	EliminateJoinUnderGroupByLeft
+	EliminateJoinUnderGroupByRight
+	EliminateDistinct
 	ReduceGroupingCols
 	ReduceNotNullGroupingCols
 	EliminateAggDistinctForKeys

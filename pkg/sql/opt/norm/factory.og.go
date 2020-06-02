@@ -7499,6 +7499,65 @@ func (_f *Factory) ConstructGroupBy(
 		}
 	}
 
+	// [EliminateJoinUnderGroupByLeft]
+	{
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
+			left := input.Child(0).(memo.RelExpr)
+			aggs := aggregations
+			private := groupingPrivate
+			groupingCols := private.GroupingCols
+			ordering := private.Ordering
+			leftCols := _f.funcs.OutputCols(left)
+			if _f.funcs.OrderingCanProjectCols(ordering, leftCols) {
+				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), leftCols) {
+					if _f.funcs.CanEliminateJoinUnderGroupByLeft(input, aggs) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByLeft) {
+							_expr := _f.ConstructGroupBy(
+								left,
+								aggs,
+								_f.funcs.MakeGrouping(groupingCols, _f.funcs.PruneOrdering(ordering, leftCols)),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateJoinUnderGroupByLeft, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinUnderGroupByRight]
+	{
+		_innerJoin, _ := input.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			right := _innerJoin.Right
+			aggs := aggregations
+			private := groupingPrivate
+			groupingCols := private.GroupingCols
+			ordering := private.Ordering
+			rightCols := _f.funcs.OutputCols(right)
+			if _f.funcs.OrderingCanProjectCols(ordering, rightCols) {
+				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), rightCols) {
+					if _f.funcs.CanEliminateJoinUnderGroupByRight(input, aggs) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByRight) {
+							_expr := _f.ConstructGroupBy(
+								right,
+								aggs,
+								_f.funcs.MakeGrouping(groupingCols, _f.funcs.PruneOrdering(ordering, rightCols)),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateJoinUnderGroupByRight, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [ReduceGroupingCols]
 	{
 		redundantCols := _f.funcs.RedundantCols(input, _f.funcs.GroupingCols(groupingPrivate))
@@ -7705,6 +7764,65 @@ func (_f *Factory) ConstructScalarGroupBy(
 						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
 					}
 					return _expr
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinUnderGroupByLeft]
+	{
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
+			left := input.Child(0).(memo.RelExpr)
+			aggs := aggregations
+			private := groupingPrivate
+			groupingCols := private.GroupingCols
+			ordering := private.Ordering
+			leftCols := _f.funcs.OutputCols(left)
+			if _f.funcs.OrderingCanProjectCols(ordering, leftCols) {
+				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), leftCols) {
+					if _f.funcs.CanEliminateJoinUnderGroupByLeft(input, aggs) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByLeft) {
+							_expr := _f.ConstructScalarGroupBy(
+								left,
+								aggs,
+								_f.funcs.MakeGrouping(groupingCols, _f.funcs.PruneOrdering(ordering, leftCols)),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateJoinUnderGroupByLeft, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinUnderGroupByRight]
+	{
+		_innerJoin, _ := input.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			right := _innerJoin.Right
+			aggs := aggregations
+			private := groupingPrivate
+			groupingCols := private.GroupingCols
+			ordering := private.Ordering
+			rightCols := _f.funcs.OutputCols(right)
+			if _f.funcs.OrderingCanProjectCols(ordering, rightCols) {
+				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), rightCols) {
+					if _f.funcs.CanEliminateJoinUnderGroupByRight(input, aggs) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByRight) {
+							_expr := _f.ConstructScalarGroupBy(
+								right,
+								aggs,
+								_f.funcs.MakeGrouping(groupingCols, _f.funcs.PruneOrdering(ordering, rightCols)),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateJoinUnderGroupByRight, nil, _expr)
+							}
+							return _expr
+						}
+					}
 				}
 			}
 		}
@@ -7972,24 +8090,6 @@ func (_f *Factory) ConstructDistinctOn(
 	aggregations memo.AggregationsExpr,
 	groupingPrivate *memo.GroupingPrivate,
 ) memo.RelExpr {
-	// [EliminateDistinct]
-	{
-		aggs := aggregations
-		if _f.funcs.ColsAreStrictKey(_f.funcs.GroupingCols(groupingPrivate), input) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-				_expr := _f.ConstructProject(
-					input,
-					memo.EmptyProjectionsExpr,
-					_f.funcs.GroupingOutputCols(groupingPrivate, aggs),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	// [EliminateGroupByProject]
 	{
 		_project, _ := input.(*memo.ProjectExpr)
@@ -8007,6 +8107,83 @@ func (_f *Factory) ConstructDistinctOn(
 					}
 					return _expr
 				}
+			}
+		}
+	}
+
+	// [EliminateJoinUnderGroupByLeft]
+	{
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
+			left := input.Child(0).(memo.RelExpr)
+			aggs := aggregations
+			private := groupingPrivate
+			groupingCols := private.GroupingCols
+			ordering := private.Ordering
+			leftCols := _f.funcs.OutputCols(left)
+			if _f.funcs.OrderingCanProjectCols(ordering, leftCols) {
+				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), leftCols) {
+					if _f.funcs.CanEliminateJoinUnderGroupByLeft(input, aggs) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByLeft) {
+							_expr := _f.ConstructDistinctOn(
+								left,
+								aggs,
+								_f.funcs.MakeGrouping(groupingCols, _f.funcs.PruneOrdering(ordering, leftCols)),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateJoinUnderGroupByLeft, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinUnderGroupByRight]
+	{
+		_innerJoin, _ := input.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			right := _innerJoin.Right
+			aggs := aggregations
+			private := groupingPrivate
+			groupingCols := private.GroupingCols
+			ordering := private.Ordering
+			rightCols := _f.funcs.OutputCols(right)
+			if _f.funcs.OrderingCanProjectCols(ordering, rightCols) {
+				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), rightCols) {
+					if _f.funcs.CanEliminateJoinUnderGroupByRight(input, aggs) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByRight) {
+							_expr := _f.ConstructDistinctOn(
+								right,
+								aggs,
+								_f.funcs.MakeGrouping(groupingCols, _f.funcs.PruneOrdering(ordering, rightCols)),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.EliminateJoinUnderGroupByRight, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateDistinct]
+	{
+		aggs := aggregations
+		if _f.funcs.ColsAreStrictKey(_f.funcs.GroupingCols(groupingPrivate), input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
+				_expr := _f.ConstructProject(
+					input,
+					memo.EmptyProjectionsExpr,
+					_f.funcs.GroupingOutputCols(groupingPrivate, aggs),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}
@@ -8116,24 +8293,6 @@ func (_f *Factory) ConstructEnsureDistinctOn(
 	aggregations memo.AggregationsExpr,
 	groupingPrivate *memo.GroupingPrivate,
 ) memo.RelExpr {
-	// [EliminateDistinct]
-	{
-		aggs := aggregations
-		if _f.funcs.ColsAreStrictKey(_f.funcs.GroupingCols(groupingPrivate), input) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
-				_expr := _f.ConstructProject(
-					input,
-					memo.EmptyProjectionsExpr,
-					_f.funcs.GroupingOutputCols(groupingPrivate, aggs),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
-				}
-				return _expr
-			}
-		}
-	}
-
 	// [EliminateGroupByProject]
 	{
 		_project, _ := input.(*memo.ProjectExpr)
@@ -8151,6 +8310,24 @@ func (_f *Factory) ConstructEnsureDistinctOn(
 					}
 					return _expr
 				}
+			}
+		}
+	}
+
+	// [EliminateDistinct]
+	{
+		aggs := aggregations
+		if _f.funcs.ColsAreStrictKey(_f.funcs.GroupingCols(groupingPrivate), input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinct) {
+				_expr := _f.ConstructProject(
+					input,
+					memo.EmptyProjectionsExpr,
+					_f.funcs.GroupingOutputCols(groupingPrivate, aggs),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinct, nil, _expr)
+				}
+				return _expr
 			}
 		}
 	}
@@ -8576,13 +8753,14 @@ func (_f *Factory) ConstructLimit(
 			input := _project.Input
 			projections := _project.Projections
 			passthrough := _project.Passthrough
-			if _f.funcs.HasColsInOrdering(input, ordering) {
+			cols := _f.funcs.OutputCols(input)
+			if _f.funcs.OrderingCanProjectCols(ordering, cols) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoProject) {
 					_expr := _f.ConstructProject(
 						_f.ConstructLimit(
 							input,
 							limit,
-							_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(input)),
+							_f.funcs.PruneOrdering(ordering, cols),
 						),
 						projections,
 						passthrough,
@@ -8645,7 +8823,7 @@ func (_f *Factory) ConstructLimit(
 			input := _ordinality.Input
 			private := &_ordinality.OrdinalityPrivate
 			limitOrdering := ordering
-			if _f.funcs.HasColsInOrdering(input, limitOrdering) {
+			if _f.funcs.OrderingCanProjectCols(limitOrdering, _f.funcs.OutputCols(input)) {
 				if _f.funcs.OrderingIntersects(_f.funcs.OrdinalityOrdering(private), limitOrdering) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoOrdinality) {
 						_expr := _f.ConstructOrdinality(
@@ -8680,14 +8858,15 @@ func (_f *Factory) ConstructLimit(
 				limit := _const.Value
 				if _f.funcs.IsPositiveInt(limit) {
 					if !_f.funcs.LimitGeMaxRows(limit, left) {
-						if _f.funcs.HasColsInOrdering(left, ordering) {
+						cols := _f.funcs.OutputCols(left)
+						if _f.funcs.OrderingCanProjectCols(ordering, cols) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoLeftJoin) {
 								_expr := _f.ConstructLimit(
 									_f.ConstructLeftJoin(
 										_f.ConstructLimit(
 											left,
 											limitExpr,
-											_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(left)),
+											_f.funcs.PruneOrdering(ordering, cols),
 										),
 										right,
 										on,
@@ -8790,13 +8969,14 @@ func (_f *Factory) ConstructOffset(
 			input := _project.Input
 			projections := _project.Projections
 			passthrough := _project.Passthrough
-			if _f.funcs.HasColsInOrdering(input, ordering) {
+			cols := _f.funcs.OutputCols(input)
+			if _f.funcs.OrderingCanProjectCols(ordering, cols) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PushOffsetIntoProject) {
 					_expr := _f.ConstructProject(
 						_f.ConstructOffset(
 							input,
 							offset,
-							_f.funcs.PruneOrdering(ordering, _f.funcs.OutputCols(input)),
+							_f.funcs.PruneOrdering(ordering, cols),
 						),
 						projections,
 						passthrough,
