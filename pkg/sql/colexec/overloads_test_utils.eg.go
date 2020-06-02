@@ -1682,6 +1682,18 @@ func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration
 	return r
 }
 
+func performConcatBytesBytes(a []byte, b []byte) []byte {
+	var r []byte
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+	colexecerror.InternalError("couldn't translate indexing on target element: r")
+	return r
+}
+
 func performEQBoolBool(a bool, b bool) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
