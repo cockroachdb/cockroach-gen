@@ -102,6 +102,7 @@ const (
 	PushAggDistinctIntoScalarGroupBy
 	PushAggFilterIntoScalarGroupBy
 	ConvertCountToCountRows
+	FoldGroupingOperators
 	InlineConstVar
 	InlineProjectConstants
 	InlineSelectConstants
