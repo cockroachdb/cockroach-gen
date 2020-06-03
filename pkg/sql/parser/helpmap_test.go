@@ -16,6 +16,7 @@ var expectedHelpStrings = []string{
 	"ALTER TYPE",
 	"ALTER VIEW",
 	"ALTER",
+	"ANALYZE",
 	"BACKUP",
 	"BEGIN",
 	"CANCEL JOBS",
