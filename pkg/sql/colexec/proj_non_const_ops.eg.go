@@ -3669,6 +3669,134 @@ func (p projPlusDatumIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projPlusDatumBytesOp struct {
+	projOpBase
+}
+
+func (p projPlusDatumBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Bytes()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projPlusDatumBytesOp) Init() {
+	p.input.Init()
+}
+
 type projPlusDatumInt16Op struct {
 	projOpBase
 }
@@ -7934,6 +8062,134 @@ func (p projMinusDatumIntervalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projMinusDatumIntervalOp) Init() {
+	p.input.Init()
+}
+
+type projMinusDatumBytesOp struct {
+	projOpBase
+}
+
+func (p projMinusDatumBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Bytes()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMinusDatumBytesOp) Init() {
 	p.input.Init()
 }
 
@@ -12749,6 +13005,134 @@ func (p projMultDatumIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projMultDatumBytesOp struct {
+	projOpBase
+}
+
+func (p projMultDatumBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Bytes()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultDatumBytesOp) Init() {
+	p.input.Init()
+}
+
 type projMultDatumInt16Op struct {
 	projOpBase
 }
@@ -17209,6 +17593,134 @@ func (p projDivDatumIntervalOp) Init() {
 	p.input.Init()
 }
 
+type projDivDatumBytesOp struct {
+	projOpBase
+}
+
+func (p projDivDatumBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Bytes()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DBytes(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DBytes(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projDivDatumBytesOp) Init() {
+	p.input.Init()
+}
+
 type projDivDatumInt16Op struct {
 	projOpBase
 }
@@ -18066,6 +18578,518 @@ func (p projConcatDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projConcatDatumDatumOp) Init() {
+	p.input.Init()
+}
+
+type projJSONFetchValDatumBytesOp struct {
+	projOpBase
+}
+
+func (p projJSONFetchValDatumBytesOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Bytes()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DString(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2.Get(i)
+
+					_convertedNativeElem := tree.DString(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DString(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2.Get(colLen - 1)
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2.Get(i)
+
+				_convertedNativeElem := tree.DString(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projJSONFetchValDatumBytesOp) Init() {
+	p.input.Init()
+}
+
+type projJSONFetchValDatumInt16Op struct {
+	projOpBase
+}
+
+func (p projJSONFetchValDatumInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Int16()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2[i]
+
+					_convertedNativeElem := tree.DInt(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2[colLen-1]
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2[i]
+
+					_convertedNativeElem := tree.DInt(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2[i]
+
+				_convertedNativeElem := tree.DInt(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2[colLen-1]
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2[i]
+
+				_convertedNativeElem := tree.DInt(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projJSONFetchValDatumInt16Op) Init() {
+	p.input.Init()
+}
+
+type projJSONFetchValDatumInt32Op struct {
+	projOpBase
+}
+
+func (p projJSONFetchValDatumInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Int32()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2[i]
+
+					_convertedNativeElem := tree.DInt(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2[colLen-1]
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2[i]
+
+					_convertedNativeElem := tree.DInt(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2[i]
+
+				_convertedNativeElem := tree.DInt(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2[colLen-1]
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2[i]
+
+				_convertedNativeElem := tree.DInt(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projJSONFetchValDatumInt32Op) Init() {
+	p.input.Init()
+}
+
+type projJSONFetchValDatumInt64Op struct {
+	projOpBase
+}
+
+func (p projJSONFetchValDatumInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	vec1 := batch.ColVec(p.col1Idx)
+	vec2 := batch.ColVec(p.col2Idx)
+	col1 := vec1.Datum()
+	col2 := vec2.Int64()
+	if vec1.Nulls().MaybeHasNulls() || vec2.Nulls().MaybeHasNulls() {
+		col1Nulls := vec1.Nulls()
+		col2Nulls := vec2.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2[i]
+
+					_convertedNativeElem := tree.DInt(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2[colLen-1]
+			for i := 0; i < n; i++ {
+				if !col1Nulls.NullAt(i) && !col2Nulls.NullAt(i) {
+					// We only want to perform the projection operation if both values are not
+					// null.
+					arg1 := col1.Get(i)
+					arg2 := col2[i]
+
+					_convertedNativeElem := tree.DInt(arg2)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		projVec.SetNulls(col1Nulls.Or(col2Nulls))
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg1 := col1.Get(i)
+				arg2 := col2[i]
+
+				_convertedNativeElem := tree.DInt(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col1 = col1.Slice(0, n)
+			colLen := col1.Len()
+			_ = projCol.Get(colLen - 1)
+			_ = col2[colLen-1]
+			for i := 0; i < n; i++ {
+				arg1 := col1.Get(i)
+				arg2 := col2[i]
+
+				_convertedNativeElem := tree.DInt(arg2)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := arg1.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col1, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projJSONFetchValDatumInt64Op) Init() {
 	p.input.Init()
 }
 
@@ -45635,6 +46659,12 @@ func GetProjectionOperator(
 						default:
 							return &projPlusDatumIntervalOp{projOpBase: projOpBase}, nil
 						}
+					case types.BytesFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projPlusDatumBytesOp{projOpBase: projOpBase}, nil
+						}
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -45862,6 +46892,12 @@ func GetProjectionOperator(
 						case -1:
 						default:
 							return &projMinusDatumIntervalOp{projOpBase: projOpBase}, nil
+						}
+					case types.BytesFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMinusDatumBytesOp{projOpBase: projOpBase}, nil
 						}
 					case types.IntFamily:
 						switch rightType.Width() {
@@ -46102,6 +47138,12 @@ func GetProjectionOperator(
 						default:
 							return &projMultDatumIntervalOp{projOpBase: projOpBase}, nil
 						}
+					case types.BytesFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultDatumBytesOp{projOpBase: projOpBase}, nil
+						}
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -46317,6 +47359,12 @@ func GetProjectionOperator(
 						default:
 							return &projDivDatumIntervalOp{projOpBase: projOpBase}, nil
 						}
+					case types.BytesFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projDivDatumBytesOp{projOpBase: projOpBase}, nil
+						}
 					case types.IntFamily:
 						switch rightType.Width() {
 						case 16:
@@ -46367,6 +47415,32 @@ func GetProjectionOperator(
 						case -1:
 						default:
 							return &projConcatDatumDatumOp{projOpBase: projOpBase}, nil
+						}
+					}
+				}
+			}
+		case tree.JSONFetchVal:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.BytesFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projJSONFetchValDatumBytesOp{projOpBase: projOpBase}, nil
+						}
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projJSONFetchValDatumInt16Op{projOpBase: projOpBase}, nil
+						case 32:
+							return &projJSONFetchValDatumInt32Op{projOpBase: projOpBase}, nil
+						case -1:
+						default:
+							return &projJSONFetchValDatumInt64Op{projOpBase: projOpBase}, nil
 						}
 					}
 				}
