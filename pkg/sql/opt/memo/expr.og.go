@@ -1628,6 +1628,7 @@ type InnerJoinExpr struct {
 	Right RelExpr
 	On    FiltersExpr
 	JoinPrivate
+	multiplicity props.JoinMultiplicity
 
 	grp  exprGroup
 	next RelExpr
@@ -1761,6 +1762,7 @@ type LeftJoinExpr struct {
 	Right RelExpr
 	On    FiltersExpr
 	JoinPrivate
+	multiplicity props.JoinMultiplicity
 
 	grp  exprGroup
 	next RelExpr
@@ -2027,6 +2029,7 @@ type FullJoinExpr struct {
 	Right RelExpr
 	On    FiltersExpr
 	JoinPrivate
+	multiplicity props.JoinMultiplicity
 
 	grp  exprGroup
 	next RelExpr
@@ -16416,6 +16419,7 @@ func (m *Memo) MemoizeInnerJoin(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildInnerJoinProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -16444,6 +16448,7 @@ func (m *Memo) MemoizeLeftJoin(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildLeftJoinProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -16500,6 +16505,7 @@ func (m *Memo) MemoizeFullJoin(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildFullJoinProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -20173,6 +20179,7 @@ func (m *Memo) AddInnerJoinToGroup(e *InnerJoinExpr, grp RelExpr) *InnerJoinExpr
 	const size = int64(unsafe.Sizeof(InnerJoinExpr{}))
 	interned := m.interner.InternInnerJoin(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
@@ -20187,6 +20194,7 @@ func (m *Memo) AddLeftJoinToGroup(e *LeftJoinExpr, grp RelExpr) *LeftJoinExpr {
 	const size = int64(unsafe.Sizeof(LeftJoinExpr{}))
 	interned := m.interner.InternLeftJoin(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
@@ -20215,6 +20223,7 @@ func (m *Memo) AddFullJoinToGroup(e *FullJoinExpr, grp RelExpr) *FullJoinExpr {
 	const size = int64(unsafe.Sizeof(FullJoinExpr{}))
 	interned := m.interner.InternFullJoin(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
